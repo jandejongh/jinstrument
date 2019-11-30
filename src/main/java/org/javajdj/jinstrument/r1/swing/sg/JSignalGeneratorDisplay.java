@@ -68,7 +68,7 @@ extends JPanel
     frequencyPanel.setOpaque (true);
     frequencyPanel.setLayout (new GridLayout (5, 1));
     //
-    this.jCenterFreqAlt = new JSevenSegmentNumber (12);
+    this.jCenterFreqAlt = new JSevenSegmentNumber (THEME_COLOR, false, 11, 9);
     frequencyPanel.add (this.jCenterFreqAlt);
     //
     this.jFreqSlider_MHz = new JSlider (0, 2559, 0);
@@ -243,7 +243,7 @@ extends JPanel
     add (modPanel);
     
     final JPanel reserved4Panel = new JPanel ();
-    setPanelBorder (modPanel, "Modulation Sweep");
+    setPanelBorder (reserved4Panel, "Modulation Sweep");
     reserved4Panel.setLayout (new BorderLayout ());
     add (reserved4Panel);
             
@@ -272,7 +272,7 @@ extends JPanel
   {
     panel.setBorder (
       BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (Color.blue, 2, true), title));    
+        BorderFactory.createLineBorder (THEME_COLOR, 2, true), title));    
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -280,6 +280,8 @@ extends JPanel
   // SWING
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private Color THEME_COLOR = Color.blue;
   
   private final JSevenSegmentNumber jCenterFreqAlt;
   
@@ -825,9 +827,7 @@ extends JPanel
       final double f_MHz = settings.getCenterFrequency_MHz ();
       final long f_mHz_long = Math.round (f_MHz * 1e9);
       //
-//      JSignalGeneratorDisplay.this.jCenterFreq.setText (
-//        new DecimalFormat ("#####.#######").format (f_MHz));
-      JSignalGeneratorDisplay.this.jCenterFreqAlt.setNumber (f_MHz);
+      JSignalGeneratorDisplay.this.jCenterFreqAlt.setNumber (f_MHz * 1.0e6);
       //
       final int f_int_MHz = (int) (f_mHz_long / 1000000000L);
       JSignalGeneratorDisplay.this.jFreqSlider_MHz.setValue (f_int_MHz);
