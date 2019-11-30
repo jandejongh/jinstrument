@@ -1,11 +1,13 @@
 package org.javajdj.jinstrument.r1.instrument.sa;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.r1.Device;
 import org.javajdj.jinstrument.r1.instrument.AbstractInstrument;
+import org.javajdj.jservice.Service;
 
 /**
  *
@@ -17,9 +19,12 @@ implements SignalGenerator
 
   private static final Logger LOG = Logger.getLogger (AbstractSpectrumAnalyzer.class.getName ());
 
-  protected AbstractSpectrumAnalyzer (final Device device)
+  protected AbstractSpectrumAnalyzer (final String name,
+    final Device device,
+    final List<Runnable> runnables,
+    final List<Service> targetServices)
   {
-    super (device);
+    super (name, device, runnables, targetServices);
   }
 
   private Set<SpectrumAnalyzerClient> clients = new LinkedHashSet<>  ();

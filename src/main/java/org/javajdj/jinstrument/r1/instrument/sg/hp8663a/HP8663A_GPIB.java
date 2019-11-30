@@ -34,7 +34,7 @@ implements SignalGenerator
   
   public HP8663A_GPIB (final GpibDevice device)
   {
-    super (device);
+    super ("HP8663A", device, null, null);
     this.out = new PrintWriter (device.getOutputStream (), true);
   }
 
@@ -105,7 +105,22 @@ public static String bytesToHex(byte[] bytes) {
   
   private transient byte[] lastL1 = null;
   
-  private volatile boolean bSwitch = false;
+  private SignalGeneratorSettings getSettingsFromInstrumentNoLock (GpibDevice gpibDevice)
+    throws IOException, InterruptedException
+  {
+    final byte[] l1Buffer = new byte[HP8663A_GPIB.L1_LENGTH];
+    this.out.println ("L1");
+    final int bytesRead = gpibDevice.getInputStream ().read (l1Buffer);
+    // LOG.log (Level.WARNING, "number of bytes read = {0}", bytesRead);
+    LOG.log (Level.WARNING, "bytes = {0}", bytesToHex (l1Buffer));
+    if (this.lastL1 != null)
+      for (int i = 0; i < HP8663A_GPIB.L1_LENGTH; i++)
+        if (l1Buffer[i] != this.lastL1[i])
+          LOG.log (Level.WARNING, "L1 string index {0} changed from {1} to {2}.",
+            new Object[]{i, Integer.toHexString (this.lastL1[i] & 0xff), Integer.toHexString (l1Buffer[i] & 0xff)});
+    this.lastL1 = l1Buffer;
+    return HP8663A_GPIB.settingsFromL1 (l1Buffer);
+  }
   
   @Override
   public synchronized SignalGeneratorSettings getSettingsFromInstrument ()
@@ -120,27 +135,15 @@ public static String bytesToHex(byte[] bytes) {
 //      if (this.bSwitch)
 //        this.out.println ("AP -50 DM");
 //      else
-        this.out.println ("AP -30 DM");
-      this.bSwitch = ! this.bSwitch;
-      Thread.sleep (100L);
-      final byte[] l1Buffer = new byte[HP8663A_GPIB.L1_LENGTH];
-      this.out.println ("L1");
-      final int bytesRead = device.getInputStream ().read (l1Buffer);
-      // LOG.log (Level.WARNING, "number of bytes read = {0}", bytesRead);
-      LOG.log (Level.WARNING, "bytes = {0}", bytesToHex (l1Buffer));
-      if (this.lastL1 != null)
-        for (int i = 0; i < HP8663A_GPIB.L1_LENGTH; i++)
-          if (l1Buffer[i] != this.lastL1[i])
-            LOG.log (Level.WARNING, "L1 string index {0} changed from {1} to {2}.",
-              new Object[]{i, Integer.toHexString (this.lastL1[i] & 0xff), Integer.toHexString (l1Buffer[i] & 0xff)});
-      this.lastL1 = l1Buffer;
-      return HP8663A_GPIB.settingsFromL1 (l1Buffer);
+//        this.out.println ("AP -30 DM");
+//      Thread.sleep (100L);
+      return getSettingsFromInstrumentNoLock (device);
     }
-    catch (Exception e)
-    {
-      LOG.log (Level.WARNING, "Caught Exception while reading L1");
-      return new DefaultSignalGeneratorSettings (100.0 /* XXX DUMMY */, -30.0);            
-    }
+//    catch (Exception e)
+//    {
+//      LOG.log (Level.WARNING, "Caught Exception while reading L1: {0}", e.getStackTrace ());
+//      return new DefaultSignalGeneratorSettings (100.0 /* XXX DUMMY */, -30.0);            
+//    }
     finally
     {
       device.unlockDevice ();
@@ -193,7 +196,24 @@ public static String bytesToHex(byte[] bytes) {
     {
       device.lockDevice ();
       this.out.println ("FR " + centerFrequency_MHz + " MZ");
-      getSettingsFromInstrument ();
+      getSettingsFromInstrumentNoLock (device);
+    }
+    finally
+    {
+      device.unlockDevice ();
+    }
+  }
+  
+  @Override
+  public synchronized void setAmplitude_dBm (final double amplitude_dBm)
+    throws IOException, InterruptedException
+  {
+    final GpibDevice device = (GpibDevice) getDevice ();
+    try
+    {
+      device.lockDevice ();
+      this.out.println ("AP " + amplitude_dBm + " DM");
+      getSettingsFromInstrumentNoLock (device);
     }
     finally
     {

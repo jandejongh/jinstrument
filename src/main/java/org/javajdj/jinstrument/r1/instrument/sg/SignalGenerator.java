@@ -14,4 +14,6 @@ public interface SignalGenerator
   
   void setCenterFrequency_MHz (double centerFrequency_MHz) throws IOException, InterruptedException;
   
+  void setAmplitude_dBm (double amplitude_dBm) throws IOException, InterruptedException;
+  
 }

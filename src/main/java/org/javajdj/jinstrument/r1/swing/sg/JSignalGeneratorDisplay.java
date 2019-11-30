@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
@@ -65,22 +66,20 @@ extends JPanel
     
     final JPanel frequencyPanel = new JPanel ();
     frequencyPanel.setOpaque (true);
-    frequencyPanel.setLayout (new GridLayout (3, 1));
-    //
-    this.jCenterFreq = new JTextArea ();
-    this.jCenterFreq.setOpaque (true);
-    this.jCenterFreq.setText ("aquiring");
-    frequencyPanel.add (this.jCenterFreq);
+    frequencyPanel.setLayout (new GridLayout (5, 1));
     //
     this.jCenterFreqAlt = new JSevenSegmentNumber (12);
     frequencyPanel.add (this.jCenterFreqAlt);
     //
-    this.jFreqSlider = new JSlider (0, 2559, 0);
-    this.jFreqSlider.setToolTipText ("-");
-    this.jFreqSlider.setMajorTickSpacing (500);
-    this.jFreqSlider.setMinorTickSpacing (100);
-    this.jFreqSlider.setPaintTicks (true);
-    this.jFreqSlider.addChangeListener ((final ChangeEvent ce) ->
+    this.jFreqSlider_MHz = new JSlider (0, 2559, 0);
+    this.jFreqSlider_kHz = new JSlider (0, 999, 0);
+    this.jFreqSlider_Hz = new JSlider (0, 999, 0);
+    this.jFreqSlider_mHz = new JSlider (0, 999, 0);
+    this.jFreqSlider_MHz.setToolTipText ("-");
+    this.jFreqSlider_MHz.setMajorTickSpacing (500);
+    this.jFreqSlider_MHz.setMinorTickSpacing (100);
+    this.jFreqSlider_MHz.setPaintTicks (true);
+    this.jFreqSlider_MHz.addChangeListener ((final ChangeEvent ce) ->
     {
       JSlider source = (JSlider)ce.getSource();
       if (!source.getValueIsAdjusting()) {
@@ -88,7 +87,11 @@ extends JPanel
           try
           {
             LOG.log (Level.INFO, "Setting frequency on instrument from slider to {0} MHz.", source.getValue ());
-            signalGenerator.setCenterFrequency_MHz (source.getValue());
+            signalGenerator.setCenterFrequency_MHz (
+              source.getValue()
+              + 1.0e-3 * this.jFreqSlider_kHz.getValue()
+              + 1.0e-6 * this.jFreqSlider_Hz.getValue ()
+              + 1.0e-9 * this.jFreqSlider_mHz.getValue ());
           }
           catch (IOException | InterruptedException e)
           {
@@ -101,7 +104,105 @@ extends JPanel
         }
       }
     });
-    frequencyPanel.add (this.jFreqSlider);
+    setSubPanelBorder (this.jFreqSlider_MHz, "[MHz]");
+    frequencyPanel.add (this.jFreqSlider_MHz);
+    //
+    this.jFreqSlider_kHz.setToolTipText ("-");
+    this.jFreqSlider_kHz.setMajorTickSpacing (100);
+    this.jFreqSlider_kHz.setMinorTickSpacing (10);
+    this.jFreqSlider_kHz.setPaintTicks (true);
+    this.jFreqSlider_kHz.addChangeListener ((final ChangeEvent ce) ->
+    {
+      JSlider source = (JSlider)ce.getSource();
+      if (!source.getValueIsAdjusting()) {
+        if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
+          try
+          {
+            // LOG.log (Level.INFO, "Setting frequency on instrument from slider to {0} kHz.", source.getValue ());
+            signalGenerator.setCenterFrequency_MHz (
+              this.jFreqSlider_MHz.getValue ()
+              + 1.0e-3 * source.getValue ()
+              + 1.0e-6 * this.jFreqSlider_Hz.getValue ()
+              + 1.0e-9 * this.jFreqSlider_mHz.getValue ());
+          }
+          catch (IOException | InterruptedException e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} kHz: {1}.",
+              new Object[]{source.getValue (), e});          
+          }
+        else
+        {
+          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} kHz.", source.getValue ());
+        }
+      }
+    });
+    setSubPanelBorder (this.jFreqSlider_kHz, "[kHz]");
+    frequencyPanel.add (this.jFreqSlider_kHz);
+    //
+    this.jFreqSlider_Hz.setToolTipText ("-");
+    this.jFreqSlider_Hz.setMajorTickSpacing (100);
+    this.jFreqSlider_Hz.setMinorTickSpacing (10);
+    this.jFreqSlider_Hz.setPaintTicks (true);
+    this.jFreqSlider_Hz.addChangeListener ((final ChangeEvent ce) ->
+    {
+      JSlider source = (JSlider)ce.getSource();
+      if (!source.getValueIsAdjusting()) {
+        if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
+          try
+          {
+            // LOG.log (Level.INFO, "Setting frequency on instrument from slider to {0} Hz.", source.getValue ());
+            signalGenerator.setCenterFrequency_MHz (
+              this.jFreqSlider_MHz.getValue ()
+              + 1.0e-3 * this.jFreqSlider_kHz.getValue ()
+              + 1.0e-6 * source.getValue ()
+              + 1.0e-9 * this.jFreqSlider_mHz.getValue ());
+          }
+          catch (IOException | InterruptedException e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} Hz: {1}.",
+              new Object[]{source.getValue (), e});          
+          }
+        else
+        {
+          // LOG.log (Level.INFO, "Suppressed instrument control for new value {0} Hz.", source.getValue ());
+        }
+      }
+    });
+    setSubPanelBorder (this.jFreqSlider_Hz, "[Hz]");
+    frequencyPanel.add (this.jFreqSlider_Hz);
+    //
+    //
+    this.jFreqSlider_mHz.setToolTipText ("-");
+    this.jFreqSlider_mHz.setMajorTickSpacing (100);
+    this.jFreqSlider_mHz.setMinorTickSpacing (10);
+    this.jFreqSlider_mHz.setPaintTicks (true);
+    this.jFreqSlider_mHz.addChangeListener ((final ChangeEvent ce) ->
+    {
+      JSlider source = (JSlider)ce.getSource();
+      if (!source.getValueIsAdjusting()) {
+        if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
+          try
+          {
+            // LOG.log (Level.INFO, "Setting frequency on instrument from slider to {0} mHz.", source.getValue ());
+            signalGenerator.setCenterFrequency_MHz (
+              this.jFreqSlider_MHz.getValue ()
+              + 1.0e-3 * this.jFreqSlider_kHz.getValue ()
+              + 1.0e-6 * this.jFreqSlider_Hz.getValue ()
+              + 1.0e-9 * source.getValue ());
+          }
+          catch (IOException | InterruptedException e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} mHz: {1}.",
+              new Object[]{source.getValue (), e});          
+          }
+        else
+        {
+          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} mHz.", source.getValue ());
+        }
+      }
+    });
+    setSubPanelBorder (this.jFreqSlider_mHz, "[mHz]");
+    frequencyPanel.add (this.jFreqSlider_mHz);
     //
     setPanelBorder (frequencyPanel, "Frequency");
     add (frequencyPanel);
@@ -160,11 +261,18 @@ extends JPanel
     
   }
   
-  private void setPanelBorder (final JPanel panel, final String title)
+  private void setPanelBorder (final JComponent panel, final String title)
   {
     panel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (Color.black, 4, true), title));
+  }
+  
+  private void setSubPanelBorder (final JComponent panel, final String title)
+  {
+    panel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (Color.blue, 2, true), title));    
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,11 +281,15 @@ extends JPanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final JTextArea jCenterFreq;
-  
   private final JSevenSegmentNumber jCenterFreqAlt;
   
-  private final JSlider jFreqSlider;
+  private final JSlider jFreqSlider_MHz;
+  
+  private final JSlider jFreqSlider_kHz;
+  
+  private final JSlider jFreqSlider_Hz;
+  
+  private final JSlider jFreqSlider_mHz;
   
   private final JTextArea jAmplitude;
   
@@ -592,7 +704,7 @@ extends JPanel
         try
         {
           // XXX
-          Thread.sleep (10000L);
+          Thread.sleep (3000L);
           final SignalGeneratorSettings settingsCopy;
           final boolean newSettingsCopy;
           synchronized (this)
@@ -709,11 +821,38 @@ extends JPanel
     SwingUtilities.invokeLater (() ->
     {
       JSignalGeneratorDisplay.this.inhibitInstrumentControl = true;
-      JSignalGeneratorDisplay.this.jCenterFreq.setText (
-        new DecimalFormat ("#####.#######").format (settings.getCenterFrequency_MHz ()));
-      JSignalGeneratorDisplay.this.jCenterFreqAlt.setNumber (settings.getCenterFrequency_MHz ());
-      JSignalGeneratorDisplay.this.jFreqSlider.setValue ((int) settings.getCenterFrequency_MHz ());
-      JSignalGeneratorDisplay.this.jFreqSlider.setToolTipText (Integer.toString ((int) settings.getCenterFrequency_MHz ()));
+      //
+      final double f_MHz = settings.getCenterFrequency_MHz ();
+      final long f_mHz_long = Math.round (f_MHz * 1e9);
+      //
+//      JSignalGeneratorDisplay.this.jCenterFreq.setText (
+//        new DecimalFormat ("#####.#######").format (f_MHz));
+      JSignalGeneratorDisplay.this.jCenterFreqAlt.setNumber (f_MHz);
+      //
+      final int f_int_MHz = (int) (f_mHz_long / 1000000000L);
+      JSignalGeneratorDisplay.this.jFreqSlider_MHz.setValue (f_int_MHz);
+      JSignalGeneratorDisplay.this.jFreqSlider_MHz.setToolTipText (Integer.toString (f_int_MHz));
+      //
+      final int f_rem_int_kHz = (int) ((f_mHz_long % 1000000000L) / 1000000L);
+      JSignalGeneratorDisplay.this.jFreqSlider_kHz.setValue (f_rem_int_kHz);
+      JSignalGeneratorDisplay.this.jFreqSlider_kHz.setToolTipText (Integer.toString (f_rem_int_kHz));
+      //
+      final int f_rem_int_Hz = (int) ((f_mHz_long % 1000000L) / 1000L);
+      JSignalGeneratorDisplay.this.jFreqSlider_Hz.setValue (f_rem_int_Hz);
+      JSignalGeneratorDisplay.this.jFreqSlider_Hz.setToolTipText (Integer.toString (f_rem_int_Hz));
+      //
+      final int f_rem_int_mHz = (int) (f_mHz_long % 1000L);
+      JSignalGeneratorDisplay.this.jFreqSlider_mHz.setValue (f_rem_int_mHz);
+      JSignalGeneratorDisplay.this.jFreqSlider_mHz.setToolTipText (Integer.toString (f_rem_int_mHz));
+      //
+//      LOG.log (Level.WARNING, "f_MHz={0}, f_int_MHz={1}, "
+//        + "f_rem_KHz={2}, f_rem_int_kHz={3}, "
+//        + "f_rem_Hz={4}, f_rem_int_Hz={5}, "
+//        + "f_rem_mHz = {6}, f_rem_int_mHz={7}",
+//        new Object[]{new DecimalFormat ("#####.##########").format (f_MHz),
+//          f_int_MHz, f_rem_kHz, f_rem_int_kHz, f_rem_Hz, f_rem_int_Hz, f_rem_mHz, f_rem_int_mHz});
+//      LOG.log (Level.WARNING, "f_mHz_long={0}, f_mHz%1000={1}.", new Object[]{f_mHz_long, f_mHz_long%1000L});
+      //
       JSignalGeneratorDisplay.this.jAmplitude.setText (
         new DecimalFormat ("###.##").format (settings.getS_dBm ()));
       JSignalGeneratorDisplay.this.inhibitInstrumentControl = false;      

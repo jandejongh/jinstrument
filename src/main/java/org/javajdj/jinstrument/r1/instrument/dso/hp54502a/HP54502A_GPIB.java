@@ -44,7 +44,7 @@ implements Oscilloscope<DefaultOscilloscopeDualChannelId_Letters>
   
   public HP54502A_GPIB (final GpibDevice device)
   {
-    super (device);
+    super ("HP54502A", device, null, null);
     this.out = new PrintWriter (device.getOutputStream (), true);
   }
 

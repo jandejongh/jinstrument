@@ -39,7 +39,7 @@ implements SignalGenerator
   
   public HP70000_GPIB (final GpibDevice device)
   {
-    super (device);
+    super ("HP70000", device, null, null);
     this.out = new PrintWriter (device.getOutputStream (), true);
   }
 
