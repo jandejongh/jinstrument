@@ -12,6 +12,11 @@ import java.util.EnumMap;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
 
+/** A single seven-segment LED/LCD display, with support for a dot (so, an eight-segment display).
+ * 
+ * @author Jan de Jongh <jfcmdejongh@gmail.com>
+ * 
+ */
 public class JSevenSegment
   extends JLabel
 {
@@ -30,21 +35,19 @@ public class JSevenSegment
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JSevenSegment ()
+  public JSevenSegment (final Color mediumColor)
   {
+    if (mediumColor != null)
+      setOnOffColorsFromMediumColor (mediumColor);
     setPreferredSize (JSevenSegment.REFERENCE_DIMENSION);
-
     setOpaque (true);
     setBackground (Color.black);
-
-    x = 0;
-    y = 0;
-
-    number = zero;
-
-    createSegments ();
-
-    number = zero;
+    setBlank ();
+  }
+  
+  public JSevenSegment ()
+  {
+    this (null);
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,10 +57,20 @@ public class JSevenSegment
   // SEGMENT PAINT MAP
   //
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-  public final static Dimension REFERENCE_DIMENSION = new Dimension(/* 110 */ 160, 180);
+  
+  /** The dimension against which the segments are (internally) defined.
+   * 
+   * <p>
+   * The paint method will compensate for (likely) other dimensions.
+   * 
+   * @see Segment
+   * 
+   */
+  private final static Dimension REFERENCE_DIMENSION = new Dimension(/* 110 */ 160, 180);
   
   /** The segments in the display, with their {@link Shape}s.
+   * 
+   * @see #REFERENCE_DIMENSION
    * 
    */
   public static enum Segment
@@ -79,7 +92,12 @@ public class JSevenSegment
     }
       
     private final Shape shape;
-      
+    
+    /** Returns the {@link Shape} of this segment, relative to {@link #REFERENCE_DIMENSION}.
+     * 
+     * @return The shape of this segment.
+     * 
+     */
     public final Shape getShape ()
     {
       return this.shape;
@@ -91,228 +109,157 @@ public class JSevenSegment
    * 
    */
   private final EnumMap<Segment, Boolean> segmentPaintMap = new EnumMap<> (Segment.class);
+ 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // METHODS SETTINGS THE SEGMENT PAINT MAP
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  /** Blanks all segments, including the decimal point.
+   * 
+   */
+  public final void setBlank ()
+  {
+    for (Segment s : Segment.values ())
+      this.segmentPaintMap.put (s, false);
+  }
   
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //
-    //
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    public void writeNumber(int n) {
-        switch (n)
-        {
-            case 0:
-                number = zero;
-                break;
-            case 1:
-                number = one;
-                break;
-            case 2:
-                number = two;
-                break;
-            case 3:
-                number = three;
-                break;
-            case 4:
-                number = four;
-                break;
-            case 5:
-                number = five;
-                break;
-            case 6:
-                number = six;
-                break;
-            case 7:
-                number = seven;
-                break;
-            case 8:
-                number = eight;
-                break;
-            case 9:
-                number = nine;
-                break;
-            default: /* other number */
-                number = zero;
-                break;
-        }
-    }
-   
-    @ Override public void paintComponent(Graphics g) {
-        // System.out.printf("paintComponent\n");
-       
-        super.paintComponent(g); // this is needed to set the background color
-        final int w = getWidth ();
-        final int h = getHeight ();
-        final double scaleX = w / 160.0;
-        final double scaleY = h / 180.0;
-        Graphics2D g2 = (Graphics2D) g;
-        AffineTransform orig = g2.getTransform();
-        AffineTransform af = new AffineTransform (orig);
-        af.translate (-20.0, -8.0);
-        af.scale (scaleX, scaleY);
-        af.translate (20.0 / scaleX, 8.0 / scaleY);
-        // af.rotate(0.025);
-        g2.setTransform(af);       
-        for (int i=0; i<SEGMENT_NUMBER; i++)
-            setSegmentState(g, segments[i], number[i]);
-        if (this.decimalPoint)
-          g.setColor(on);
-        else
-          g.setColor (off);
-        g2.draw (this.dot);
-        g2.fill (this.dot);
-        g2.setTransform(orig);
-    }
-   
-    private void createSegments() {
-        segments = new Polygon[SEGMENT_NUMBER];
-           
-        segments[A] = new Polygon();       
-        segments[A].addPoint(x+20,y+8);
-        segments[A].addPoint(x+90,y+8);
-        segments[A].addPoint(x+98,y+15);
-        segments[A].addPoint(x+90,y+22);
-        segments[A].addPoint(x+20,y+22);
-        segments[A].addPoint(x+12,y+15);
-       
-        segments[B] = new Polygon();       
-        segments[B].addPoint(x+91,y+23);
-        segments[B].addPoint(x+98,y+18);
-        segments[B].addPoint(x+105,y+23);
-        segments[B].addPoint(x+105,y+81);
-        segments[B].addPoint(x+98,y+89);
-        segments[B].addPoint(x+91,y+81);
-       
-        segments[C] = new Polygon();
-        segments[C].addPoint(x+91,y+97);
-        segments[C].addPoint(x+98,y+89);
-        segments[C].addPoint(x+105,y+97);
-        segments[C].addPoint(x+105,y+154);
-        segments[C].addPoint(x+98,y+159);
-        segments[C].addPoint(x+91,y+154);
-       
-        segments[D] = new Polygon();
-        segments[D].addPoint(x+20,y+155);
-        segments[D].addPoint(x+90,y+155);
-        segments[D].addPoint(x+98,y+162);
-        segments[D].addPoint(x+90,y+169);
-        segments[D].addPoint(x+20,y+169);
-        segments[D].addPoint(x+12,y+162);
-       
-        segments[E] = new Polygon();
-        segments[E].addPoint(x+5,y+97);
-        segments[E].addPoint(x+12,y+89);
-        segments[E].addPoint(x+19,y+97);
-        segments[E].addPoint(x+19,y+154);
-        segments[E].addPoint(x+12,y+159);
-        segments[E].addPoint(x+5,y+154);
-              
-        segments[F] = new Polygon();
-        segments[F].addPoint(x+5,y+23);
-        segments[F].addPoint(x+12,y+18);
-        segments[F].addPoint(x+19,y+23);
-        segments[F].addPoint(x+19,y+81);
-        segments[F].addPoint(x+12,y+89);
-        segments[F].addPoint(x+5,y+81);
-       
-        segments[G] = new Polygon();
-        segments[G].addPoint(x+20,y+82);
-        segments[G].addPoint(x+90,y+82);
-        segments[G].addPoint(x+95,y+89);
-        segments[G].addPoint(x+90,y+96);
-        segments[G].addPoint(x+20,y+96);
-        segments[G].addPoint(x+15,y+89);
-    }
-   
-    private void setSegmentState(Graphics graphics, Polygon segment, int state) {
-        if (state == OFF)  graphics.setColor(off);
-        else graphics.setColor(on);
-       
-        graphics.fillPolygon(segment);       
-        graphics.drawPolygon(segment);
-    }
-   
-    private final int x;
-    private final int y;
-   
-    private Polygon[] segments;
-    private int[] number;
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // DECIMAL POINT
-    //
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    Ellipse2D.Double dot = new Ellipse2D.Double (125,150,20,20);
-    
-    private boolean decimalPoint = false;
-    
-    public void setDecimalPoint ()
-    {
-      // old
-      this.decimalPoint = true;
-      // new
-      this.segmentPaintMap.put (Segment.dot, true);
-    }
-    
-    public void resetDecimalPoint ()
-    {
-      // old
-      this.decimalPoint = false;
-      // new
-      this.segmentPaintMap.put (Segment.dot, false);
-    }
-    
-    public void setDecimalPoint (final boolean decimalPoint)
-    {
-      // old
-      this.decimalPoint = decimalPoint;
-      // new
-      this.segmentPaintMap.put (Segment.dot, decimalPoint);      
-    }
-    
-    /* Constants */
-    private final static int SEGMENT_NUMBER = 7;
-    private final static int A = 0;
-    private final static int B = 1;
-    private final static int C = 2;
-    private final static int D = 3;
-    private final static int E = 4;
-    private final static int F = 5;
-    private final static int G = 6;
-   
-    private final static int OFF = 0;
-    private final static int ON = 1;
-   
-    private final static int zero[] = { ON, ON, ON, ON, ON, ON, OFF };
-    private final static int one[] = { OFF, ON, ON, OFF, OFF, OFF, OFF };
-    private final static int two[] = { ON, ON, OFF, ON, ON, OFF, ON };
-    private final static int three[] = { ON, ON, ON, ON, OFF, OFF, ON };
-    private final static int four[] = { OFF, ON, ON, OFF, OFF, ON, ON };
-    private final static int five[] = { ON, OFF, ON, ON, OFF, ON, ON };
-    private final static int six[] = { ON, OFF, ON, ON, ON, ON, ON };
-    private final static int seven[] = { ON, ON, ON, OFF, OFF, OFF, OFF };
-    private final static int eight[] = { ON, ON, ON, ON, ON, ON, ON };
-    private final static int nine[] = { ON, ON, ON, ON, OFF, ON, ON };
-   
-    private final static Color off = Color.red.darker().darker().darker().darker();
-    private final static Color on = Color.red.brighter().brighter().brighter().brighter().brighter();
+  /** Shows the minus sign, blanking the decimal point.
+   * 
+   */
+  public final void setMinus ()
+  {
+    setBlank ();
+    this.segmentPaintMap.put (Segment.g, true);
+  }
   
+  private final static boolean NUMBERS[][] = new boolean[][]
+  {
+    /* 0 */ { true,  true,  true,  true,  true,  true, false },
+    /* 1 */ {false,  true,  true, false, false, false, false },
+    /* 2 */ { true,  true, false,  true,  true, false,  true },
+    /* 3 */ { true,  true,  true,  true, false, false,  true },
+    /* 4 */ {false,  true,  true, false, false,  true,  true },
+    /* 5 */ { true, false,  true,  true, false,  true,  true },
+    /* 6 */ { true, false,  true,  true,  true,  true,  true },
+    /* 7 */ { true,  true,  true, false, false, false, false },
+    /* 8 */ { true,  true,  true,  true,  true,  true,  true },
+    /* 9 */ { true,  true,  true,  true, false,  true,  true }
+  };
+  
+  /** Shows the given number, which must be between 0 and 9 inclusive.
+   * 
+   * <p>
+   * This method does <i>not</i> affect the decimal point.
+   * 
+   * @param n The number.
+   * 
+   * @throws IllegalArgumentException If the number is out of range.
+   * 
+   */
+  public final void setNumber (final int n)
+  {
+    if (n < 0 || n > 9)
+      throw new IllegalArgumentException ();
+    for (Segment s : Segment.values ())
+      if (s.ordinal () >= Segment.a.ordinal () && s.ordinal () <= Segment.g.ordinal ())
+        this.segmentPaintMap.put (s, JSevenSegment.NUMBERS[n][s.ordinal ()]);
+  }
+
+  /** Controls visibility of the decimal point.
+   * 
+   * @param decimalPoint Whether the decimal point is to be shown.
+   * 
+   */
+  public void setDecimalPoint (final boolean decimalPoint)
+  {
+    this.segmentPaintMap.put (Segment.dot, decimalPoint);      
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DEFAULT MEDIUM COLOR
+  // OFF AND ON COLORS
+  // MEDIUM COLOR
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public static final Color DEFAULT_MEDIUM_COLOR = Color.red;
+  
+  private Color offColor = JSevenSegment.DEFAULT_MEDIUM_COLOR.darker ().darker ().darker ().darker ();
+  
+  public final Color getOffColor ()
+  {
+    return this.offColor;
+  }
+  
+  public final void setOffColor (final Color offColor)
+  {
+    if (offColor == null)
+      throw new IllegalArgumentException ();
+    this.offColor = offColor;
+  }
+  
+  private Color onColor = JSevenSegment.DEFAULT_MEDIUM_COLOR.brighter ().brighter ().brighter ().brighter ().brighter ();
+    
+  public final Color getOnColor ()
+  {
+    return this.onColor;
+  }
+  
+  public final void setOnColor (final Color onColor)
+  {
+    if (onColor == null)
+      throw new IllegalArgumentException ();
+    this.onColor = onColor;
+  }
+  
+  public final void setOnOffColorsFromMediumColor (final Color mediumColor)
+  {
+    if (mediumColor == null)
+      throw new IllegalArgumentException ();
+    this.offColor = mediumColor.darker ().darker ().darker ().darker ();
+    this.onColor = mediumColor.brighter ().brighter ().brighter ().brighter ().brighter ();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // paintComponent
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public void paintComponent (final Graphics g)
+  {
+    super.paintComponent (g); // This is needed to set the background color.
+    final Color origColor = g.getColor ();
+    final int w = getWidth ();
+    final int h = getHeight ();
+    final double scaleX = w / 160.0;
+    final double scaleY = h / 180.0;
+    final Graphics2D g2 = (Graphics2D) g;
+    final AffineTransform origTransform = g2.getTransform ();
+    final AffineTransform af = new AffineTransform (origTransform);
+    af.translate (-20.0, -8.0);
+    af.scale (scaleX, scaleY);
+    af.translate (20.0 / scaleX, 8.0 / scaleY);
+    // af.rotate(0.025);
+    g2.setTransform (af);
+    for (final Segment s: Segment.values ())
+    {
+      g2.setColor (this.segmentPaintMap.get (s) ? this.onColor : this.offColor);
+      g2.draw (s.getShape ());
+      g2.fill (s.getShape ());
+    }
+    g2.setTransform (origTransform);
+    g.setColor (origColor);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // END OF FILE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
 }
