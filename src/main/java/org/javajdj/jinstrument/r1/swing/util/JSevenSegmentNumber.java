@@ -65,16 +65,19 @@ public class JSevenSegmentNumber
   public void setNumber (final double d)
   {
     if (this.minus != null)
+    {
       if (d < 0)
         this.minus.setMinus ();
       else
         this.minus.setBlank ();
+      this.minus.repaint ();
+    }
     final long N;
     if (this.decimalPointIndex >= 0)
       N = (long) Math.round (d * Math.pow (10, this.digits.length - this.decimalPointIndex - 1));
     else
       N = (long) Math.round (d);
-    final String s = this.decimalFormat.format (N);
+    final String s = this.decimalFormat.format (Math.abs (N));
     if (s.length () != this.digits.length)
     {
       LOG.log (Level.SEVERE, "Formatted string size ({0}) does not match number of digits ({1}); String={2}!",
