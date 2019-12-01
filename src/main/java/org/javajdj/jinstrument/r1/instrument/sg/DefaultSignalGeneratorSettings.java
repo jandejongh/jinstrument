@@ -23,10 +23,11 @@ public class DefaultSignalGeneratorSettings
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public DefaultSignalGeneratorSettings (final double centerFrequency_MHz, final double S_dBm)
+  public DefaultSignalGeneratorSettings (final double centerFrequency_MHz, final double S_dBm, final boolean outputEnable)
   {
     this.centerFrequency_MHz = centerFrequency_MHz;
     this.S_dBm = S_dBm;
+    this.outputEnable = outputEnable;
   }
 
   @Override
@@ -65,16 +66,31 @@ public class DefaultSignalGeneratorSettings
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // EQUALS / HASHCODE
+  // OUTPUT ENABLE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  private final boolean outputEnable;
+  
+  @Override
+  public final boolean getOutputEnable ()
+  {
+    return this.outputEnable;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // EQUALS / HASHCODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   @Override
   public int hashCode ()
   {
-    int hash = 3;
-    hash = 29 * hash + (int) (Double.doubleToLongBits (this.centerFrequency_MHz) ^ (Double.doubleToLongBits (this.centerFrequency_MHz) >>> 32));
-    hash = 29 * hash + (int) (Double.doubleToLongBits (this.S_dBm) ^ (Double.doubleToLongBits (this.S_dBm) >>> 32));
+    int hash = 7;
+    hash = 89 * hash + (int) (Double.doubleToLongBits (this.centerFrequency_MHz) ^ (Double.doubleToLongBits (this.centerFrequency_MHz) >>> 32));
+    hash = 89 * hash + (int) (Double.doubleToLongBits (this.S_dBm) ^ (Double.doubleToLongBits (this.S_dBm) >>> 32));
+    hash = 89 * hash + (this.outputEnable ? 1 : 0);
     return hash;
   }
 
@@ -102,9 +118,13 @@ public class DefaultSignalGeneratorSettings
     {
       return false;
     }
+    if (this.outputEnable != other.outputEnable)
+    {
+      return false;
+    }
     return true;
   }
-
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
