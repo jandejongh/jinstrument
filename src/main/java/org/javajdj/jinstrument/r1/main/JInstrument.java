@@ -40,9 +40,9 @@ extends JFrame
 //    final HP70000_GPIB  hp70000Instrument = new HP70000_GPIB (hp70000Device);
 //    tabbedPane.addTab ("HP70000[1]", createHp70000Tab (controller, hp70000Instrument));
     //
-//    final GpibDevice hp8566bDevice = controller.openDevice ("gpib:22"); // hp8566bb
-//    final HP8566B_GPIB  hp8566bInstrument = new HP8566B_GPIB (hp8566bDevice);
-//    tabbedPane.addTab ("HP8566B[1]", createHp8566bTab (controller, hp8566bInstrument));
+    final GpibDevice hp8566bDevice = controller.openDevice ("gpib:22"); // hp8566bb
+    final HP8566B_GPIB  hp8566bInstrument = new HP8566B_GPIB (hp8566bDevice);
+    tabbedPane.addTab ("HP8566B[1]", createHp8566bTab (controller, hp8566bInstrument));
     //
     final GpibDevice hp8663aDevice = controller.openDevice ("gpib:19"); // hp8663a
     final HP8663A_GPIB  hp8663aInstrument = new HP8663A_GPIB (hp8663aDevice);

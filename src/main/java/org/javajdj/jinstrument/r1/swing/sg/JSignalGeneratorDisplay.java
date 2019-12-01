@@ -4,15 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ItemEvent;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import org.javajdj.jinstrument.r1.instrument.sg.SignalGenerator;
@@ -68,8 +68,8 @@ extends JPanel
     frequencyPanel.setOpaque (true);
     frequencyPanel.setLayout (new GridLayout (5, 1));
     //
-    this.jCenterFreqAlt = new JSevenSegmentNumber (THEME_COLOR, false, 11, 9);
-    frequencyPanel.add (this.jCenterFreqAlt);
+    this.jCenterFreq = new JSevenSegmentNumber (THEME_COLOR, false, 11, 9);
+    frequencyPanel.add (this.jCenterFreq);
     //
     this.jFreqSlider_MHz = new JSlider (0, 2559, 0);
     this.jFreqSlider_kHz = new JSlider (0, 999, 0);
@@ -79,17 +79,19 @@ extends JPanel
     this.jFreqSlider_MHz.setMajorTickSpacing (500);
     this.jFreqSlider_MHz.setMinorTickSpacing (100);
     this.jFreqSlider_MHz.setPaintTicks (true);
+    this.jFreqSlider_MHz.setPaintLabels (true);
     this.jFreqSlider_MHz.addChangeListener ((final ChangeEvent ce) ->
     {
-      JSlider source = (JSlider)ce.getSource();
-      if (!source.getValueIsAdjusting()) {
+      JSlider source = (JSlider) ce.getSource ();
+      if (! source.getValueIsAdjusting ())
+      {
         if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
           try
           {
             LOG.log (Level.INFO, "Setting frequency on instrument from slider to {0} MHz.", source.getValue ());
             signalGenerator.setCenterFrequency_MHz (
-              source.getValue()
-              + 1.0e-3 * this.jFreqSlider_kHz.getValue()
+              source.getValue ()
+              + 1.0e-3 * this.jFreqSlider_kHz.getValue ()
               + 1.0e-6 * this.jFreqSlider_Hz.getValue ()
               + 1.0e-9 * this.jFreqSlider_mHz.getValue ());
           }
@@ -103,6 +105,8 @@ extends JPanel
           LOG.log (Level.INFO, "Suppressed instrument control for new value {0} MHz.", source.getValue ());
         }
       }
+      else
+        source.setToolTipText (Integer.toString (source.getValue ()));
     });
     setSubPanelBorder (this.jFreqSlider_MHz, "[MHz]");
     frequencyPanel.add (this.jFreqSlider_MHz);
@@ -113,8 +117,8 @@ extends JPanel
     this.jFreqSlider_kHz.setPaintTicks (true);
     this.jFreqSlider_kHz.addChangeListener ((final ChangeEvent ce) ->
     {
-      JSlider source = (JSlider)ce.getSource();
-      if (!source.getValueIsAdjusting()) {
+      JSlider source = (JSlider) ce.getSource ();
+      if (! source.getValueIsAdjusting ()) {
         if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
           try
           {
@@ -145,8 +149,8 @@ extends JPanel
     this.jFreqSlider_Hz.setPaintTicks (true);
     this.jFreqSlider_Hz.addChangeListener ((final ChangeEvent ce) ->
     {
-      JSlider source = (JSlider)ce.getSource();
-      if (!source.getValueIsAdjusting()) {
+      JSlider source = (JSlider) ce.getSource ();
+      if (! source.getValueIsAdjusting ()) {
         if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
           try
           {
@@ -171,15 +175,14 @@ extends JPanel
     setSubPanelBorder (this.jFreqSlider_Hz, "[Hz]");
     frequencyPanel.add (this.jFreqSlider_Hz);
     //
-    //
     this.jFreqSlider_mHz.setToolTipText ("-");
     this.jFreqSlider_mHz.setMajorTickSpacing (100);
     this.jFreqSlider_mHz.setMinorTickSpacing (10);
     this.jFreqSlider_mHz.setPaintTicks (true);
     this.jFreqSlider_mHz.addChangeListener ((final ChangeEvent ce) ->
     {
-      JSlider source = (JSlider)ce.getSource();
-      if (!source.getValueIsAdjusting()) {
+      JSlider source = (JSlider) ce.getSource ();
+      if (! source.getValueIsAdjusting ()) {
         if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
           try
           {
@@ -219,11 +222,98 @@ extends JPanel
     
     final JPanel amplitudePanel = new JPanel ();
     setPanelBorder (amplitudePanel, "Amplitude");
-    amplitudePanel.setLayout (new BorderLayout ());
+    amplitudePanel.setLayout (new GridLayout (3, 1));    
     //
-    this.jAmplitude = new JTextArea ();
-    this.jAmplitude.setText ("acquiring");
-    amplitudePanel.add (this.jAmplitude, BorderLayout.CENTER);
+    final JPanel amplitudeTopPanel = new JPanel ();
+    amplitudeTopPanel.setLayout (new GridLayout (1, 2));
+    //
+    this.jAmpEnable = new JCheckBox ("Output Enable");
+    this.jAmpEnable.addItemListener ((itemEvent) ->
+    {
+      if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
+      {
+        try
+        {
+          signalGenerator.setOutputEnable (itemEvent.getStateChange () == ItemEvent.SELECTED);
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting outputEnable to {0}: {1}.",
+            new Object[]{itemEvent.getStateChange () == ItemEvent.SELECTED, e});          
+        }
+      }
+     });
+    amplitudeTopPanel.add (this.jAmpEnable);
+    //
+    this.jAmplitudeAlt = new JSevenSegmentNumber (Color.red, true, 5, 2);
+    amplitudeTopPanel.add (this.jAmplitudeAlt);
+    //
+    amplitudePanel.add (amplitudeTopPanel);
+    //
+    this.jAmpSlider_dBm = new JSlider (-150, 30, -150);
+    this.jAmpSlider_mdBm = new JSlider (-1000, 1000, 0);
+    //
+    this.jAmpSlider_dBm.setToolTipText ("-");
+    this.jAmpSlider_dBm.setMajorTickSpacing (30);
+    this.jAmpSlider_dBm.setMinorTickSpacing (10);
+    this.jAmpSlider_dBm.setPaintTicks (true);
+    this.jAmpSlider_dBm.setPaintLabels (true);
+    this.jAmpSlider_dBm.addChangeListener ((final ChangeEvent ce) ->
+    {
+      JSlider source = (JSlider) ce.getSource ();
+      if (! source.getValueIsAdjusting ()) {
+        if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
+          try
+          {
+            LOG.log (Level.INFO, "Setting amplitude on instrument from slider to {0} dBm.", source.getValue ());
+            signalGenerator.setAmplitude_dBm (
+              source.getValue ()
+              + 1.0e-3 * this.jAmpSlider_mdBm.getValue ());
+          }
+          catch (IOException | InterruptedException e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting amplitude from slider to {0} dBm: {1}.",
+              new Object[]{source.getValue (), e});
+          }
+        else
+        {
+          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} dBm.", source.getValue ());
+        }
+      }
+    });
+    setSubPanelBorder (Color.red, this.jAmpSlider_dBm, "[dBm]");
+    amplitudePanel.add (this.jAmpSlider_dBm);
+    //
+    this.jAmpSlider_mdBm.setToolTipText ("-");
+    this.jAmpSlider_mdBm.setMajorTickSpacing (1000);
+    this.jAmpSlider_mdBm.setMinorTickSpacing (100);
+    this.jAmpSlider_mdBm.setPaintTicks (true);
+    this.jAmpSlider_mdBm.setPaintLabels (true);
+    this.jAmpSlider_mdBm.addChangeListener ((final ChangeEvent ce) ->
+    {
+      JSlider source = (JSlider) ce.getSource ();
+      if (!source.getValueIsAdjusting ()) {
+        if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
+          try
+          {
+            LOG.log (Level.INFO, "Setting amplitude on instrument from slider to {0} mdBm.", source.getValue ());
+            signalGenerator.setAmplitude_dBm (
+              this.jAmpSlider_dBm.getValue ()
+              + 1.0e-3 * source.getValue ());
+          }
+          catch (IOException | InterruptedException e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting amplitude from slider to {0} mdBm: {1}.",
+              new Object[]{source.getValue (), e});
+          }
+        else
+        {
+          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} mdBm.", source.getValue ());
+        }
+      }
+    });
+    setSubPanelBorder (Color.red, this.jAmpSlider_mdBm, "[mdBm]");
+    amplitudePanel.add (this.jAmpSlider_mdBm);
     //
     add (amplitudePanel);
     
@@ -247,16 +337,6 @@ extends JPanel
     reserved4Panel.setLayout (new BorderLayout ());
     add (reserved4Panel);
             
-//    this.display = new JSpectrumAnalyzerTraceDisplay (this);
-//    add (this.display, BorderLayout.CENTER);
-//    this.statusBar = new StatusBar ();
-//    add (this.statusBar, BorderLayout.WEST);
-//    this.messagePane = new JTextPane ();
-//    this.messagePane.setMinimumSize (new Dimension (1024, 100));
-//    this.messagePane.setMaximumSize (new Dimension (1024, 100));
-//    this.messagePane.setPreferredSize (new Dimension (1024, 100));
-//    add (/* new JScrollPane ( */ this.messagePane /* ) */, BorderLayout.SOUTH);
-//    startSettingsThread (true);
     startSettingsThread (true);
     
   }
@@ -268,11 +348,16 @@ extends JPanel
         BorderFactory.createLineBorder (Color.black, 4, true), title));
   }
   
-  private void setSubPanelBorder (final JComponent panel, final String title)
+  private void setSubPanelBorder (final Color color, final JComponent panel, final String title)
   {
     panel.setBorder (
       BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (THEME_COLOR, 2, true), title));    
+        BorderFactory.createLineBorder (color, 2, true), title));    
+  }
+  
+  private void setSubPanelBorder (final JComponent panel, final String title)
+  {
+    setSubPanelBorder (THEME_COLOR, panel, title);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -283,7 +368,7 @@ extends JPanel
   
   private Color THEME_COLOR = Color.blue;
   
-  private final JSevenSegmentNumber jCenterFreqAlt;
+  private final JSevenSegmentNumber jCenterFreq;
   
   private final JSlider jFreqSlider_MHz;
   
@@ -293,7 +378,13 @@ extends JPanel
   
   private final JSlider jFreqSlider_mHz;
   
-  private final JTextArea jAmplitude;
+  private final JCheckBox jAmpEnable;
+  
+  private final JSevenSegmentNumber jAmplitudeAlt;
+  
+  private final JSlider jAmpSlider_dBm;
+  
+  private final JSlider jAmpSlider_mdBm;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -324,380 +415,6 @@ extends JPanel
     
     private volatile boolean newSettings = false;
     
-//    protected synchronized void setCenterFrequency_MHz (final double f_MHz)
-//    {
-//      final SpectrumAnalyzerTraceSettings newSettings;
-//      if (this.traceSettings != null)
-//      {
-//        newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (f_MHz,
-//           this.traceSettings.getSpan_MHz (),
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//      }
-//      else
-//      {
-//        final double span_MHz = f_MHz / 10;
-//        newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (f_MHz,
-//           span_MHz,
-//           span_MHz / 100,
-//           true,
-//           span_MHz / 100,
-//           true,
-//           1.0,
-//           true,
-//           800,
-//           0.0,
-//           10.0,
-//           SpectrumAnalyzerDetector_Simple.ROSENFELL);
-//      }
-//      this.traceSettings = newSettings;
-//      this.newTraceSettings = true;
-//    }
-//    
-//    protected synchronized void setSpan_MHz (final double span_MHz)
-//    {
-//      final SpectrumAnalyzerTraceSettings newSettings;
-//      if (this.traceSettings != null)
-//      {
-//        newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           span_MHz,
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//      }
-//      else
-//      {
-//        final double f_MHz = span_MHz / 2;
-//        newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (f_MHz,
-//           span_MHz,
-//           span_MHz / 100,
-//           true,
-//           span_MHz / 100,
-//           true,
-//           1.0,
-//           true,
-//           800,
-//           0.0,
-//           10.0,
-//           SpectrumAnalyzerDetector_Simple.ROSENFELL);        
-//      }
-//      this.traceSettings = newSettings;
-//      this.newTraceSettings = true;
-//    }
-//    
-//    protected synchronized void setCenterFrequencyAndSpan_MHz (final double f_MHz, final double span_MHz)
-//    {
-//      final SpectrumAnalyzerTraceSettings newSettings;
-//      if (this.traceSettings != null)
-//      {
-//        newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (f_MHz,
-//           span_MHz,
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//      }
-//      else
-//      {
-//        newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (f_MHz,
-//           span_MHz,
-//           span_MHz / 100,
-//           true,
-//           span_MHz / 100,
-//           true,
-//           1.0,
-//           true,
-//           800,
-//           0.0,
-//           10.0,
-//           SpectrumAnalyzerDetector_Simple.ROSENFELL);        
-//      }
-//      this.traceSettings = newSettings;
-//      this.newTraceSettings = true;
-//    }
-//    
-//    protected synchronized void doubleSpan ()
-//    {
-//      if (this.traceSettings != null)
-//      {
-//        final SpectrumAnalyzerTraceSettings newSettings;
-//        newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           this.traceSettings.getSpan_MHz () * 2,
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//        this.traceSettings = newSettings;
-//        this.newTraceSettings = true;
-//      }
-//    }
-//    
-//    protected synchronized void setResolutionBandwidth_Hz (final double rb_Hz)
-//    {
-//      if (this.traceSettings != null)
-//      {
-//        final SpectrumAnalyzerTraceSettings newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           this.traceSettings.getSpan_MHz (),
-//           rb_Hz,
-//           false,
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//        this.traceSettings = newSettings;
-//        this.newTraceSettings = true;
-//      }
-//    }
-//    
-//    protected synchronized void setAutoResolutionBandwidth ()
-//    {
-//      if (this.traceSettings != null)
-//      {
-//        if (this.traceSettings.isAutoResolutionBandwidth ())
-//          return;
-//        final SpectrumAnalyzerTraceSettings newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           this.traceSettings.getSpan_MHz (),
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           true,
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//        this.traceSettings = newSettings;
-//        this.newTraceSettings = true;
-//      }
-//    }
-//    
-//    protected synchronized void setVideoBandwidth_Hz (final double vb_Hz)
-//    {
-//      if (this.traceSettings != null)
-//      {
-//        final SpectrumAnalyzerTraceSettings newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           this.traceSettings.getSpan_MHz (),
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           vb_Hz,
-//           false,
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//        this.traceSettings = newSettings;
-//        this.newTraceSettings = true;
-//      }
-//    }
-//    
-//    protected synchronized void setAutoVideoBandwidth ()
-//    {
-//      if (this.traceSettings != null)
-//      {
-//        if (this.traceSettings.isAutoVideoBandwidth ())
-//          return;
-//        final SpectrumAnalyzerTraceSettings newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           this.traceSettings.getSpan_MHz (),
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           true,
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//        this.traceSettings = newSettings;
-//        this.newTraceSettings = true;
-//      }
-//    }
-//    
-//    protected synchronized void setSweepTime_s (final double sweepTime_s)
-//    {
-//      if (this.traceSettings != null)
-//      {
-//        final SpectrumAnalyzerTraceSettings newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           this.traceSettings.getSpan_MHz (),
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           sweepTime_s,
-//           false,
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//        this.traceSettings = newSettings;
-//        this.newTraceSettings = true;
-//      }      
-//    }
-//    
-//    protected synchronized void setAutoSweepTime ()
-//    {
-//      if (this.traceSettings != null)
-//      {
-//        if (this.traceSettings.isAutoSweepTime ())
-//          return;
-//        final SpectrumAnalyzerTraceSettings newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           this.traceSettings.getSpan_MHz (),
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           this.traceSettings.getSweepTime_s (),
-//           true,
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//        this.traceSettings = newSettings;
-//        this.newTraceSettings = true;
-//      }
-//    }
-//    
-//    protected synchronized void setTraceLength (final int traceLength)
-//    {
-//      if (this.traceSettings != null)
-//      {
-//        final SpectrumAnalyzerTraceSettings newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           this.traceSettings.getSpan_MHz (),
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           traceLength,
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//        this.traceSettings = newSettings;
-//        this.newTraceSettings = true;
-//      }      
-//    }
-//    
-//    protected synchronized void setReferenceLevel_dBm (final double referenceLevel_dBm)
-//    {
-//      if (this.traceSettings != null)
-//      {
-//        final SpectrumAnalyzerTraceSettings newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           this.traceSettings.getSpan_MHz (),
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           this.traceSettings.getTraceLength (),
-//           referenceLevel_dBm,
-//           this.traceSettings.getAttenuation_dB (),
-//           this.traceSettings.getDetector ());
-//        this.traceSettings = newSettings;
-//        this.newTraceSettings = true;
-//      }      
-//    }
-//    
-//    protected synchronized void setAttenuation_dB (final double attenuation_dB)
-//    {
-//      if (this.traceSettings != null)
-//      {
-//        final SpectrumAnalyzerTraceSettings newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           this.traceSettings.getSpan_MHz (),
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           attenuation_dB,
-//           this.traceSettings.getDetector ());
-//        this.traceSettings = newSettings;
-//        this.newTraceSettings = true;
-//      }      
-//    }
-//    
-//    protected synchronized boolean setDetectorFromString (final String detectorString)
-//    {
-//      if (this.traceSettings == null)
-//        return false;
-//      final SpectrumAnalyzerDetector detector = this.traceSettings.getDetector ().fromString (detectorString);
-//      if (detector != null)
-//      {
-//        final SpectrumAnalyzerTraceSettings newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//          (this.traceSettings.getCenterFrequency_MHz (),
-//           this.traceSettings.getSpan_MHz (),
-//           this.traceSettings.getResolutionBandwidth_Hz (),
-//           this.traceSettings.isAutoResolutionBandwidth (),
-//           this.traceSettings.getVideoBandwidth_Hz (),
-//           this.traceSettings.isAutoVideoBandwidth (),
-//           this.traceSettings.getSweepTime_s (),
-//           this.traceSettings.isAutoSweepTime (),
-//           this.traceSettings.getTraceLength (),
-//           this.traceSettings.getReferenceLevel_dBm (),
-//           this.traceSettings.getAttenuation_dB (),
-//           detector);
-//        this.traceSettings = newSettings;
-//        this.newTraceSettings = true;
-//        return true;
-//      }
-//      else
-//        return false;
-//    }
-    
     @Override
     public final void run ()
     {
@@ -706,7 +423,7 @@ extends JPanel
         try
         {
           // XXX
-          Thread.sleep (3000L);
+          Thread.sleep (5000L);
           final SignalGeneratorSettings settingsCopy;
           final boolean newSettingsCopy;
           synchronized (this)
@@ -717,11 +434,6 @@ extends JPanel
           }
           // Obtain current settings from the signal generator.
           final SignalGeneratorSettings settingsRead = JSignalGeneratorDisplay.this.signalGenerator.getSettingsFromInstrument ();
-          LOG.log (Level.WARNING, "f_MHz={0}.", new Object[]{
-            new DecimalFormat ("#####.#######").format (settingsRead.getCenterFrequency_MHz ())});
-//          // Obtain a trace from the spectrum analyzer with our current settings.
-//          final SpectrumAnalyzerTrace trace =
-//            JSignalGeneratorDisplay.this.signalGenerator.getTrace (traceSettingsCopy);
           synchronized (this)
           {
             if (this.settings == null || (newSettingsCopy && ! this.newSettings))
@@ -818,8 +530,10 @@ extends JPanel
   
   private synchronized void newSettingsFromSignalGenerator (final SignalGeneratorSettings settings)
   {
+    //
     if (settings == null)
       throw new IllegalArgumentException ();
+    //
     SwingUtilities.invokeLater (() ->
     {
       JSignalGeneratorDisplay.this.inhibitInstrumentControl = true;
@@ -827,7 +541,7 @@ extends JPanel
       final double f_MHz = settings.getCenterFrequency_MHz ();
       final long f_mHz_long = Math.round (f_MHz * 1e9);
       //
-      JSignalGeneratorDisplay.this.jCenterFreqAlt.setNumber (f_MHz * 1.0e6);
+      JSignalGeneratorDisplay.this.jCenterFreq.setNumber (f_MHz * 1.0e6);
       //
       final int f_int_MHz = (int) (f_mHz_long / 1000000000L);
       JSignalGeneratorDisplay.this.jFreqSlider_MHz.setValue (f_int_MHz);
@@ -845,134 +559,23 @@ extends JPanel
       JSignalGeneratorDisplay.this.jFreqSlider_mHz.setValue (f_rem_int_mHz);
       JSignalGeneratorDisplay.this.jFreqSlider_mHz.setToolTipText (Integer.toString (f_rem_int_mHz));
       //
-//      LOG.log (Level.WARNING, "f_MHz={0}, f_int_MHz={1}, "
-//        + "f_rem_KHz={2}, f_rem_int_kHz={3}, "
-//        + "f_rem_Hz={4}, f_rem_int_Hz={5}, "
-//        + "f_rem_mHz = {6}, f_rem_int_mHz={7}",
-//        new Object[]{new DecimalFormat ("#####.##########").format (f_MHz),
-//          f_int_MHz, f_rem_kHz, f_rem_int_kHz, f_rem_Hz, f_rem_int_Hz, f_rem_mHz, f_rem_int_mHz});
-//      LOG.log (Level.WARNING, "f_mHz_long={0}, f_mHz%1000={1}.", new Object[]{f_mHz_long, f_mHz_long%1000L});
+      final double S_dBm = settings.getS_dBm ();
+      final long S_mdBm_long = Math.round (S_dBm * 1e3);
       //
-      JSignalGeneratorDisplay.this.jAmplitude.setText (
-        new DecimalFormat ("###.##").format (settings.getS_dBm ()));
-      JSignalGeneratorDisplay.this.inhibitInstrumentControl = false;      
+      JSignalGeneratorDisplay.this.jAmplitudeAlt.setNumber (settings.getS_dBm ());
+      //
+      final int S_int_dBm = (int) (S_mdBm_long / 1000L);
+      JSignalGeneratorDisplay.this.jAmpSlider_dBm.setValue (S_int_dBm);
+      JSignalGeneratorDisplay.this.jAmpSlider_dBm.setToolTipText (Integer.toString (S_int_dBm));
+      //
+      final int S_rem_int_mdBm = (int) (S_mdBm_long % 1000L);
+      JSignalGeneratorDisplay.this.jAmpSlider_mdBm.setValue (S_rem_int_mdBm);
+      JSignalGeneratorDisplay.this.jAmpSlider_mdBm.setToolTipText (Integer.toString (S_rem_int_mdBm));
+      //
+      JSignalGeneratorDisplay.this.jAmpEnable.setSelected (settings.getOutputEnable ());
+      JSignalGeneratorDisplay.this.inhibitInstrumentControl = false;
     });
-//    this.display.setTrace (trace);
-//    this.statusBar.updateComponent (trace.getSettings (), trace);
-//    if (this.lastTraceIndexInHistory >= 0
-//    && (! this.traceHistory[this.lastTraceIndexInHistory].getSettings ().equals (trace.getSettings ())))
-//      clearTraceHistory ();
-//    addTraceToHistory (trace);
-//    this.display.setAvgTrace (this.avgTrace);
-//    this.display.setAvgFTrace (this.avgFTrace);
-//    if (trace.isError ())
-//      addTraceMessage (trace.getErrorMessage ());
-    // addTraceMessage ("New Trace!");
   }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // PROPERTY centerFrequency_MHz
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-//  private synchronized void setCenterFrequency_MHz (final double f_MHz)
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setCenterFrequency_MHz (f_MHz);
-//  }
-// 
-//  private synchronized void setSpan_MHz (final double span_MHz)
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setSpan_MHz (span_MHz);
-//  }
-// 
-//  private synchronized void setResolutionBandwidth_Hz (final double rb_Hz)
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setResolutionBandwidth_Hz (rb_Hz);
-//  }
-// 
-//  private synchronized void setVideoBandwidth_Hz (final double vb_Hz)
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setVideoBandwidth_Hz (vb_Hz);
-//  }
- 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // PROPERTY centerFrequencyAndSpan_MHz
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-//  private synchronized void setCenterFrequencyAndSpan_MHz (final double f_MHz, final double span_MHz)
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setCenterFrequencyAndSpan_MHz (f_MHz, span_MHz);
-//  }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // METHOD doubleSpan
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-//  private synchronized void doubleSpan ()
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.doubleSpan ();
-//  }
-//  
-//  private synchronized void setAutoResolutionBandwidth ()
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setAutoResolutionBandwidth ();    
-//  }
-//  
-//  private synchronized void setAutoVideoBandwidth ()
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setAutoVideoBandwidth ();    
-//  }
-//  
-//  private synchronized void setSweepTime_s (final double sweepTime_s)
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setSweepTime_s (sweepTime_s);
-//  }
-//  
-//  private synchronized void setAutoSweepTime ()
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setAutoSweepTime ();    
-//  }
-//  
-//  private synchronized void setTraceLength (final int traceLength)
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setTraceLength (traceLength);
-//  }
-//  
-//  private synchronized void setReferenceLevel_dBm (final double referenceLevel_dBm)
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setReferenceLevel_dBm (referenceLevel_dBm);   
-//  }
-//  
-//  private synchronized void setAttenuation_dB (final double attenuation_dB)
-//  {
-//    if (this.settingsThread != null)
-//      this.settingsThread.setAttenuation_dB (attenuation_dB);   
-//  }
-//  
-//  private synchronized boolean setDetectorFromString (final String detectorString)
-//  {
-//    if (this.settingsThread != null)
-//      return this.settingsThread.setDetectorFromString (detectorString);
-//    else
-//      return false;
-//  }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -1901,5 +1504,11 @@ extends JPanel
 //      }
 //    }
 //  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // END OF FILE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
 }

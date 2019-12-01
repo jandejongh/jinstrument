@@ -178,7 +178,12 @@ public static String bytesToHex(byte[] bytes) {
       + 0.1   * ((l1[15] & 0xf0) >> 4)
       + 0.01  * (l1[15] & 0x0f)
       ) * (1 - 2 * ((l1[17] & 0x80) >> 7));
-    return new DefaultSignalGeneratorSettings (f_MHz, S_dBm); 
+    final boolean outputEnable;
+    // Guess work below... Candidates are 21 and 81.
+    // On 21, the change is from 0xfe (on) to 0xfb (off)...
+    // On 81, the change is from 0x02 (on) to 0x0a (off)...
+    outputEnable = (l1[21] & 0x04) != 0;
+    return new DefaultSignalGeneratorSettings (f_MHz, S_dBm, outputEnable); 
   }
   
   @Override
@@ -219,6 +224,26 @@ public static String bytesToHex(byte[] bytes) {
     {
       device.unlockDevice ();
     }
+  }
+  
+  @Override
+  public synchronized void setOutputEnable (final boolean outputEnable)
+    throws IOException, InterruptedException
+  {
+    final GpibDevice device = (GpibDevice) getDevice ();
+    try
+    {
+      device.lockDevice ();
+      if (outputEnable)
+        this.out.println ("AP -60 DM");
+      else
+        this.out.println ("AO");
+      getSettingsFromInstrumentNoLock (device);
+    }
+    finally
+    {
+      device.unlockDevice ();
+    }    
   }
   
 //  private synchronized void getTraceSettingsFromInstrument

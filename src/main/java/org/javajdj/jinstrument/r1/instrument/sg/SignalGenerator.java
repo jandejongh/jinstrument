@@ -16,4 +16,6 @@ public interface SignalGenerator
   
   void setAmplitude_dBm (double amplitude_dBm) throws IOException, InterruptedException;
   
+  void setOutputEnable (boolean outputEnable) throws IOException, InterruptedException;
+  
 }
