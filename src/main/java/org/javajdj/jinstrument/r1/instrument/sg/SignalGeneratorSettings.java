@@ -16,4 +16,6 @@ public interface SignalGeneratorSettings
 
   double getS_dBm ();
   
+  boolean getOutputEnable ();
+  
 }
