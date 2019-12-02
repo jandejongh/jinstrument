@@ -215,10 +215,10 @@ extends JPanel
     setPanelBorder (fSweepPanel, "Frequency Sweep");
     add (fSweepPanel);
     
-    final JPanel reserved2Panel = new JPanel ();
-    setPanelBorder (reserved2Panel, "Reserved");
-    reserved2Panel.setLayout (new BorderLayout ());
-    add (reserved2Panel);
+    final JPanel sweepSources = new JPanel ();
+    setPanelBorder (sweepSources, "Sweep Source(s)");
+    sweepSources.setLayout (new BorderLayout ());
+    add (sweepSources);
     
     final JPanel amplitudePanel = new JPanel ();
     setPanelBorder (amplitudePanel, "Amplitude");
@@ -322,20 +322,35 @@ extends JPanel
     aSweepPanel.setLayout (new BorderLayout ());
     add (aSweepPanel);
     
-    final JPanel reserved3Panel = new JPanel ();
-    setPanelBorder (reserved3Panel, "Reserved");
-    reserved3Panel.setLayout (new BorderLayout ());
-    add (reserved3Panel);
+    final JPanel modSourcesPanel = new JPanel ();
+    setPanelBorder (modSourcesPanel, "Modulation Source(s)");
+    modSourcesPanel.setLayout (new BorderLayout ());
+    add (modSourcesPanel);
 
-    final JPanel modPanel = new JPanel ();
-    setPanelBorder (modPanel, "Modulation");
-    modPanel.setLayout (new BorderLayout ());
-    add (modPanel);
+    final JPanel modAnalogPanel = new JPanel ();
+    setPanelBorder (modAnalogPanel, "Modulation [Analog]");
+    modAnalogPanel.setLayout (new GridLayout (3, 1));
+    final JPanel amPanel = new JPanel ();
+    setSubPanelBorder (Color.green, amPanel, "AM");
+    modAnalogPanel.add (amPanel);
+    final JPanel fmPanel = new JPanel ();
+    setSubPanelBorder (Color.green, fmPanel, "FM");
+    modAnalogPanel.add (fmPanel);
+    final JPanel pmPanel = new JPanel ();
+    setSubPanelBorder (Color.green, pmPanel, "PM");
+    modAnalogPanel.add (pmPanel);
+    add (modAnalogPanel);
     
-    final JPanel reserved4Panel = new JPanel ();
-    setPanelBorder (reserved4Panel, "Modulation Sweep");
-    reserved4Panel.setLayout (new BorderLayout ());
-    add (reserved4Panel);
+    final JPanel modDigitalPanel = new JPanel ();
+    setPanelBorder (modDigitalPanel, "Modulation [Digital]");
+    modDigitalPanel.setLayout (new GridLayout (2, 1));
+    final JPanel bpskPanel = new JPanel ();
+    setSubPanelBorder (Color.green, bpskPanel, "BPSK");
+    modDigitalPanel.add (bpskPanel);
+    final JPanel pulsePanel = new JPanel ();
+    setSubPanelBorder (Color.green, pulsePanel, "PULSE");
+    modDigitalPanel.add (pulsePanel);
+    add (modDigitalPanel);
             
     startSettingsThread (true);
     
