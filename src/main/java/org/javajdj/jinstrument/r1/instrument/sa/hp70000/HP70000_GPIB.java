@@ -13,14 +13,14 @@ import org.javajdj.jinstrument.r1.instrument.sa.SpectrumAnalyzerDetector;
 import org.javajdj.jinstrument.r1.instrument.sa.SpectrumAnalyzerDetector_Simple;
 import org.javajdj.jinstrument.r1.instrument.sa.SpectrumAnalyzerTrace;
 import org.javajdj.jinstrument.r1.instrument.sa.SpectrumAnalyzerTraceSettings;
-import org.javajdj.jinstrument.r1.instrument.sa.SignalGenerator;
+import org.javajdj.jinstrument.r1.instrument.sa.SpectrumAnalyzer;
 
 /**
  *
  */
 public class HP70000_GPIB
 extends AbstractSpectrumAnalyzer
-implements SignalGenerator
+implements SpectrumAnalyzer
 {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
