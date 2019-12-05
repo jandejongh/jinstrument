@@ -31,7 +31,7 @@ import org.javajdj.jinstrument.r1.instrument.sa.SpectrumAnalyzerDetector_Simple;
 import org.javajdj.jinstrument.r1.instrument.sa.SpectrumAnalyzerTrace;
 import org.javajdj.jinstrument.r1.instrument.sa.SpectrumAnalyzerTraceSettings;
 import org.javajdj.jinstrument.r1.swing.util.JStatusCheckBox;
-import org.javajdj.jinstrument.r1.instrument.sa.SignalGenerator;
+import org.javajdj.jinstrument.r1.instrument.sa.SpectrumAnalyzer;
 
 /**
  *
@@ -55,7 +55,7 @@ implements SpectrumAnalyzerClient
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JSpectrumAnalyzerManagedTraceDisplay (final SignalGenerator spectrumAnalyzer)
+  public JSpectrumAnalyzerManagedTraceDisplay (final SpectrumAnalyzer spectrumAnalyzer)
   {
     super ();
     if (spectrumAnalyzer == null)
@@ -84,7 +84,7 @@ implements SpectrumAnalyzerClient
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final SignalGenerator spectrumAnalyzer;
+  private final SpectrumAnalyzer spectrumAnalyzer;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
