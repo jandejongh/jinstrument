@@ -6,7 +6,7 @@ import org.javajdj.jinstrument.r1.instrument.Instrument;
 /**
  *
  */
-public interface SignalGenerator
+public interface SpectrumAnalyzer
 extends Instrument
 {
 

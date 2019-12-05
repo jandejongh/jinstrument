@@ -14,7 +14,7 @@ import org.javajdj.jservice.Service;
  */
 public abstract class AbstractSpectrumAnalyzer
 extends AbstractInstrument
-implements SignalGenerator
+implements SpectrumAnalyzer
 {
 
   private static final Logger LOG = Logger.getLogger (AbstractSpectrumAnalyzer.class.getName ());
