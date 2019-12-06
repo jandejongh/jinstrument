@@ -18,4 +18,12 @@ public interface SignalGeneratorSettings
   
   boolean getOutputEnable ();
   
+  byte[] getBytes ();
+  
+  double getModulationSourceInternalFrequency_kHz ();
+  
+  boolean getAmEnable ();
+  
+  double getAmDepth_percent ();
+  
 }
