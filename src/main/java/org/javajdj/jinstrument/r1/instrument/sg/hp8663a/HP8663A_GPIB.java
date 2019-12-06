@@ -149,7 +149,6 @@ public static String bytesToHex(byte[] bytes) {
       device.unlockDevice ();
     }
   }
-
  
   private static SignalGeneratorSettings settingsFromL1 (final byte[] l1)
   {
@@ -183,7 +182,58 @@ public static String bytesToHex(byte[] bytes) {
     // On 21, the change is from 0xfe (on) to 0xfb (off)...
     // On 81, the change is from 0x02 (on) to 0x0a (off)...
     outputEnable = (l1[21] & 0x04) != 0;
-    return new DefaultSignalGeneratorSettings (f_MHz, S_dBm, outputEnable); 
+    final double modulationSourceInternalFrequency_kHz = 0.0
+      + 10.0 * ((l1[116]  & 0xf0) >> 4)
+      + 1.0  * (l1[116] & 0x0f)
+      + 0.1  * ((l1[117]  & 0xf0) >> 4)
+      + 0.01 * (l1[117] & 0x0f);
+    // LOG.log (Level.INFO, "Read 116/117: {0}/{1}; modulationSourceInternalFrequency_kHz: {2}.",
+    //  new Object[]{Integer.toHexString (l1[116] & 0xff),
+    //    Integer.toHexString (l1[117] & 0xff),
+    //    modulationSourceInternalFrequency_kHz});
+    // XXX NO CLUE YET HERE!
+    final boolean amEnable = true;
+    final double amDepth_percent = 0.0
+      + 10.0 * (l1[128]  & 0x0f)
+      + 1.0  * ((l1[129] & 0xf0) >> 4)
+      + 0.1  * (l1[129]  & 0x0f);
+    // LOG.log (Level.INFO, "Read 128/129: {0}/{1}; amDepth_percent: {2}.",
+    //  new Object[]{Integer.toHexString (l1[128] & 0xff),
+    //    Integer.toHexString (l1[129] & 0xff),
+    //    amDepth_percent});
+    //
+    //
+    // 186/187: checksum.
+    // The checksum is most likely taken over the first 185 bytes in the L1 array.
+    // Perhaps starting at index 2, since the first two bytes are always 0x4041.
+    //
+    int sum = 0;
+    for (int i=0; i < 186; i++)
+      sum += (l1[i]);
+    LOG.log (Level.WARNING, "Sum 0...185 = {0}, 186={1}, 187={2}.",
+      new Object[]{Integer.toHexString (sum & 0xffff),
+        Integer.toHexString (l1[186] & 0xff),
+        Integer.toHexString (l1[187] & 0xff)});
+    // Through reverse engineering I discoved that the least-significant byte of the sum
+    // is followed "at a distance" by L1[187].
+    // The distance is non-zero, though.
+    final int sumLSB = sum & 0xff;
+    final int sumLSBMinus187 = (sumLSB - (l1[187] & 0xff)) & 0xff;
+    if (sumLSBMinus187 != 0x86)
+      LOG.log (Level.WARNING, "Potential checksum error (LSB/L1[187] mismatch].");
+    final int sumMSB = (sum & 0xff00) >> 8;
+    final int sumMSBMinus186 = (sumMSB - (l1[186] & 0xff)) & 0xff;
+    LOG.log (Level.WARNING, "MSB (Sum 2...185) - 186 = {0}.",
+      new Object[]{Integer.toHexString (sumMSBMinus186)});
+    
+    return new DefaultSignalGeneratorSettings (
+      l1,
+      f_MHz,
+      S_dBm,
+      outputEnable,
+      modulationSourceInternalFrequency_kHz,
+      amEnable,
+      amDepth_percent); 
   }
   
   @Override
@@ -235,7 +285,8 @@ public static String bytesToHex(byte[] bytes) {
     {
       device.lockDevice ();
       if (outputEnable)
-        this.out.println ("AP -60 DM");
+        // this.out.println ("AP -60 DM");
+        this.out.println ("AP");
       else
         this.out.println ("AO");
       getSettingsFromInstrumentNoLock (device);
@@ -246,232 +297,99 @@ public static String bytesToHex(byte[] bytes) {
     }    
   }
   
-//  private synchronized void getTraceSettingsFromInstrument
-//  (final boolean autoResolutionBandwidth, final boolean autoVideoBandwidth, final boolean autoSweepTime)
-//  throws IOException
-//  {
-//    try
-//    {
-//      out.println ("sngls;");
-//      out.println ("trdef tra?;");
-//      final int traceLength = Integer.parseInt (readLine ());
-//      this.out.println ("cf?;");
-//      final double centerFrequency_MHz = 1.0E-6 * Double.parseDouble (readLine ());
-//      this.out.println ("sp?;");
-//      final double span_MHz = 1.0E-6 * Double.parseDouble (readLine ());
-//      this.out.println ("rb?;");
-//      final double resolutionBandwidth_Hz = Double.parseDouble (readLine ());
-//      this.out.println ("vb?;");
-//      final double videoBandwidth_Hz = Double.parseDouble (readLine ());
-//      this.out.println ("st?;");
-//      final double sweepTime_s = Double.parseDouble (readLine ());
-//      this.out.println ("rl?;");
-//      final double referenceLevel_dBm = Double.parseDouble (readLine ());
-//      this.out.println ("at?;");
-//      final double attenuation_dB = Double.parseDouble (readLine ());
-//      this.out.println ("det?;");
-//      final String detectorString = readLine ().trim ().toLowerCase ();
-//      final SpectrumAnalyzerDetector detector;
-//      switch (detectorString)
-//      {
-//        case "gnd":
-//          detector = SpectrumAnalyzerDetector_Simple.GROUND;
-//          break;
-//        case "smp":
-//          detector = SpectrumAnalyzerDetector_Simple.SAMPLE;
-//          break;
-//        case "pos":
-//          detector = SpectrumAnalyzerDetector_Simple.PEAK_MAX;
-//          break;
-//        case "neg":
-//          detector = SpectrumAnalyzerDetector_Simple.PEAK_MIN;
-//          break;
-//        case "nrm":
-//          detector = SpectrumAnalyzerDetector_Simple.ROSENFELL;
-//          break;
-//        default:
-//          throw new IOException ("Unrecognized detector type from HP-7000!");
-//      }
-//      final SpectrumAnalyzerTraceSettings newSettings = new DefaultSpectrumAnalyzerTraceSettings
-//        (centerFrequency_MHz, span_MHz,
-//         resolutionBandwidth_Hz, autoResolutionBandwidth,
-//         videoBandwidth_Hz, autoVideoBandwidth,
-//         sweepTime_s, autoSweepTime,
-//         traceLength,
-//         referenceLevel_dBm,
-//         attenuation_dB,
-//         detector);
-//      setCurrentTraceSettings (newSettings);
-//    }
-//    catch (NumberFormatException nfe)
-//    {
-//      throw new IOException (nfe);
-//    }
-//  }
-//  
-//  private synchronized void getTraceSettingsFromInstrument ()
-//  throws IOException
-//  {
-//    getTraceSettingsFromInstrument (false, false, false);
-//  }
-//  
-//  private synchronized void setTraceSettingsOnInstrument (final SpectrumAnalyzerTraceSettings settings)
-//  throws IOException, InterruptedException
-//  {
-//    this.out.println ("sngls;");
-//    if (this.binaryTraceData)
-//      this.out.println ("tdf b;");
-//    else
-//      this.out.println ("tdf p;");
-//    this.out.println ("trdef tra" + settings.getTraceLength () + ";");
-//    this.out.println ("cf " + settings.getCenterFrequency_MHz () + " MHZ;");
-//    this.out.println ("sp " + settings.getSpan_MHz () + " MHZ;");
-//    if (settings.isAutoResolutionBandwidth ())
-//      this.out.println ("rb auto;");
-//    else
-//      this.out.println ("rb " + settings.getResolutionBandwidth_Hz () + " HZ;");
-//    if (settings.isAutoVideoBandwidth ())
-//      this.out.println ("vb auto;");
-//    else
-//      this.out.println ("vb " + settings.getVideoBandwidth_Hz () + " HZ;");
-//    if (settings.isAutoSweepTime ())
-//      this.out.println ("st auto;");
-//    else
-//      this.out.println ("st " + settings.getSweepTime_s () + " S;");
-//    this.out.println ("rl " + settings.getReferenceLevel_dBm () + " DBM;");
-//    this.out.println ("at " + settings.getAttenuation_dB () + " DB;");
-//    if (settings.getDetector () != null && (settings.getDetector () instanceof SpectrumAnalyzerDetector_Simple))
-//      switch ((SpectrumAnalyzerDetector_Simple) settings.getDetector ())
-//      {
-//        case UNKNOWN:
-//          break;
-//        case GROUND:
-//          this.out.println ("det gnd;");
-//          break;
-//        case SAMPLE:
-//          this.out.println ("det smp;");
-//          break;
-//        case PEAK_MAX:
-//          this.out.println ("det pos;");
-//          break;
-//        case PEAK_MIN:
-//          this.out.println ("det neg;");
-//          break;
-//        case ROSENFELL:
-//          this.out.println ("det nrm;");
-//          break;
-//        default:
-//          break;
-//      }
-//    getTraceSettingsFromInstrument
-//      (settings.isAutoResolutionBandwidth (), settings.isAutoVideoBandwidth (), settings.isAutoSweepTime ());
-//  }
-//  
-//  @Override
-//  public synchronized SpectrumAnalyzerTrace getTrace ()
-//  throws IOException, InterruptedException
-//  {
-//    return getTrace (null);
-//  }
-//  
-//  @Override
-//  public synchronized SpectrumAnalyzerTrace getTrace (final SpectrumAnalyzerTraceSettings settings)
-//  throws IOException, InterruptedException
-//  {
-//    final GpibDevice device = (GpibDevice) getDevice ();
-//    try
-//    {
-//      device.lockDevice ();
-//      final SpectrumAnalyzerTraceSettings oldSettings = getCurrentTraceSettings ();
-//      if (settings == null && oldSettings == null)
-//        getTraceSettingsFromInstrument ();
-//      else if (settings != null && ! settings.equals (getCurrentTraceSettings ()))
-//        setTraceSettingsOnInstrument (settings);
-//      if (getCurrentTraceSettings ().getSweepTime_s () > 60)
-//      {
-//        if (JOptionPane.showConfirmDialog (null, "Sweep Time is " + getCurrentTraceSettings ().getSweepTime_s () + ", OK?")
-//          != JOptionPane.OK_OPTION)
-//          setTraceSettingsOnInstrument (oldSettings != null ? oldSettings : HP8663A_GPIB.SAFE_SETTINGS);
-//      }
-//      final int traceLength = getCurrentTraceSettings ().getTraceLength ();
-//      if (this.binaryTraceData)
-//        this.out.println ("tdf b;");
-//      else
-//        this.out.println ("tdf p;");
-//      this.out.println ("ts;");   // Take Sweep.
-//      this.out.println ("tra?;"); // Return Trace.
-//      final double samples[];
-//      if (this.binaryTraceData)
-//      {
-//        byte buf[] = new byte[2 * traceLength];
-//        int bytesRead = 0;
-//        while (bytesRead < buf.length)
-//          bytesRead += device.getInputStream ().read (buf, bytesRead, buf.length - bytesRead);
-//        samples = new double[traceLength];
-//        int i_buf = 0;
-//        for (int s = 0; s < samples.length; s++)
-//          samples[s] = binaryTracePairToDouble (buf[i_buf++], buf[i_buf++]);
-//      }
-//      else
-//      {
-//        final String traString = readLine ();
-//        // LOG.log (Level.INFO, "Read TRA String" + traString + ".");
-//        final String[] samplesString = traString.split (",");
-//        samples = new double[samplesString.length];
-//        for (int s = 0; s < samplesString.length; s++)
-//          samples[s] = Double.parseDouble (samplesString[s]);
-//      }
-//      this.out.println ("stb?;"); // Status Byte.
-//      final String stbString = readLine ();
-//      boolean error = false;
-//      String errorMessage = null;
-//      boolean uncal = false;
-//      boolean uncor = false;
-//      try
-//      {
-//        final int stbInt = Integer.parseInt (stbString);
-//        error = ((stbInt & 0x20) != 0);
-//        if (error)
-//        {
-//          this.out.println ("err?");
-//          errorMessage = readLine ();
-//        }
-//        if ((stbInt & 0x02) != 0)
-//        {
-//          // MESSAGE [UNCAL/UNCOR]
-//          this.out.println ("msg?;"); // Error Message.
-//          final String msgString = readLine ();
-//          final String[] splitString = msgString.trim ().split (",");
-//          if (splitString == null || splitString.length < 2)
-//            error = true;
-//          else
-//          {
-//            uncal = ! splitString[0].equalsIgnoreCase ("0");
-//            uncor = ! splitString[1].equalsIgnoreCase ("0");
-//            if (! (uncal || uncor))
-//              error = true;
-//          }
-//        }
-//        else
-//        {
-//          uncal = false;
-//          uncor = false;
-//        }
-//      }
-//      catch (NumberFormatException nfe)
-//      {
-//        error = true;
-//      }
-//      return new DefaultSpectrumAnalyzerTrace (getCurrentTraceSettings ().clone (), samples, error, errorMessage, uncal, uncor);
-//    }
-//    catch (CloneNotSupportedException cnse)
-//    {
-//      throw new RuntimeException (cnse);
-//    }
-//    finally
-//    {
-//      device.unlockDevice ();
-//    }
-//  }
+  @Override
+  public void setEnableAm (final boolean enableAm, final double depth_percent, SignalGenerator.ModulationSource modulationSource)
+    throws IOException, InterruptedException
+  {
+    final GpibDevice device = (GpibDevice) getDevice ();
+    try
+    {
+      device.lockDevice ();
+      if (enableAm)
+        switch (modulationSource)
+        {
+          case INT:
+            this.out.println ("AM " + depth_percent + " PC");
+            break;
+          case INT_400:
+            this.out.println ("AM M1 " + depth_percent + " PC");
+            break;
+          case INT_1K:
+            this.out.println ("AM M2 " + depth_percent + " PC");
+            break;
+          case EXT_AC:
+            this.out.println ("AM M3 " + depth_percent + " PC");
+            break;
+          case EXT_DC:
+            this.out.println ("AM M4 " + depth_percent + " PC");
+            break;
+          default:
+            throw new RuntimeException ();
+        }
+      else
+        this.out.println ("AM FO");
+      getSettingsFromInstrumentNoLock (device);
+    }
+    finally
+    {
+      device.unlockDevice ();
+    }    
+  }
+
+  @Override
+  public void setEnableFm (final boolean enableFm) throws IOException, InterruptedException
+  {
+    final GpibDevice device = (GpibDevice) getDevice ();
+    try
+    {
+      device.lockDevice ();
+      if (enableFm)
+        this.out.println ("FM 13 KZ");
+      else
+        this.out.println ("FM FO");
+      getSettingsFromInstrumentNoLock (device);
+    }
+    finally
+    {
+      device.unlockDevice ();
+    }    
+  }
+
+  @Override
+  public void setEnablePm (final boolean enablePm) throws IOException, InterruptedException
+  {
+    final GpibDevice device = (GpibDevice) getDevice ();
+    try
+    {
+      device.lockDevice ();
+      if (enablePm)
+        this.out.println ("PM 19 DG");
+      else
+        this.out.println ("PM FO");
+      getSettingsFromInstrumentNoLock (device);
+    }
+    finally
+    {
+      device.unlockDevice ();
+    }    
+  }
+
+  @Override
+  public final void setModulationSourceInternalFrequency_kHz (final double modulationSourceInternalFrequency_kHz)
+    throws IOException, InterruptedException
+  {
+    LOG.log (Level.INFO, "Setting ModulationSourceInternalFrequency_kHz to {0} kHz.", modulationSourceInternalFrequency_kHz);
+    final GpibDevice device = (GpibDevice) getDevice ();
+    try
+    {
+      device.lockDevice ();
+      this.out.println ("MF " + modulationSourceInternalFrequency_kHz + " KZ");
+      getSettingsFromInstrumentNoLock (device);
+    }
+    finally
+    {
+      device.unlockDevice ();
+    }    
+  }
 
 }
