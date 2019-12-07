@@ -94,16 +94,20 @@ implements SignalGenerator
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-private static final char[] HEX_ARRAY = "0123456789abcdef".toCharArray();
-public static String bytesToHex(byte[] bytes) {
+  private static final char[] HEX_ARRAY = "0123456789abcdef".toCharArray ();
+
+  public static String bytesToHex (byte[] bytes)
+  {
     char[] hexChars = new char[bytes.length * 2];
-    for (int j = 0; j < bytes.length; j++) {
-        int v = bytes[j] & 0xFF;
-        hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-        hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+    for (int j = 0; j < bytes.length; j++)
+    {
+      int v = bytes[j] & 0xFF;
+      hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+      hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
     }
-    return new String(hexChars);
-}
+    return new String (hexChars);
+  }
+  
   private static final int L1_LENGTH = 189;
   
   private transient byte[] lastL1 = null;
@@ -114,8 +118,16 @@ public static String bytesToHex(byte[] bytes) {
     final byte[] l1Buffer = new byte[HP8663A_GPIB.L1_LENGTH];
     this.out.println ("L1");
     final int bytesRead = gpibDevice.getInputStream ().read (l1Buffer);
-    // LOG.log (Level.WARNING, "number of bytes read = {0}", bytesRead);
-    LOG.log (Level.WARNING, "bytes = {0}", bytesToHex (l1Buffer));
+    if (bytesRead != HP8663A_GPIB.L1_LENGTH)
+    {
+      LOG.log (Level.WARNING, "Unexpected number of bytes read for L1: {0} (should be {1}).",
+        new Object[]{bytesRead, HP8663A_GPIB.L1_LENGTH});
+      throw new IOException ();
+    }
+    // LOG message for debugging the L1 output.
+    // LOG.log (Level.WARNING, "bytes = {0}", bytesToHex (l1Buffer));
+    LOG.log (Level.INFO, "L1 received.");
+    // Also for debugging L1 output; but this one only reports changes.
     if (this.lastL1 != null)
       for (int i = 0; i < HP8663A_GPIB.L1_LENGTH; i++)
         if (l1Buffer[i] != this.lastL1[i])
@@ -193,7 +205,6 @@ public static String bytesToHex(byte[] bytes) {
     //    Integer.toHexString (l1[129] & 0xff),
     //    amDepth_percent});
     //
-    //
     // 186/187: checksum.
     // The checksum is most likely taken over the first 185 bytes in the L1 array.
     // Perhaps starting at index 2, since the first two bytes are always 0x4041.
@@ -201,10 +212,11 @@ public static String bytesToHex(byte[] bytes) {
     int sum = 0;
     for (int i=0; i < 186; i++)
       sum += (l1[i]);
-    LOG.log (Level.WARNING, "Sum 0...185 = {0}, 186={1}, 187={2}.",
-      new Object[]{Integer.toHexString (sum & 0xffff),
-        Integer.toHexString (l1[186] & 0xff),
-        Integer.toHexString (l1[187] & 0xff)});
+    // LOG message for debugging 186/187 checksums [?].
+    // LOG.log (Level.WARNING, "Sum 0...185 = {0}, 186={1}, 187={2}.",
+    //   new Object[]{Integer.toHexString (sum & 0xffff),
+    //     Integer.toHexString (l1[186] & 0xff),
+    //    Integer.toHexString (l1[187] & 0xff)});
     // Through reverse engineering I discoved that the least-significant byte of the sum
     // is followed "at a distance" by L1[187].
     // The distance is non-zero, though.
@@ -213,9 +225,10 @@ public static String bytesToHex(byte[] bytes) {
     if (sumLSBMinus187 != 0x86)
       LOG.log (Level.WARNING, "Potential checksum error (LSB/L1[187] mismatch].");
     final int sumMSB = (sum & 0xff00) >> 8;
-    final int sumMSBMinus186 = (sumMSB - (l1[186] & 0xff)) & 0xff;
-    LOG.log (Level.WARNING, "MSB (Sum 2...185) - 186 = {0}.",
-      new Object[]{Integer.toHexString (sumMSBMinus186)});
+    // Variable and LOG message for debugging the "checksum" on 186...
+    // final int sumMSBMinus186 = (sumMSB - (l1[186] & 0xff)) & 0xff;
+    // LOG.log (Level.WARNING, "MSB (Sum 2...185) - 186 = {0}.",
+    //   new Object[]{Integer.toHexString (sumMSBMinus186)});
     return new DefaultSignalGeneratorSettings (
       l1,
       f_MHz,
