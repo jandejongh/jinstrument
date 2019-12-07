@@ -216,7 +216,6 @@ public static String bytesToHex(byte[] bytes) {
     final int sumMSBMinus186 = (sumMSB - (l1[186] & 0xff)) & 0xff;
     LOG.log (Level.WARNING, "MSB (Sum 2...185) - 186 = {0}.",
       new Object[]{Integer.toHexString (sumMSBMinus186)});
-    
     return new DefaultSignalGeneratorSettings (
       l1,
       f_MHz,
