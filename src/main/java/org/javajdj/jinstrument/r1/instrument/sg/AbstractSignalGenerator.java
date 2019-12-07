@@ -13,15 +13,15 @@ public abstract class AbstractSignalGenerator
   implements SignalGenerator
 {
 
-  public AbstractSignalGenerator (final String name,
+  protected AbstractSignalGenerator (final String name,
     final Device device,
     final List<Runnable> runnables,
     final List<Service> targetServices)
   {
-    super (name, device, runnables, targetServices);
+    super (name, device, runnables, targetServices, true);
   }
   
-  public AbstractSignalGenerator (final Device device,
+  protected AbstractSignalGenerator (final Device device,
     final List<Runnable> runnables,
     final List<Service> targetServices)
   {
