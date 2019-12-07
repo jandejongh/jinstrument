@@ -30,7 +30,9 @@ public class DefaultSignalGeneratorSettings
     final boolean outputEnable,
     final double modulationSourceInternalFrequency_kHz,
     final boolean amEnable,
-    final double amDepth_percent)
+    final double amDepth_percent,
+    final boolean fmEnable,
+    final double fmDeviation_kHz)
   {
     this.centerFrequency_MHz = centerFrequency_MHz;
     this.S_dBm = S_dBm;
@@ -39,6 +41,8 @@ public class DefaultSignalGeneratorSettings
     this.modulationSourceInternalFrequency_kHz = modulationSourceInternalFrequency_kHz;
     this.amEnable = amEnable;
     this.amDepth_percent = amDepth_percent;
+    this.fmEnable = fmEnable;
+    this.fmDeviation_kHz = fmDeviation_kHz;
   }
 
   @Override
@@ -132,8 +136,35 @@ public class DefaultSignalGeneratorSettings
   {
     return this.amDepth_percent;
   }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // FM ENABLE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  private final boolean fmEnable;
   
+  @Override
+  public final boolean getFmEnable ()
+  {
+    return this.fmEnable;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // FM DEVIATION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final double fmDeviation_kHz;
+
+  @Override
+  public final double getFmDeviation_kHz ()
+  {
+    return this.fmDeviation_kHz;
+  }
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // EQUALS / HASHCODE
@@ -144,11 +175,14 @@ public class DefaultSignalGeneratorSettings
   public int hashCode ()
   {
     int hash = 7;
-    hash = 67 * hash + (int) (Double.doubleToLongBits (this.centerFrequency_MHz) ^ (Double.doubleToLongBits (this.centerFrequency_MHz) >>> 32));
-    hash = 67 * hash + (int) (Double.doubleToLongBits (this.S_dBm) ^ (Double.doubleToLongBits (this.S_dBm) >>> 32));
-    hash = 67 * hash + (this.outputEnable ? 1 : 0);
-    hash = 67 * hash + (int) (Double.doubleToLongBits (this.amDepth_percent) ^ (Double.doubleToLongBits (this.amDepth_percent) >>> 32));
-    hash = 67 * hash + (int) (Double.doubleToLongBits (this.modulationSourceInternalFrequency_kHz) ^ (Double.doubleToLongBits (this.modulationSourceInternalFrequency_kHz) >>> 32));
+    hash = 11 * hash + (int) (Double.doubleToLongBits (this.modulationSourceInternalFrequency_kHz) ^ (Double.doubleToLongBits (this.modulationSourceInternalFrequency_kHz) >>> 32));
+    hash = 11 * hash + (int) (Double.doubleToLongBits (this.centerFrequency_MHz) ^ (Double.doubleToLongBits (this.centerFrequency_MHz) >>> 32));
+    hash = 11 * hash + (int) (Double.doubleToLongBits (this.S_dBm) ^ (Double.doubleToLongBits (this.S_dBm) >>> 32));
+    hash = 11 * hash + (this.outputEnable ? 1 : 0);
+    hash = 11 * hash + (this.amEnable ? 1 : 0);
+    hash = 11 * hash + (int) (Double.doubleToLongBits (this.amDepth_percent) ^ (Double.doubleToLongBits (this.amDepth_percent) >>> 32));
+    hash = 11 * hash + (this.fmEnable ? 1 : 0);
+    hash = 11 * hash + (int) (Double.doubleToLongBits (this.fmDeviation_kHz) ^ (Double.doubleToLongBits (this.fmDeviation_kHz) >>> 32));
     return hash;
   }
 
@@ -168,6 +202,10 @@ public class DefaultSignalGeneratorSettings
       return false;
     }
     final DefaultSignalGeneratorSettings other = (DefaultSignalGeneratorSettings) obj;
+    if (Double.doubleToLongBits (this.modulationSourceInternalFrequency_kHz) != Double.doubleToLongBits (other.modulationSourceInternalFrequency_kHz))
+    {
+      return false;
+    }
     if (Double.doubleToLongBits (this.centerFrequency_MHz) != Double.doubleToLongBits (other.centerFrequency_MHz))
     {
       return false;
@@ -180,11 +218,19 @@ public class DefaultSignalGeneratorSettings
     {
       return false;
     }
+    if (this.amEnable != other.amEnable)
+    {
+      return false;
+    }
     if (Double.doubleToLongBits (this.amDepth_percent) != Double.doubleToLongBits (other.amDepth_percent))
     {
       return false;
     }
-    if (Double.doubleToLongBits (this.modulationSourceInternalFrequency_kHz) != Double.doubleToLongBits (other.modulationSourceInternalFrequency_kHz))
+    if (this.fmEnable != other.fmEnable)
+    {
+      return false;
+    }
+    if (Double.doubleToLongBits (this.fmDeviation_kHz) != Double.doubleToLongBits (other.fmDeviation_kHz))
     {
       return false;
     }

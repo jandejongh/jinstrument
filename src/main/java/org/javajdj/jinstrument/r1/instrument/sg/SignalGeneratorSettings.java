@@ -26,4 +26,8 @@ public interface SignalGeneratorSettings
   
   double getAmDepth_percent ();
   
+  boolean getFmEnable ();
+  
+  double getFmDeviation_kHz ();
+  
 }
