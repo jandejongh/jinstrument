@@ -480,7 +480,7 @@ extends JPanel
       }      
     });
     amPanel.add (this.jAmEnable);
-    setSubPanelBorder (Color.black, this.jAmDepth, "Depth");
+    setSubPanelBorder (Color.black, this.jAmDepth, "Depth [%]");
     this.jAmDepth.setMajorTickSpacing (100);
     this.jAmDepth.setPaintTicks (true);
     this.jAmDepth.setToolTipText ("-");
@@ -571,6 +571,10 @@ extends JPanel
     });
     fmPanel.add (this.jFmEnable);
     setSubPanelBorder (Color.black, this.jFmDeviation_kHz, "Max Dev [kHz]");
+    this.jFmDeviation_kHz.setMajorTickSpacing (50);
+    this.jFmDeviation_kHz.setMinorTickSpacing (10);
+    this.jFmDeviation_kHz.setPaintTicks (true);
+    this.jFmDeviation_kHz.setToolTipText ("-");
     this.jFmDeviation_kHz.addChangeListener ((final ChangeEvent ce) ->
     {
       final JSlider source = (JSlider) ce.getSource ();
