@@ -997,6 +997,12 @@ extends JPanel
         JSignalGeneratorDisplay.this.jAmDepth.setValue ((int) Math.round (amDepth_percent * 10.0));
         JSignalGeneratorDisplay.this.jAmDepth.setToolTipText (new DecimalFormat ("##0.0").format (amDepth_percent));
         //
+        // XXX Fix me later, when the value is reliable.
+        // JSignalGeneratorDisplay.this.jFmEnable.setDisplayedValue (settings.getFmEnable ());
+        final double fmDeviation_kHz = settings.getFmDeviation_kHz ();
+        JSignalGeneratorDisplay.this.jFmDeviation_kHz.setValue ((int) Math.round (fmDeviation_kHz));
+        JSignalGeneratorDisplay.this.jFmDeviation_kHz.setToolTipText (new DecimalFormat ("##0.0").format (fmDeviation_kHz));
+        //
         JSignalGeneratorDisplay.this.inhibitInstrumentControl = false;
         //
       });
