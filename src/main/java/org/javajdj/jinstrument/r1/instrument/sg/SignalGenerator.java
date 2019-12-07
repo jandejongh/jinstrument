@@ -19,8 +19,6 @@ public interface SignalGenerator
     EXT_DC;
   }
   
-  SignalGeneratorSettings getSettingsFromInstrument () throws IOException, InterruptedException;
-
   void setSettingsOnInstrument (SignalGeneratorSettings signalGeneratorSettings) throws IOException, InterruptedException;
   
   void setCenterFrequency_MHz (double centerFrequency_MHz) throws IOException, InterruptedException;
@@ -35,8 +33,10 @@ public interface SignalGenerator
   void setEnableAm (boolean enableAm, double depth_percent, ModulationSource modulationSource)
     throws IOException, InterruptedException;
   
-  void setEnableFm (boolean enableFm) throws IOException, InterruptedException;
+  void setEnableFm (boolean enableFm, double deviation_kHz, ModulationSource modulationSource)
+    throws IOException, InterruptedException;
   
-  void setEnablePm (boolean enablePm) throws IOException, InterruptedException;
+  void setEnablePm (boolean enablePm, double deviation_degrees, ModulationSource modulationSource)
+    throws IOException, InterruptedException;
   
 }
