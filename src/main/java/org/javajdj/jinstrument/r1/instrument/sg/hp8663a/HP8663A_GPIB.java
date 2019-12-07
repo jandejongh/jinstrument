@@ -196,6 +196,7 @@ implements SignalGenerator
     //    modulationSourceInternalFrequency_kHz});
     // XXX NO CLUE YET HERE!
     final boolean amEnable = true;
+    // Seems OK...
     final double amDepth_percent = 0.0
       + 10.0 * (l1[128]  & 0x0f)
       + 1.0  * ((l1[129] & 0xf0) >> 4)
@@ -204,6 +205,17 @@ implements SignalGenerator
     //  new Object[]{Integer.toHexString (l1[128] & 0xff),
     //    Integer.toHexString (l1[129] & 0xff),
     //    amDepth_percent});
+    // XXX NO CLUE YET HERE!
+    final boolean fmEnable = true;
+    final double fmMaxDeviation_kHz = 0.0
+      + 100.0 * ((l1[133] & 0xf0) >> 4)
+      + 10.0  * (l1[133]  & 0x0f)
+      + 1.0   * ((l1[134] & 0xf0) >> 4)
+      + 0.1   * (l1[134]  & 0x0f);
+    // LOG.log (Level.INFO, "Read 133/134: {0}/{1}; fmMaxDeviation_kHz: {2}.",
+    //   new Object[]{Integer.toHexString (l1[133] & 0xff),
+    //     Integer.toHexString (l1[134] & 0xff),
+    //     fmMaxDeviation_kHz});
     //
     // 186/187: checksum.
     // The checksum is most likely taken over the first 185 bytes in the L1 array.
@@ -236,7 +248,9 @@ implements SignalGenerator
       outputEnable,
       modulationSourceInternalFrequency_kHz,
       amEnable,
-      amDepth_percent); 
+      amDepth_percent,
+      fmEnable,
+      fmMaxDeviation_kHz); 
   }
   
   @Override
