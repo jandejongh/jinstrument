@@ -5,6 +5,9 @@ import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.r1.controller.gpib.GpibDevice;
+import org.javajdj.jinstrument.r1.instrument.DefaultInstrumentCommand;
+import org.javajdj.jinstrument.r1.instrument.InstrumentCommand;
+import org.javajdj.jinstrument.r1.instrument.InstrumentSettings;
 import org.javajdj.jinstrument.r1.instrument.sg.AbstractSignalGenerator;
 import org.javajdj.jinstrument.r1.instrument.sg.DefaultSignalGeneratorSettings;
 import org.javajdj.jinstrument.r1.instrument.sg.SignalGenerator;
@@ -55,13 +58,13 @@ implements SignalGenerator
   @Override
   public boolean isPoweredOn ()
   {
-    throw new UnsupportedOperationException ("Not supported yet.");
+    throw new UnsupportedOperationException ();
   }
 
   @Override
   public void setPoweredOn (boolean poweredOn)
   {
-    throw new UnsupportedOperationException ("Not supported yet.");
+    throw new UnsupportedOperationException ();
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,7 +90,7 @@ implements SignalGenerator
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // SETTINGS
+  // INSTRUMENT SETTINGS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -105,7 +108,7 @@ public static String bytesToHex(byte[] bytes) {
   
   private transient byte[] lastL1 = null;
   
-  private SignalGeneratorSettings getSettingsFromInstrumentNoLock (GpibDevice gpibDevice)
+  private SignalGeneratorSettings getSettingsFromInstrumentSyncNoLock (GpibDevice gpibDevice)
     throws IOException, InterruptedException
   {
     final byte[] l1Buffer = new byte[HP8663A_GPIB.L1_LENGTH];
@@ -123,27 +126,15 @@ public static String bytesToHex(byte[] bytes) {
   }
   
   @Override
-  public synchronized SignalGeneratorSettings getSettingsFromInstrument ()
+  public synchronized SignalGeneratorSettings getSettingsFromInstrumentSync ()
     throws IOException, InterruptedException
   {
     final GpibDevice device = (GpibDevice) getDevice ();
     try
     {
       device.lockDevice ();
-//      this.out.println ("FR 500 MZ");
-//      Thread.sleep (100L);
-//      if (this.bSwitch)
-//        this.out.println ("AP -50 DM");
-//      else
-//        this.out.println ("AP -30 DM");
-//      Thread.sleep (100L);
-      return getSettingsFromInstrumentNoLock (device);
+      return getSettingsFromInstrumentSyncNoLock (device);
     }
-//    catch (Exception e)
-//    {
-//      LOG.log (Level.WARNING, "Caught Exception while reading L1: {0}", e.getStackTrace ());
-//      return new DefaultSignalGeneratorSettings (100.0 /* XXX DUMMY */, -30.0);            
-//    }
     finally
     {
       device.unlockDevice ();
@@ -243,153 +234,301 @@ public static String bytesToHex(byte[] bytes) {
   }
   
   @Override
-  public synchronized void setCenterFrequency_MHz (final double centerFrequency_MHz)
+  public synchronized void setOutputEnable (final boolean outputEnable)
     throws IOException, InterruptedException
   {
-    final GpibDevice device = (GpibDevice) getDevice ();
-    try
-    {
-      device.lockDevice ();
-      this.out.println ("FR " + centerFrequency_MHz + " MZ");
-      getSettingsFromInstrumentNoLock (device);
-    }
-    finally
-    {
-      device.unlockDevice ();
-    }
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_OUTPUT_ENABLE,
+      InstrumentCommand.ICARG_RF_OUTPUT_ENABLE,
+      outputEnable));
   }
   
   @Override
   public synchronized void setAmplitude_dBm (final double amplitude_dBm)
     throws IOException, InterruptedException
   {
-    final GpibDevice device = (GpibDevice) getDevice ();
-    try
-    {
-      device.lockDevice ();
-      this.out.println ("AP " + amplitude_dBm + " DM");
-      getSettingsFromInstrumentNoLock (device);
-    }
-    finally
-    {
-      device.unlockDevice ();
-    }
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_OUTPUT_LEVEL,
+      InstrumentCommand.ICARG_RF_OUTPUT_LEVEL_DBM,
+      amplitude_dBm));
   }
   
   @Override
-  public synchronized void setOutputEnable (final boolean outputEnable)
+  public synchronized void setCenterFrequency_MHz (final double centerFrequency_MHz)
     throws IOException, InterruptedException
   {
-    final GpibDevice device = (GpibDevice) getDevice ();
-    try
-    {
-      device.lockDevice ();
-      if (outputEnable)
-        // this.out.println ("AP -60 DM");
-        this.out.println ("AP");
-      else
-        this.out.println ("AO");
-      getSettingsFromInstrumentNoLock (device);
-    }
-    finally
-    {
-      device.unlockDevice ();
-    }    
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_FREQUENCY,
+      InstrumentCommand.ICARG_RF_FREQUENCY_MHZ,
+      centerFrequency_MHz));
   }
   
   @Override
-  public void setEnableAm (final boolean enableAm, final double depth_percent, SignalGenerator.ModulationSource modulationSource)
+  public void setEnableAm (
+    final boolean enableAm,
+    final double depth_percent,
+    final SignalGenerator.ModulationSource modulationSource)
     throws IOException, InterruptedException
   {
-    final GpibDevice device = (GpibDevice) getDevice ();
-    try
-    {
-      device.lockDevice ();
-      if (enableAm)
-        switch (modulationSource)
-        {
-          case INT:
-            this.out.println ("AM " + depth_percent + " PC");
-            break;
-          case INT_400:
-            this.out.println ("AM M1 " + depth_percent + " PC");
-            break;
-          case INT_1K:
-            this.out.println ("AM M2 " + depth_percent + " PC");
-            break;
-          case EXT_AC:
-            this.out.println ("AM M3 " + depth_percent + " PC");
-            break;
-          case EXT_DC:
-            this.out.println ("AM M4 " + depth_percent + " PC");
-            break;
-          default:
-            throw new RuntimeException ();
-        }
-      else
-        this.out.println ("AM FO");
-      getSettingsFromInstrumentNoLock (device);
-    }
-    finally
-    {
-      device.unlockDevice ();
-    }    
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_AM_CONTROL,
+      InstrumentCommand.ICARG_RF_AM_ENABLE, enableAm,
+      InstrumentCommand.ICARG_RF_AM_DEPTH_PERCENT, depth_percent,
+      InstrumentCommand.ICARG_RF_AM_SOURCE, modulationSource));
   }
 
   @Override
-  public void setEnableFm (final boolean enableFm) throws IOException, InterruptedException
+  public void setEnableFm (
+    final boolean enableFm,
+    final double fmDeviation_kHz,
+    SignalGenerator.ModulationSource modulationSource)
+    throws IOException, InterruptedException
   {
-    final GpibDevice device = (GpibDevice) getDevice ();
-    try
-    {
-      device.lockDevice ();
-      if (enableFm)
-        this.out.println ("FM 13 KZ");
-      else
-        this.out.println ("FM FO");
-      getSettingsFromInstrumentNoLock (device);
-    }
-    finally
-    {
-      device.unlockDevice ();
-    }    
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_FM_CONTROL,
+      InstrumentCommand.ICARG_RF_FM_ENABLE, enableFm,
+      InstrumentCommand.ICARG_RF_FM_DEVIATION_KHZ, fmDeviation_kHz,
+      InstrumentCommand.ICARG_RF_FM_SOURCE, modulationSource));
   }
-
+  
   @Override
-  public void setEnablePm (final boolean enablePm) throws IOException, InterruptedException
+  public void setEnablePm (
+    final boolean enablePm,
+    final double pmDeviation_degrees,
+    SignalGenerator.ModulationSource modulationSource)
+    throws IOException, InterruptedException
   {
-    final GpibDevice device = (GpibDevice) getDevice ();
-    try
-    {
-      device.lockDevice ();
-      if (enablePm)
-        this.out.println ("PM 19 DG");
-      else
-        this.out.println ("PM FO");
-      getSettingsFromInstrumentNoLock (device);
-    }
-    finally
-    {
-      device.unlockDevice ();
-    }    
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_PM_CONTROL,
+      InstrumentCommand.ICARG_RF_PM_ENABLE, enablePm,
+      InstrumentCommand.ICARG_RF_PM_DEVIATION_DEGREES, pmDeviation_degrees,
+      InstrumentCommand.ICARG_RF_PM_SOURCE, modulationSource));
   }
-
+  
   @Override
   public final void setModulationSourceInternalFrequency_kHz (final double modulationSourceInternalFrequency_kHz)
     throws IOException, InterruptedException
   {
-    LOG.log (Level.INFO, "Setting ModulationSourceInternalFrequency_kHz to {0} kHz.", modulationSourceInternalFrequency_kHz);
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_INTMODSOURCE_CONTROL,
+      InstrumentCommand.ICARG_INTMODSOURCE_FREQUENCY_KHZ, modulationSourceInternalFrequency_kHz));
+  }
+
+  @Override
+  protected void requestSettingsFromInstrumentASync () throws UnsupportedOperationException, IOException
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // PROCESS COMMAND
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+  @Override
+  protected void processCommand (final InstrumentCommand instrumentCommand)
+    throws UnsupportedOperationException, IOException, InterruptedException
+  {
+    if (instrumentCommand == null)
+      throw new IllegalArgumentException ();
+    if (! instrumentCommand.containsKey (InstrumentCommand.IC_COMMAND_KEY))
+      throw new IllegalArgumentException ();
+    if (instrumentCommand.get (InstrumentCommand.IC_COMMAND_KEY) == null)
+      throw new IllegalArgumentException ();
+    if (! (instrumentCommand.get (InstrumentCommand.IC_COMMAND_KEY) instanceof String))
+      throw new IllegalArgumentException ();
+    final String commandString = (String) instrumentCommand.get (InstrumentCommand.IC_COMMAND_KEY);
+    if (commandString.trim ().isEmpty ())
+      throw new IllegalArgumentException ();
     final GpibDevice device = (GpibDevice) getDevice ();
+    InstrumentSettings newInstrumentSettings = null;
     try
     {
       device.lockDevice ();
-      this.out.println ("MF " + modulationSourceInternalFrequency_kHz + " KZ");
-      getSettingsFromInstrumentNoLock (device);
+      switch (commandString)
+      {
+        case InstrumentCommand.IC_NOP_KEY:
+          break;
+        case InstrumentCommand.IC_GET_SETTINGS_KEY:
+        {
+          final byte[] l1Buffer = new byte[HP8663A_GPIB.L1_LENGTH];
+          this.out.println ("L1");
+          final int bytesRead = device.getInputStream ().read (l1Buffer);
+          // LOG.log (Level.WARNING, "number of bytes read = {0}", bytesRead);
+          LOG.log (Level.WARNING, "bytes = {0}", bytesToHex (l1Buffer));
+          if (this.lastL1 != null)
+            for (int i = 0; i < HP8663A_GPIB.L1_LENGTH; i++)
+              if (l1Buffer[i] != this.lastL1[i])
+                LOG.log (Level.WARNING, "L1 string index {0} changed from {1} to {2}.",
+                  new Object[]
+                  {
+                    i, Integer.toHexString (this.lastL1[i] & 0xff), Integer.toHexString (l1Buffer[i] & 0xff)
+                  });
+          this.lastL1 = l1Buffer;
+          newInstrumentSettings = HP8663A_GPIB.settingsFromL1 (l1Buffer);
+          break;
+        }
+        case InstrumentCommand.IC_RF_OUTPUT_ENABLE:
+        {
+          final Boolean outputEnable;
+          if (instrumentCommand.containsKey (InstrumentCommand.ICARG_RF_OUTPUT_ENABLE))
+            outputEnable = (Boolean) instrumentCommand.get (InstrumentCommand.ICARG_RF_OUTPUT_ENABLE);
+          else
+            outputEnable = true;
+          if (outputEnable)
+            this.out.println ("AP");
+          else
+            this.out.println ("AO");
+          break;
+        }
+        case InstrumentCommand.IC_RF_OUTPUT_LEVEL:
+        {
+          // XXX There seems to be no way to just set the output level, without also enabling RF output.
+          final double amplitude_dBm = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_OUTPUT_LEVEL_DBM);
+          this.out.println ("AP " + amplitude_dBm + " DM");
+          break;
+        }
+        case InstrumentCommand.IC_RF_FREQUENCY:
+        {
+          final double centerFrequency_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_FREQUENCY_MHZ);
+          this.out.println ("FR " + centerFrequency_MHz + " MZ");
+          break;
+        }
+        case InstrumentCommand.IC_RF_AM_CONTROL:
+        {
+          final Boolean amEnable;
+          if (instrumentCommand.containsKey (InstrumentCommand.ICARG_RF_AM_ENABLE))
+            amEnable = (Boolean) instrumentCommand.get (InstrumentCommand.ICARG_RF_AM_ENABLE);
+          else
+            amEnable = true;
+          if (amEnable)
+          {
+            final double depth_percent = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_AM_DEPTH_PERCENT);
+            final ModulationSource modulationSource =
+              (ModulationSource) instrumentCommand.get (InstrumentCommand.ICARG_RF_AM_SOURCE);
+            switch (modulationSource)
+            {
+              case INT:
+                this.out.println ("AM " + depth_percent + " PC");
+                break;
+              case INT_400:
+                this.out.println ("AM M1 " + depth_percent + " PC");
+                break;
+              case INT_1K:
+                this.out.println ("AM M2 " + depth_percent + " PC");
+                break;
+              case EXT_AC:
+                this.out.println ("AM M3 " + depth_percent + " PC");
+                break;
+              case EXT_DC:
+                this.out.println ("AM M4 " + depth_percent + " PC");
+                break;
+              default:
+                throw new UnsupportedOperationException ();
+            }            
+          }
+          else
+            this.out.println ("AM FO");
+          break;
+        }
+        case InstrumentCommand.IC_RF_FM_CONTROL:
+        {
+          final Boolean fmEnable;
+          if (instrumentCommand.containsKey (InstrumentCommand.ICARG_RF_FM_ENABLE))
+            fmEnable = (Boolean) instrumentCommand.get (InstrumentCommand.ICARG_RF_FM_ENABLE);
+          else
+            fmEnable = true;
+          if (fmEnable)
+          {
+            final double fmDeviation_kHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_FM_DEVIATION_KHZ);
+            final ModulationSource modulationSource =
+              (ModulationSource) instrumentCommand.get (InstrumentCommand.ICARG_RF_FM_SOURCE);
+            switch (modulationSource)
+            {
+              case INT:
+                this.out.println ("FM " + fmDeviation_kHz + " KZ");
+                break;
+              case INT_400:
+                this.out.println ("FM M1 " + fmDeviation_kHz + " KZ");
+                break;
+              case INT_1K:
+                this.out.println ("FM M2 " + fmDeviation_kHz + " KZ");
+                break;
+              case EXT_AC:
+                this.out.println ("FM M3 " + fmDeviation_kHz + " KZ");
+                break;
+              case EXT_DC:
+                this.out.println ("FM M4 " + fmDeviation_kHz + " KZ");
+                break;
+              default:
+                throw new UnsupportedOperationException ();
+            }            
+          }
+          else
+            this.out.println ("FM FO");  
+          break;
+        }
+        case InstrumentCommand.IC_RF_PM_CONTROL:
+        {
+          final Boolean pmEnable;
+          if (instrumentCommand.containsKey (InstrumentCommand.ICARG_RF_PM_ENABLE))
+            pmEnable = (Boolean) instrumentCommand.get (InstrumentCommand.ICARG_RF_PM_ENABLE);
+          else
+            pmEnable = true;
+          if (pmEnable)
+          {
+            final double pmDeviation_degrees = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_PM_DEVIATION_DEGREES);
+            final ModulationSource modulationSource =
+              (ModulationSource) instrumentCommand.get (InstrumentCommand.ICARG_RF_PM_SOURCE);
+            switch (modulationSource)
+            {
+              case INT:
+                this.out.println ("PM " + pmDeviation_degrees + " DG");
+                break;
+              case INT_400:
+                this.out.println ("PM M1 " + pmDeviation_degrees + " DG");
+                break;
+              case INT_1K:
+                this.out.println ("PM M2 " + pmDeviation_degrees + " DG");
+                break;
+              case EXT_AC:
+                this.out.println ("PM M3 " + pmDeviation_degrees + " DG");
+                break;
+              case EXT_DC:
+                this.out.println ("PM M4 " + pmDeviation_degrees + " DG");
+                break;
+              default:
+                throw new UnsupportedOperationException ();
+            }            
+          }
+          else
+            this.out.println ("PM FO");  
+          break;
+        }
+        case InstrumentCommand.IC_INTMODSOURCE_CONTROL:
+        {
+          final double intModSourceFrequency_kHz =
+            (double) instrumentCommand.get (InstrumentCommand.ICARG_INTMODSOURCE_FREQUENCY_KHZ);
+          this.out.println ("MF " + intModSourceFrequency_kHz + " KZ");
+          break;
+        }
+        default:
+          throw new UnsupportedOperationException ();
+      }
     }
     finally
     {
-      device.unlockDevice ();
-    }    
+      device.unlockDevice ();      
+    }
+    if (newInstrumentSettings != null)
+      settingsReadFromInstrument (newInstrumentSettings);
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // END OF FILE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
 }
