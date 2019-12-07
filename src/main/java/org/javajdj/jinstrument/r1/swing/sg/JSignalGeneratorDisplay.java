@@ -15,7 +15,6 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -58,8 +57,6 @@ extends JPanel
   // CONSTRUCTOR(S) / FACTORY / CLONING
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private boolean _toggle = false;
   
   public JSignalGeneratorDisplay (final SignalGenerator signalGenerator)
   {
@@ -139,10 +136,6 @@ extends JPanel
             LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} MHz: {1}.",
               new Object[]{source.getValue (), e});          
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} MHz.", source.getValue ());
-        }
       }
       else
         source.setToolTipText (Integer.toString (source.getValue ()));
@@ -173,10 +166,6 @@ extends JPanel
             LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} kHz: {1}.",
               new Object[]{source.getValue (), e});          
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} kHz.", source.getValue ());
-        }
       }
     });
     setSubPanelBorder (FREQUENCY_COLOR, this.jFreqSlider_kHz, "[kHz]");
@@ -205,10 +194,6 @@ extends JPanel
             LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} Hz: {1}.",
               new Object[]{source.getValue (), e});          
           }
-        else
-        {
-          // LOG.log (Level.INFO, "Suppressed instrument control for new value {0} Hz.", source.getValue ());
-        }
       }
     });
     setSubPanelBorder (FREQUENCY_COLOR, this.jFreqSlider_Hz, "[Hz]");
@@ -237,10 +222,6 @@ extends JPanel
             LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} mHz: {1}.",
               new Object[]{source.getValue (), e});          
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} mHz.", source.getValue ());
-        }
       }
     });
     setSubPanelBorder (FREQUENCY_COLOR, this.jFreqSlider_mHz, "[mHz]");
@@ -278,26 +259,39 @@ extends JPanel
     final JPanel amplitudeTopPanel = new JPanel ();
     amplitudeTopPanel.setLayout (new GridLayout (1, 2));
     //
-    this.jAmpEnable = new JCheckBox ("Output Enable");
-    this.jAmpEnable.addItemListener ((itemEvent) ->
+    this.jAmpEnable = new JColorCheckBox ((Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? AMPLITUDE_COLOR : null);
+    final JPanel jAmpEnablePanel = new JPanel ();
+    // jAmpEnablePanel.setLayout (new FlowLayout (FlowLayout.CENTER));
+    jAmpEnablePanel.setLayout (new GridLayout (1, 1));
+    jAmpEnablePanel.add (jAmpEnable);
+    setSubPanelBorder (AMPLITUDE_COLOR, jAmpEnablePanel, "RF Out");
+    this.jAmpEnable.setDisplayedValue (false);
+    this.jAmpEnable.addMouseListener (new MouseAdapter ()
     {
-      if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
+      @Override
+      public void mouseClicked (final MouseEvent me)
       {
-        final boolean newOutputEnable = (itemEvent.getStateChange () == ItemEvent.SELECTED);
+        super.mouseClicked (me);
+        final JColorCheckBox<Boolean> source = (JColorCheckBox<Boolean>) me.getSource ();
         try
         {
-          signalGenerator.setOutputEnable (newOutputEnable);
+          final boolean newValue = ! source.getDisplayedValue ();
+          // XXX This should not be necessary! Should be done upon new instrument settings.
+          source.setDisplayedValue (newValue);
+          LOG.log (Level.INFO, "Toggling outputEnable on instrument; becomes {0}", newValue);
+          signalGenerator.setOutputEnable (newValue);
         }
         catch (IOException | InterruptedException e)
         {
-          LOG.log (Level.INFO, "Caught exception while setting outputEnable to {0}: {1}.",
-            new Object[]{newOutputEnable, e});          
+          LOG.log (Level.INFO, "Caught exception while toggling outputEnable on instrument.");
         }
       }
-     });
-    amplitudeTopPanel.add (this.jAmpEnable);
+    });
+    // amplitudeTopPanel.add (this.jAmpEnable);
+    amplitudeTopPanel.add (jAmpEnablePanel);
     //
     this.jAmplitudeAlt = new JSevenSegmentNumber (AMPLITUDE_COLOR, true, 5, 2);
+    setSubPanelBorder (AMPLITUDE_COLOR, jAmplitudeAlt, "[dBm]");
     amplitudeTopPanel.add (this.jAmplitudeAlt);
     //
     amplitudePanel.add (amplitudeTopPanel);
@@ -327,10 +321,6 @@ extends JPanel
             LOG.log (Level.INFO, "Caught exception while setting amplitude from slider to {0} dBm: {1}.",
               new Object[]{source.getValue (), e});
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} dBm.", source.getValue ());
-        }
       }
     });
     setSubPanelBorder (AMPLITUDE_COLOR, this.jAmpSlider_dBm, "[dBm]");
@@ -358,10 +348,6 @@ extends JPanel
             LOG.log (Level.INFO, "Caught exception while setting amplitude from slider to {0} mdBm: {1}.",
               new Object[]{source.getValue (), e});
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} mdBm.", source.getValue ());
-        }
       }
     });
     setSubPanelBorder (AMPLITUDE_COLOR, this.jAmpSlider_mdBm, "[mdBm]");
@@ -420,15 +406,12 @@ extends JPanel
               + " from slider to {0} kHz.",
               new Object[]{source.getValue (), e});          
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} kHz.", source.getValue ());
-        }
       }
       else
         source.setToolTipText (Integer.toString (source.getValue ()));
     });
     modSourcesInternalPanel.add (this.jModulationSourceInternalFrequency_kHz);
+    setSubPanelBorder (MODULATION_COLOR, this.jModulationSourceInternalFrequency_Hz, "Hz");
     this.jModulationSourceInternalFrequency_Hz.setMajorTickSpacing (100);
     this.jModulationSourceInternalFrequency_Hz.setMinorTickSpacing (10);
     this.jModulationSourceInternalFrequency_Hz.setPaintTicks (true);
@@ -454,10 +437,6 @@ extends JPanel
               + " from slider to {0} Hz.",
               new Object[]{source.getValue (), e});          
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} Hz.", source.getValue ());
-        }
       }
       else
         source.setToolTipText (Integer.toString (source.getValue ()));
@@ -485,15 +464,14 @@ extends JPanel
         final JColorCheckBox<Boolean> source = (JColorCheckBox<Boolean>) me.getSource ();
         try
         {
-          final boolean newValue = ! _toggle;
+          final boolean newValue = ! source.getDisplayedValue ();
+          // XXX This should not be necessary! Should be done upon new instrument settings.
+          source.setDisplayedValue (newValue);
           LOG.log (Level.INFO, "Toggling AM on instrument; becomes {0}", newValue);
-          // signalGenerator.setEnableAm (source.getDisplayedValue () == null || ! source.getDisplayedValue ());
-          // signalGenerator.setEnableAm (source.getDisplayedValue () == null || ! source.getDisplayedValue ());
           signalGenerator.setEnableAm (
             newValue,
             JSignalGeneratorDisplay.this.jAmDepth.getValue () / 10.0,
             SignalGenerator.ModulationSource.values ()[JSignalGeneratorDisplay.this.jAmSource.getSelectedIndex ()]);
-          _toggle = newValue;
         }
         catch (IOException | InterruptedException e)
         {
@@ -504,9 +482,7 @@ extends JPanel
     amPanel.add (this.jAmEnable);
     setSubPanelBorder (Color.black, this.jAmDepth, "Depth");
     this.jAmDepth.setMajorTickSpacing (100);
-//  this.jAmDepth.setMinorTickSpacing (1);
     this.jAmDepth.setPaintTicks (true);
-//  this.jAmDepth.setPaintLabels (true);
     this.jAmDepth.setToolTipText ("-");
     this.jAmDepth.addChangeListener ((final ChangeEvent ce) ->
     {
@@ -530,10 +506,6 @@ extends JPanel
               + " from slider to {0} %.",
               new Object[]{newDepth, e});          
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} %.", newDepth);
-        }
       }
       else
         source.setToolTipText (Double.toString (newDepth));
@@ -561,10 +533,6 @@ extends JPanel
               + " from combo box to {0}.",
               new Object[]{newValue, e});
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0}.", newValue);
-        }
       }
     });
     amPanel.add (this.jAmSource);
@@ -586,15 +554,14 @@ extends JPanel
         final JColorCheckBox<Boolean> source = (JColorCheckBox<Boolean>) me.getSource ();
         try
         {
-          final boolean newValue = ! _toggle;
+          final boolean newValue = ! source.getDisplayedValue ();
+          // XXX This should not be necessary! Should be done upon new instrument settings.
+          source.setDisplayedValue (newValue);
           LOG.log (Level.INFO, "Toggling FM on instrument; becomes {0}", newValue);
-          // signalGenerator.setEnableFm (source.getDisplayedValue () == null || ! source.getDisplayedValue ());
-          // signalGenerator.setEnableFm (source.getDisplayedValue () == null || ! source.getDisplayedValue ());
           signalGenerator.setEnableFm (
             newValue,
             JSignalGeneratorDisplay.this.jFmDeviation_kHz.getValue (),
             SignalGenerator.ModulationSource.values ()[JSignalGeneratorDisplay.this.jFmSource.getSelectedIndex ()]);
-          _toggle = newValue;
         }
         catch (IOException | InterruptedException e)
         {
@@ -603,7 +570,7 @@ extends JPanel
       }
     });
     fmPanel.add (this.jFmEnable);
-    setSubPanelBorder (Color.black, this.jFmDeviation_kHz, "Max Dev");
+    setSubPanelBorder (Color.black, this.jFmDeviation_kHz, "Max Dev [kHz]");
     this.jFmDeviation_kHz.addChangeListener ((final ChangeEvent ce) ->
     {
       final JSlider source = (JSlider) ce.getSource ();
@@ -626,10 +593,6 @@ extends JPanel
               + " from slider to {0} kHz.",
               new Object[]{newDeviation_kHz, e});          
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} kHz.", newDeviation_kHz);
-        }
       }
       else
         source.setToolTipText (Double.toString (newDeviation_kHz));
@@ -656,10 +619,6 @@ extends JPanel
               + " from combo box to {0}.",
               new Object[]{newValue, e});
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0}.", newValue);
-        }
       }
     });
     fmPanel.add (this.jFmSource);
@@ -679,15 +638,14 @@ extends JPanel
         final JColorCheckBox<Boolean> source = (JColorCheckBox<Boolean>) me.getSource ();
         try
         {
-          final boolean newValue = ! _toggle;
+          final boolean newValue = ! source.getDisplayedValue ();
+          // XXX This should not be necessary! Should be done upon new instrument settings.
+          source.setDisplayedValue (newValue);
           LOG.log (Level.INFO, "Toggling PM on instrument; becomes {0}", newValue);
-          // signalGenerator.setEnableFm (source.getDisplayedValue () == null || ! source.getDisplayedValue ());
-          // signalGenerator.setEnableFm (source.getDisplayedValue () == null || ! source.getDisplayedValue ());
           signalGenerator.setEnablePm (
             newValue,
             JSignalGeneratorDisplay.this.jPmDeviation_degrees.getValue (),
             SignalGenerator.ModulationSource.values ()[JSignalGeneratorDisplay.this.jPmSource.getSelectedIndex ()]);
-          _toggle = newValue;
         }
         catch (IOException | InterruptedException e)
         {
@@ -719,10 +677,6 @@ extends JPanel
               + " from slider to {0} degrees.",
               new Object[]{newDeviation_degrees, e});          
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0} degrees.", newDeviation_degrees);
-        }
       }
       else
         source.setToolTipText (Double.toString (newDeviation_degrees));
@@ -750,10 +704,6 @@ extends JPanel
               + " from combo box to {0}.",
               new Object[]{newValue, e});
           }
-        else
-        {
-          LOG.log (Level.INFO, "Suppressed instrument control for new value {0}.", newValue);
-        }
       }
     });
     pmPanel.add (this.jPmSource);
@@ -766,9 +716,111 @@ extends JPanel
     modDigitalPanel.setLayout (new GridLayout (2, 1));
     final JPanel pulsePanel = new JPanel ();
     setSubPanelBorder (MODULATION_COLOR, pulsePanel, "PULSE");
+    pulsePanel.setLayout (new GridLayout (1, 2));
+    this.jPulseMEnable = new JColorCheckBox ((Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? MODULATION_COLOR : null);
+    this.jPulseMSource = new JComboBox (ModulationSource.values ());
+    this.jPulseMEnable.setDisplayedValue (false);
+    this.jPulseMEnable.addMouseListener (new MouseAdapter ()
+    {
+      @Override
+      public void mouseClicked (final MouseEvent me)
+      {
+        super.mouseClicked (me);
+        final JColorCheckBox<Boolean> source = (JColorCheckBox<Boolean>) me.getSource ();
+        try
+        {
+          final boolean newValue = ! source.getDisplayedValue ();
+          // XXX This should not be necessary! Should be done upon new instrument settings.
+          source.setDisplayedValue (newValue);
+          LOG.log (Level.INFO, "Toggling PulseM on instrument; becomes {0}", newValue);
+          signalGenerator.setEnablePulseM (
+            newValue,
+            SignalGenerator.ModulationSource.values ()[JSignalGeneratorDisplay.this.jPulseMSource.getSelectedIndex ()]);
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while toggling PulseM on instrument.");
+        }
+      }
+    });
+    pulsePanel.add (this.jPulseMEnable);
+    setSubPanelBorder (Color.black, this.jPulseMSource, "Source");
+    this.jPulseMSource.addItemListener ((ItemEvent ie) ->
+    {
+      if (ie.getStateChange () == ItemEvent.SELECTED)
+      {
+        final SignalGenerator.ModulationSource newValue = (SignalGenerator.ModulationSource) ie.getItem ();
+        if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
+          try
+          {
+            LOG.log (Level.INFO, "Setting PulseM modulation source on instrument from combo box to {0}.", newValue);
+            signalGenerator.setEnablePulseM (
+              JSignalGeneratorDisplay.this.jPulseMEnable.getDisplayedValue (),
+              newValue);
+          }
+          catch (IOException | InterruptedException e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting PulseM modulation source on instrument"
+              + " from combo box to {0}.",
+              new Object[]{newValue, e});
+          }
+      }
+    });
+    pulsePanel.add (this.jPulseMSource);
     modDigitalPanel.add (pulsePanel);
     final JPanel bpskPanel = new JPanel ();
     setSubPanelBorder (MODULATION_COLOR, bpskPanel, "BPSK");
+    bpskPanel.setLayout (new GridLayout (1, 2));
+    this.jBpskEnable = new JColorCheckBox ((Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? MODULATION_COLOR : null);
+    this.jBpskSource = new JComboBox (ModulationSource.values ());
+    this.jBpskEnable.setDisplayedValue (false);
+    this.jBpskEnable.addMouseListener (new MouseAdapter ()
+    {
+      @Override
+      public void mouseClicked (final MouseEvent me)
+      {
+        super.mouseClicked (me);
+        final JColorCheckBox<Boolean> source = (JColorCheckBox<Boolean>) me.getSource ();
+        try
+        {
+          final boolean newValue = ! source.getDisplayedValue ();
+          // XXX This should not be necessary! Should be done upon new instrument settings.
+          source.setDisplayedValue (newValue);
+          LOG.log (Level.INFO, "Toggling Bpsk on instrument; becomes {0}", newValue);
+          signalGenerator.setEnableBpsk (
+            newValue,
+            SignalGenerator.ModulationSource.values ()[JSignalGeneratorDisplay.this.jBpskSource.getSelectedIndex ()]);
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while toggling Bpsk on instrument.");
+        }
+      }
+    });
+    bpskPanel.add (this.jBpskEnable);
+    setSubPanelBorder (Color.black, this.jBpskSource, "Source");
+    this.jBpskSource.addItemListener ((ItemEvent ie) ->
+    {
+      if (ie.getStateChange () == ItemEvent.SELECTED)
+      {
+        final SignalGenerator.ModulationSource newValue = (SignalGenerator.ModulationSource) ie.getItem ();
+        if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
+          try
+          {
+            LOG.log (Level.INFO, "Setting BPSK modulation source on instrument from combo box to {0}.", newValue);
+            signalGenerator.setEnableBpsk (
+              JSignalGeneratorDisplay.this.jBpskEnable.getDisplayedValue (),
+              newValue);
+          }
+          catch (IOException | InterruptedException e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting BPSK modulation source on instrument"
+              + " from combo box to {0}.",
+              new Object[]{newValue, e});
+          }
+      }
+    });
+    bpskPanel.add (this.jBpskSource);
     modDigitalPanel.add (bpskPanel);
     add (modDigitalPanel);
     
@@ -810,7 +862,7 @@ extends JPanel
   
   private final JSlider jFreqSlider_mHz;
   
-  private final JCheckBox jAmpEnable;
+  private final JColorCheckBox<Boolean> jAmpEnable;
   
   private final JSevenSegmentNumber jAmplitudeAlt;
   
@@ -842,6 +894,14 @@ extends JPanel
   
   private final JComboBox jPmSource;
   
+  private final JColorCheckBox<Boolean> jPulseMEnable;
+  
+  private final JComboBox jPulseMSource;
+  
+  private final JColorCheckBox<Boolean> jBpskEnable;
+  
+  private final JComboBox jBpskSource;
+  
   private final JByte jByte21 = new JByte ();
   private final JByte jByte81 = new JByte ();
   private final JByte jByte181 = new JByte ();
@@ -860,7 +920,7 @@ extends JPanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  /** Inhibits changes to settings on the instrument.
+  /** Inhibits backfiring changes to settings on the instrument while updating the Swing GUI.
    * 
    * Only used by the Swing EDT to prevent that Swing components being updated from new instrument settings generate (change)
    * events and (as a result) instrument operations as a result.
@@ -907,7 +967,8 @@ extends JPanel
         JSignalGeneratorDisplay.this.jFreqSlider_mHz.setValue (f_rem_int_mHz);
         JSignalGeneratorDisplay.this.jFreqSlider_mHz.setToolTipText (Integer.toString (f_rem_int_mHz));
         //
-        JSignalGeneratorDisplay.this.jAmpEnable.setSelected (settings.getOutputEnable ());
+        // XXX Fix me later, when the value is reliable.
+        // JSignalGeneratorDisplay.this.jAmpEnable.setSelected (settings.getOutputEnable ());
         final double S_dBm = settings.getS_dBm ();
         JSignalGeneratorDisplay.this.jAmplitudeAlt.setNumber (settings.getS_dBm ());
         final long S_mdBm_long = Math.round (S_dBm * 1e3);
@@ -930,7 +991,8 @@ extends JPanel
         JSignalGeneratorDisplay.this.jModulationSourceInternalFrequency_Hz.setToolTipText (
           Integer.toString (modSrcIntFreq_rem_int_Hz));
         //
-        JSignalGeneratorDisplay.this.jAmEnable.setDisplayedValue (settings.getAmEnable ());
+        // XXX Fix me later, when the value is reliable.
+        // JSignalGeneratorDisplay.this.jAmEnable.setDisplayedValue (settings.getAmEnable ());
         final double amDepth_percent = settings.getAmDepth_percent ();
         JSignalGeneratorDisplay.this.jAmDepth.setValue ((int) Math.round (amDepth_percent * 10.0));
         JSignalGeneratorDisplay.this.jAmDepth.setToolTipText (new DecimalFormat ("##0.0").format (amDepth_percent));
