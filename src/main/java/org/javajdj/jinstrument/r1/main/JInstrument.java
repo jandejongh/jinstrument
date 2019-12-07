@@ -26,7 +26,7 @@ extends JFrame
   public JInstrument (final String title)
   throws HeadlessException
   {
-    super (title == null ? "JInstrument V1.1" : title);
+    super (title == null ? "JInstrument V0.1-SNAPSHOT" : title);
     setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
     final JTabbedPane tabbedPane = new JTabbedPane ();
     getContentPane ().add (tabbedPane, BorderLayout.CENTER);
