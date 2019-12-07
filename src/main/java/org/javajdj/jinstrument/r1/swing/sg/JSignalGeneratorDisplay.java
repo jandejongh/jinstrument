@@ -764,12 +764,12 @@ extends JPanel
     final JPanel modDigitalPanel = new JPanel ();
     setPanelBorder (modDigitalPanel, "Modulation [Digital]");
     modDigitalPanel.setLayout (new GridLayout (2, 1));
-    final JPanel bpskPanel = new JPanel ();
-    setSubPanelBorder (MODULATION_COLOR, bpskPanel, "BPSK");
-    modDigitalPanel.add (bpskPanel);
     final JPanel pulsePanel = new JPanel ();
     setSubPanelBorder (MODULATION_COLOR, pulsePanel, "PULSE");
     modDigitalPanel.add (pulsePanel);
+    final JPanel bpskPanel = new JPanel ();
+    setSubPanelBorder (MODULATION_COLOR, bpskPanel, "BPSK");
+    modDigitalPanel.add (bpskPanel);
     add (modDigitalPanel);
     
     this.signalGenerator.addInstrumentListener (this.instrumentListener);
