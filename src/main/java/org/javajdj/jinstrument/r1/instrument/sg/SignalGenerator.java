@@ -39,4 +39,10 @@ public interface SignalGenerator
   void setEnablePm (boolean enablePm, double deviation_degrees, ModulationSource modulationSource)
     throws IOException, InterruptedException;
   
+  void setEnablePulseM (boolean enablePulseM, ModulationSource modulationSource)
+    throws IOException, InterruptedException;
+  
+  void setEnableBpsk (boolean enableBpsk, ModulationSource modulationSource)
+    throws IOException, InterruptedException;
+  
 }

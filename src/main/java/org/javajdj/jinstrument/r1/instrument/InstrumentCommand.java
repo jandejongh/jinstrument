@@ -62,6 +62,14 @@ public interface InstrumentCommand
   public final static String ICARG_RF_PM_DEVIATION_DEGREES = "rfPmDeviation_degrees"; 
   public final static String ICARG_RF_PM_SOURCE = "rfPmSource"; 
 
+  public final static String IC_RF_PULSEM_CONTROL = "commandRfPulseMControl";
+  public final static String ICARG_RF_PULSEM_ENABLE = "rfPulseMEnable"; 
+  public final static String ICARG_RF_PULSEM_SOURCE = "rfPulseMSource"; 
+
+  public final static String IC_RF_BPSK_CONTROL = "commandRfBpskControl";
+  public final static String ICARG_RF_BPSK_ENABLE = "rfBpskEnable"; 
+  public final static String ICARG_RF_BPSK_SOURCE = "rfBpskSource"; 
+
   public final static String IC_INTMODSOURCE_CONTROL = "commandIntModSourceControl";
   public final static String ICARG_INTMODSOURCE_FREQUENCY_KHZ = "intModSourceFrequency_kHz";
 

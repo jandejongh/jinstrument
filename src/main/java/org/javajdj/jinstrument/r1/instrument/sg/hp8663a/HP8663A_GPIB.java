@@ -306,6 +306,30 @@ public static String bytesToHex(byte[] bytes) {
   }
   
   @Override
+  public void setEnablePulseM (
+    final boolean enablePulseM,
+    SignalGenerator.ModulationSource modulationSource)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_PULSEM_CONTROL,
+      InstrumentCommand.ICARG_RF_PULSEM_ENABLE, enablePulseM,
+      InstrumentCommand.ICARG_RF_PULSEM_SOURCE, modulationSource));
+  }
+  
+  @Override
+  public void setEnableBpsk (
+    final boolean enableBpsk,
+    SignalGenerator.ModulationSource modulationSource)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_BPSK_CONTROL,
+      InstrumentCommand.ICARG_RF_BPSK_ENABLE, enableBpsk,
+      InstrumentCommand.ICARG_RF_BPSK_SOURCE, modulationSource));
+  }
+  
+  @Override
   public final void setModulationSourceInternalFrequency_kHz (final double modulationSourceInternalFrequency_kHz)
     throws IOException, InterruptedException
   {
@@ -504,6 +528,76 @@ public static String bytesToHex(byte[] bytes) {
           }
           else
             this.out.println ("PM FO");  
+          break;
+        }
+        case InstrumentCommand.IC_RF_PULSEM_CONTROL:
+        {
+          final Boolean pulseMEnable;
+          if (instrumentCommand.containsKey (InstrumentCommand.ICARG_RF_PULSEM_ENABLE))
+            pulseMEnable = (Boolean) instrumentCommand.get (InstrumentCommand.ICARG_RF_PULSEM_ENABLE);
+          else
+            pulseMEnable = true;
+          if (pulseMEnable)
+          {
+            final ModulationSource modulationSource =
+              (ModulationSource) instrumentCommand.get (InstrumentCommand.ICARG_RF_PULSEM_SOURCE);
+            switch (modulationSource)
+            {
+              case INT:
+                this.out.println ("PL");
+                break;
+              case INT_400:
+                this.out.println ("PL M1");
+                break;
+              case INT_1K:
+                this.out.println ("PL M2");
+                break;
+              case EXT_AC:
+                throw new UnsupportedOperationException ();
+              case EXT_DC:
+                this.out.println ("PL M4");
+                break;
+              default:
+                throw new UnsupportedOperationException ();
+            }            
+          }
+          else
+            this.out.println ("PL FO");
+          break;
+        }
+        case InstrumentCommand.IC_RF_BPSK_CONTROL:
+        {
+          final Boolean bpskEnable;
+          if (instrumentCommand.containsKey (InstrumentCommand.ICARG_RF_BPSK_ENABLE))
+            bpskEnable = (Boolean) instrumentCommand.get (InstrumentCommand.ICARG_RF_BPSK_ENABLE);
+          else
+            bpskEnable = true;
+          if (bpskEnable)
+          {
+            final ModulationSource modulationSource =
+              (ModulationSource) instrumentCommand.get (InstrumentCommand.ICARG_RF_BPSK_SOURCE);
+            switch (modulationSource)
+            {
+              case INT:
+                this.out.println ("BP");
+                break;
+              case INT_400:
+                this.out.println ("BP M1");
+                break;
+              case INT_1K:
+                this.out.println ("BP M2");
+                break;
+              case EXT_AC:
+                throw new UnsupportedOperationException ();
+              case EXT_DC:
+                this.out.println ("BP M4");
+                break;
+              default:
+                throw new UnsupportedOperationException ();
+            }
+          }
+          else
+            this.out.println ("BP FO");
           break;
         }
         case InstrumentCommand.IC_INTMODSOURCE_CONTROL:
