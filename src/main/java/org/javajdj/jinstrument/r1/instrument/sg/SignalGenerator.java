@@ -22,6 +22,12 @@ public interface SignalGenerator
   void setSettingsOnInstrument (SignalGeneratorSettings signalGeneratorSettings) throws IOException, InterruptedException;
   
   void setCenterFrequency_MHz (double centerFrequency_MHz) throws IOException, InterruptedException;
+
+  void setSpan_MHz (double span_MHz) throws IOException, InterruptedException;
+  
+  void setStartFrequency_MHz (double startFrequency_MHz) throws IOException, InterruptedException;
+  
+  void setStopFrequency_MHz (double stopFrequency_MHz) throws IOException, InterruptedException;
   
   void setOutputEnable (boolean outputEnable) throws IOException, InterruptedException;
   

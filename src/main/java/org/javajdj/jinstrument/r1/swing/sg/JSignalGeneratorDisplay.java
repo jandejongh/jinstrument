@@ -18,6 +18,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
@@ -112,6 +113,29 @@ extends JPanel
     frequencyPanel.setLayout (new GridLayout (5, 1));
     //
     this.jCenterFreq = new JSevenSegmentNumber (FREQUENCY_COLOR, false, 11, 9);
+    this.jCenterFreq.addMouseListener (new MouseAdapter ()
+    {
+      @Override
+      public void mouseClicked (final MouseEvent me)
+      {
+        final Double newCenterFrequency_Hz = getFrequencyFromDialog_Hz ("Enter Center Frequency [Hz]", null);
+        if (newCenterFrequency_Hz != null)
+          try
+          {
+            signalGenerator.setCenterFrequency_MHz (1.0e-6 * newCenterFrequency_Hz);
+          }
+          catch (InterruptedException ie)
+          {
+             LOG.log (Level.INFO, "Caught InterruptedException while setting center frequency on instrument: {0}.",
+               ie.getStackTrace ());
+          }
+          catch (IOException ioe)
+          {
+             LOG.log (Level.INFO, "Caught IOException while setting center frequency on instrument: {0}.",
+               ioe.getStackTrace ());
+          }
+      }
+    });
     frequencyPanel.add (this.jCenterFreq);
     //
     this.jFreqSlider_MHz = new JSlider (0, 2559, 0);
@@ -242,17 +266,93 @@ extends JPanel
     final JPanel frequencySweepModePanel = new JPanel ();
     setSubPanelBorder (FREQUENCY_COLOR, frequencySweepModePanel, "Mode");
     frequencySweepPanel.add (frequencySweepModePanel);
-    final JPanel frequencySweepStartPanel = new JPanel ();
-    setSubPanelBorder (FREQUENCY_COLOR, frequencySweepStartPanel, "Start Frequency");
-    frequencySweepPanel.add (frequencySweepStartPanel);
-    final JPanel frequencySweepStopPanel = new JPanel ();
-    setSubPanelBorder (FREQUENCY_COLOR, frequencySweepStopPanel, "Stop Frequency");
-    frequencySweepPanel.add (frequencySweepStopPanel);
     final JPanel frequencySweepSpanPanel = new JPanel ();
     setSubPanelBorder (FREQUENCY_COLOR, frequencySweepSpanPanel, "Span");
+    frequencySweepSpanPanel.setLayout (new GridLayout (1, 1));
+    this.jSpan = new JSevenSegmentNumber (FREQUENCY_COLOR, false, 11, 9);
+    this.jSpan.addMouseListener (new MouseAdapter ()
+    {
+      @Override
+      public void mouseClicked (final MouseEvent me)
+      {
+        final Double newSpan_Hz = getFrequencyFromDialog_Hz ("Enter Span [Hz]", null);
+        if (newSpan_Hz != null)
+          try
+          {
+            signalGenerator.setSpan_MHz (1.0e-6 * newSpan_Hz);
+          }
+          catch (InterruptedException ie)
+          {
+             LOG.log (Level.INFO, "Caught InterruptedException while setting span on instrument: {0}.", ie.getStackTrace ());
+          }
+          catch (IOException ioe)
+          {
+             LOG.log (Level.INFO, "Caught IOException while setting span on instrument: {0}.", ioe.getStackTrace ());
+          }
+      }
+    });
+    frequencySweepSpanPanel.add (this.jSpan);
     frequencySweepPanel.add (frequencySweepSpanPanel);
     setPanelBorder (frequencySweepPanel, "Frequency Sweep");
     add (frequencySweepPanel);
+    final JPanel frequencySweepStartPanel = new JPanel ();
+    setSubPanelBorder (FREQUENCY_COLOR, frequencySweepStartPanel, "Start Frequency [Hz]");
+    frequencySweepStartPanel.setLayout (new GridLayout (1, 1));
+    this.jStartFreq = new JSevenSegmentNumber (FREQUENCY_COLOR, false, 11, 9);
+    this.jStartFreq.addMouseListener (new MouseAdapter ()
+    {
+      @Override
+      public void mouseClicked (final MouseEvent me)
+      {
+        final Double newStartFrequency_Hz = getFrequencyFromDialog_Hz ("Enter Start Frequency [Hz]", null);
+        if (newStartFrequency_Hz != null)
+          try
+          {
+            signalGenerator.setStartFrequency_MHz (1.0e-6 * newStartFrequency_Hz);
+          }
+          catch (InterruptedException ie)
+          {
+             LOG.log (Level.INFO, "Caught InterruptedException while setting start frequency on instrument: {0}.",
+               ie.getStackTrace ());
+          }
+          catch (IOException ioe)
+          {
+             LOG.log (Level.INFO, "Caught IOException while setting start frequency on instrument: {0}.",
+               ioe.getStackTrace ());
+          }
+      }
+    });
+    frequencySweepStartPanel.add (this.jStartFreq);
+    frequencySweepPanel.add (frequencySweepStartPanel);
+    final JPanel frequencySweepStopPanel = new JPanel ();
+    setSubPanelBorder (FREQUENCY_COLOR, frequencySweepStopPanel, "Stop Frequency [Hz]");
+    frequencySweepStopPanel.setLayout (new GridLayout (1, 1));
+    this.jStopFreq = new JSevenSegmentNumber (FREQUENCY_COLOR, false, 11, 9);
+    this.jStopFreq.addMouseListener (new MouseAdapter ()
+    {
+      @Override
+      public void mouseClicked (final MouseEvent me)
+      {
+        final Double newStopFrequency_Hz = getFrequencyFromDialog_Hz ("Enter Stop Frequency [Hz]", null);
+        if (newStopFrequency_Hz != null)
+          try
+          {
+            signalGenerator.setStopFrequency_MHz (1.0e-6 * newStopFrequency_Hz);
+          }
+          catch (InterruptedException ie)
+          {
+             LOG.log (Level.INFO, "Caught InterruptedException while setting stop frequency on instrument: {0}.",
+               ie.getStackTrace ());
+          }
+          catch (IOException ioe)
+          {
+             LOG.log (Level.INFO, "Caught IOException while setting stop frequency on instrument: {0}.",
+               ioe.getStackTrace ());
+          }
+      }
+    });
+    frequencySweepStopPanel.add (this.jStopFreq);
+    frequencySweepPanel.add (frequencySweepStopPanel);
     
     final JPanel sweepSources = new JPanel ();
     setPanelBorder (sweepSources, "Sweep Source(s)");
@@ -875,6 +975,12 @@ extends JPanel
   
   private final JSlider jFreqSlider_mHz;
   
+  private final JSevenSegmentNumber jSpan;
+  
+  private final JSevenSegmentNumber jStartFreq;
+  
+  private final JSevenSegmentNumber jStopFreq;
+  
   private final JColorCheckBox<Boolean> jAmpEnable;
   
   private final JSevenSegmentNumber jAmplitudeAlt;
@@ -976,68 +1082,144 @@ extends JPanel
       {
         JSignalGeneratorDisplay.this.inhibitInstrumentControl = true;
         //
-        JSignalGeneratorDisplay.this.jByte21.setDisplayedValue (settings.getBytes ()[21]);
-        JSignalGeneratorDisplay.this.jByte81.setDisplayedValue (settings.getBytes ()[81]);
-        JSignalGeneratorDisplay.this.jByte181.setDisplayedValue (settings.getBytes ()[181]);
-        //
-        final double f_MHz = settings.getCenterFrequency_MHz ();
-        final long f_mHz_long = Math.round (f_MHz * 1e9);
-        JSignalGeneratorDisplay.this.jCenterFreq.setNumber (f_MHz * 1.0e6);
-        final int f_int_MHz = (int) (f_mHz_long / 1000000000L);
-        JSignalGeneratorDisplay.this.jFreqSlider_MHz.setValue (f_int_MHz);
-        JSignalGeneratorDisplay.this.jFreqSlider_MHz.setToolTipText (Integer.toString (f_int_MHz));
-        final int f_rem_int_kHz = (int) ((f_mHz_long % 1000000000L) / 1000000L);
-        JSignalGeneratorDisplay.this.jFreqSlider_kHz.setValue (f_rem_int_kHz);
-        JSignalGeneratorDisplay.this.jFreqSlider_kHz.setToolTipText (Integer.toString (f_rem_int_kHz));
-        final int f_rem_int_Hz = (int) ((f_mHz_long % 1000000L) / 1000L);
-        JSignalGeneratorDisplay.this.jFreqSlider_Hz.setValue (f_rem_int_Hz);
-        JSignalGeneratorDisplay.this.jFreqSlider_Hz.setToolTipText (Integer.toString (f_rem_int_Hz));
-        final int f_rem_int_mHz = (int) (f_mHz_long % 1000L);
-        JSignalGeneratorDisplay.this.jFreqSlider_mHz.setValue (f_rem_int_mHz);
-        JSignalGeneratorDisplay.this.jFreqSlider_mHz.setToolTipText (Integer.toString (f_rem_int_mHz));
-        //
-        // XXX Fix me later, when the value is reliable.
-        // JSignalGeneratorDisplay.this.jAmpEnable.setSelected (settings.getOutputEnable ());
-        final double S_dBm = settings.getS_dBm ();
-        JSignalGeneratorDisplay.this.jAmplitudeAlt.setNumber (settings.getS_dBm ());
-        final long S_mdBm_long = Math.round (S_dBm * 1e3);
-        final int S_int_dBm = (int) (S_mdBm_long / 1000L);
-        JSignalGeneratorDisplay.this.jAmpSlider_dBm.setValue (S_int_dBm);
-        JSignalGeneratorDisplay.this.jAmpSlider_dBm.setToolTipText (Integer.toString (S_int_dBm));
-        final int S_rem_int_mdBm = (int) (S_mdBm_long % 1000L);
-        JSignalGeneratorDisplay.this.jAmpSlider_mdBm.setValue (S_rem_int_mdBm);
-        JSignalGeneratorDisplay.this.jAmpSlider_mdBm.setToolTipText (Integer.toString (S_rem_int_mdBm));
-        //
-        final double modulationSourceInternalFrequency_kHz = settings.getModulationSourceInternalFrequency_kHz ();
-        JSignalGeneratorDisplay.this.jModulationSourceInternalFrequency.setNumber (modulationSourceInternalFrequency_kHz);
-        final long modSrcIntFreq_Hz_long = Math.round (modulationSourceInternalFrequency_kHz * 1e3);
-        final int modSrcIntFreq_int_kHz = (int) (modSrcIntFreq_Hz_long / 1000L);
-        JSignalGeneratorDisplay.this.jModulationSourceInternalFrequency_kHz.setValue (modSrcIntFreq_int_kHz);
-        JSignalGeneratorDisplay.this.jModulationSourceInternalFrequency_kHz.setToolTipText (
-          Integer.toString (modSrcIntFreq_int_kHz));
-        final int modSrcIntFreq_rem_int_Hz = (int) (modSrcIntFreq_Hz_long % 1000L);
-        JSignalGeneratorDisplay.this.jModulationSourceInternalFrequency_Hz.setValue (modSrcIntFreq_rem_int_Hz);
-        JSignalGeneratorDisplay.this.jModulationSourceInternalFrequency_Hz.setToolTipText (
-          Integer.toString (modSrcIntFreq_rem_int_Hz));
-        //
-        // XXX Fix me later, when the value is reliable.
-        // JSignalGeneratorDisplay.this.jAmEnable.setDisplayedValue (settings.getAmEnable ());
-        final double amDepth_percent = settings.getAmDepth_percent ();
-        JSignalGeneratorDisplay.this.jAmDepth.setValue ((int) Math.round (amDepth_percent * 10.0));
-        JSignalGeneratorDisplay.this.jAmDepth.setToolTipText (new DecimalFormat ("##0.0").format (amDepth_percent));
-        //
-        // XXX Fix me later, when the value is reliable.
-        // JSignalGeneratorDisplay.this.jFmEnable.setDisplayedValue (settings.getFmEnable ());
-        final double fmDeviation_kHz = settings.getFmDeviation_kHz ();
-        JSignalGeneratorDisplay.this.jFmDeviation_kHz.setValue ((int) Math.round (fmDeviation_kHz));
-        JSignalGeneratorDisplay.this.jFmDeviation_kHz.setToolTipText (new DecimalFormat ("##0.0").format (fmDeviation_kHz));
-        //
-        JSignalGeneratorDisplay.this.inhibitInstrumentControl = false;
-        //
+        try
+        {
+          JSignalGeneratorDisplay.this.jByte21.setDisplayedValue (settings.getBytes ()[21]);
+          JSignalGeneratorDisplay.this.jByte81.setDisplayedValue (settings.getBytes ()[81]);
+          JSignalGeneratorDisplay.this.jByte181.setDisplayedValue (settings.getBytes ()[181]);
+          //
+          final double f_MHz = settings.getCenterFrequency_MHz ();
+          final long f_mHz_long = Math.round (f_MHz * 1e9);
+          JSignalGeneratorDisplay.this.jCenterFreq.setNumber (f_MHz * 1.0e6);
+          final int f_int_MHz = (int) (f_mHz_long / 1000000000L);
+          JSignalGeneratorDisplay.this.jFreqSlider_MHz.setValue (f_int_MHz);
+          JSignalGeneratorDisplay.this.jFreqSlider_MHz.setToolTipText (Integer.toString (f_int_MHz));
+          final int f_rem_int_kHz = (int) ((f_mHz_long % 1000000000L) / 1000000L);
+          JSignalGeneratorDisplay.this.jFreqSlider_kHz.setValue (f_rem_int_kHz);
+          JSignalGeneratorDisplay.this.jFreqSlider_kHz.setToolTipText (Integer.toString (f_rem_int_kHz));
+          final int f_rem_int_Hz = (int) ((f_mHz_long % 1000000L) / 1000L);
+          JSignalGeneratorDisplay.this.jFreqSlider_Hz.setValue (f_rem_int_Hz);
+          JSignalGeneratorDisplay.this.jFreqSlider_Hz.setToolTipText (Integer.toString (f_rem_int_Hz));
+          final int f_rem_int_mHz = (int) (f_mHz_long % 1000L);
+          JSignalGeneratorDisplay.this.jFreqSlider_mHz.setValue (f_rem_int_mHz);
+          JSignalGeneratorDisplay.this.jFreqSlider_mHz.setToolTipText (Integer.toString (f_rem_int_mHz));
+          //
+          final double span_MHz = settings.getSpan_MHz ();
+          JSignalGeneratorDisplay.this.jSpan.setNumber (span_MHz * 1.0e6);
+          //
+          final double startFrequency_MHz = settings.getStartFrequency_MHz ();
+          JSignalGeneratorDisplay.this.jStartFreq.setNumber (startFrequency_MHz * 1.0e6);
+          final double stopFrequency_MHz = settings.getStopFrequency_MHz ();
+          JSignalGeneratorDisplay.this.jStopFreq.setNumber (stopFrequency_MHz * 1.0e6);
+          //
+          // XXX Fix me later, when the value is reliable.
+          // JSignalGeneratorDisplay.this.jAmpEnable.setSelected (settings.getOutputEnable ());
+          final double S_dBm = settings.getS_dBm ();
+          JSignalGeneratorDisplay.this.jAmplitudeAlt.setNumber (settings.getS_dBm ());
+          final long S_mdBm_long = Math.round (S_dBm * 1e3);
+          final int S_int_dBm = (int) (S_mdBm_long / 1000L);
+          JSignalGeneratorDisplay.this.jAmpSlider_dBm.setValue (S_int_dBm);
+          JSignalGeneratorDisplay.this.jAmpSlider_dBm.setToolTipText (Integer.toString (S_int_dBm));
+          final int S_rem_int_mdBm = (int) (S_mdBm_long % 1000L);
+          JSignalGeneratorDisplay.this.jAmpSlider_mdBm.setValue (S_rem_int_mdBm);
+          JSignalGeneratorDisplay.this.jAmpSlider_mdBm.setToolTipText (Integer.toString (S_rem_int_mdBm));
+          //
+          final double modulationSourceInternalFrequency_kHz = settings.getModulationSourceInternalFrequency_kHz ();
+          JSignalGeneratorDisplay.this.jModulationSourceInternalFrequency.setNumber (modulationSourceInternalFrequency_kHz);
+          final long modSrcIntFreq_Hz_long = Math.round (modulationSourceInternalFrequency_kHz * 1e3);
+          final int modSrcIntFreq_int_kHz = (int) (modSrcIntFreq_Hz_long / 1000L);
+          JSignalGeneratorDisplay.this.jModulationSourceInternalFrequency_kHz.setValue (modSrcIntFreq_int_kHz);
+          JSignalGeneratorDisplay.this.jModulationSourceInternalFrequency_kHz.setToolTipText (
+            Integer.toString (modSrcIntFreq_int_kHz));
+          final int modSrcIntFreq_rem_int_Hz = (int) (modSrcIntFreq_Hz_long % 1000L);
+          JSignalGeneratorDisplay.this.jModulationSourceInternalFrequency_Hz.setValue (modSrcIntFreq_rem_int_Hz);
+          JSignalGeneratorDisplay.this.jModulationSourceInternalFrequency_Hz.setToolTipText (
+            Integer.toString (modSrcIntFreq_rem_int_Hz));
+          //
+          // XXX Fix me later, when the value is reliable.
+          // JSignalGeneratorDisplay.this.jAmEnable.setDisplayedValue (settings.getAmEnable ());
+          final double amDepth_percent = settings.getAmDepth_percent ();
+          JSignalGeneratorDisplay.this.jAmDepth.setValue ((int) Math.round (amDepth_percent * 10.0));
+          JSignalGeneratorDisplay.this.jAmDepth.setToolTipText (new DecimalFormat ("##0.0").format (amDepth_percent));
+          //
+          // XXX Fix me later, when the value is reliable.
+          // JSignalGeneratorDisplay.this.jFmEnable.setDisplayedValue (settings.getFmEnable ());
+          final double fmDeviation_kHz = settings.getFmDeviation_kHz ();
+          JSignalGeneratorDisplay.this.jFmDeviation_kHz.setValue ((int) Math.round (fmDeviation_kHz));
+          JSignalGeneratorDisplay.this.jFmDeviation_kHz.setToolTipText (new DecimalFormat ("##0.0").format (fmDeviation_kHz));
+        }
+        finally
+        {
+          JSignalGeneratorDisplay.this.inhibitInstrumentControl = false;
+        }
       });
     }
     
   };
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING UTILITIES
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private Double getFrequencyFromDialog_Hz (final String title, final Double startValue_Hz)
+  {
+    final String inputString = JOptionPane.showInputDialog (title);
+    if (inputString != null)
+    {
+      final String[] splitString = inputString.split ("\\s+");
+      if (splitString == null || splitString.length == 0 || splitString.length > 2)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + inputString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      final String valueString = splitString[0];
+      final String unitString = splitString.length > 1 ? splitString[1] : null;
+      final double conversionFactor;
+      if (unitString != null)
+      {
+        if (unitString.equalsIgnoreCase ("Hz"))
+        {
+          conversionFactor = 1.0;
+        }
+        else if (unitString.equalsIgnoreCase ("kHz"))
+        {
+          conversionFactor = 1.0e3;
+        }
+        else if (unitString.equalsIgnoreCase ("MHz"))
+        {
+          conversionFactor = 1.0e6;
+        }
+        else if (unitString.equalsIgnoreCase ("GHz"))
+        {
+          conversionFactor = 1.0e9;
+        }
+        else
+        {
+          JOptionPane.showMessageDialog (null, "Illegal unit " + unitString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+          return null;
+        }
+      }
+      else
+      {
+        conversionFactor = 1.0;
+      }
+      final double value_Hz;
+      try
+      {
+        value_Hz = Double.parseDouble (valueString);
+      }
+      catch (NumberFormatException nfe)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + valueString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      return value_Hz * conversionFactor;
+    }
+    else
+      return null;
+  }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //

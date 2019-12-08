@@ -13,6 +13,12 @@ public interface SignalGeneratorSettings
   SignalGeneratorSettings clone() throws CloneNotSupportedException;
   
   double getCenterFrequency_MHz ();
+  
+  double getSpan_MHz ();
+  
+  double getStartFrequency_MHz ();
+  
+  double getStopFrequency_MHz ();
 
   double getS_dBm ();
   

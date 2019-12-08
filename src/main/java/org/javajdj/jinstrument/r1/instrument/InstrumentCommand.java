@@ -47,6 +47,15 @@ public interface InstrumentCommand
   public final static String IC_RF_FREQUENCY = "commandRfFrequency";
   public final static String ICARG_RF_FREQUENCY_MHZ = "rfFrequency_MHz"; 
   
+  public final static String IC_RF_SPAN = "commandRfSpan";
+  public final static String ICARG_RF_SPAN_MHZ = "rfSpan_MHz"; 
+  
+  public final static String IC_RF_START_FREQUENCY = "commandRfStartFrequency";
+  public final static String ICARG_RF_START_FREQUENCY_MHZ = "rfStartFrequency_MHz"; 
+  
+  public final static String IC_RF_STOP_FREQUENCY = "commandRfStopFrequency";
+  public final static String ICARG_RF_STOP_FREQUENCY_MHZ = "rfStopFrequency_MHz"; 
+  
   public final static String IC_RF_AM_CONTROL = "commandRfAmControl";
   public final static String ICARG_RF_AM_ENABLE = "rfAmEnable"; 
   public final static String ICARG_RF_AM_DEPTH_PERCENT = "rfAmDepth_percent"; 

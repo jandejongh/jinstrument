@@ -85,7 +85,7 @@ implements SignalGenerator
       final int intRead = ((GpibDevice) getDevice ()).getInputStream ().read ();
       if (intRead == 0x0d)
         // SKIP 0x0d.
-        continue;;
+        continue;
       done = (intRead == 0x0a);
       if (! done )
         line += Character.toString ((char) intRead);
@@ -233,6 +233,48 @@ implements SignalGenerator
       + 0.000001  * ((l1[2] & 0xf0) >> 4)
       + 0.0000001 * (l1[2] & 0x0f)
       ;
+    final double span_MHz = 0.0
+      // XXX First nibble of 53 might be always zero; or used for other purposes.
+      + 1000.0    * (l1[53] & 0x0f)
+      + 100.0     * ((l1[52] & 0xf0) >> 4)
+      + 10.0      * (l1[52] & 0x0f)
+      + 1         * ((l1[51] & 0xf0) >> 4)
+      + 0.1       * (l1[51] & 0x0f)
+      + 0.01      * ((l1[50] & 0xf0) >> 4)
+      + 0.001     * (l1[50] & 0x0f)
+      + 0.0001    * ((l1[49] & 0xf0) >> 4)
+      + 0.00001   * (l1[49] & 0x0f)
+      + 0.000001  * ((l1[48] & 0xf0) >> 4)
+      + 0.0000001 * (l1[48] & 0x0f)
+      ;
+    final double startFrequency_MHz = 0.0
+      // XXX First nibble of 38 might be always zero; or used for other purposes.
+      + 1000.0    * (l1[40] & 0x0f)
+      + 100.0     * ((l1[39] & 0xf0) >> 4)
+      + 10.0      * (l1[39] & 0x0f)
+      + 1         * ((l1[38] & 0xf0) >> 4)
+      + 0.1       * (l1[38] & 0x0f)
+      + 0.01      * ((l1[37] & 0xf0) >> 4)
+      + 0.001     * (l1[37] & 0x0f)
+      + 0.0001    * ((l1[36] & 0xf0) >> 4)
+      + 0.00001   * (l1[36] & 0x0f)
+      + 0.000001  * ((l1[35] & 0xf0) >> 4)
+      + 0.0000001 * (l1[35] & 0x0f)
+      ;
+    final double stopFrequency_MHz = 0.0
+      // XXX First nibble of 46 might be always zero; or used for other purposes.
+      + 1000.0    * (l1[46] & 0x0f)
+      + 100.0     * ((l1[45] & 0xf0) >> 4)
+      + 10.0      * (l1[45] & 0x0f)
+      + 1         * ((l1[44] & 0xf0) >> 4)
+      + 0.1       * (l1[44] & 0x0f)
+      + 0.01      * ((l1[43] & 0xf0) >> 4)
+      + 0.001     * (l1[43] & 0x0f)
+      + 0.0001    * ((l1[42] & 0xf0) >> 4)
+      + 0.00001   * (l1[42] & 0x0f)
+      + 0.000001  * ((l1[41] & 0xf0) >> 4)
+      + 0.0000001 * (l1[41] & 0x0f)
+      ;
     final double S_dBm = (0
       + 100.0 * (l1[17] & 0x0f)
       + 10.0  * ((l1[16] & 0xf0) >> 4)
@@ -304,6 +346,9 @@ implements SignalGenerator
     return new DefaultSignalGeneratorSettings (
       l1,
       f_MHz,
+      span_MHz,
+      startFrequency_MHz,
+      stopFrequency_MHz,
       S_dBm,
       outputEnable,
       modulationSourceInternalFrequency_kHz,
@@ -336,16 +381,6 @@ implements SignalGenerator
   }
   
   @Override
-  public synchronized void setAmplitude_dBm (final double amplitude_dBm)
-    throws IOException, InterruptedException
-  {
-    addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_RF_OUTPUT_LEVEL,
-      InstrumentCommand.ICARG_RF_OUTPUT_LEVEL_DBM,
-      amplitude_dBm));
-  }
-  
-  @Override
   public synchronized void setCenterFrequency_MHz (final double centerFrequency_MHz)
     throws IOException, InterruptedException
   {
@@ -353,6 +388,46 @@ implements SignalGenerator
       InstrumentCommand.IC_RF_FREQUENCY,
       InstrumentCommand.ICARG_RF_FREQUENCY_MHZ,
       centerFrequency_MHz));
+  }
+  
+  @Override
+  public synchronized void setSpan_MHz (final double span_MHz)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_SPAN,
+      InstrumentCommand.ICARG_RF_SPAN_MHZ,
+      span_MHz));
+  }
+  
+  @Override
+  public synchronized void setStartFrequency_MHz (final double startFrequency_MHz)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_START_FREQUENCY,
+      InstrumentCommand.ICARG_RF_START_FREQUENCY_MHZ,
+      startFrequency_MHz));
+  }
+  
+  @Override
+  public synchronized void setStopFrequency_MHz (final double stopFrequency_MHz)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_STOP_FREQUENCY,
+      InstrumentCommand.ICARG_RF_STOP_FREQUENCY_MHZ,
+      stopFrequency_MHz));
+  }
+  
+  @Override
+  public synchronized void setAmplitude_dBm (final double amplitude_dBm)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_OUTPUT_LEVEL,
+      InstrumentCommand.ICARG_RF_OUTPUT_LEVEL_DBM,
+      amplitude_dBm));
   }
   
   @Override
@@ -509,6 +584,24 @@ implements SignalGenerator
         {
           final double centerFrequency_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_FREQUENCY_MHZ);
           this.out.println ("FR " + centerFrequency_MHz + " MZ");
+          break;
+        }
+        case InstrumentCommand.IC_RF_SPAN:
+        {
+          final double span_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_SPAN_MHZ);
+          this.out.println ("FS " + span_MHz + " MZ");
+          break;
+        }
+        case InstrumentCommand.IC_RF_START_FREQUENCY:
+        {
+          final double startFrequency_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_START_FREQUENCY_MHZ);
+          this.out.println ("FA " + startFrequency_MHz + " MZ");
+          break;
+        }
+        case InstrumentCommand.IC_RF_STOP_FREQUENCY:
+        {
+          final double stopFrequency_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_STOP_FREQUENCY_MHZ);
+          this.out.println ("FB " + stopFrequency_MHz + " MZ");
           break;
         }
         case InstrumentCommand.IC_RF_AM_CONTROL:
