@@ -8,6 +8,7 @@ import org.javajdj.jinstrument.r1.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.r1.instrument.DefaultInstrumentCommand;
 import org.javajdj.jinstrument.r1.instrument.InstrumentCommand;
 import org.javajdj.jinstrument.r1.instrument.InstrumentSettings;
+import org.javajdj.jinstrument.r1.instrument.InstrumentStatus;
 import org.javajdj.jinstrument.r1.instrument.sg.AbstractSignalGenerator;
 import org.javajdj.jinstrument.r1.instrument.sg.DefaultSignalGeneratorSettings;
 import org.javajdj.jinstrument.r1.instrument.sg.SignalGenerator;
@@ -62,7 +63,7 @@ implements SignalGenerator
   }
 
   @Override
-  public void setPoweredOn (boolean poweredOn)
+  public void setPoweredOn (final boolean poweredOn)
   {
     throw new UnsupportedOperationException ();
   }
@@ -76,13 +77,17 @@ implements SignalGenerator
   private String readLine () throws IOException
   {
     // XXX THIS METHOD SHOULD REALLY NOT BE NEEDED!!
+    // NOTE: SPECIAL VERSION FOR HP-8663A, WHICH SENDS 0x0d+0x0a LINE TERMINATORS!
     String line = "";
     boolean done = false;
     while (! done)
     {
       final int intRead = ((GpibDevice) getDevice ()).getInputStream ().read ();
-      done = (intRead == 10);
-      if (! done)
+      if (intRead == 0x0d)
+        // SKIP 0x0d.
+        continue;;
+      done = (intRead == 0x0a);
+      if (! done )
         line += Character.toString ((char) intRead);
     }
     return line;
@@ -90,7 +95,9 @@ implements SignalGenerator
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // INSTRUMENT SETTINGS
+  // BYTES TO HEX
+  //
+  // [XXX SHOULD BE TAKEN FROM UTILITY LIBRARY]
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -108,11 +115,64 @@ implements SignalGenerator
     return new String (hexChars);
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INSTRUMENT STATUS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private InstrumentStatus getStatusFromInstrumentSyncNoLock (final GpibDevice gpibDevice)
+    throws IOException, InterruptedException
+  {
+    this.out.println ("MS");
+    final String statusLine = readLine ();
+    if (statusLine.length () != HP8663A_GPIB_Status.STATUS_LENGTH)
+    {
+      LOG.log (Level.WARNING, "Unexpected number of bytes read for HP8663A status: {0} (should be {1}).",
+        new Object[]{statusLine.length (), HP8663A_GPIB_Status.STATUS_LENGTH});
+      throw new IOException ();
+    }
+    final byte[] statusBuffer = statusLine.getBytes ();
+    // LOG message for debugging the status output.
+    // LOG.log (Level.WARNING, "bytes = {0}", bytesToHex (statusBuffer));
+    LOG.log (Level.INFO, "Status received.");
+    return new HP8663A_GPIB_Status (statusBuffer);
+  }
+  
+  @Override
+  protected InstrumentStatus getStatusFromInstrumentSync ()
+    throws UnsupportedOperationException, IOException, InterruptedException
+  {
+    final GpibDevice device = (GpibDevice) getDevice ();
+    try
+    {
+      device.lockDevice ();
+      return getStatusFromInstrumentSyncNoLock (device);
+    }
+    finally
+    {
+      device.unlockDevice ();
+    }
+  }
+
+  @Override
+  protected void requestStatusFromInstrumentASync ()
+    throws UnsupportedOperationException, IOException
+  {
+    throw new UnsupportedOperationException ();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INSTRUMENT SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   private static final int L1_LENGTH = 189;
   
   private transient byte[] lastL1 = null;
   
-  private SignalGeneratorSettings getSettingsFromInstrumentSyncNoLock (GpibDevice gpibDevice)
+  private SignalGeneratorSettings getSettingsFromInstrumentSyncNoLock (final GpibDevice gpibDevice)
     throws IOException, InterruptedException
   {
     final byte[] l1Buffer = new byte[HP8663A_GPIB.L1_LENGTH];
@@ -258,6 +318,12 @@ implements SignalGenerator
   {
     throw new UnsupportedOperationException ("Not supported yet.");
   }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SignalGenerator-specific implementation.
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
   public synchronized void setOutputEnable (final boolean outputEnable)
