@@ -16,6 +16,8 @@ public interface Instrument
   
   void removeInstrumentListener (InstrumentListener l);
   
+  InstrumentStatus getCurrentInstrumentStatus ();
+  
   InstrumentSettings getCurrentInstrumentSettings ();
     
   boolean isPoweredOn ();
