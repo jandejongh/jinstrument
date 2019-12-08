@@ -20,14 +20,17 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import org.javajdj.jinstrument.r1.instrument.Instrument;
 import org.javajdj.jinstrument.r1.instrument.InstrumentListener;
 import org.javajdj.jinstrument.r1.instrument.InstrumentSettings;
+import org.javajdj.jinstrument.r1.instrument.InstrumentStatus;
 import org.javajdj.jinstrument.r1.instrument.sg.SignalGenerator;
 import org.javajdj.jinstrument.r1.instrument.sg.SignalGenerator.ModulationSource;
 import org.javajdj.jinstrument.r1.instrument.sg.SignalGeneratorSettings;
+import org.javajdj.jinstrument.r1.instrument.sg.hp8663a.HP8663A_GPIB_Status;
 import org.javajdj.jservice.Service;
 import org.javajdj.jservice.swing.JServiceControl;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
@@ -75,7 +78,7 @@ extends JPanel
     setLayout (new GridLayout (3, 3));
     
     final JPanel instrumentPanel = new JPanel ();
-    instrumentPanel.setLayout (new GridLayout (4, 2));    
+    instrumentPanel.setLayout (new GridLayout (5, 2));    
     setPanelBorder (instrumentPanel, "Instrument");
     instrumentPanel.add (new JLabel ("Enabled"));
     final Map<Boolean, Color> enableColorMap = new HashMap<> ();
@@ -92,6 +95,10 @@ extends JPanel
       }
     });
     instrumentPanel.add (enabledCheckBox);
+    instrumentPanel.add (new JLabel ("IStatus"));
+    this.jInstrumentStatus = new JTextField ();
+    this.jInstrumentStatus.setEditable (false);
+    instrumentPanel.add (this.jInstrumentStatus);    
     instrumentPanel.add (new JLabel ("21"));
     instrumentPanel.add (this.jByte21);
     instrumentPanel.add (new JLabel ("81"));
@@ -856,6 +863,8 @@ extends JPanel
   private Color AMPLITUDE_COLOR = Color.red;
   private Color MODULATION_COLOR = Color.green;
   
+  private final JTextField jInstrumentStatus;
+  
   private final JSevenSegmentNumber jCenterFreq;
   
   private final JSlider jFreqSlider_MHz;
@@ -938,6 +947,22 @@ extends JPanel
   
   private final InstrumentListener instrumentListener = new InstrumentListener ()
   {
+    @Override
+    public void newInstrumentStatus (final Instrument instrument, final InstrumentStatus instrumentStatus)
+    {
+      if (instrument != JSignalGeneratorDisplay.this.signalGenerator || instrumentStatus == null)
+        throw new IllegalArgumentException ();
+      if (! (instrumentStatus instanceof HP8663A_GPIB_Status))
+      {
+        LOG.log (Level.WARNING, "Unknown InstrumentStatus implementation; please fix! Object: {0}", instrumentStatus);
+        return;
+      }
+      final HP8663A_GPIB_Status status = (HP8663A_GPIB_Status) instrumentStatus;
+      SwingUtilities.invokeLater (() ->
+      {
+        JSignalGeneratorDisplay.this.jInstrumentStatus.setText (instrumentStatus.toString ());
+      });
+    }
     
     @Override
     public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
