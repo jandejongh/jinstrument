@@ -35,6 +35,8 @@ implements Instrument
     if (addSettingsServices)
     {
       // XXX Aren't we losing the name of the Thread?
+      addRunnable (new InstrumentStatusThread ());
+      addRunnable (new InstrumentStatusDispatcherThread ());
       addRunnable (new InstrumentSettingsThread ());
       addRunnable (new InstrumentSettingsDispatcherThread ());
       addRunnable (new InstrumentCommandProcessorThread ());
@@ -111,12 +113,211 @@ implements Instrument
     }
   }
   
+  protected final void fireInstrumentStatusChanged (final InstrumentStatus instrumentStatus)
+  {
+    // References are atomic.
+    final Set<InstrumentListener> listeners = this.instrumentListenersCopy;
+    for (final InstrumentListener l : listeners)
+      l.newInstrumentStatus (this, instrumentStatus);
+  }
+  
   protected final void fireInstrumentSettingsChanged (final InstrumentSettings instrumentSettings)
   {
     // References are atomic.
     final Set<InstrumentListener> listeners = this.instrumentListenersCopy;
     for (final InstrumentListener l : listeners)
       l.newInstrumentSettings (this, instrumentSettings);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GET STATUS FROM INSTRUMENT SYNCHRONOUSLY [ABSTRACT]
+  // REQUEST STATUS FROM INSTRUMENT ASYNCHROUNOUSLY [ABSTRACT]
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected abstract InstrumentStatus getStatusFromInstrumentSync ()
+    throws UnsupportedOperationException, IOException, InterruptedException;
+    
+  protected abstract void requestStatusFromInstrumentASync ()
+    throws UnsupportedOperationException, IOException;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INSTRUMENT STATUS THREAD
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected class InstrumentStatusThread
+    extends Thread
+  {
+    
+    public InstrumentStatusThread (final String name)
+    {
+      super (name);
+    }
+    
+    public InstrumentStatusThread ()
+    {
+      this ("InstrumentStatusThread on " + AbstractInstrument.this);
+    }
+    
+    @Override
+    public final void run ()
+    {
+      while (! isInterrupted ())
+      {
+        try
+        {
+          // Mark start of sojourn.
+          final long timeBeforeRead_ms = System.currentTimeMillis ();
+          // Obtain current settings from the instrument.
+          final InstrumentStatus statusRead = AbstractInstrument.this.getStatusFromInstrumentSync ();
+          // Report the trace to our superclass.
+          AbstractInstrument.this.statusReadFromInstrument (statusRead);
+          // Mark end of sojourn.
+          final long timeAfterRead_ms = System.currentTimeMillis ();
+          // Calculate sojourn.
+          final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
+          // Find out the remaining time to wait in order to respect the given period.
+          final long remainingSleep_ms = ((long) AbstractInstrument.this.getStatusThreadPeriod_s () * 1000) - sojourn_ms;
+          if (remainingSleep_ms < 0)
+            LOG.log (Level.WARNING, "Cannot meet timing settings on {0}.", this);
+          if (remainingSleep_ms > 0)
+            Thread.sleep (remainingSleep_ms);
+        }
+        catch (InterruptedException ie)
+        {
+          LOG.log (Level.WARNING, "InterruptedException while acquiring instrument status: {0}.", ie.getStackTrace ());
+          return;
+        }
+        catch (IOException ioe)
+        {
+          LOG.log (Level.WARNING, "IOException while acquiring instrument status: {0}.", ioe.getStackTrace ());
+        }
+        catch (UnsupportedOperationException usoe)
+        {
+          LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument status: {0}.", usoe.getStackTrace ());
+        }
+        // Prevent termination of the Thread due to a misbehaving sub-class method.
+        catch (Exception e)
+        {
+          LOG.log (Level.WARNING, "Exception while acquiring instrument status: {0}.", e.getStackTrace ());
+        }
+      }
+    }
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // STATUS THREAD PERIOD
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static String STATUS_THREAD_PERIOD_S_PROPERTY_NAME = "statusThreadPeriod_s";
+  
+  public final static double DEFAULT_STATUS_THREAD_PERIOD_S = 5;
+  
+  private volatile double statusThreadPeriod_s = AbstractInstrument.DEFAULT_STATUS_THREAD_PERIOD_S;
+
+  private final Object statusThreadPeriodLock = new Object ();
+  
+  public final double getStatusThreadPeriod_s ()
+  {
+    synchronized (this.statusThreadPeriodLock)
+    {
+      return this.statusThreadPeriod_s;
+    }
+  }
+  
+  public final void setStatusThreadPeriod_s (final double statusThreadPeriod_s)
+  {
+    if (statusThreadPeriod_s < 0)
+      throw new IllegalArgumentException ();
+    final double oldStatusThreadPeriod_s;
+    synchronized (this.statusThreadPeriodLock)
+    {
+      if (this.statusThreadPeriod_s == statusThreadPeriod_s)
+        return;
+      oldStatusThreadPeriod_s = this.statusThreadPeriod_s;
+      this.statusThreadPeriod_s = statusThreadPeriod_s;
+    }
+    fireSettingsChanged (
+      AbstractInstrument.STATUS_THREAD_PERIOD_S_PROPERTY_NAME,
+      oldStatusThreadPeriod_s,
+      statusThreadPeriod_s);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // STATUS READ QUEUE
+  // STATUS READ FROM INSTRUMENT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final BlockingQueue<InstrumentStatus> statusReadQueue = new LinkedBlockingQueue<> ();
+  
+  protected void statusReadFromInstrument (final InstrumentStatus instrumentStatus)
+  {
+    if (instrumentStatus == null)
+      throw new IllegalArgumentException ();
+    if (! this.statusReadQueue.offer (instrumentStatus))
+      LOG.log (Level.WARNING, "Overflow on status-read buffer on {0}.", this);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INSTRUMENT STATUS DISPATCHER THREAD
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected class InstrumentStatusDispatcherThread
+    extends Thread
+  {
+    
+    public InstrumentStatusDispatcherThread (final String name)
+    {
+      super (name);
+    }
+    
+    public InstrumentStatusDispatcherThread ()
+    {
+      this ("InstrumentStatusDispatcherThread on " + AbstractInstrument.this + ".");
+    }
+  
+    @Override
+    public final void run ()
+    {
+      while (! isInterrupted ())
+      {
+        try
+        {
+          final InstrumentStatus oldStatus;
+          final InstrumentStatus newStatus = AbstractInstrument.this.statusReadQueue.take ();
+          synchronized (AbstractInstrument.this.currentInstrumentStatusLock)
+          {
+            oldStatus = AbstractInstrument.this.currentInstrumentStatus;
+            if (oldStatus == null || ! newStatus.equals (oldStatus))
+            {
+              AbstractInstrument.this.currentInstrumentStatus = newStatus;
+              AbstractInstrument.this.fireInstrumentStatusChanged (newStatus);
+            }
+          }
+        }
+        catch (InterruptedException ie)
+        {
+          LOG.log (Level.WARNING, "InterruptedException while dispatching instrument status: {0}.", ie.getStackTrace ());
+          return;
+        }
+        // Prevent termination of the Thread due to a misbehaving listener.
+        catch (Exception e)
+        {
+          LOG.log (Level.WARNING, "Exception while dispatching instrument status: {0}.", e.getStackTrace ());
+        }
+      }
+    }
+    
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,16 +379,22 @@ implements Instrument
         }
         catch (InterruptedException ie)
         {
-          LOG.log (Level.WARNING, "InterruptedException: {0}.", ie.getMessage ());
+          LOG.log (Level.WARNING, "InterruptedException while acquiring instrument settings: {0}.", ie.getStackTrace ());
           return;
         }
         catch (IOException ioe)
         {
-          LOG.log (Level.WARNING, "IOException: {0}.", ioe.getMessage ());
+          LOG.log (Level.WARNING, "IOException while acquiring instrument settings: {0}.", ioe.getMessage ());
         }
         catch (UnsupportedOperationException usoe)
         {
-          LOG.log (Level.WARNING, "UnsupportedOperationException: {0}.", usoe.getMessage ());
+          LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument settings: {0}.",
+            usoe.getStackTrace ());
+        }
+        // Prevent termination of the Thread due to a misbehaving sub-class method.
+        catch (Exception e)
+        {
+          LOG.log (Level.WARNING, "Exception while acquiring instrument settings: {0}.", e.getStackTrace ());
         }
       }
     }
@@ -248,7 +455,7 @@ implements Instrument
     if (instrumentSettings == null)
       throw new IllegalArgumentException ();
     if (! this.settingsReadQueue.offer (instrumentSettings))
-      LOG.log (Level.WARNING, "Overflow on setting-read buffer on {0}.", this);
+      LOG.log (Level.WARNING, "Overflow on settings-read buffer on {0}.", this);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -292,12 +499,38 @@ implements Instrument
         }
         catch (InterruptedException ie)
         {
-          LOG.log (Level.WARNING, "InterruptedException: {0}.", ie.getMessage ());
+          LOG.log (Level.WARNING, "InterruptedException while dispatching instrument settings: {0}.", ie.getStackTrace ());
           return;
+        }
+        // Prevent termination of the Thread due to a misbehaving listener.
+        catch (Exception e)
+        {
+          LOG.log (Level.WARNING, "Exception while dispatching instrument settings: {0}.", e.getStackTrace ());
         }
       }
     }
     
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // CURRENT INSTRUMENT STATUS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static String CURRENT_INSTRUMENT_STATUS_PROPERTY_NAME = "currentInstrumentStatus";
+  
+  private volatile InstrumentStatus currentInstrumentStatus = null;
+  
+  private final Object currentInstrumentStatusLock = new Object ();
+  
+  @Override
+  public final InstrumentStatus getCurrentInstrumentStatus ()
+  {
+    synchronized (this.currentInstrumentStatusLock)
+    {
+      return this.currentInstrumentStatus;
+    }
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -373,16 +606,21 @@ implements Instrument
         }
         catch (InterruptedException ie)
         {
-          LOG.log (Level.WARNING, "InterruptedException: {0}.", ie.getMessage ());
+          LOG.log (Level.WARNING, "InterruptedException while processing command: {0}.", ie.getStackTrace ());
           return;
         }
         catch (IOException ioe)
         {
-          LOG.log (Level.WARNING, "IOException: {0}.", ioe.getMessage ());
+          LOG.log (Level.WARNING, "IOException while processing command: {0}.", ioe.getStackTrace ());
         }
         catch (UnsupportedOperationException uoe)
         {
-          LOG.log (Level.WARNING, "UnsupportedOperationException: {0}.", uoe.getMessage ());
+          LOG.log (Level.WARNING, "UnsupportedOperationException while processing command: {0}.", uoe.getStackTrace ());
+        }
+        // Prevent termination of the Thread due to a misbehaving implementation of processCommand.
+        catch (Exception e)
+        {
+          LOG.log (Level.WARNING, "Exception while processing command: {0}.", e.getStackTrace ());
         }
       }
     }
