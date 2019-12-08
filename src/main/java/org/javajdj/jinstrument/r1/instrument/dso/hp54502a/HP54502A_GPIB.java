@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import org.javajdj.jinstrument.r1.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.r1.instrument.InstrumentCommand;
 import org.javajdj.jinstrument.r1.instrument.InstrumentSettings;
+import org.javajdj.jinstrument.r1.instrument.InstrumentStatus;
 import org.javajdj.jinstrument.r1.instrument.dso.AbstractOscilloscope;
 import org.javajdj.jinstrument.r1.instrument.dso.DefaultOscilloscopeDualChannelId_Letters;
 import org.javajdj.jinstrument.r1.instrument.dso.DefaultOscilloscopeTrace;
@@ -470,6 +471,20 @@ implements Oscilloscope<DefaultOscilloscopeDualChannelId_Letters>
       if (lockDevice)
         device.unlockDevice ();
     }
+  }
+
+  @Override
+  protected InstrumentStatus getStatusFromInstrumentSync ()
+    throws UnsupportedOperationException, IOException, InterruptedException
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  protected void requestStatusFromInstrumentASync ()
+    throws UnsupportedOperationException, IOException
+  {
+    throw new UnsupportedOperationException ();
   }
 
   @Override

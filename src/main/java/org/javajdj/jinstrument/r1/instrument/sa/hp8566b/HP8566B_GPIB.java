@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 import org.javajdj.jinstrument.r1.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.r1.instrument.InstrumentCommand;
 import org.javajdj.jinstrument.r1.instrument.InstrumentSettings;
+import org.javajdj.jinstrument.r1.instrument.InstrumentStatus;
 import org.javajdj.jinstrument.r1.instrument.sa.AbstractSpectrumAnalyzer;
 import org.javajdj.jinstrument.r1.instrument.sa.DefaultSpectrumAnalyzerTrace;
 import org.javajdj.jinstrument.r1.instrument.sa.DefaultSpectrumAnalyzerTraceSettings;
@@ -324,6 +325,20 @@ implements SpectrumAnalyzer
     }
   }
   
+  @Override
+  protected InstrumentStatus getStatusFromInstrumentSync ()
+    throws UnsupportedOperationException, IOException, InterruptedException
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  protected void requestStatusFromInstrumentASync ()
+    throws UnsupportedOperationException, IOException
+  {
+    throw new UnsupportedOperationException ();
+  }
+
   @Override
   protected InstrumentSettings getSettingsFromInstrumentSync ()
     throws UnsupportedOperationException, IOException, InterruptedException
