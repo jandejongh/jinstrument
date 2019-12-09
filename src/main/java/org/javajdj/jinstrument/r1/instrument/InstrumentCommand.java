@@ -56,6 +56,9 @@ public interface InstrumentCommand
   public final static String IC_RF_STOP_FREQUENCY = "commandRfStopFrequency";
   public final static String ICARG_RF_STOP_FREQUENCY_MHZ = "rfStopFrequency_MHz"; 
   
+  public final static String IC_RF_SWEEP_MODE = "commandRfSweepMode";
+  public final static String ICARG_RF_SWEEP_MODE = "rfSweepMode"; 
+  
   public final static String IC_RF_AM_CONTROL = "commandRfAmControl";
   public final static String ICARG_RF_AM_ENABLE = "rfAmEnable"; 
   public final static String ICARG_RF_AM_DEPTH_PERCENT = "rfAmDepth_percent"; 

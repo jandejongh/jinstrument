@@ -10,6 +10,14 @@ public interface SignalGenerator
   extends Instrument
 {
 
+  enum RfSweepMode
+  {
+    OFF,
+    AUTO,
+    MANUAL,
+    SINGLE;
+  }
+  
   enum ModulationSource
   {
     INT,
@@ -23,6 +31,8 @@ public interface SignalGenerator
   
   void setCenterFrequency_MHz (double centerFrequency_MHz) throws IOException, InterruptedException;
 
+  void setRfSweepMode (RfSweepMode rfSweepMode) throws IOException, InterruptedException;
+  
   void setSpan_MHz (double span_MHz) throws IOException, InterruptedException;
   
   void setStartFrequency_MHz (double startFrequency_MHz) throws IOException, InterruptedException;

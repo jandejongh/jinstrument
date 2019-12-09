@@ -421,6 +421,16 @@ implements SignalGenerator
   }
   
   @Override
+  public synchronized void setRfSweepMode (final RfSweepMode rfSweepMode)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_SWEEP_MODE,
+      InstrumentCommand.ICARG_RF_SWEEP_MODE,
+      rfSweepMode));
+  }
+  
+  @Override
   public synchronized void setAmplitude_dBm (final double amplitude_dBm)
     throws IOException, InterruptedException
   {
@@ -585,6 +595,37 @@ implements SignalGenerator
           final double centerFrequency_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_FREQUENCY_MHZ);
           this.out.println ("FR " + centerFrequency_MHz + " MZ");
           break;
+        }
+        case InstrumentCommand.IC_RF_SWEEP_MODE:
+        {
+          final RfSweepMode rfSweepMode = (RfSweepMode) instrumentCommand.get (InstrumentCommand.ICARG_RF_SWEEP_MODE);
+          if (rfSweepMode == null)
+            throw new IllegalArgumentException ();
+          switch (rfSweepMode)
+          {
+            case OFF:
+            {
+              this.out.println ("W1");
+              break;
+            }
+            case AUTO:
+            {
+              this.out.println ("W2");
+              break;
+            }
+            case MANUAL:
+            {
+              this.out.println ("W3");
+              break;
+            }
+            case SINGLE:
+            {
+              this.out.println ("W4");
+              break;
+            }
+            default:
+              throw new UnsupportedOperationException ();
+          }
         }
         case InstrumentCommand.IC_RF_SPAN:
         {

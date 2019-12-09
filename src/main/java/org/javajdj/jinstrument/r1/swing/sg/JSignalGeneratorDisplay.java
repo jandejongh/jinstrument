@@ -265,6 +265,27 @@ extends JPanel
     frequencySweepPanel.setLayout (new GridLayout (4, 1));
     final JPanel frequencySweepModePanel = new JPanel ();
     setSubPanelBorder (FREQUENCY_COLOR, frequencySweepModePanel, "Mode");
+    this.jRfSweepMode = new JComboBox<> (SignalGenerator.RfSweepMode.values ());
+    this.jRfSweepMode.addItemListener ((ItemEvent ie) ->
+    {
+      if (ie.getStateChange () == ItemEvent.SELECTED)
+      {
+        final SignalGenerator.RfSweepMode newValue = (SignalGenerator.RfSweepMode) ie.getItem ();
+        if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
+          try
+          {
+            LOG.log (Level.INFO, "Setting RF sweep mode on instrument from combo box to {0}.", newValue);
+            signalGenerator.setRfSweepMode (newValue);
+          }
+          catch (IOException | InterruptedException e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting RF sweep mode on instrument"
+              + " from combo box to {0}.",
+              new Object[]{newValue, e});
+          }
+      }
+    });
+    frequencySweepModePanel.add (this.jRfSweepMode);
     frequencySweepPanel.add (frequencySweepModePanel);
     final JPanel frequencySweepSpanPanel = new JPanel ();
     setSubPanelBorder (FREQUENCY_COLOR, frequencySweepSpanPanel, "Span");
@@ -628,7 +649,7 @@ extends JPanel
         if (! JSignalGeneratorDisplay.this.inhibitInstrumentControl)
           try
           {
-            LOG.log (Level.INFO, "Setting AM modulation source on instrument from combo box to {0} %.", newValue);
+            LOG.log (Level.INFO, "Setting AM modulation source on instrument from combo box to {0}.", newValue);
             signalGenerator.setEnableAm (
               JSignalGeneratorDisplay.this.jAmEnable.getDisplayedValue (),
               JSignalGeneratorDisplay.this.jAmDepth.getValue () / 10.0,
@@ -974,6 +995,8 @@ extends JPanel
   private final JSlider jFreqSlider_Hz;
   
   private final JSlider jFreqSlider_mHz;
+  
+  private final JComboBox<SignalGenerator.RfSweepMode> jRfSweepMode;
   
   private final JSevenSegmentNumber jSpan;
   
