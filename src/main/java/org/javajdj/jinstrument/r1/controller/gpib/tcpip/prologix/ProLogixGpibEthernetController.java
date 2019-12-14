@@ -9,13 +9,13 @@ import java.util.logging.Logger;
 import org.javajdj.jinstrument.r1.controller.gpib.GpibAddress;
 import org.javajdj.jinstrument.r1.swing.util.JStatusBar;
 import org.javajdj.jinstrument.r1.Controller;
-import org.javajdj.jinstrument.r1.controller.gpib.GpibController;
+import org.javajdj.jinstrument.r1.controller.gpib.AbstractGpibController;
 
 /**
  *
  */
 public final class ProLogixGpibEthernetController
-  extends GpibController
+  extends AbstractGpibController
   implements JStatusBar.StatusableItem, Controller
 {
 
@@ -23,6 +23,7 @@ public final class ProLogixGpibEthernetController
   
   public ProLogixGpibEthernetController (final String ipAddress, final int tcpConnectPort)
   {
+    super ("ProLogixGpibEthernetController", null, null);
     if (ipAddress == null || tcpConnectPort < 0 || tcpConnectPort > 65535)
       throw new IllegalArgumentException ();
     this.ipAddress = ipAddress;
