@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.r1.controller.gpib.GpibAddress;
 import org.javajdj.jinstrument.r1.swing.util.JStatusBar;
-import org.javajdj.jinstrument.r1.Controller;
 import org.javajdj.jinstrument.r1.controller.gpib.AbstractGpibController;
 
 /**
@@ -16,7 +15,7 @@ import org.javajdj.jinstrument.r1.controller.gpib.AbstractGpibController;
  */
 public final class ProLogixGpibEthernetController
   extends AbstractGpibController
-  implements JStatusBar.StatusableItem, Controller
+  implements JStatusBar.StatusableItem
 {
 
   private static final Logger LOG = Logger.getLogger (ProLogixGpibEthernetController.class.getName ());
