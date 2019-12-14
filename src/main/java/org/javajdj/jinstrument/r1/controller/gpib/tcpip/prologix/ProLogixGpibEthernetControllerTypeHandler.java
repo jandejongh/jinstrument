@@ -43,7 +43,8 @@ implements ControllerTypeHandler
   {
     if (! isValidUrl (controllerUrl))
       return null;
-    final String addressAndPortString = controllerUrl.replaceFirst (ProLogixGpibEthernetControllerTypeHandler.PROLOGIX_URL_PREFIX, "");
+    final String addressAndPortString =
+      controllerUrl.replaceFirst (ProLogixGpibEthernetControllerTypeHandler.PROLOGIX_URL_PREFIX, "");
     final String ipAddress;
     final int tcpConnectPort;
     if (! addressAndPortString.contains (":"))
