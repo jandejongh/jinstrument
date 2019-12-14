@@ -12,7 +12,7 @@ public class GpibDevice
 implements Device
 {
 
-  public GpibDevice (final GpibController controller, final GpibAddress address)
+  public GpibDevice (final AbstractGpibController controller, final GpibAddress address)
   {
     if (controller == null || address == null)
       throw new IllegalArgumentException ();
@@ -20,9 +20,9 @@ implements Device
     this.address = address;
   }
 
-  private final GpibController controller;
+  private final AbstractGpibController controller;
   
-  public final GpibController getController ()
+  public final AbstractGpibController getController ()
   {
     return this.controller;
   }

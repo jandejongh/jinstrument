@@ -4,18 +4,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.r1.Controller;
+import org.javajdj.jservice.Service;
+import org.javajdj.jservice.support.Service_FromMix;
 
 /**
  *
  */
-public abstract class GpibController
+public abstract class AbstractGpibController
+extends Service_FromMix
 implements Controller
 {
 
-  private static final Logger LOG = Logger.getLogger (GpibController.class.getName ());
+  private static final Logger LOG = Logger.getLogger (AbstractGpibController.class.getName ());
+
+  public AbstractGpibController (final String name, final List<Runnable> runnables, final List<Service> targetServices)
+  {
+    super (name, runnables, targetServices);
+  }
   
   protected final GpibAddress createAddress (final String deviceUrl)
   {
@@ -173,7 +182,7 @@ implements Controller
         return -1;
       try
       {
-        return GpibController.this.read (this);      
+        return AbstractGpibController.this.read (this);      
       }
       catch (InterruptedException ie)
       {
@@ -185,7 +194,7 @@ implements Controller
     public void close () throws IOException
     {
       this.closed = true;
-      GpibController.this.closeInputStream (this);
+      AbstractGpibController.this.closeInputStream (this);
     }
     
   }
@@ -212,7 +221,7 @@ implements Controller
         throw new IOException ();
       try
       {
-        GpibController.this.write (this, b);      
+        AbstractGpibController.this.write (this, b);      
       }
       catch (InterruptedException ie)
       {
@@ -224,7 +233,7 @@ implements Controller
     public void close () throws IOException
     {
       this.closed = true;
-      GpibController.this.closeOutputStream (this);
+      AbstractGpibController.this.closeOutputStream (this);
     }
     
   }
