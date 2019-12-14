@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.javajdj.jinstrument.r1.Controller;
 import org.javajdj.jservice.Service;
 import org.javajdj.jservice.support.Service_FromMix;
 
@@ -16,7 +15,7 @@ import org.javajdj.jservice.support.Service_FromMix;
  */
 public abstract class AbstractGpibController
 extends Service_FromMix
-implements Controller
+implements GpibController
 {
 
   private static final Logger LOG = Logger.getLogger (AbstractGpibController.class.getName ());
