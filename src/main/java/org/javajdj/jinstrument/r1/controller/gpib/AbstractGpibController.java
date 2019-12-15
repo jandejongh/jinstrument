@@ -7,14 +7,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.javajdj.jinstrument.r1.AbstractController;
 import org.javajdj.jservice.Service;
-import org.javajdj.jservice.support.Service_FromMix;
 
 /**
  *
  */
 public abstract class AbstractGpibController
-extends Service_FromMix
+extends AbstractController
 implements GpibController
 {
 
