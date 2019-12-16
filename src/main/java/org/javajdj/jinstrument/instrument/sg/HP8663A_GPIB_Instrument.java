@@ -33,7 +33,7 @@ import org.javajdj.jinstrument.r1.instrument.InstrumentStatus;
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class HP8663A_GPIB
+public class HP8663A_GPIB_Instrument
 extends AbstractSignalGenerator
 implements SignalGenerator
 {
@@ -44,7 +44,7 @@ implements SignalGenerator
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private static final Logger LOG = Logger.getLogger (HP8663A_GPIB.class.getName ());
+  private static final Logger LOG = Logger.getLogger (HP8663A_GPIB_Instrument.class.getName ());
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -52,7 +52,7 @@ implements SignalGenerator
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public HP8663A_GPIB (final GpibDevice device)
+  public HP8663A_GPIB_Instrument (final GpibDevice device)
   {
     super ("HP8663A", device, null, null);
   }
@@ -77,20 +77,18 @@ implements SignalGenerator
   private String writeAndReadlnSync (final String string)
     throws InterruptedException, IOException, TimeoutException
   {
-    final byte[] bytes = ((GpibDevice) getDevice ()).writeAndReadlnSync (
-      string.getBytes (Charset.forName ("US-ASCII")),
-      HP8663A_GPIB.READLINE_TERMINATION_MODE,
-      HP8663A_GPIB.READLINE_TIMEOUT_MS);
+    final byte[] bytes = ((GpibDevice) getDevice ()).writeAndReadlnSync (string.getBytes (Charset.forName ("US-ASCII")),
+      HP8663A_GPIB_Instrument.READLINE_TERMINATION_MODE,
+      HP8663A_GPIB_Instrument.READLINE_TIMEOUT_MS);
     return new String (bytes, Charset.forName ("US-ASCII"));
   }
   
   private byte[] writeAndReadNSync (final String string, final int N)
     throws InterruptedException, IOException, TimeoutException
   {
-    final byte[] bytes = ((GpibDevice) getDevice ()).writeAndReadNSync (
-      string.getBytes (Charset.forName ("US-ASCII")),
+    final byte[] bytes = ((GpibDevice) getDevice ()).writeAndReadNSync (string.getBytes (Charset.forName ("US-ASCII")),
       N,
-      HP8663A_GPIB.READLINE_TIMEOUT_MS);
+      HP8663A_GPIB_Instrument.READLINE_TIMEOUT_MS);
     return bytes;
   }
   
@@ -189,10 +187,10 @@ implements SignalGenerator
     throws IOException, InterruptedException, TimeoutException
   {
     final byte[] l1 = writeAndReadNSync ("L1\n", L1_LENGTH);
-    if (l1.length != HP8663A_GPIB.L1_LENGTH)
+    if (l1.length != HP8663A_GPIB_Instrument.L1_LENGTH)
     {
       LOG.log (Level.WARNING, "Unexpected number of bytes read for L1: {0} (should be {1}).",
-        new Object[]{l1.length, HP8663A_GPIB.L1_LENGTH});
+        new Object[]{l1.length, HP8663A_GPIB_Instrument.L1_LENGTH});
       throw new IOException ();
     }
     // LOG message for debugging the L1 output.
@@ -200,12 +198,12 @@ implements SignalGenerator
     LOG.log (Level.INFO, "L1 received.");
     // Also for debugging L1 output; but this one only reports changes.
     if (this.lastL1 != null)
-      for (int i = 0; i < HP8663A_GPIB.L1_LENGTH; i++)
+      for (int i = 0; i < HP8663A_GPIB_Instrument.L1_LENGTH; i++)
         if (l1[i] != this.lastL1[i])
           LOG.log (Level.WARNING, "L1 string index {0} changed from {1} to {2}.",
             new Object[]{i, Integer.toHexString (this.lastL1[i] & 0xff), Integer.toHexString (l1[i] & 0xff)});
     this.lastL1 = l1;
-    return HP8663A_GPIB.settingsFromL1 (l1);
+    return HP8663A_GPIB_Instrument.settingsFromL1 (l1);
   }
  
   private static SignalGeneratorSettings settingsFromL1 (final byte[] l1)
