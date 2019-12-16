@@ -25,7 +25,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.javajdj.jinstrument.r1.instrument.InstrumentCommand;
 import org.javajdj.jservice.Service;
 import org.javajdj.jservice.support.Service_FromMix;
 
@@ -601,13 +600,15 @@ implements Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // COMMAND QUEUE
+  // ADD COMMAND [Instrument]
   // PROCESS COMMAND [ABSTRACT]
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   private final BlockingQueue<InstrumentCommand> commandQueue = new LinkedBlockingQueue<> ();
   
-  protected void addCommand (final InstrumentCommand instrumentCommand)
+  @Override
+  public final void addCommand (final InstrumentCommand instrumentCommand)
   {
     if (instrumentCommand == null)
       throw new IllegalArgumentException ();
