@@ -17,7 +17,7 @@
 package org.javajdj.jinstrument.instrument.sg;
 
 import java.io.IOException;
-import org.javajdj.jinstrument.r1.instrument.Instrument;
+import org.javajdj.jinstrument.Instrument;
 
 /** Extension of {@link Instrument} for (typically RF) signal generators.
  *

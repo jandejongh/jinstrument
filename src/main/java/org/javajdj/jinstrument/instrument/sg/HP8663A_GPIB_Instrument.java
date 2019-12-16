@@ -23,10 +23,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.r1.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.r1.instrument.DefaultInstrumentCommand;
-import org.javajdj.jinstrument.r1.instrument.Instrument;
-import org.javajdj.jinstrument.r1.instrument.InstrumentCommand;
-import org.javajdj.jinstrument.r1.instrument.InstrumentSettings;
-import org.javajdj.jinstrument.r1.instrument.InstrumentStatus;
+import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentCommand;
+import org.javajdj.jinstrument.InstrumentSettings;
+import org.javajdj.jinstrument.InstrumentStatus;
 
 /** Implementation of {@link Instrument} and {@link SignalGenerator} for the HP-8663A.
  *

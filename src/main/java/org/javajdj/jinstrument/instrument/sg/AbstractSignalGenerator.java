@@ -18,7 +18,7 @@ package org.javajdj.jinstrument.instrument.sg;
 
 import java.util.List;
 import org.javajdj.jinstrument.Device;
-import org.javajdj.jinstrument.r1.instrument.AbstractInstrument;
+import org.javajdj.jinstrument.AbstractInstrument;
 import org.javajdj.jservice.Service;
 
 /** Abstract base implementation of {@link SignalGenerator}.

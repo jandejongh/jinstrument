@@ -16,7 +16,7 @@
  */
 package org.javajdj.jinstrument.instrument.sg;
 
-import org.javajdj.jinstrument.r1.instrument.InstrumentSettings;
+import org.javajdj.jinstrument.InstrumentSettings;
 
 /** Extension of {@link InstrumentSettings} for (typically RF) signal generators.
  *

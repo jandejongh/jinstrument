@@ -18,7 +18,7 @@ package org.javajdj.jinstrument.instrument.sg;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import org.javajdj.jinstrument.r1.instrument.InstrumentStatus;
+import org.javajdj.jinstrument.InstrumentStatus;
 
 /** Implementation of {@link InstrumentStatus} for the HP-8663A
  *
