@@ -25,11 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.r1.instrument.InstrumentCommand;
-import org.javajdj.jinstrument.r1.instrument.InstrumentListener;
-import org.javajdj.jinstrument.r1.instrument.InstrumentSettings;
-import org.javajdj.jinstrument.r1.instrument.InstrumentStatus;
 import org.javajdj.jservice.Service;
 import org.javajdj.jservice.support.Service_FromMix;
 

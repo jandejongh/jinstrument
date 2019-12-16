@@ -14,9 +14,8 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.r1.instrument;
+package org.javajdj.jinstrument;
 
-import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jservice.Service;
 
 /** A listener to instrument-related changes of an {@link Instrument}.

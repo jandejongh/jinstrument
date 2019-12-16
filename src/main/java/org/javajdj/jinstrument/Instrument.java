@@ -16,10 +16,6 @@
  */
 package org.javajdj.jinstrument;
 
-import org.javajdj.jinstrument.Device;
-import org.javajdj.jinstrument.r1.instrument.InstrumentListener;
-import org.javajdj.jinstrument.r1.instrument.InstrumentSettings;
-import org.javajdj.jinstrument.r1.instrument.InstrumentStatus;
 import org.javajdj.jservice.Service;
 
 /** A software representation of a (or more) physical instrument.
