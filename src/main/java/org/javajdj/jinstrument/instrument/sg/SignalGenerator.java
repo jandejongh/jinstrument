@@ -45,21 +45,29 @@ public interface SignalGenerator
     EXT_DC;
   }
   
-  void setSettingsOnInstrument (SignalGeneratorSettings signalGeneratorSettings) throws IOException, InterruptedException;
+  void setSettingsOnInstrument (SignalGeneratorSettings signalGeneratorSettings)
+    throws IOException, InterruptedException;
   
-  void setCenterFrequency_MHz (double centerFrequency_MHz) throws IOException, InterruptedException;
+  void setCenterFrequency_MHz (double centerFrequency_MHz)
+    throws IOException, InterruptedException;
 
-  void setRfSweepMode (RfSweepMode rfSweepMode) throws IOException, InterruptedException;
+  void setRfSweepMode (RfSweepMode rfSweepMode)
+    throws IOException, InterruptedException;
   
-  void setSpan_MHz (double span_MHz) throws IOException, InterruptedException;
+  void setSpan_MHz (double span_MHz)
+    throws IOException, InterruptedException;
   
-  void setStartFrequency_MHz (double startFrequency_MHz) throws IOException, InterruptedException;
+  void setStartFrequency_MHz (double startFrequency_MHz)
+    throws IOException, InterruptedException;
   
-  void setStopFrequency_MHz (double stopFrequency_MHz) throws IOException, InterruptedException;
+  void setStopFrequency_MHz (double stopFrequency_MHz)
+    throws IOException, InterruptedException;
   
-  void setOutputEnable (boolean outputEnable) throws IOException, InterruptedException;
+  void setOutputEnable (boolean outputEnable)
+    throws IOException, InterruptedException;
   
-  void setAmplitude_dBm (double amplitude_dBm) throws IOException, InterruptedException;
+  void setAmplitude_dBm (double amplitude_dBm)
+    throws IOException, InterruptedException;
   
   void setModulationSourceInternalFrequency_kHz (double ModulationSourceInternalFrequency_kHz)
     throws IOException, InterruptedException;
@@ -78,5 +86,5 @@ public interface SignalGenerator
   
   void setEnableBpsk (boolean enableBpsk, ModulationSource modulationSource)
     throws IOException, InterruptedException;
-  
+
 }
