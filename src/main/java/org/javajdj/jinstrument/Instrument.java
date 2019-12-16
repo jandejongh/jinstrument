@@ -41,4 +41,6 @@ public interface Instrument
   
   void setPoweredOn (boolean poweredOn);
   
+  void addCommand (InstrumentCommand instrumentCommand);
+    
 }
