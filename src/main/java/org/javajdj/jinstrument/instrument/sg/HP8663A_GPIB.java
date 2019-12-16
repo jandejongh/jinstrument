@@ -1,21 +1,37 @@
-package org.javajdj.jinstrument.r1.instrument.sg.hp8663a;
+/* 
+ * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ */
+package org.javajdj.jinstrument.instrument.sg;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.r1.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.r1.instrument.DefaultInstrumentCommand;
+import org.javajdj.jinstrument.r1.instrument.Instrument;
 import org.javajdj.jinstrument.r1.instrument.InstrumentCommand;
 import org.javajdj.jinstrument.r1.instrument.InstrumentSettings;
 import org.javajdj.jinstrument.r1.instrument.InstrumentStatus;
-import org.javajdj.jinstrument.r1.instrument.sg.AbstractSignalGenerator;
-import org.javajdj.jinstrument.r1.instrument.sg.DefaultSignalGeneratorSettings;
-import org.javajdj.jinstrument.r1.instrument.sg.SignalGenerator;
-import org.javajdj.jinstrument.r1.instrument.sg.SignalGeneratorSettings;
 
-/**
+/** Implementation of {@link Instrument} and {@link SignalGenerator} for the HP-8663A.
  *
+ * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
+ * 
  */
 public class HP8663A_GPIB
 extends AbstractSignalGenerator
@@ -39,60 +55,45 @@ implements SignalGenerator
   public HP8663A_GPIB (final GpibDevice device)
   {
     super ("HP8663A", device, null, null);
-    this.out = new PrintWriter (device.getOutputStream (), true);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // OUT PRINTWRITER
+  // READ LINE TERMINATION MODE
+  // READLINE TIMEOUT
+  // READ AND WRITE METHODS TO THE DEVICE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final PrintWriter out;
+  private final static GpibDevice.ReadlineTerminationMode READLINE_TERMINATION_MODE = GpibDevice.ReadlineTerminationMode.CR_LF;
   
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // POWER ON
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  private final static long READLINE_TIMEOUT_MS = 10000L;
   
-  @Override
-  public boolean isPoweredOn ()
+  private void writeAsync (final String string)
   {
-    throw new UnsupportedOperationException ();
+    ((GpibDevice) getDevice ()).writeAsync (string.getBytes (Charset.forName ("US-ASCII")));
   }
-
-  @Override
-  public void setPoweredOn (final boolean poweredOn)
-  {
-    throw new UnsupportedOperationException ();
-  }
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // READ LINE
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private String readLine () throws IOException
+  private String writeAndReadlnSync (final String string)
+    throws InterruptedException, IOException, TimeoutException
   {
-    // XXX THIS METHOD SHOULD REALLY NOT BE NEEDED!!
-    // NOTE: SPECIAL VERSION FOR HP-8663A, WHICH SENDS 0x0d+0x0a LINE TERMINATORS!
-    String line = "";
-    boolean done = false;
-    while (! done)
-    {
-      final int intRead = ((GpibDevice) getDevice ()).getInputStream ().read ();
-      if (intRead == 0x0d)
-        // SKIP 0x0d.
-        continue;
-      done = (intRead == 0x0a);
-      if (! done )
-        line += Character.toString ((char) intRead);
-    }
-    return line;
+    final byte[] bytes = ((GpibDevice) getDevice ()).writeAndReadlnSync (
+      string.getBytes (Charset.forName ("US-ASCII")),
+      HP8663A_GPIB.READLINE_TERMINATION_MODE,
+      HP8663A_GPIB.READLINE_TIMEOUT_MS);
+    return new String (bytes, Charset.forName ("US-ASCII"));
   }
-    
+  
+  private byte[] writeAndReadNSync (final String string, final int N)
+    throws InterruptedException, IOException, TimeoutException
+  {
+    final byte[] bytes = ((GpibDevice) getDevice ()).writeAndReadNSync (
+      string.getBytes (Charset.forName ("US-ASCII")),
+      N,
+      HP8663A_GPIB.READLINE_TIMEOUT_MS);
+    return bytes;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // BYTES TO HEX
@@ -117,15 +118,35 @@ implements SignalGenerator
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // Instrument
+  // POWER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public boolean isPoweredOn ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  public void setPoweredOn (final boolean poweredOn)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AbstractInstrument
   // INSTRUMENT STATUS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  private InstrumentStatus getStatusFromInstrumentSyncNoLock (final GpibDevice gpibDevice)
-    throws IOException, InterruptedException
+  @Override
+  protected InstrumentStatus getStatusFromInstrumentSync ()
+    throws IOException, InterruptedException, TimeoutException
   {
-    this.out.println ("MS");
-    final String statusLine = readLine ();
+    final String statusLine = writeAndReadlnSync ("MS\n");
     if (statusLine.length () != HP8663A_GPIB_Status.STATUS_LENGTH)
     {
       LOG.log (Level.WARNING, "Unexpected number of bytes read for HP8663A status: {0} (should be {1}).",
@@ -138,22 +159,6 @@ implements SignalGenerator
     LOG.log (Level.INFO, "Status received.");
     return new HP8663A_GPIB_Status (statusBuffer);
   }
-  
-  @Override
-  protected InstrumentStatus getStatusFromInstrumentSync ()
-    throws UnsupportedOperationException, IOException, InterruptedException
-  {
-    final GpibDevice device = (GpibDevice) getDevice ();
-    try
-    {
-      device.lockDevice ();
-      return getStatusFromInstrumentSyncNoLock (device);
-    }
-    finally
-    {
-      device.unlockDevice ();
-    }
-  }
 
   @Override
   protected void requestStatusFromInstrumentASync ()
@@ -164,6 +169,7 @@ implements SignalGenerator
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
   // INSTRUMENT SETTINGS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,46 +177,35 @@ implements SignalGenerator
   private static final int L1_LENGTH = 189;
   
   private transient byte[] lastL1 = null;
-  
-  private SignalGeneratorSettings getSettingsFromInstrumentSyncNoLock (final GpibDevice gpibDevice)
-    throws IOException, InterruptedException
+    
+  @Override
+  protected void requestSettingsFromInstrumentASync () throws UnsupportedOperationException, IOException
   {
-    final byte[] l1Buffer = new byte[HP8663A_GPIB.L1_LENGTH];
-    this.out.println ("L1");
-    final int bytesRead = gpibDevice.getInputStream ().read (l1Buffer);
-    if (bytesRead != HP8663A_GPIB.L1_LENGTH)
-    {
-      LOG.log (Level.WARNING, "Unexpected number of bytes read for L1: {0} (should be {1}).",
-        new Object[]{bytesRead, HP8663A_GPIB.L1_LENGTH});
-      throw new IOException ();
-    }
-    // LOG message for debugging the L1 output.
-    // LOG.log (Level.WARNING, "bytes = {0}", bytesToHex (l1Buffer));
-    LOG.log (Level.INFO, "L1 received.");
-    // Also for debugging L1 output; but this one only reports changes.
-    if (this.lastL1 != null)
-      for (int i = 0; i < HP8663A_GPIB.L1_LENGTH; i++)
-        if (l1Buffer[i] != this.lastL1[i])
-          LOG.log (Level.WARNING, "L1 string index {0} changed from {1} to {2}.",
-            new Object[]{i, Integer.toHexString (this.lastL1[i] & 0xff), Integer.toHexString (l1Buffer[i] & 0xff)});
-    this.lastL1 = l1Buffer;
-    return HP8663A_GPIB.settingsFromL1 (l1Buffer);
+    throw new UnsupportedOperationException ();
   }
   
   @Override
   public synchronized SignalGeneratorSettings getSettingsFromInstrumentSync ()
-    throws IOException, InterruptedException
+    throws IOException, InterruptedException, TimeoutException
   {
-    final GpibDevice device = (GpibDevice) getDevice ();
-    try
+    final byte[] l1 = writeAndReadNSync ("L1\n", L1_LENGTH);
+    if (l1.length != HP8663A_GPIB.L1_LENGTH)
     {
-      device.lockDevice ();
-      return getSettingsFromInstrumentSyncNoLock (device);
+      LOG.log (Level.WARNING, "Unexpected number of bytes read for L1: {0} (should be {1}).",
+        new Object[]{l1.length, HP8663A_GPIB.L1_LENGTH});
+      throw new IOException ();
     }
-    finally
-    {
-      device.unlockDevice ();
-    }
+    // LOG message for debugging the L1 output.
+    // LOG.log (Level.WARNING, "bytes = {0}", bytesToHex (l1));
+    LOG.log (Level.INFO, "L1 received.");
+    // Also for debugging L1 output; but this one only reports changes.
+    if (this.lastL1 != null)
+      for (int i = 0; i < HP8663A_GPIB.L1_LENGTH; i++)
+        if (l1[i] != this.lastL1[i])
+          LOG.log (Level.WARNING, "L1 string index {0} changed from {1} to {2}.",
+            new Object[]{i, Integer.toHexString (this.lastL1[i] & 0xff), Integer.toHexString (l1[i] & 0xff)});
+    this.lastL1 = l1;
+    return HP8663A_GPIB.settingsFromL1 (l1);
   }
  
   private static SignalGeneratorSettings settingsFromL1 (final byte[] l1)
@@ -366,7 +361,7 @@ implements SignalGenerator
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // SignalGenerator-specific implementation.
+  // SignalGenerator
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -515,21 +510,16 @@ implements SignalGenerator
       InstrumentCommand.ICARG_INTMODSOURCE_FREQUENCY_KHZ, modulationSourceInternalFrequency_kHz));
   }
 
-  @Override
-  protected void requestSettingsFromInstrumentASync () throws UnsupportedOperationException, IOException
-  {
-    throw new UnsupportedOperationException ();
-  }
-
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
   // PROCESS COMMAND
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
   @Override
   protected void processCommand (final InstrumentCommand instrumentCommand)
-    throws UnsupportedOperationException, IOException, InterruptedException
+    throws IOException, InterruptedException, TimeoutException
   {
     if (instrumentCommand == null)
       throw new IllegalArgumentException ();
@@ -546,28 +536,13 @@ implements SignalGenerator
     InstrumentSettings newInstrumentSettings = null;
     try
     {
-      device.lockDevice ();
       switch (commandString)
       {
         case InstrumentCommand.IC_NOP_KEY:
           break;
         case InstrumentCommand.IC_GET_SETTINGS_KEY:
         {
-          final byte[] l1Buffer = new byte[HP8663A_GPIB.L1_LENGTH];
-          this.out.println ("L1");
-          final int bytesRead = device.getInputStream ().read (l1Buffer);
-          // LOG.log (Level.WARNING, "number of bytes read = {0}", bytesRead);
-          LOG.log (Level.WARNING, "bytes = {0}", bytesToHex (l1Buffer));
-          if (this.lastL1 != null)
-            for (int i = 0; i < HP8663A_GPIB.L1_LENGTH; i++)
-              if (l1Buffer[i] != this.lastL1[i])
-                LOG.log (Level.WARNING, "L1 string index {0} changed from {1} to {2}.",
-                  new Object[]
-                  {
-                    i, Integer.toHexString (this.lastL1[i] & 0xff), Integer.toHexString (l1Buffer[i] & 0xff)
-                  });
-          this.lastL1 = l1Buffer;
-          newInstrumentSettings = HP8663A_GPIB.settingsFromL1 (l1Buffer);
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case InstrumentCommand.IC_RF_OUTPUT_ENABLE:
@@ -577,23 +552,20 @@ implements SignalGenerator
             outputEnable = (Boolean) instrumentCommand.get (InstrumentCommand.ICARG_RF_OUTPUT_ENABLE);
           else
             outputEnable = true;
-          if (outputEnable)
-            this.out.println ("AP");
-          else
-            this.out.println ("AO");
+          writeAsync (outputEnable ? "AP\n" : "AO\n");
           break;
         }
         case InstrumentCommand.IC_RF_OUTPUT_LEVEL:
         {
           // XXX There seems to be no way to just set the output level, without also enabling RF output.
           final double amplitude_dBm = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_OUTPUT_LEVEL_DBM);
-          this.out.println ("AP " + amplitude_dBm + " DM");
+          writeAsync ("AP " + amplitude_dBm + " DM\n");
           break;
         }
         case InstrumentCommand.IC_RF_FREQUENCY:
         {
           final double centerFrequency_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_FREQUENCY_MHZ);
-          this.out.println ("FR " + centerFrequency_MHz + " MZ");
+          writeAsync ("FR " + centerFrequency_MHz + " MZ\n");
           break;
         }
         case InstrumentCommand.IC_RF_SWEEP_MODE:
@@ -605,22 +577,22 @@ implements SignalGenerator
           {
             case OFF:
             {
-              this.out.println ("W1");
+              writeAsync ("W1\n");
               break;
             }
             case AUTO:
             {
-              this.out.println ("W2");
+              writeAsync ("W2\n");
               break;
             }
             case MANUAL:
             {
-              this.out.println ("W3");
+              writeAsync ("W3\n");
               break;
             }
             case SINGLE:
             {
-              this.out.println ("W4");
+              writeAsync ("W4\n");
               break;
             }
             default:
@@ -630,19 +602,19 @@ implements SignalGenerator
         case InstrumentCommand.IC_RF_SPAN:
         {
           final double span_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_SPAN_MHZ);
-          this.out.println ("FS " + span_MHz + " MZ");
+          writeAsync ("FS " + span_MHz + " MZ\n");
           break;
         }
         case InstrumentCommand.IC_RF_START_FREQUENCY:
         {
           final double startFrequency_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_START_FREQUENCY_MHZ);
-          this.out.println ("FA " + startFrequency_MHz + " MZ");
+          writeAsync ("FA " + startFrequency_MHz + " MZ\n");
           break;
         }
         case InstrumentCommand.IC_RF_STOP_FREQUENCY:
         {
           final double stopFrequency_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_STOP_FREQUENCY_MHZ);
-          this.out.println ("FB " + stopFrequency_MHz + " MZ");
+          writeAsync ("FB " + stopFrequency_MHz + " MZ\n");
           break;
         }
         case InstrumentCommand.IC_RF_AM_CONTROL:
@@ -660,26 +632,26 @@ implements SignalGenerator
             switch (modulationSource)
             {
               case INT:
-                this.out.println ("AM " + depth_percent + " PC");
+                writeAsync ("AM " + depth_percent + " PC\n");
                 break;
               case INT_400:
-                this.out.println ("AM M1 " + depth_percent + " PC");
+                writeAsync ("AM M1 " + depth_percent + " PC\n");
                 break;
               case INT_1K:
-                this.out.println ("AM M2 " + depth_percent + " PC");
+                writeAsync ("AM M2 " + depth_percent + " PC\n");
                 break;
               case EXT_AC:
-                this.out.println ("AM M3 " + depth_percent + " PC");
+                writeAsync ("AM M3 " + depth_percent + " PC\n");
                 break;
               case EXT_DC:
-                this.out.println ("AM M4 " + depth_percent + " PC");
+                writeAsync ("AM M4 " + depth_percent + " PC\n");
                 break;
               default:
                 throw new UnsupportedOperationException ();
             }            
           }
           else
-            this.out.println ("AM FO");
+            writeAsync ("AM FO\n");
           break;
         }
         case InstrumentCommand.IC_RF_FM_CONTROL:
@@ -697,26 +669,26 @@ implements SignalGenerator
             switch (modulationSource)
             {
               case INT:
-                this.out.println ("FM " + fmDeviation_kHz + " KZ");
+                writeAsync ("FM " + fmDeviation_kHz + " KZ\n");
                 break;
               case INT_400:
-                this.out.println ("FM M1 " + fmDeviation_kHz + " KZ");
+                writeAsync ("FM M1 " + fmDeviation_kHz + " KZ\n");
                 break;
               case INT_1K:
-                this.out.println ("FM M2 " + fmDeviation_kHz + " KZ");
+                writeAsync ("FM M2 " + fmDeviation_kHz + " KZ\n");
                 break;
               case EXT_AC:
-                this.out.println ("FM M3 " + fmDeviation_kHz + " KZ");
+                writeAsync ("FM M3 " + fmDeviation_kHz + " KZ\n");
                 break;
               case EXT_DC:
-                this.out.println ("FM M4 " + fmDeviation_kHz + " KZ");
+                writeAsync ("FM M4 " + fmDeviation_kHz + " KZ\n");
                 break;
               default:
                 throw new UnsupportedOperationException ();
             }            
           }
           else
-            this.out.println ("FM FO");  
+            writeAsync ("FM FO\n");  
           break;
         }
         case InstrumentCommand.IC_RF_PM_CONTROL:
@@ -734,26 +706,26 @@ implements SignalGenerator
             switch (modulationSource)
             {
               case INT:
-                this.out.println ("PM " + pmDeviation_degrees + " DG");
+                writeAsync ("PM " + pmDeviation_degrees + " DG\n");
                 break;
               case INT_400:
-                this.out.println ("PM M1 " + pmDeviation_degrees + " DG");
+                writeAsync ("PM M1 " + pmDeviation_degrees + " DG\n");
                 break;
               case INT_1K:
-                this.out.println ("PM M2 " + pmDeviation_degrees + " DG");
+                writeAsync ("PM M2 " + pmDeviation_degrees + " DG\n");
                 break;
               case EXT_AC:
-                this.out.println ("PM M3 " + pmDeviation_degrees + " DG");
+                writeAsync ("PM M3 " + pmDeviation_degrees + " DG\n");
                 break;
               case EXT_DC:
-                this.out.println ("PM M4 " + pmDeviation_degrees + " DG");
+                writeAsync ("PM M4 " + pmDeviation_degrees + " DG\n");
                 break;
               default:
                 throw new UnsupportedOperationException ();
             }            
           }
           else
-            this.out.println ("PM FO");  
+            writeAsync ("PM FO\n");  
           break;
         }
         case InstrumentCommand.IC_RF_PULSEM_CONTROL:
@@ -770,25 +742,25 @@ implements SignalGenerator
             switch (modulationSource)
             {
               case INT:
-                this.out.println ("PL");
+                writeAsync ("PL\n");
                 break;
               case INT_400:
-                this.out.println ("PL M1");
+                writeAsync ("PL M1\n");
                 break;
               case INT_1K:
-                this.out.println ("PL M2");
+                writeAsync ("PL M2\n");
                 break;
               case EXT_AC:
                 throw new UnsupportedOperationException ();
               case EXT_DC:
-                this.out.println ("PL M4");
+                writeAsync ("PL M4\n");
                 break;
               default:
                 throw new UnsupportedOperationException ();
             }            
           }
           else
-            this.out.println ("PL FO");
+            writeAsync ("PL FO\n");
           break;
         }
         case InstrumentCommand.IC_RF_BPSK_CONTROL:
@@ -805,32 +777,32 @@ implements SignalGenerator
             switch (modulationSource)
             {
               case INT:
-                this.out.println ("BP");
+                writeAsync ("BP\n");
                 break;
               case INT_400:
-                this.out.println ("BP M1");
+                writeAsync ("BP M1\n");
                 break;
               case INT_1K:
-                this.out.println ("BP M2");
+                writeAsync ("BP M2\n");
                 break;
               case EXT_AC:
                 throw new UnsupportedOperationException ();
               case EXT_DC:
-                this.out.println ("BP M4");
+                writeAsync ("BP M4\n");
                 break;
               default:
                 throw new UnsupportedOperationException ();
             }
           }
           else
-            this.out.println ("BP FO");
+            writeAsync ("BP FO\n");
           break;
         }
         case InstrumentCommand.IC_INTMODSOURCE_CONTROL:
         {
           final double intModSourceFrequency_kHz =
             (double) instrumentCommand.get (InstrumentCommand.ICARG_INTMODSOURCE_FREQUENCY_KHZ);
-          this.out.println ("MF " + intModSourceFrequency_kHz + " KZ");
+          writeAsync ("MF " + intModSourceFrequency_kHz + " KZ\n");
           break;
         }
         default:
@@ -839,7 +811,7 @@ implements SignalGenerator
     }
     finally
     {
-      device.unlockDevice ();      
+      // EMPTY
     }
     if (newInstrumentSettings != null)
       settingsReadFromInstrument (newInstrumentSettings);
