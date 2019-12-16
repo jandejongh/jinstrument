@@ -22,7 +22,7 @@ package org.javajdj.jinstrument;
  * Objects implementing this interface carry the complete (relevant) settings of
  * an instrument.
  * It is highly recommended that such objects are immutable and equipped with
- * suitable implementations of {@link #equals} and {@link #hashCode}.
+ * suitable implementations of {@link Object#equals} and {@link Object#hashCode}.
  * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
