@@ -16,7 +16,14 @@
  */
 package org.javajdj.jinstrument.r1.instrument;
 
-/**
+import org.javajdj.jinstrument.Instrument;
+
+/** The status of an {@link Instrument}.
+ * 
+ * <p>
+ * Implementations of {@link Instrument} are free to choose a suitable further refinement of this interface.
+ * It is highly recommended that implementing objects are immutable and equipped with
+ * suitable implementations of {@link #equals} and {@link #hashCode}.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
