@@ -1,3 +1,19 @@
+/* 
+ * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ */
 package org.javajdj.jinstrument.r1.instrument;
 
 import java.io.IOException;
@@ -6,14 +22,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.javajdj.jinstrument.r1.Device;
+import org.javajdj.jinstrument.Device;
 import org.javajdj.jservice.Service;
 import org.javajdj.jservice.support.Service_FromMix;
 
-/**
+/** Abstract base implementation of {@link Instrument}.
+ * 
+ * <p>
+ * The base class provides various sub-services like for obtaining instrument settings and status and for data acquisition.
  *
+ * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
+ * 
  */
 public abstract class AbstractInstrument
 extends Service_FromMix
@@ -143,16 +165,37 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // CURRENT INSTRUMENT STATUS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static String CURRENT_INSTRUMENT_STATUS_PROPERTY_NAME = "currentInstrumentStatus";
+  
+  private volatile InstrumentStatus currentInstrumentStatus = null;
+  
+  private final Object currentInstrumentStatusLock = new Object ();
+  
+  @Override
+  public final InstrumentStatus getCurrentInstrumentStatus ()
+  {
+    synchronized (this.currentInstrumentStatusLock)
+    {
+      return this.currentInstrumentStatus;
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // GET STATUS FROM INSTRUMENT SYNCHRONOUSLY [ABSTRACT]
   // REQUEST STATUS FROM INSTRUMENT ASYNCHROUNOUSLY [ABSTRACT]
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   protected abstract InstrumentStatus getStatusFromInstrumentSync ()
-    throws UnsupportedOperationException, IOException, InterruptedException;
+    throws IOException, InterruptedException, TimeoutException;
     
   protected abstract void requestStatusFromInstrumentASync ()
-    throws UnsupportedOperationException, IOException;
+    throws IOException;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -200,21 +243,26 @@ implements Instrument
         }
         catch (InterruptedException ie)
         {
-          LOG.log (Level.WARNING, "InterruptedException while acquiring instrument status: {0}.", ie.getStackTrace ());
+          LOG.log (Level.INFO, "InterruptedException while acquiring instrument status: {0}.", ie.getStackTrace ());
           return;
         }
         catch (IOException ioe)
         {
           LOG.log (Level.WARNING, "IOException while acquiring instrument status: {0}.", ioe.getStackTrace ());
+          error ();
+          return;
         }
         catch (UnsupportedOperationException usoe)
         {
           LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument status: {0}.", usoe.getStackTrace ());
+          error ();
+          return;
         }
-        // Prevent termination of the Thread due to a misbehaving sub-class method.
         catch (Exception e)
         {
           LOG.log (Level.WARNING, "Exception while acquiring instrument status: {0}.", e.getStackTrace ());
+          error ();
+          return;
         }
       }
     }
@@ -334,16 +382,37 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // CURRENT INSTRUMENT SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static String CURRENT_INSTRUMENT_SETTINGS_PROPERTY_NAME = "currentInstrumentSettings";
+  
+  private volatile InstrumentSettings currentInstrumentSettings = null;
+  
+  private final Object currentInstrumentSettingsLock = new Object ();
+  
+  @Override
+  public final InstrumentSettings getCurrentInstrumentSettings ()
+  {
+    synchronized (this.currentInstrumentSettingsLock)
+    {
+      return this.currentInstrumentSettings;
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // GET SETTINGS FROM INSTRUMENT SYNCHRONOUSLY [ABSTRACT]
   // REQUEST SETTINGS FROM INSTRUMENT ASYNCHROUNOUSLY [ABSTRACT]
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   protected abstract InstrumentSettings getSettingsFromInstrumentSync ()
-    throws UnsupportedOperationException, IOException, InterruptedException;
+    throws IOException, InterruptedException, TimeoutException;
     
   protected abstract void requestSettingsFromInstrumentASync ()
-    throws UnsupportedOperationException, IOException;
+    throws IOException;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -391,22 +460,27 @@ implements Instrument
         }
         catch (InterruptedException ie)
         {
-          LOG.log (Level.WARNING, "InterruptedException while acquiring instrument settings: {0}.", ie.getStackTrace ());
+          LOG.log (Level.INFO, "InterruptedException while acquiring instrument settings: {0}.", ie.getStackTrace ());
           return;
         }
         catch (IOException ioe)
         {
-          LOG.log (Level.WARNING, "IOException while acquiring instrument settings: {0}.", ioe.getMessage ());
+          LOG.log (Level.WARNING, "IOException while acquiring instrument settings: {0}.", ioe.getStackTrace ());
+          error ();
+          return;
         }
         catch (UnsupportedOperationException usoe)
         {
           LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument settings: {0}.",
             usoe.getStackTrace ());
+          error ();
+          return;
         }
-        // Prevent termination of the Thread due to a misbehaving sub-class method.
         catch (Exception e)
         {
           LOG.log (Level.WARNING, "Exception while acquiring instrument settings: {0}.", e.getStackTrace ());
+          error ();
+          return;
         }
       }
     }
@@ -526,48 +600,6 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // CURRENT INSTRUMENT STATUS
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  public final static String CURRENT_INSTRUMENT_STATUS_PROPERTY_NAME = "currentInstrumentStatus";
-  
-  private volatile InstrumentStatus currentInstrumentStatus = null;
-  
-  private final Object currentInstrumentStatusLock = new Object ();
-  
-  @Override
-  public final InstrumentStatus getCurrentInstrumentStatus ()
-  {
-    synchronized (this.currentInstrumentStatusLock)
-    {
-      return this.currentInstrumentStatus;
-    }
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // CURRENT INSTRUMENT SETTINGS
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  public final static String CURRENT_INSTRUMENT_SETTINGS_PROPERTY_NAME = "currentInstrumentSettings";
-  
-  private volatile InstrumentSettings currentInstrumentSettings = null;
-  
-  private final Object currentInstrumentSettingsLock = new Object ();
-  
-  @Override
-  public final InstrumentSettings getCurrentInstrumentSettings ()
-  {
-    synchronized (this.currentInstrumentSettingsLock)
-    {
-      return this.currentInstrumentSettings;
-    }
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
   // COMMAND QUEUE
   // PROCESS COMMAND [ABSTRACT]
   //
@@ -584,7 +616,7 @@ implements Instrument
   }
   
   protected abstract void processCommand (final InstrumentCommand instrumentCommand)
-    throws UnsupportedOperationException, IOException, InterruptedException;
+    throws IOException, InterruptedException, TimeoutException;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
