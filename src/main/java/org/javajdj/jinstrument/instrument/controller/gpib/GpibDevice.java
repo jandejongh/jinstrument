@@ -14,9 +14,8 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.r1.controller.gpib;
+package org.javajdj.jinstrument.instrument.controller.gpib;
 
-import org.javajdj.jinstrument.instrument.controller.gpib.GpibAddress;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import org.javajdj.jinstrument.Device;
