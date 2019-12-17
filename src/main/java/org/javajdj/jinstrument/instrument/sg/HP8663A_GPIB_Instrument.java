@@ -21,7 +21,7 @@ import java.nio.charset.Charset;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.javajdj.jinstrument.r1.controller.gpib.GpibDevice;
+import org.javajdj.jinstrument.instrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.r1.instrument.DefaultInstrumentCommand;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentCommand;
