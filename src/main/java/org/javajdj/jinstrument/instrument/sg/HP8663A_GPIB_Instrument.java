@@ -352,12 +352,6 @@ implements SignalGenerator
       fmMaxDeviation_kHz); 
   }
   
-  @Override
-  public synchronized void setSettingsOnInstrument (final SignalGeneratorSettings signalGeneratorSettings)
-  {
-    throw new UnsupportedOperationException ("Not supported yet.");
-  }
-  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument

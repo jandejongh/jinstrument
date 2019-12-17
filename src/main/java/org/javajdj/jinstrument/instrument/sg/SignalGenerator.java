@@ -45,9 +45,6 @@ public interface SignalGenerator
     EXT_DC;
   }
   
-  void setSettingsOnInstrument (SignalGeneratorSettings signalGeneratorSettings)
-    throws IOException, InterruptedException;
-  
   void setCenterFrequency_MHz (double centerFrequency_MHz)
     throws IOException, InterruptedException;
 
