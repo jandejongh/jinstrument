@@ -9,8 +9,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,14 +22,15 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
-import org.javajdj.jinstrument.r1.instrument.Instrument;
-import org.javajdj.jinstrument.r1.instrument.InstrumentListener;
-import org.javajdj.jinstrument.r1.instrument.InstrumentSettings;
-import org.javajdj.jinstrument.r1.instrument.InstrumentStatus;
-import org.javajdj.jinstrument.r1.instrument.sg.SignalGenerator;
-import org.javajdj.jinstrument.r1.instrument.sg.SignalGenerator.ModulationSource;
-import org.javajdj.jinstrument.r1.instrument.sg.SignalGeneratorSettings;
-import org.javajdj.jinstrument.r1.instrument.sg.hp8663a.HP8663A_GPIB_Status;
+import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentListener;
+import org.javajdj.jinstrument.InstrumentReading;
+import org.javajdj.jinstrument.InstrumentSettings;
+import org.javajdj.jinstrument.InstrumentStatus;
+import org.javajdj.jinstrument.instrument.sg.SignalGenerator;
+import org.javajdj.jinstrument.instrument.sg.SignalGenerator.ModulationSource;
+import org.javajdj.jinstrument.instrument.sg.SignalGeneratorSettings;
+import org.javajdj.jinstrument.instrument.sg.HP8663A_GPIB_Status;
 import org.javajdj.jservice.Service;
 import org.javajdj.jservice.swing.JServiceControl;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
@@ -45,7 +44,6 @@ import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
  */
 public class JSignalGeneratorDisplay
 extends JPanel
-// implements SpectrumAnalyzerClient
 {
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,14 +76,52 @@ extends JPanel
     
     setLayout (new GridLayout (3, 3));
     
+    final JPanel managementPanel = new JPanel ();
+    managementPanel.setLayout (new GridLayout (4, 1));
+    setPanelBorder (managementPanel, "Management");
+    final JPanel controllerPanel = new JPanel ();
+    setSubPanelBorder (MANAGEMENT_COLOR, controllerPanel, "Controller");
+    controllerPanel.setLayout (new GridLayout (2, 2));
+    controllerPanel.add (new JLabel ("URL"));
+    controllerPanel.add (new JLabel (signalGenerator.getDevice ().getController ().getControllerUrl ()));
+    controllerPanel.add (new JLabel ("Service"));
+    final JServiceControl controllerServiceCheckBox =
+      new JServiceControl (this.signalGenerator.getDevice ().getController (), (Service.Status t) ->
+      {
+        switch (t)
+        {
+          case STOPPED: return null;
+          case ACTIVE:  return Color.green;
+          case ERROR:   return Color.orange;
+          default:      throw new RuntimeException ();
+        }
+      });
+    controllerPanel.add (controllerServiceCheckBox);
+    managementPanel.add (controllerPanel);
+    final JPanel devicePanel = new JPanel ();
+    setSubPanelBorder (MANAGEMENT_COLOR, devicePanel, "Device");
+    devicePanel.setLayout (new GridLayout (2, 2));
+    devicePanel.add (new JLabel ("URL"));
+    devicePanel.add (new JLabel (signalGenerator.getDevice ().getDeviceUrl ()));
+    devicePanel.add (new JLabel ("Service"));
+    final JServiceControl deviceServiceCheckBox =
+      new JServiceControl (this.signalGenerator.getDevice (), (Service.Status t) ->
+      {
+        switch (t)
+        {
+          case STOPPED: return null;
+          case ACTIVE:  return Color.green;
+          case ERROR:   return Color.orange;
+          default:      throw new RuntimeException ();
+        }
+      });
+    devicePanel.add (deviceServiceCheckBox);
+    managementPanel.add (devicePanel);
     final JPanel instrumentPanel = new JPanel ();
-    instrumentPanel.setLayout (new GridLayout (5, 2));    
-    setPanelBorder (instrumentPanel, "Instrument");
-    instrumentPanel.add (new JLabel ("Enabled"));
-    final Map<Boolean, Color> enableColorMap = new HashMap<> ();
-    enableColorMap.put (false, null);
-    enableColorMap.put (true, Color.red);
-    final JServiceControl enabledCheckBox = new JServiceControl (this.signalGenerator, (Service.Status t) ->
+    setSubPanelBorder (MANAGEMENT_COLOR, instrumentPanel, "Instrument");
+    instrumentPanel.setLayout (new GridLayout (2, 2));
+    instrumentPanel.add (new JLabel ("Service"));
+    final JServiceControl instrumentServiceCheckBox = new JServiceControl (this.signalGenerator, (Service.Status t) ->
     {
       switch (t)
       {
@@ -95,18 +131,23 @@ extends JPanel
         default:      throw new RuntimeException ();
       }
     });
-    instrumentPanel.add (enabledCheckBox);
-    instrumentPanel.add (new JLabel ("IStatus"));
+    instrumentPanel.add (instrumentServiceCheckBox);
+    instrumentPanel.add (new JLabel ("Status"));
     this.jInstrumentStatus = new JTextField ();
     this.jInstrumentStatus.setEditable (false);
-    instrumentPanel.add (this.jInstrumentStatus);    
-    instrumentPanel.add (new JLabel ("21"));
-    instrumentPanel.add (this.jByte21);
-    instrumentPanel.add (new JLabel ("81"));
-    instrumentPanel.add (this.jByte81);
-    instrumentPanel.add (new JLabel ("181"));
-    instrumentPanel.add (this.jByte181);
-    add (instrumentPanel);
+    instrumentPanel.add (this.jInstrumentStatus);
+    managementPanel.add (instrumentPanel);
+    final JPanel debugPanel = new JPanel ();
+    setSubPanelBorder (MANAGEMENT_COLOR, debugPanel, "Debug");
+    debugPanel.setLayout (new GridLayout (3, 2));
+    debugPanel.add (new JLabel ("21"));
+    debugPanel.add (this.jByte21);
+    debugPanel.add (new JLabel ("81"));
+    debugPanel.add (this.jByte81);
+    debugPanel.add (new JLabel ("181"));
+    debugPanel.add (this.jByte181);
+    managementPanel.add (debugPanel);
+    add (managementPanel);
     
     final JPanel frequencyPanel = new JPanel ();
     frequencyPanel.setOpaque (true);
@@ -980,6 +1021,7 @@ extends JPanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  private Color MANAGEMENT_COLOR = Color.orange;
   private Color FREQUENCY_COLOR = Color.blue;
   private Color AMPLITUDE_COLOR = Color.red;
   private Color MODULATION_COLOR = Color.green;
@@ -1076,6 +1118,7 @@ extends JPanel
   
   private final InstrumentListener instrumentListener = new InstrumentListener ()
   {
+    
     @Override
     public void newInstrumentStatus (final Instrument instrument, final InstrumentStatus instrumentStatus)
     {
@@ -1176,6 +1219,12 @@ extends JPanel
           JSignalGeneratorDisplay.this.inhibitInstrumentControl = false;
         }
       });
+    }
+
+    @Override
+    public void newInstrumentReading (final Instrument instrument, final InstrumentReading instrumentReading)
+    {
+      LOG.log (Level.WARNING, "Unexpected InstrumentReading: {0}.", instrumentReading);
     }
     
   };
