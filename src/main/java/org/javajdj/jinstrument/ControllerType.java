@@ -21,7 +21,7 @@ package org.javajdj.jinstrument;
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public interface ControllerTypeHandler
+public interface ControllerType
 {
   
   boolean isValidUrl (final String controllerUrl);
