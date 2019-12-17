@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Jan de Jongh <jfcmdejongh@gmail.com>, TNO.
+ * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>, TNO.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,14 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.r1.instrument;
+package org.javajdj.jinstrument;
 
 import java.util.LinkedHashMap;
 
-/**
+/** Default implementation of a {@link InstrumentCommand}.
+ * 
+ * <p>
+ * The main purpose of this class is to provide custom constructors with (some) additional error checking.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
