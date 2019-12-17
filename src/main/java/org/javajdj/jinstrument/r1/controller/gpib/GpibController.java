@@ -16,7 +16,7 @@
  */
 package org.javajdj.jinstrument.r1.controller.gpib;
 
-import org.javajdj.jinstrument.r1.Controller;
+import org.javajdj.jinstrument.Controller;
 
 /** A {@link Controller} for a single General-Purpose Interface Bus (IEEE-488). 
  *
