@@ -59,42 +59,33 @@ implements Instrument
     final Device device,
     final List<Runnable> runnables,
     final List<Service> targetServices,
-    final boolean addSettingsServices)
+    final boolean addStatusServices,
+    final boolean addSettingsServices,
+    final boolean addCommandProcessorServices,
+    final boolean addAcquisitionServices)
   {
     super (name, runnables, targetServices);
     if (device == null)
       throw new IllegalArgumentException ();
     this.device = device;
+    if (addStatusServices)
+    {
+      addRunnable (this.instrumentStatusCollector);
+      addRunnable (this.instrumentStatusDispatcher);      
+    }
     if (addSettingsServices)
     {
-      // XXX Aren't we losing the name of the Thread?
-      addRunnable (new InstrumentStatusThread ());
-      addRunnable (new InstrumentStatusDispatcherThread ());
-      addRunnable (new InstrumentSettingsThread ());
-      addRunnable (new InstrumentSettingsDispatcherThread ());
-      addRunnable (new InstrumentCommandProcessorThread ());
+      addRunnable (this.instrumentSettingsCollector);
+      addRunnable (this.instrumentSettingsDispatcher);
     }
-  }
-  
-  protected AbstractInstrument (final String name,
-    final Device device,
-    final List<Runnable> runnables,
-    final List<Service> targetServices)
-  {
-    super (name, runnables, targetServices);
-    if (device == null)
-      throw new IllegalArgumentException ();
-    this.device = device;
-  }
-  
-  protected AbstractInstrument (final Device device,
-    final List<Runnable> runnables,
-    final List<Service> targetServices)
-  {
-    super (runnables, targetServices);
-    if (device == null)
-      throw new IllegalArgumentException ();
-    this.device = device;
+    if (addCommandProcessorServices)
+    {
+      addRunnable (this.instrumentCommandProcessor);      
+    }
+    if (addAcquisitionServices)
+    {
+      
+    }
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,114 +189,96 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // INSTRUMENT STATUS THREAD
+  // INSTRUMENT STATUS COLLECTOR
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected class InstrumentStatusThread
-    extends Thread
+  private final Runnable instrumentStatusCollector = () ->
   {
-    
-    public InstrumentStatusThread (final String name)
+    while (! Thread.currentThread ().isInterrupted ())
     {
-      super (name);
-    }
-    
-    public InstrumentStatusThread ()
-    {
-      this ("InstrumentStatusThread on " + AbstractInstrument.this);
-    }
-    
-    @Override
-    public final void run ()
-    {
-      while (! isInterrupted ())
+      try
       {
-        try
-        {
-          // Mark start of sojourn.
-          final long timeBeforeRead_ms = System.currentTimeMillis ();
-          // Obtain current settings from the instrument.
-          final InstrumentStatus statusRead = AbstractInstrument.this.getStatusFromInstrumentSync ();
-          // Report the trace to our superclass.
-          AbstractInstrument.this.statusReadFromInstrument (statusRead);
-          // Mark end of sojourn.
-          final long timeAfterRead_ms = System.currentTimeMillis ();
-          // Calculate sojourn.
-          final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
-          // Find out the remaining time to wait in order to respect the given period.
-          final long remainingSleep_ms = ((long) AbstractInstrument.this.getStatusThreadPeriod_s () * 1000) - sojourn_ms;
-          if (remainingSleep_ms < 0)
-            LOG.log (Level.WARNING, "Cannot meet timing settings on {0}.", this);
-          if (remainingSleep_ms > 0)
-            Thread.sleep (remainingSleep_ms);
-        }
-        catch (InterruptedException ie)
-        {
-          LOG.log (Level.INFO, "InterruptedException while acquiring instrument status: {0}.", ie.getStackTrace ());
-          return;
-        }
-        catch (IOException ioe)
-        {
-          LOG.log (Level.WARNING, "IOException while acquiring instrument status: {0}.", ioe.getStackTrace ());
-          error ();
-          return;
-        }
-        catch (UnsupportedOperationException usoe)
-        {
-          LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument status: {0}.", usoe.getStackTrace ());
-          error ();
-          return;
-        }
-        catch (Exception e)
-        {
-          LOG.log (Level.WARNING, "Exception while acquiring instrument status: {0}.", e.getStackTrace ());
-          error ();
-          return;
-        }
+        // Mark start of sojourn.
+        final long timeBeforeRead_ms = System.currentTimeMillis ();
+        // Obtain current settings from the instrument.
+        final InstrumentStatus statusRead = AbstractInstrument.this.getStatusFromInstrumentSync ();
+        // Report the trace to our superclass.
+        AbstractInstrument.this.statusReadFromInstrument (statusRead);
+        // Mark end of sojourn.
+        final long timeAfterRead_ms = System.currentTimeMillis ();
+        // Calculate sojourn.
+        final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
+        // Find out the remaining time to wait in order to respect the given period.
+        final long remainingSleep_ms = ((long) AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000) - sojourn_ms;
+        if (remainingSleep_ms < 0)
+          LOG.log (Level.WARNING, "Cannot meet timing settings on {0}.", this);
+        if (remainingSleep_ms > 0)
+          Thread.sleep (remainingSleep_ms);
+      }
+      catch (InterruptedException ie)
+      {
+        LOG.log (Level.INFO, "InterruptedException while acquiring instrument status: {0}.", ie.getStackTrace ());
+        return;
+      }
+      catch (IOException ioe)
+      {
+        LOG.log (Level.WARNING, "IOException while acquiring instrument status: {0}.", ioe.getStackTrace ());
+        error ();
+        return;
+      }
+      catch (UnsupportedOperationException usoe)
+      {
+        LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument status: {0}.", usoe.getStackTrace ());
+        error ();
+        return;
+      }
+      catch (Exception e)
+      {
+        LOG.log (Level.WARNING, "Exception while acquiring instrument status: {0}.", e.getStackTrace ());
+        error ();
+        return;
       }
     }
-    
-  }
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // STATUS THREAD PERIOD
+  // STATUS COLLECTOR PERIOD
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public final static String STATUS_THREAD_PERIOD_S_PROPERTY_NAME = "statusThreadPeriod_s";
+  public final static String STATUS_COLLECTOR_PERIOD_S_PROPERTY_NAME = "statusCollectorPeriod_s";
   
-  public final static double DEFAULT_STATUS_THREAD_PERIOD_S = 5;
+  public final static double DEFAULT_STATUS_COLLECTOR_PERIOD_S = 5;
   
-  private volatile double statusThreadPeriod_s = AbstractInstrument.DEFAULT_STATUS_THREAD_PERIOD_S;
+  private volatile double statusCollectorPeriod_s = AbstractInstrument.DEFAULT_STATUS_COLLECTOR_PERIOD_S;
 
-  private final Object statusThreadPeriodLock = new Object ();
+  private final Object statusCollectorPeriodLock = new Object ();
   
-  public final double getStatusThreadPeriod_s ()
+  public final double getStatusCollectorPeriod_s ()
   {
-    synchronized (this.statusThreadPeriodLock)
+    synchronized (this.statusCollectorPeriodLock)
     {
-      return this.statusThreadPeriod_s;
+      return this.statusCollectorPeriod_s;
     }
   }
   
-  public final void setStatusThreadPeriod_s (final double statusThreadPeriod_s)
+  public final void setStatusCollectorPeriod_s (final double statusCollectorPeriod_s)
   {
-    if (statusThreadPeriod_s < 0)
+    if (statusCollectorPeriod_s < 0)
       throw new IllegalArgumentException ();
-    final double oldStatusThreadPeriod_s;
-    synchronized (this.statusThreadPeriodLock)
+    final double oldStatusCollectorPeriod_s;
+    synchronized (this.statusCollectorPeriodLock)
     {
-      if (this.statusThreadPeriod_s == statusThreadPeriod_s)
+      if (this.statusCollectorPeriod_s == statusCollectorPeriod_s)
         return;
-      oldStatusThreadPeriod_s = this.statusThreadPeriod_s;
-      this.statusThreadPeriod_s = statusThreadPeriod_s;
+      oldStatusCollectorPeriod_s = this.statusCollectorPeriod_s;
+      this.statusCollectorPeriod_s = statusCollectorPeriod_s;
     }
-    fireSettingsChanged (
-      AbstractInstrument.STATUS_THREAD_PERIOD_S_PROPERTY_NAME,
-      oldStatusThreadPeriod_s,
-      statusThreadPeriod_s);
+    fireSettingsChanged (AbstractInstrument.STATUS_COLLECTOR_PERIOD_S_PROPERTY_NAME,
+      oldStatusCollectorPeriod_s,
+      statusCollectorPeriod_s);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -327,57 +300,40 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // INSTRUMENT STATUS DISPATCHER THREAD
+  // INSTRUMENT STATUS DISPATCHER
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected class InstrumentStatusDispatcherThread
-    extends Thread
+  private final Runnable instrumentStatusDispatcher = () ->
   {
-    
-    public InstrumentStatusDispatcherThread (final String name)
+    while (! Thread.currentThread ().isInterrupted ())
     {
-      super (name);
-    }
-    
-    public InstrumentStatusDispatcherThread ()
-    {
-      this ("InstrumentStatusDispatcherThread on " + AbstractInstrument.this + ".");
-    }
-  
-    @Override
-    public final void run ()
-    {
-      while (! isInterrupted ())
+      try
       {
-        try
+        final InstrumentStatus oldStatus;
+        final InstrumentStatus newStatus = AbstractInstrument.this.statusReadQueue.take ();
+        synchronized (AbstractInstrument.this.currentInstrumentStatusLock)
         {
-          final InstrumentStatus oldStatus;
-          final InstrumentStatus newStatus = AbstractInstrument.this.statusReadQueue.take ();
-          synchronized (AbstractInstrument.this.currentInstrumentStatusLock)
+          oldStatus = AbstractInstrument.this.currentInstrumentStatus;
+          if (oldStatus == null || ! newStatus.equals (oldStatus))
           {
-            oldStatus = AbstractInstrument.this.currentInstrumentStatus;
-            if (oldStatus == null || ! newStatus.equals (oldStatus))
-            {
-              AbstractInstrument.this.currentInstrumentStatus = newStatus;
-              AbstractInstrument.this.fireInstrumentStatusChanged (newStatus);
-            }
+            AbstractInstrument.this.currentInstrumentStatus = newStatus;
+            AbstractInstrument.this.fireInstrumentStatusChanged (newStatus);
           }
         }
-        catch (InterruptedException ie)
-        {
-          LOG.log (Level.WARNING, "InterruptedException while dispatching instrument status: {0}.", ie.getStackTrace ());
-          return;
-        }
-        // Prevent termination of the Thread due to a misbehaving listener.
-        catch (Exception e)
-        {
-          LOG.log (Level.WARNING, "Exception while dispatching instrument status: {0}.", e.getStackTrace ());
-        }
+      }
+      catch (InterruptedException ie)
+      {
+        LOG.log (Level.WARNING, "InterruptedException while dispatching instrument status: {0}.", ie.getStackTrace ());
+        return;
+      }
+      // Prevent termination of the Thread due to a misbehaving listener.
+      catch (Exception e)
+      {
+        LOG.log (Level.WARNING, "Exception while dispatching instrument status: {0}.", e.getStackTrace ());
       }
     }
-    
-  }
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -415,28 +371,16 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // INSTRUMENT SETTINGS THREAD
+  // INSTRUMENT SETTINGS COLLECTOR
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected class InstrumentSettingsThread
-    extends Thread
-  {
-    
-    public InstrumentSettingsThread (final String name)
-    {
-      super (name);
-    }
-    
-    public InstrumentSettingsThread ()
-    {
-      this ("InstrumentSettingsThread on " + AbstractInstrument.this);
-    }
-    
+  private final Runnable instrumentSettingsCollector = new Runnable ()
+  { 
     @Override
     public final void run ()
     {
-      while (! isInterrupted ())
+      while (! Thread.currentThread ().isInterrupted ())
       {
         try
         {
@@ -451,7 +395,7 @@ implements Instrument
           // Calculate sojourn.
           final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
           // Find out the remaining time to wait in order to respect the given period.
-          final long remainingSleep_ms = ((long) AbstractInstrument.this.getSettingsThreadPeriod_s () * 1000) - sojourn_ms;
+          final long remainingSleep_ms = ((long) AbstractInstrument.this.getSettingsCollectorPeriod_s () * 1000) - sojourn_ms;
           if (remainingSleep_ms < 0)
             LOG.log (Level.WARNING, "Cannot meet timing settings on {0}.", this);
           if (remainingSleep_ms > 0)
@@ -483,47 +427,46 @@ implements Instrument
         }
       }
     }
-    
-  }
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // SETTINGS THREAD PERIOD
+  // SETTINGS COLLECTOR PERIOD
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public final static String SETTINGS_THREAD_PERIOD_S_PROPERTY_NAME = "settingsThreadPeriod_s";
+  public final static String SETTINGS_COLLECTOR_PERIOD_S_PROPERTY_NAME = "settingsCollectorPeriod_s";
   
-  public final static double DEFAULT_SETTINGS_THREAD_PERIOD_S = 10;
+  public final static double DEFAULT_SETTINGS_COLLECTOR_PERIOD_S = 10;
   
-  private volatile double settingsThreadPeriod_s = AbstractInstrument.DEFAULT_SETTINGS_THREAD_PERIOD_S;
+  private volatile double settingsCollectorPeriod_s = AbstractInstrument.DEFAULT_SETTINGS_COLLECTOR_PERIOD_S;
 
-  private final Object settingsThreadPeriodLock = new Object ();
+  private final Object settingsCollectorPeriodLock = new Object ();
   
-  public final double getSettingsThreadPeriod_s ()
+  public final double getSettingsCollectorPeriod_s ()
   {
-    synchronized (this.settingsThreadPeriodLock)
+    synchronized (this.settingsCollectorPeriodLock)
     {
-      return this.settingsThreadPeriod_s;
+      return this.settingsCollectorPeriod_s;
     }
   }
   
-  public final void setSettingsThreadPeriod_s (final double settingsThreadPeriod_s)
+  public final void setSettingsCollectorPeriod_s (final double settingsCollectorPeriod_s)
   {
-    if (settingsThreadPeriod_s < 0)
+    if (settingsCollectorPeriod_s < 0)
       throw new IllegalArgumentException ();
-    final double oldSettingsThreadPeriod_s;
-    synchronized (this.settingsThreadPeriodLock)
+    final double oldSettingsCollectorPeriod_s;
+    synchronized (this.settingsCollectorPeriodLock)
     {
-      if (this.settingsThreadPeriod_s == settingsThreadPeriod_s)
+      if (this.settingsCollectorPeriod_s == settingsCollectorPeriod_s)
         return;
-      oldSettingsThreadPeriod_s = this.settingsThreadPeriod_s;
-      this.settingsThreadPeriod_s = settingsThreadPeriod_s;
+      oldSettingsCollectorPeriod_s = this.settingsCollectorPeriod_s;
+      this.settingsCollectorPeriod_s = settingsCollectorPeriod_s;
     }
     fireSettingsChanged (
-      AbstractInstrument.SETTINGS_THREAD_PERIOD_S_PROPERTY_NAME,
-      oldSettingsThreadPeriod_s,
-      settingsThreadPeriod_s);
+      AbstractInstrument.SETTINGS_COLLECTOR_PERIOD_S_PROPERTY_NAME,
+      oldSettingsCollectorPeriod_s,
+      settingsCollectorPeriod_s);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -545,57 +488,40 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // INSTRUMENT SETTINGS DISPATCHER THREAD
+  // INSTRUMENT SETTINGS DISPATCHER
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected class InstrumentSettingsDispatcherThread
-    extends Thread
+  private final Runnable instrumentSettingsDispatcher = () ->
   {
-    
-    public InstrumentSettingsDispatcherThread (final String name)
+    while (! Thread.currentThread ().isInterrupted ())
     {
-      super (name);
-    }
-    
-    public InstrumentSettingsDispatcherThread ()
-    {
-      this ("InstrumentSettingsDispatcherThread on " + AbstractInstrument.this + ".");
-    }
-  
-    @Override
-    public final void run ()
-    {
-      while (! isInterrupted ())
+      try
       {
-        try
+        final InstrumentSettings oldSettings;
+        final InstrumentSettings newSettings = AbstractInstrument.this.settingsReadQueue.take ();
+        synchronized (AbstractInstrument.this.currentInstrumentSettingsLock)
         {
-          final InstrumentSettings oldSettings;
-          final InstrumentSettings newSettings = AbstractInstrument.this.settingsReadQueue.take ();
-          synchronized (AbstractInstrument.this.currentInstrumentSettingsLock)
+          oldSettings = AbstractInstrument.this.currentInstrumentSettings;
+          if (oldSettings == null || ! newSettings.equals (oldSettings))
           {
-            oldSettings = AbstractInstrument.this.currentInstrumentSettings;
-            if (oldSettings == null || ! newSettings.equals (oldSettings))
-            {
-              AbstractInstrument.this.currentInstrumentSettings = newSettings;
-              AbstractInstrument.this.fireInstrumentSettingsChanged (newSettings);
-            }
+            AbstractInstrument.this.currentInstrumentSettings = newSettings;
+            AbstractInstrument.this.fireInstrumentSettingsChanged (newSettings);
           }
         }
-        catch (InterruptedException ie)
-        {
-          LOG.log (Level.WARNING, "InterruptedException while dispatching instrument settings: {0}.", ie.getStackTrace ());
-          return;
-        }
-        // Prevent termination of the Thread due to a misbehaving listener.
-        catch (Exception e)
-        {
-          LOG.log (Level.WARNING, "Exception while dispatching instrument settings: {0}.", e.getStackTrace ());
-        }
+      }
+      catch (InterruptedException ie)
+      {
+        LOG.log (Level.WARNING, "InterruptedException while dispatching instrument settings: {0}.", ie.getStackTrace ());
+        return;
+      }
+      // Prevent termination of the Thread due to a misbehaving listener.
+      catch (Exception e)
+      {
+        LOG.log (Level.WARNING, "Exception while dispatching instrument settings: {0}.", e.getStackTrace ());
       }
     }
-    
-  }
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -621,56 +547,39 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // INSTRUMENT COMMAND PROCESSOR THREAD
+  // INSTRUMENT COMMAND PROCESSOR
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected class InstrumentCommandProcessorThread
-    extends Thread
-  {
-    
-    public InstrumentCommandProcessorThread (final String name)
+  private final Runnable instrumentCommandProcessor = () ->
+  {    
+    while (! Thread.currentThread ().isInterrupted ())
     {
-      super (name);
-    }
-    
-    public InstrumentCommandProcessorThread ()
-    {
-      this ("InstrumentCommandProcessorThread on " + AbstractInstrument.this);
-    }
-    
-    @Override
-    public final void run ()
-    {
-      while (! isInterrupted ())
+      try
       {
-        try
-        {
-          final InstrumentCommand nextCommand = AbstractInstrument.this.commandQueue.take ();
-          AbstractInstrument.this.processCommand (nextCommand);
-        }
-        catch (InterruptedException ie)
-        {
-          LOG.log (Level.WARNING, "InterruptedException while processing command: {0}.", ie.getStackTrace ());
-          return;
-        }
-        catch (IOException ioe)
-        {
-          LOG.log (Level.WARNING, "IOException while processing command: {0}.", ioe.getStackTrace ());
-        }
-        catch (UnsupportedOperationException uoe)
-        {
-          LOG.log (Level.WARNING, "UnsupportedOperationException while processing command: {0}.", uoe.getStackTrace ());
-        }
-        // Prevent termination of the Thread due to a misbehaving implementation of processCommand.
-        catch (Exception e)
-        {
-          LOG.log (Level.WARNING, "Exception while processing command: {0}.", e.getStackTrace ());
-        }
+        final InstrumentCommand nextCommand = AbstractInstrument.this.commandQueue.take ();
+        AbstractInstrument.this.processCommand (nextCommand);
+      }
+      catch (InterruptedException ie)
+      {
+        LOG.log (Level.WARNING, "InterruptedException while processing command: {0}.", ie.getStackTrace ());
+        return;
+      }
+      catch (IOException ioe)
+      {
+        LOG.log (Level.WARNING, "IOException while processing command: {0}.", ioe.getStackTrace ());
+      }
+      catch (UnsupportedOperationException uoe)
+      {
+        LOG.log (Level.WARNING, "UnsupportedOperationException while processing command: {0}.", uoe.getStackTrace ());
+      }
+      // Prevent termination of the Thread due to a misbehaving implementation of processCommand.
+      catch (Exception e)
+      {
+        LOG.log (Level.WARNING, "Exception while processing command: {0}.", e.getStackTrace ());
       }
     }
-    
-  }
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
