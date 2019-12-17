@@ -378,7 +378,7 @@ implements SignalGenerator
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
-  public synchronized void setOutputEnable (final boolean outputEnable)
+  public void setOutputEnable (final boolean outputEnable)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
@@ -388,7 +388,7 @@ implements SignalGenerator
   }
   
   @Override
-  public synchronized void setCenterFrequency_MHz (final double centerFrequency_MHz)
+  public void setCenterFrequency_MHz (final double centerFrequency_MHz)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
@@ -398,7 +398,7 @@ implements SignalGenerator
   }
   
   @Override
-  public synchronized void setSpan_MHz (final double span_MHz)
+  public void setSpan_MHz (final double span_MHz)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
@@ -408,7 +408,7 @@ implements SignalGenerator
   }
   
   @Override
-  public synchronized void setStartFrequency_MHz (final double startFrequency_MHz)
+  public void setStartFrequency_MHz (final double startFrequency_MHz)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
@@ -418,7 +418,7 @@ implements SignalGenerator
   }
   
   @Override
-  public synchronized void setStopFrequency_MHz (final double stopFrequency_MHz)
+  public void setStopFrequency_MHz (final double stopFrequency_MHz)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
@@ -428,7 +428,7 @@ implements SignalGenerator
   }
   
   @Override
-  public synchronized void setRfSweepMode (final RfSweepMode rfSweepMode)
+  public void setRfSweepMode (final RfSweepMode rfSweepMode)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
@@ -438,7 +438,7 @@ implements SignalGenerator
   }
   
   @Override
-  public synchronized void setAmplitude_dBm (final double amplitude_dBm)
+  public void setAmplitude_dBm (final double amplitude_dBm)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
@@ -514,7 +514,7 @@ implements SignalGenerator
   }
   
   @Override
-  public final void setModulationSourceInternalFrequency_kHz (final double modulationSourceInternalFrequency_kHz)
+  public void setModulationSourceInternalFrequency_kHz (final double modulationSourceInternalFrequency_kHz)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
