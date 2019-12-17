@@ -16,7 +16,7 @@
  */
 package org.javajdj.jinstrument;
 
-/** An instrument reading consisting of samples like the output from an oscilloscope or spectrum analyzer.
+/** An instrument reading consisting of a sequence of samples like the output from an oscilloscope or spectrum analyzer.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
