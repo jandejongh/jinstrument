@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.r1.controller.gpib.tcpip.prologix;
+package org.javajdj.jinstrument.instrument.controller.gpib;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,10 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.Controller;
 import org.javajdj.jinstrument.ControllerCommand;
-import org.javajdj.jinstrument.instrument.controller.gpib.GpibAddress;
-import org.javajdj.jinstrument.instrument.controller.gpib.AbstractGpibController;
-import org.javajdj.jinstrument.instrument.controller.gpib.GpibControllerCommand;
-import org.javajdj.jinstrument.instrument.controller.gpib.GpibDevice;
 
 /** Implementation of {@link Controller} for the Prologix GPIB-ETHERNET controller.
  *
