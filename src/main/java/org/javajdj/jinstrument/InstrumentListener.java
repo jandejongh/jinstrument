@@ -40,4 +40,6 @@ public interface InstrumentListener
   
   void newInstrumentSettings (Instrument instrument, InstrumentSettings instrumentSettings);
   
+  void newInstrumentReading (Instrument instrument, InstrumentReading instrumentReading);
+  
 }

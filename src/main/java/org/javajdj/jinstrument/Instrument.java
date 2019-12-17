@@ -36,6 +36,8 @@ public interface Instrument
   InstrumentStatus getCurrentInstrumentStatus ();
   
   InstrumentSettings getCurrentInstrumentSettings ();
+  
+  InstrumentReading getLastInstrumentReading ();
     
   boolean isPoweredOn ();
   

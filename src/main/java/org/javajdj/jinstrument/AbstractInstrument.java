@@ -84,7 +84,8 @@ implements Instrument
     }
     if (addAcquisitionServices)
     {
-      
+      addRunnable (this.instrumentReadingCollector);
+      addRunnable (this.instrumentReadingDispatcher);      
     }
   }
   
@@ -151,6 +152,14 @@ implements Instrument
     final Set<InstrumentListener> listeners = this.instrumentListenersCopy;
     for (final InstrumentListener l : listeners)
       l.newInstrumentSettings (this, instrumentSettings);
+  }
+  
+  protected final void fireInstrumentReading (final InstrumentReading instrumentReading)
+  {
+    // References are atomic.
+    final Set<InstrumentListener> listeners = this.instrumentListenersCopy;
+    for (final InstrumentListener l : listeners)
+      l.newInstrumentReading (this, instrumentReading);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -375,56 +384,52 @@ implements Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final Runnable instrumentSettingsCollector = new Runnable ()
-  { 
-    @Override
-    public final void run ()
+  private final Runnable instrumentSettingsCollector = () ->
+  {
+    while (! Thread.currentThread ().isInterrupted ())
     {
-      while (! Thread.currentThread ().isInterrupted ())
+      try
       {
-        try
-        {
-          // Mark start of sojourn.
-          final long timeBeforeRead_ms = System.currentTimeMillis ();
-          // Obtain current settings from the instrument.
-          final InstrumentSettings settingsRead = AbstractInstrument.this.getSettingsFromInstrumentSync ();
-          // Report the trace to our superclass.
-          AbstractInstrument.this.settingsReadFromInstrument (settingsRead);
-          // Mark end of sojourn.
-          final long timeAfterRead_ms = System.currentTimeMillis ();
-          // Calculate sojourn.
-          final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
-          // Find out the remaining time to wait in order to respect the given period.
-          final long remainingSleep_ms = ((long) AbstractInstrument.this.getSettingsCollectorPeriod_s () * 1000) - sojourn_ms;
-          if (remainingSleep_ms < 0)
-            LOG.log (Level.WARNING, "Cannot meet timing settings on {0}.", this);
-          if (remainingSleep_ms > 0)
-            Thread.sleep (remainingSleep_ms);
-        }
-        catch (InterruptedException ie)
-        {
-          LOG.log (Level.INFO, "InterruptedException while acquiring instrument settings: {0}.", ie.getStackTrace ());
-          return;
-        }
-        catch (IOException ioe)
-        {
-          LOG.log (Level.WARNING, "IOException while acquiring instrument settings: {0}.", ioe.getStackTrace ());
-          error ();
-          return;
-        }
-        catch (UnsupportedOperationException usoe)
-        {
-          LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument settings: {0}.",
-            usoe.getStackTrace ());
-          error ();
-          return;
-        }
-        catch (Exception e)
-        {
-          LOG.log (Level.WARNING, "Exception while acquiring instrument settings: {0}.", e.getStackTrace ());
-          error ();
-          return;
-        }
+        // Mark start of sojourn.
+        final long timeBeforeRead_ms = System.currentTimeMillis ();
+        // Obtain current settings from the instrument.
+        final InstrumentSettings settingsRead = AbstractInstrument.this.getSettingsFromInstrumentSync ();
+        // Report the trace to our superclass.
+        AbstractInstrument.this.settingsReadFromInstrument (settingsRead);
+        // Mark end of sojourn.
+        final long timeAfterRead_ms = System.currentTimeMillis ();
+        // Calculate sojourn.
+        final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
+        // Find out the remaining time to wait in order to respect the given period.
+        final long remainingSleep_ms = ((long) AbstractInstrument.this.getSettingsCollectorPeriod_s () * 1000) - sojourn_ms;
+        if (remainingSleep_ms < 0)
+          LOG.log (Level.WARNING, "Cannot meet timing settings on {0}.", this);
+        if (remainingSleep_ms > 0)
+          Thread.sleep (remainingSleep_ms);
+      }
+      catch (InterruptedException ie)
+      {
+        LOG.log (Level.INFO, "InterruptedException while acquiring instrument settings: {0}.", ie.getStackTrace ());
+        return;
+      }
+      catch (IOException ioe)
+      {
+        LOG.log (Level.WARNING, "IOException while acquiring instrument settings: {0}.", ioe.getStackTrace ());
+        error ();
+        return;
+      }
+      catch (UnsupportedOperationException usoe)
+      {
+        LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument settings: {0}.",
+          usoe.getStackTrace ());
+        error ();
+        return;
+      }
+      catch (Exception e)
+      {
+        LOG.log (Level.WARNING, "Exception while acquiring instrument settings: {0}.", e.getStackTrace ());
+        error ();
+        return;
       }
     }
   };
@@ -577,6 +582,185 @@ implements Instrument
       catch (Exception e)
       {
         LOG.log (Level.WARNING, "Exception while processing command: {0}.", e.getStackTrace ());
+      }
+    }
+  };
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // LAST INSTRUMENT READING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static String LAST_INSTRUMENT_READING_PROPERTY_NAME = "lastInstrumentReading";
+  
+  private volatile InstrumentReading lastInstrumentReading = null;
+  
+  private final Object lastInstrumentReadingLock = new Object ();
+  
+  @Override
+  public final InstrumentReading getLastInstrumentReading ()
+  {
+    synchronized (this.lastInstrumentReadingLock)
+    {
+      return this.lastInstrumentReading;
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GET READING FROM INSTRUMENT SYNCHRONOUSLY [ABSTRACT]
+  // REQUEST REDING FROM INSTRUMENT ASYNCHROUNOUSLY [ABSTRACT]
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected abstract InstrumentReading getReadingFromInstrumentSync ()
+    throws IOException, InterruptedException, TimeoutException;
+    
+  protected abstract void requestReadingFromInstrumentASync ()
+    throws IOException;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INSTRUMENT READING COLLECTOR
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Runnable instrumentReadingCollector = () ->
+  { 
+    while (! Thread.currentThread ().isInterrupted ())
+    {
+      try
+      {
+        // Mark start of sojourn.
+        final long timeBeforeRead_ms = System.currentTimeMillis ();
+        // Obtain current reading from the instrument.
+        final InstrumentReading readingRead = AbstractInstrument.this.getReadingFromInstrumentSync ();
+        // Report the trace to our superclass.
+        AbstractInstrument.this.readingReadFromInstrument (readingRead);
+        // Mark end of sojourn.
+        final long timeAfterRead_ms = System.currentTimeMillis ();
+        // Calculate sojourn.
+        final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
+        // Find out the remaining time to wait in order to respect the given period.
+        final long remainingSleep_ms = ((long) AbstractInstrument.this.getReadingCollectorPeriod_s () * 1000) - sojourn_ms;
+        if (remainingSleep_ms < 0)
+          LOG.log (Level.WARNING, "Cannot meet timing reading on {0}.", this);
+        if (remainingSleep_ms > 0)
+          Thread.sleep (remainingSleep_ms);
+      }
+      catch (InterruptedException ie)
+      {
+        LOG.log (Level.INFO, "InterruptedException while acquiring instrument reading: {0}.", ie.getStackTrace ());
+        return;
+      }
+      catch (IOException ioe)
+      {
+        LOG.log (Level.WARNING, "IOException while acquiring instrument reading: {0}.", ioe.getStackTrace ());
+        error ();
+        return;
+      }
+      catch (UnsupportedOperationException usoe)
+      {
+        LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument reading: {0}.",
+          usoe.getStackTrace ());
+        error ();
+        return;
+      }
+      catch (Exception e)
+      {
+        LOG.log (Level.WARNING, "Exception while acquiring instrument reading: {0}.", e.getStackTrace ());
+        error ();
+        return;
+      }
+    }
+  };
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // READING COLLECTOR PERIOD
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static String READING_COLLECTOR_PERIOD_S_PROPERTY_NAME = "readingCollectorPeriod_s";
+  
+  public final static double DEFAULT_READING_COLLECTOR_PERIOD_S = 10;
+  
+  private volatile double readingCollectorPeriod_s = AbstractInstrument.DEFAULT_READING_COLLECTOR_PERIOD_S;
+
+  private final Object readingCollectorPeriodLock = new Object ();
+  
+  public final double getReadingCollectorPeriod_s ()
+  {
+    synchronized (this.readingCollectorPeriodLock)
+    {
+      return this.readingCollectorPeriod_s;
+    }
+  }
+  
+  public final void setReadingCollectorPeriod_s (final double readingCollectorPeriod_s)
+  {
+    if (readingCollectorPeriod_s < 0)
+      throw new IllegalArgumentException ();
+    final double oldReadingCollectorPeriod_s;
+    synchronized (this.readingCollectorPeriodLock)
+    {
+      if (this.readingCollectorPeriod_s == readingCollectorPeriod_s)
+        return;
+      oldReadingCollectorPeriod_s = this.readingCollectorPeriod_s;
+      this.readingCollectorPeriod_s = readingCollectorPeriod_s;
+    }
+    fireSettingsChanged (
+      AbstractInstrument.READING_COLLECTOR_PERIOD_S_PROPERTY_NAME,
+      oldReadingCollectorPeriod_s,
+      readingCollectorPeriod_s);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // READING READ QUEUE
+  // READING READ FROM INSTRUMENT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final BlockingQueue<InstrumentReading> readingReadQueue = new LinkedBlockingQueue<> ();
+  
+  protected void readingReadFromInstrument (final InstrumentReading instrumentReading)
+  {
+    if (instrumentReading == null)
+      throw new IllegalArgumentException ();
+    if (! this.readingReadQueue.offer (instrumentReading))
+      LOG.log (Level.WARNING, "Overflow on reading-read buffer on {0}.", this);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INSTRUMENT READING DISPATCHER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Runnable instrumentReadingDispatcher = () ->
+  {
+    while (! Thread.currentThread ().isInterrupted ())
+    {
+      try
+      {
+        final InstrumentReading newReading = AbstractInstrument.this.readingReadQueue.take ();
+        synchronized (AbstractInstrument.this.lastInstrumentReadingLock)
+        {
+          AbstractInstrument.this.lastInstrumentReading = newReading;
+          AbstractInstrument.this.fireInstrumentReading (newReading);
+        }
+      }
+      catch (InterruptedException ie)
+      {
+        LOG.log (Level.WARNING, "InterruptedException while dispatching instrument reading: {0}.", ie.getStackTrace ());
+        return;
+      }
+      // Prevent termination of the Thread due to a misbehaving listener.
+      catch (Exception e)
+      {
+        LOG.log (Level.WARNING, "Exception while dispatching instrument reading: {0}.", e.getStackTrace ());
       }
     }
   };
