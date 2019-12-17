@@ -22,7 +22,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
-import org.javajdj.jinstrument.r1.instrument.DefaultInstrumentCommand;
+import org.javajdj.jinstrument.DefaultInstrumentCommand;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentCommand;
 import org.javajdj.jinstrument.InstrumentReading;
