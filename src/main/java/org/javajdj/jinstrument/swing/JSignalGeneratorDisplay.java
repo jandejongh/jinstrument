@@ -80,7 +80,7 @@ extends JPanel
     managementPanel.setLayout (new GridLayout (4, 1));
     setPanelBorder (managementPanel, "Management");
     final JPanel controllerPanel = new JPanel ();
-    setSubPanelBorder (MANAGEMENT_COLOR, controllerPanel, "Controller");
+    setSubPanelBorder (JInstrument.getGuiPreferencesManagementColor (), controllerPanel, "Controller");
     controllerPanel.setLayout (new GridLayout (2, 2));
     controllerPanel.add (new JLabel ("URL"));
     controllerPanel.add (new JLabel (signalGenerator.getDevice ().getController ().getControllerUrl ()));
@@ -99,7 +99,7 @@ extends JPanel
     controllerPanel.add (controllerServiceCheckBox);
     managementPanel.add (controllerPanel);
     final JPanel devicePanel = new JPanel ();
-    setSubPanelBorder (MANAGEMENT_COLOR, devicePanel, "Device");
+    setSubPanelBorder (JInstrument.getGuiPreferencesManagementColor (), devicePanel, "Device");
     devicePanel.setLayout (new GridLayout (2, 2));
     devicePanel.add (new JLabel ("URL"));
     devicePanel.add (new JLabel (signalGenerator.getDevice ().getDeviceUrl ()));
@@ -118,7 +118,7 @@ extends JPanel
     devicePanel.add (deviceServiceCheckBox);
     managementPanel.add (devicePanel);
     final JPanel instrumentPanel = new JPanel ();
-    setSubPanelBorder (MANAGEMENT_COLOR, instrumentPanel, "Instrument");
+    setSubPanelBorder (JInstrument.getGuiPreferencesManagementColor (), instrumentPanel, "Instrument");
     instrumentPanel.setLayout (new GridLayout (2, 2));
     instrumentPanel.add (new JLabel ("Service"));
     final JServiceControl instrumentServiceCheckBox = new JServiceControl (this.signalGenerator, (Service.Status t) ->
@@ -138,7 +138,7 @@ extends JPanel
     instrumentPanel.add (this.jInstrumentStatus);
     managementPanel.add (instrumentPanel);
     final JPanel debugPanel = new JPanel ();
-    setSubPanelBorder (MANAGEMENT_COLOR, debugPanel, "Debug");
+    setSubPanelBorder (JInstrument.getGuiPreferencesManagementColor (), debugPanel, "Debug");
     debugPanel.setLayout (new GridLayout (3, 2));
     debugPanel.add (new JLabel ("21"));
     debugPanel.add (this.jByte21);
@@ -153,7 +153,7 @@ extends JPanel
     frequencyPanel.setOpaque (true);
     frequencyPanel.setLayout (new GridLayout (5, 1));
     //
-    this.jCenterFreq = new JSevenSegmentNumber (FREQUENCY_COLOR, false, 11, 9);
+    this.jCenterFreq = new JSevenSegmentNumber (JInstrument.getGuiPreferencesFrequencyColor (), false, 11, 9);
     this.jCenterFreq.addMouseListener (new MouseAdapter ()
     {
       @Override
@@ -212,7 +212,7 @@ extends JPanel
       else
         source.setToolTipText (Integer.toString (source.getValue ()));
     });
-    setSubPanelBorder (FREQUENCY_COLOR, this.jFreqSlider_MHz, "[MHz]");
+    setSubPanelBorder (JInstrument.getGuiPreferencesFrequencyColor (), this.jFreqSlider_MHz, "[MHz]");
     frequencyPanel.add (this.jFreqSlider_MHz);
     //
     this.jFreqSlider_kHz.setToolTipText ("-");
@@ -240,7 +240,7 @@ extends JPanel
           }
       }
     });
-    setSubPanelBorder (FREQUENCY_COLOR, this.jFreqSlider_kHz, "[kHz]");
+    setSubPanelBorder (JInstrument.getGuiPreferencesFrequencyColor (), this.jFreqSlider_kHz, "[kHz]");
     frequencyPanel.add (this.jFreqSlider_kHz);
     //
     this.jFreqSlider_Hz.setToolTipText ("-");
@@ -268,7 +268,7 @@ extends JPanel
           }
       }
     });
-    setSubPanelBorder (FREQUENCY_COLOR, this.jFreqSlider_Hz, "[Hz]");
+    setSubPanelBorder (JInstrument.getGuiPreferencesFrequencyColor (), this.jFreqSlider_Hz, "[Hz]");
     frequencyPanel.add (this.jFreqSlider_Hz);
     //
     this.jFreqSlider_mHz.setToolTipText ("-");
@@ -296,7 +296,7 @@ extends JPanel
           }
       }
     });
-    setSubPanelBorder (FREQUENCY_COLOR, this.jFreqSlider_mHz, "[mHz]");
+    setSubPanelBorder (JInstrument.getGuiPreferencesFrequencyColor (), this.jFreqSlider_mHz, "[mHz]");
     frequencyPanel.add (this.jFreqSlider_mHz);
     //
     setPanelBorder (frequencyPanel, "Frequency [Hz]");
@@ -305,7 +305,7 @@ extends JPanel
     final JPanel frequencySweepPanel = new JPanel ();
     frequencySweepPanel.setLayout (new GridLayout (4, 1));
     final JPanel frequencySweepModePanel = new JPanel ();
-    setSubPanelBorder (FREQUENCY_COLOR, frequencySweepModePanel, "Mode");
+    setSubPanelBorder (JInstrument.getGuiPreferencesFrequencyColor (), frequencySweepModePanel, "Mode");
     this.jRfSweepMode = new JComboBox<> (SignalGenerator.RfSweepMode.values ());
     this.jRfSweepMode.addItemListener ((ItemEvent ie) ->
     {
@@ -329,9 +329,9 @@ extends JPanel
     frequencySweepModePanel.add (this.jRfSweepMode);
     frequencySweepPanel.add (frequencySweepModePanel);
     final JPanel frequencySweepSpanPanel = new JPanel ();
-    setSubPanelBorder (FREQUENCY_COLOR, frequencySweepSpanPanel, "Span");
+    setSubPanelBorder (JInstrument.getGuiPreferencesFrequencyColor (), frequencySweepSpanPanel, "Span");
     frequencySweepSpanPanel.setLayout (new GridLayout (1, 1));
-    this.jSpan = new JSevenSegmentNumber (FREQUENCY_COLOR, false, 11, 9);
+    this.jSpan = new JSevenSegmentNumber (JInstrument.getGuiPreferencesFrequencyColor (), false, 11, 9);
     this.jSpan.addMouseListener (new MouseAdapter ()
     {
       @Override
@@ -358,9 +358,9 @@ extends JPanel
     setPanelBorder (frequencySweepPanel, "Frequency Sweep");
     add (frequencySweepPanel);
     final JPanel frequencySweepStartPanel = new JPanel ();
-    setSubPanelBorder (FREQUENCY_COLOR, frequencySweepStartPanel, "Start Frequency [Hz]");
+    setSubPanelBorder (JInstrument.getGuiPreferencesFrequencyColor (), frequencySweepStartPanel, "Start Frequency [Hz]");
     frequencySweepStartPanel.setLayout (new GridLayout (1, 1));
-    this.jStartFreq = new JSevenSegmentNumber (FREQUENCY_COLOR, false, 11, 9);
+    this.jStartFreq = new JSevenSegmentNumber (JInstrument.getGuiPreferencesFrequencyColor (), false, 11, 9);
     this.jStartFreq.addMouseListener (new MouseAdapter ()
     {
       @Override
@@ -387,9 +387,9 @@ extends JPanel
     frequencySweepStartPanel.add (this.jStartFreq);
     frequencySweepPanel.add (frequencySweepStartPanel);
     final JPanel frequencySweepStopPanel = new JPanel ();
-    setSubPanelBorder (FREQUENCY_COLOR, frequencySweepStopPanel, "Stop Frequency [Hz]");
+    setSubPanelBorder (JInstrument.getGuiPreferencesFrequencyColor (), frequencySweepStopPanel, "Stop Frequency [Hz]");
     frequencySweepStopPanel.setLayout (new GridLayout (1, 1));
-    this.jStopFreq = new JSevenSegmentNumber (FREQUENCY_COLOR, false, 11, 9);
+    this.jStopFreq = new JSevenSegmentNumber (JInstrument.getGuiPreferencesFrequencyColor (), false, 11, 9);
     this.jStopFreq.addMouseListener (new MouseAdapter ()
     {
       @Override
@@ -428,12 +428,13 @@ extends JPanel
     final JPanel amplitudeTopPanel = new JPanel ();
     amplitudeTopPanel.setLayout (new GridLayout (1, 2));
     //
-    this.jAmpEnable = new JColorCheckBox ((Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? AMPLITUDE_COLOR : null);
+    this.jAmpEnable = new JColorCheckBox (
+      (Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? JInstrument.getGuiPreferencesAmplitudeColor () : null);
     final JPanel jAmpEnablePanel = new JPanel ();
     // jAmpEnablePanel.setLayout (new FlowLayout (FlowLayout.CENTER));
     jAmpEnablePanel.setLayout (new GridLayout (1, 1));
     jAmpEnablePanel.add (jAmpEnable);
-    setSubPanelBorder (AMPLITUDE_COLOR, jAmpEnablePanel, "RF Out");
+    setSubPanelBorder (JInstrument.getGuiPreferencesAmplitudeColor (), jAmpEnablePanel, "RF Out");
     this.jAmpEnable.setDisplayedValue (false);
     this.jAmpEnable.addMouseListener (new MouseAdapter ()
     {
@@ -459,8 +460,8 @@ extends JPanel
     // amplitudeTopPanel.add (this.jAmpEnable);
     amplitudeTopPanel.add (jAmpEnablePanel);
     //
-    this.jAmplitudeAlt = new JSevenSegmentNumber (AMPLITUDE_COLOR, true, 5, 2);
-    setSubPanelBorder (AMPLITUDE_COLOR, jAmplitudeAlt, "[dBm]");
+    this.jAmplitudeAlt = new JSevenSegmentNumber (JInstrument.getGuiPreferencesAmplitudeColor (), true, 5, 2);
+    setSubPanelBorder (JInstrument.getGuiPreferencesAmplitudeColor (), jAmplitudeAlt, "[dBm]");
     amplitudeTopPanel.add (this.jAmplitudeAlt);
     //
     amplitudePanel.add (amplitudeTopPanel);
@@ -492,7 +493,7 @@ extends JPanel
           }
       }
     });
-    setSubPanelBorder (AMPLITUDE_COLOR, this.jAmpSlider_dBm, "[dBm]");
+    setSubPanelBorder (JInstrument.getGuiPreferencesAmplitudeColor (), this.jAmpSlider_dBm, "[dBm]");
     amplitudePanel.add (this.jAmpSlider_dBm);
     //
     this.jAmpSlider_mdBm.setToolTipText ("-");
@@ -519,7 +520,7 @@ extends JPanel
           }
       }
     });
-    setSubPanelBorder (AMPLITUDE_COLOR, this.jAmpSlider_mdBm, "[mdBm]");
+    setSubPanelBorder (JInstrument.getGuiPreferencesAmplitudeColor (), this.jAmpSlider_mdBm, "[mdBm]");
     amplitudePanel.add (this.jAmpSlider_mdBm);
     //
     add (amplitudePanel);
@@ -527,13 +528,13 @@ extends JPanel
     final JPanel amplitudeSweepPanel = new JPanel ();
     amplitudeSweepPanel.setLayout (new GridLayout (3, 1));
     final JPanel amplitudeSweepModePanel = new JPanel ();
-    setSubPanelBorder (AMPLITUDE_COLOR, amplitudeSweepModePanel, "Mode");
+    setSubPanelBorder (JInstrument.getGuiPreferencesAmplitudeColor (), amplitudeSweepModePanel, "Mode");
     amplitudeSweepPanel.add (amplitudeSweepModePanel);
     final JPanel amplitudeSweepStartPanel = new JPanel ();
-    setSubPanelBorder (AMPLITUDE_COLOR, amplitudeSweepStartPanel, "Start Amplitude");
+    setSubPanelBorder (JInstrument.getGuiPreferencesAmplitudeColor (), amplitudeSweepStartPanel, "Start Amplitude");
     amplitudeSweepPanel.add (amplitudeSweepStartPanel);
     final JPanel amplitudeSweepStopPanel = new JPanel ();
-    setSubPanelBorder (AMPLITUDE_COLOR, amplitudeSweepStopPanel, "Stop Amplitude");
+    setSubPanelBorder (JInstrument.getGuiPreferencesAmplitudeColor (), amplitudeSweepStopPanel, "Stop Amplitude");
     amplitudeSweepPanel.add (amplitudeSweepStopPanel);
     setPanelBorder (amplitudeSweepPanel, "Amplitude Sweep");
     add (amplitudeSweepPanel);
@@ -544,12 +545,14 @@ extends JPanel
     final JPanel modSourcesInternalPanel = new JPanel ();
     modSourcesInternalPanel.setLayout (new GridLayout (3, 1));
     setSubPanelBorder (Color.black, modSourcesInternalPanel, "Internal");
-    this.jModulationSourceInternalFrequency = new JSevenSegmentNumber (MODULATION_COLOR, false, 5, 2);
-    setSubPanelBorder (MODULATION_COLOR, this.jModulationSourceInternalFrequency, "Frequency [kHz]");
+    this.jModulationSourceInternalFrequency =
+      new JSevenSegmentNumber (JInstrument.getGuiPreferencesModulationColor (), false, 5, 2);
+    setSubPanelBorder (
+      JInstrument.getGuiPreferencesModulationColor (), this.jModulationSourceInternalFrequency, "Frequency [kHz]");
     modSourcesInternalPanel.add (this.jModulationSourceInternalFrequency);
     this.jModulationSourceInternalFrequency_kHz = new JSlider (0, 100, 1);
     this.jModulationSourceInternalFrequency_Hz = new JSlider (0, 999, 0);
-    setSubPanelBorder (MODULATION_COLOR, this.jModulationSourceInternalFrequency_kHz, "kHz");
+    setSubPanelBorder (JInstrument.getGuiPreferencesModulationColor (), this.jModulationSourceInternalFrequency_kHz, "kHz");
     this.jModulationSourceInternalFrequency_kHz.setMajorTickSpacing (10);
     this.jModulationSourceInternalFrequency_kHz.setMinorTickSpacing (1);
     this.jModulationSourceInternalFrequency_kHz.setPaintTicks (true);
@@ -580,7 +583,7 @@ extends JPanel
         source.setToolTipText (Integer.toString (source.getValue ()));
     });
     modSourcesInternalPanel.add (this.jModulationSourceInternalFrequency_kHz);
-    setSubPanelBorder (MODULATION_COLOR, this.jModulationSourceInternalFrequency_Hz, "Hz");
+    setSubPanelBorder (JInstrument.getGuiPreferencesModulationColor (), this.jModulationSourceInternalFrequency_Hz, "Hz");
     this.jModulationSourceInternalFrequency_Hz.setMajorTickSpacing (100);
     this.jModulationSourceInternalFrequency_Hz.setMinorTickSpacing (10);
     this.jModulationSourceInternalFrequency_Hz.setPaintTicks (true);
@@ -619,9 +622,10 @@ extends JPanel
     modAnalogPanel.setLayout (new GridLayout (3, 1));
     //
     final JPanel amPanel = new JPanel ();
-    setSubPanelBorder (MODULATION_COLOR, amPanel, "AM");
+    setSubPanelBorder (JInstrument.getGuiPreferencesModulationColor (), amPanel, "AM");
     amPanel.setLayout (new GridLayout (1, 3));
-    this.jAmEnable = new JColorCheckBox ((Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? MODULATION_COLOR : null);
+    this.jAmEnable = new JColorCheckBox (
+      (Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? JInstrument.getGuiPreferencesModulationColor () : null);
     this.jAmDepth = new JSlider (0, 1000, 500);
     this.jAmEnable.setDisplayedValue (false);
     this.jAmEnable.addMouseListener (new MouseAdapter ()
@@ -708,9 +712,10 @@ extends JPanel
     modAnalogPanel.add (amPanel);
     //
     final JPanel fmPanel = new JPanel ();
-    setSubPanelBorder (MODULATION_COLOR, fmPanel, "FM");
+    setSubPanelBorder (JInstrument.getGuiPreferencesModulationColor (), fmPanel, "FM");
     fmPanel.setLayout (new GridLayout (1, 3));
-    this.jFmEnable = new JColorCheckBox ((Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? MODULATION_COLOR : null);
+    this.jFmEnable = new JColorCheckBox (
+      (Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? JInstrument.getGuiPreferencesModulationColor () : null);
     this.jFmDeviation_kHz = new JSlider (0, 100, 0);
     this.jFmSource = new JComboBox (ModulationSource.values ());
     this.jFmEnable.setDisplayedValue (false);
@@ -798,9 +803,10 @@ extends JPanel
     modAnalogPanel.add (fmPanel);
     //
     final JPanel pmPanel = new JPanel ();
-    setSubPanelBorder (MODULATION_COLOR, pmPanel, "PM");
+    setSubPanelBorder (JInstrument.getGuiPreferencesModulationColor (), pmPanel, "PM");
     pmPanel.setLayout (new GridLayout (1, 3));
-    this.jPmEnable = new JColorCheckBox ((Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? MODULATION_COLOR : null);
+    this.jPmEnable = new JColorCheckBox (
+      (Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? JInstrument.getGuiPreferencesModulationColor () : null);
     this.jPmEnable.setDisplayedValue (false);
     this.jPmEnable.addMouseListener (new MouseAdapter ()
     {
@@ -888,9 +894,10 @@ extends JPanel
     setPanelBorder (modDigitalPanel, "Modulation [Digital]");
     modDigitalPanel.setLayout (new GridLayout (2, 1));
     final JPanel pulsePanel = new JPanel ();
-    setSubPanelBorder (MODULATION_COLOR, pulsePanel, "PULSE");
+    setSubPanelBorder (JInstrument.getGuiPreferencesModulationColor (), pulsePanel, "PULSE");
     pulsePanel.setLayout (new GridLayout (1, 2));
-    this.jPulseMEnable = new JColorCheckBox ((Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? MODULATION_COLOR : null);
+    this.jPulseMEnable = new JColorCheckBox (
+      (Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? JInstrument.getGuiPreferencesModulationColor () : null);
     this.jPulseMSource = new JComboBox (ModulationSource.values ());
     this.jPulseMEnable.setDisplayedValue (false);
     this.jPulseMEnable.addMouseListener (new MouseAdapter ()
@@ -942,9 +949,10 @@ extends JPanel
     pulsePanel.add (this.jPulseMSource);
     modDigitalPanel.add (pulsePanel);
     final JPanel bpskPanel = new JPanel ();
-    setSubPanelBorder (MODULATION_COLOR, bpskPanel, "BPSK");
+    setSubPanelBorder (JInstrument.getGuiPreferencesModulationColor (), bpskPanel, "BPSK");
     bpskPanel.setLayout (new GridLayout (1, 2));
-    this.jBpskEnable = new JColorCheckBox ((Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? MODULATION_COLOR : null);
+    this.jBpskEnable = new JColorCheckBox (
+      (Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? JInstrument.getGuiPreferencesModulationColor () : null);
     this.jBpskSource = new JComboBox (ModulationSource.values ());
     this.jBpskEnable.setDisplayedValue (false);
     this.jBpskEnable.addMouseListener (new MouseAdapter ()
@@ -1020,11 +1028,6 @@ extends JPanel
   // SWING
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private Color MANAGEMENT_COLOR = Color.orange;
-  private Color FREQUENCY_COLOR = Color.blue;
-  private Color AMPLITUDE_COLOR = Color.red;
-  private Color MODULATION_COLOR = Color.green;
   
   private final JTextField jInstrumentStatus;
   
