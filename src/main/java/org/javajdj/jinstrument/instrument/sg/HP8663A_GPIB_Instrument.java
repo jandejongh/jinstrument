@@ -25,6 +25,7 @@ import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.r1.instrument.DefaultInstrumentCommand;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentCommand;
+import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 
@@ -54,7 +55,7 @@ implements SignalGenerator
   
   public HP8663A_GPIB_Instrument (final GpibDevice device)
   {
-    super ("HP8663A", device, null, null);
+    super ("HP8663A", device, null, null, true, true, true, false);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -355,6 +356,25 @@ implements SignalGenerator
   public synchronized void setSettingsOnInstrument (final SignalGeneratorSettings signalGeneratorSettings)
   {
     throw new UnsupportedOperationException ("Not supported yet.");
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AbstractInstrument
+  // INSTRUMENT READING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  protected final InstrumentReading getReadingFromInstrumentSync () throws IOException, InterruptedException, TimeoutException
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  protected final void requestReadingFromInstrumentASync () throws IOException
+  {
+    throw new UnsupportedOperationException ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

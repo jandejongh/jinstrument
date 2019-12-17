@@ -40,16 +40,15 @@ public abstract class AbstractSignalGenerator
   protected AbstractSignalGenerator (final String name,
     final Device device,
     final List<Runnable> runnables,
-    final List<Service> targetServices)
+    final List<Service> targetServices,
+    final boolean addStatusServices,
+    final boolean addSettingsServices,
+    final boolean addCommandProcessorServices,
+    final boolean addAcquisitionServices)
+
   {
-    super (name, device, runnables, targetServices, true);
-  }
-  
-  protected AbstractSignalGenerator (final Device device,
-    final List<Runnable> runnables,
-    final List<Service> targetServices)
-  {
-    super (device, runnables, targetServices);
+    super (name, device, runnables, targetServices,
+      addStatusServices, addSettingsServices, addCommandProcessorServices, addAcquisitionServices);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
