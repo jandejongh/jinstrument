@@ -69,7 +69,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.javajdj.jinstrument.r1.main.JInstrument</mainClass>
+              <mainClass>org.javajdj.jinstrument.swing.JInstrument</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
