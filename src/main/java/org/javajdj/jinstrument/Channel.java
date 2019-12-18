@@ -16,14 +16,14 @@
  */
 package org.javajdj.jinstrument;
 
-/** An identifier for a specific {@link Channel} on an {@link Instrument}.
+/** A <i>channel</i> on an {@link Instrument}.
  *
- * @see Channel
+ * @see ChannelId
  * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public interface ChannelId
+public interface Channel
 {
   
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +16,12 @@
  */
 package org.javajdj.jinstrument;
 
-/** An identifier for a specific {@link Channel} on an {@link Instrument}.
+/** Representation of an interconnection protocol between (compatible) devices and one (or more) controllers.
  *
- * @see Channel
- * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public interface ChannelId
+public interface BusType
 {
   
 }
