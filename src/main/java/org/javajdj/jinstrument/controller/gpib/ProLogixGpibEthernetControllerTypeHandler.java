@@ -17,15 +17,15 @@
 package org.javajdj.jinstrument.controller.gpib;
 
 import org.javajdj.jinstrument.Controller;
-import org.javajdj.jinstrument.ControllerTypeHandler;
+import org.javajdj.jinstrument.ControllerType;
 
-/** Implementation of {@link ControllerTypeHandler} for the Prologix GPIB-ETHERNET controller.
+/** Implementation of {@link ControllerType} for the Prologix GPIB-ETHERNET controller.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
 public class ProLogixGpibEthernetControllerTypeHandler
-implements ControllerTypeHandler
+implements ControllerType
 {
 
   private ProLogixGpibEthernetControllerTypeHandler ()
