@@ -95,10 +95,24 @@ public interface InstrumentCommand
   public final static String IC_RESOLUTION_BANDWIDTH = "commandResolutionBandwidth";
   public final static String ICARG_RESOLUTION_BANDWIDTH_HZ = "resolutionBandwidth_Hz";
 
+  public final static String IC_SET_RESOLUTION_BANDWIDTH_COUPLED = "commandSetResolutionBandwidthCoupled";
+
   public final static String IC_VIDEO_BANDWIDTH = "commandVideoBandwidth";
   public final static String ICARG_VIDEO_BANDWIDTH_HZ = "videoBandwidth_Hz";
 
+  public final static String IC_SET_VIDEO_BANDWIDTH_COUPLED = "commandSetVideoBandwidthCoupled";
+  
   public final static String IC_SWEEP_TIME = "commandSweepTime";
   public final static String ICARG_SWEEP_TIME_S = "sweepTime_s";
 
+  public final static String IC_SET_SWEEP_TIME_COUPLED = "commandSetSweepTimeCoupled";
+  
+  public final static String IC_REFERENCE_LEVEL = "commandReferenceLevel";
+  public final static String ICARG_REFERENCE_LEVEL_DBM = "referenceLevel_dBm";
+
+  public final static String IC_RF_ATTENUATION = "commandRfAttenuation";
+  public final static String ICARG_RF_ATTENUATION_DB = "rfAttenuation_dB";
+
+  public final static String IC_SET_RF_ATTENUATION_COUPLED = "commandSetRfAttenuationCoupled";
+  
 }
