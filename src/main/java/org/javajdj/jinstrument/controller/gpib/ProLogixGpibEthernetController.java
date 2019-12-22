@@ -19,6 +19,7 @@ package org.javajdj.jinstrument.controller.gpib;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -145,6 +146,23 @@ public final class ProLogixGpibEthernetController
           }
           else
             baos.write (byteRead);
+          break;
+        }
+        case OPTCR_LF:
+        {
+          switch (byteRead)
+          {
+            case 0x0d:
+              if (socket.getInputStream ().read () == 0x0a)
+                return baos.toByteArray ();
+              else
+                throw new IOException ();
+            case 0x0a:
+              return baos.toByteArray ();
+            default:
+              baos.write (byteRead);
+              break;
+          }
           break;
         }
         case LF_CR:
@@ -498,6 +516,72 @@ public final class ProLogixGpibEthernetController
             throw new IllegalArgumentException ();
           writeRaw (address, bytes);
           controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, readN (address, N, true));
+          break;
+        }
+        case GpibControllerCommand.CC_GPIB_WRITE_AND_READLN_N:
+        {
+          if (! controllerCommand.containsKey (GpibControllerCommand.CCARG_GPIB_ADDRESS))
+            throw new IllegalArgumentException ();
+          if (controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS) == null)
+            throw new IllegalArgumentException ();
+          if (! (controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS) instanceof GpibAddress))
+            throw new IllegalArgumentException ();
+          if (! controllerCommand.containsKey (GpibControllerCommand.CCARG_GPIB_WRITE_BYTES))
+            throw new IllegalArgumentException ();
+          if (controllerCommand.get (GpibControllerCommand.CCARG_GPIB_WRITE_BYTES) == null)
+            throw new IllegalArgumentException ();
+          if (! (controllerCommand.get (GpibControllerCommand.CCARG_GPIB_WRITE_BYTES).getClass ().isArray ()))
+            throw new IllegalArgumentException ();
+          if (controllerCommand.get (GpibControllerCommand.CCARG_GPIB_WRITE_BYTES).getClass ().getComponentType ()
+            != byte.class)
+            throw new IllegalArgumentException ();
+          if (! controllerCommand.containsKey (GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE))
+            throw new IllegalArgumentException ();
+          if (controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE) == null)
+            throw new IllegalArgumentException ();
+          if (! (controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE)
+            instanceof GpibDevice.ReadlineTerminationMode))
+            throw new IllegalArgumentException ();
+          if (! controllerCommand.containsKey (GpibControllerCommand.CCARG_GPIB_READ_N))
+            throw new IllegalArgumentException ();
+          if (controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READ_N) == null)
+            throw new IllegalArgumentException ();
+          if (! (controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READ_N) instanceof Integer))
+            throw new IllegalArgumentException ();
+          final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
+          final byte[] bytes = (byte[]) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_WRITE_BYTES);
+          final GpibDevice.ReadlineTerminationMode readlineTerminationMode =
+            (GpibDevice.ReadlineTerminationMode) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE);
+          final int N = (int) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READ_N);
+          if (N < 0)
+            throw new IllegalArgumentException ();
+          final byte[][] bytesRead = new byte[N][];
+          writeRaw (address, bytes);
+          for (int n = 0; n < N; n++)
+          {
+            bytesRead[n] = readln (address, readlineTerminationMode, false);
+            // LOG.log (Level.WARNING, "n={0}, read: {1} ({2}).",
+            //   new Object[]{n, Util.bytesToHex (bytesRead[n]), new String (bytesRead[n], Charset.forName ("US-ASCII"))});
+          }
+          controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, bytesRead);
+          break;
+        }
+        case GpibControllerCommand.CC_GPIB_ATOMIC_SEQUENCE:
+        {
+          if (! controllerCommand.containsKey (GpibControllerCommand.CCARG_GPIB_ATOMIC_SEQUENCE))
+            throw new IllegalArgumentException ();
+          if (controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ATOMIC_SEQUENCE) == null)
+            throw new IllegalArgumentException ();
+          if (! (controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ATOMIC_SEQUENCE).getClass ().isArray ()))
+            throw new IllegalArgumentException ();
+          final Class componentType = controllerCommand.get (
+            GpibControllerCommand.CCARG_GPIB_ATOMIC_SEQUENCE).getClass ().getComponentType ();
+          if (! ControllerCommand.class.isAssignableFrom (componentType))
+            throw new IllegalArgumentException ();
+          final Object sequence = controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ATOMIC_SEQUENCE);
+          // XXX Check for cycles? -> Way too complicated...
+          for (int i = 0; i < Array.getLength (sequence); i++)
+            processCommand ((ControllerCommand) Array.get (sequence, i));
           break;
         }
         default:
