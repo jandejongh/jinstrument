@@ -24,7 +24,6 @@ import java.util.concurrent.TimeoutException;
 import org.javajdj.jinstrument.Controller;
 import org.javajdj.jinstrument.ControllerCommand;
 import org.javajdj.jinstrument.ControllerListener;
-import org.javajdj.jinstrument.DefaultControllerCommand;
 import org.javajdj.jservice.support.Service_FromMix;
 
 /** Implementation of {@link GpibDevice}.
@@ -37,6 +36,12 @@ public class DefaultGpibDevice
   implements GpibDevice
 {
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // CONSTRUCTOR(S) / FACTORY / CLONING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   public DefaultGpibDevice (final GpibController controller, final GpibAddress address, final String deviceUrl)
   {
     super ("DefaultGpibDevice", null, null);
@@ -47,20 +52,19 @@ public class DefaultGpibDevice
     this.deviceUrl = deviceUrl;
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // Device
+  // CONTROLLER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   private final GpibController controller;
   
   @Override
   public final GpibController getController ()
   {
     return this.controller;
-  }
-  
-  private final GpibAddress address;
-  
-  @Override
-  public final GpibAddress getAddress ()
-  {
-    return this.address;
   }
   
   private String deviceUrl;
@@ -71,7 +75,36 @@ public class DefaultGpibDevice
     return this.deviceUrl;
   }
   
-  private void doControllerCommandSync (final ControllerCommand command, final long timeout_ms)
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GpibDevice
+  // ADDRESS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final GpibAddress address;
+  
+  @Override
+  public final GpibAddress getAddress ()
+  {
+    return this.address;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GpibDevice
+  // COMMAND
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  public void addCommand (final GpibControllerCommand command)
+  {
+    this.controller.addCommand (command);    
+  }
+  
+  @Override
+  public void doControllerCommandSync (final GpibControllerCommand command, final long timeout_ms)
     throws InterruptedException, IOException, TimeoutException
   {
     final BlockingQueue<ControllerCommand> queue = new LinkedBlockingQueue<> ();
@@ -113,112 +146,181 @@ public class DefaultGpibDevice
         throw new IllegalArgumentException (e);
     }    
   }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // read
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public GpibControllerCommand generateReadCommand ()
+  {
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_READ,
+      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address);
+    return command;
+  }
   
   @Override
   public void readAsync ()
   {
-    this.controller.addCommand (new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_READ,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address));
+    this.controller.addCommand (generateReadCommand ());
   }
 
   @Override
   public byte[] readSync (final long timeout_ms)
     throws InterruptedException, IOException, TimeoutException
   {
-    final ControllerCommand command = new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_READ,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address);
+    final GpibControllerCommand command = generateReadCommand ();
     doControllerCommandSync (command, timeout_ms);
     return (byte[]) command.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // readln
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   @Override
-  public void readlnAsync (final GpibDevice.ReadlineTerminationMode readlineTerminationMode)
+  public GpibControllerCommand generateReadlnCommand (final GpibDevice.ReadlineTerminationMode readlineTerminationMode)
   {
     if (readlineTerminationMode == null)
       throw new IllegalArgumentException ();
-    this.controller.addCommand (new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_READLN,
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_READLN,
       GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE, readlineTerminationMode));    
+      GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE, readlineTerminationMode);
+    return command;
+  }
+  
+  @Override
+  public void readlnAsync (final GpibDevice.ReadlineTerminationMode readlineTerminationMode)
+  {
+    this.controller.addCommand (generateReadlnCommand (readlineTerminationMode));    
   }
   
   @Override
   public byte[] readlnSync (final GpibDevice.ReadlineTerminationMode readlineTerminationMode, final long timeout_ms)
     throws InterruptedException, IOException, TimeoutException
   {
-    final ControllerCommand command = new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_READLN,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE, readlineTerminationMode);    
+    final GpibControllerCommand command = generateReadlnCommand (readlineTerminationMode);
     doControllerCommandSync (command, timeout_ms);
     return (byte[]) command.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // readN
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   @Override
-  public void readNAsync (final int N)
+  public GpibControllerCommand generateReadNCommand (final int N)
   {
     if (N < 0)
       throw new IllegalArgumentException ();
-    this.controller.addCommand (new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_READ_N,
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_READ_N,
       GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_READ_N, N));
+      GpibControllerCommand.CCARG_GPIB_READ_N, N);
+    return command;
+  }
+  
+  @Override
+  public void readNAsync (final int N)
+  {
+    this.controller.addCommand (generateReadNCommand (N));
   }
 
   @Override
   public byte[] readNSync (final int N, final long timeout_ms)
     throws InterruptedException, IOException, TimeoutException
   {
-    if (N < 0)
-      throw new IllegalArgumentException ();
-    final ControllerCommand command = new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_READ_N,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_READ_N, N);
+    final GpibControllerCommand command = generateReadNCommand (N);
     doControllerCommandSync (command, timeout_ms);
     return (byte[]) command.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // write
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public GpibControllerCommand generateWriteCommand (final byte[] bytes)
+  {
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_WRITE,
+      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
+      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes);
+    return command;    
+  }
+  
   @Override
   public void writeAsync (final byte[] bytes)
   {
-    this.controller.addCommand (new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_WRITE,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes));
+    this.controller.addCommand (generateWriteCommand (bytes));
   }
 
   @Override
   public void writeSync (final byte[] bytes, final long timeout_ms)
     throws InterruptedException, IOException, TimeoutException
   {
-    final ControllerCommand command = new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_WRITE,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes);
+    final GpibControllerCommand command = generateWriteCommand (bytes);
     doControllerCommandSync (command, timeout_ms);
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // writeAndRead
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public GpibControllerCommand generateWriteAndReadCommand (final byte[] bytes)
+  {
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READ,
+      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
+      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes);
+    return command;
+  }
+  
   @Override
   public void writeAndReadAsync (final byte[] bytes)
   {
-    this.controller.addCommand (new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READ,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes));
+    this.controller.addCommand (generateWriteAndReadCommand (bytes));
   }
 
   @Override
   public byte[] writeAndReadSync (final byte[] bytes, final long timeout_ms)
     throws InterruptedException, IOException, TimeoutException
   {
-    final ControllerCommand command = new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READ,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes);
+    final GpibControllerCommand command = generateWriteAndReadCommand (bytes);
     doControllerCommandSync (command, timeout_ms);
     return (byte[]) command.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // writeAndReadln
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public GpibControllerCommand generateWriteAndReadlnCommand (
+    final byte[] bytes,
+    final GpibDevice.ReadlineTerminationMode readlineTerminationMode)
+  {
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READLN,
+      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
+      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes,
+      GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE, readlineTerminationMode);
+    return command;
   }
   
   @Override
   public void writeAndReadlnAsync (final byte[] bytes, final GpibDevice.ReadlineTerminationMode readlineTerminationMode)
   {
-    this.controller.addCommand (new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READLN,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes,
-      GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE, readlineTerminationMode));
+    this.controller.addCommand (generateWriteAndReadlnCommand (bytes, readlineTerminationMode));
   }
 
   @Override
@@ -228,37 +330,121 @@ public class DefaultGpibDevice
     final long timeout_ms)
     throws InterruptedException, IOException, TimeoutException
   {
-    final ControllerCommand command = new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READLN,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes,
-      GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE, readlineTerminationMode);
+    final GpibControllerCommand command = generateWriteAndReadlnCommand (bytes, readlineTerminationMode);
     doControllerCommandSync (command, timeout_ms);
     return (byte[]) command.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // writeAndReadN
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public GpibControllerCommand generateWriteAndReadNCommand (final byte[] bytes, final int N)
+  {
+    if (N < 0)
+      throw new IllegalArgumentException ();
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READ_N,
+      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
+      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes,
+      GpibControllerCommand.CCARG_GPIB_READ_N, N);
+    return command;    
   }
   
   @Override
   public void writeAndReadNAsync (final byte[] bytes, final int N)
   {
-    if (N < 0)
-      throw new IllegalArgumentException ();
-    this.controller.addCommand (new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READ_N,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes,
-      GpibControllerCommand.CCARG_GPIB_READ_N, N));
+    this.controller.addCommand (generateWriteAndReadNCommand (bytes, N));
   }
   
   @Override
   public byte[] writeAndReadNSync (final byte[] bytes, final int N, final long timeout_ms)
     throws InterruptedException, IOException, TimeoutException
   {
-    if (N < 0)
-      throw new IllegalArgumentException ();
-    final ControllerCommand command = new DefaultControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READ_N,
-      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
-      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes,
-      GpibControllerCommand.CCARG_GPIB_READ_N, N);
+    final GpibControllerCommand command = generateWriteAndReadNCommand (bytes, N);
     doControllerCommandSync (command, timeout_ms);
     return (byte[]) command.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // writeAndReadlnN
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public GpibControllerCommand generateWriteAndReadlnNCommand (
+    final byte[] bytes,
+    final GpibDevice.ReadlineTerminationMode readlineTerminationMode,
+    final int N)
+  {
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READLN_N,
+      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
+      GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes,
+      GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE, readlineTerminationMode,
+      GpibControllerCommand.CCARG_GPIB_READ_N, N);
+    return command;
+  }
+  
+  @Override
+  public void writeAndReadlnNAsync (
+    final byte[] bytes,
+    final GpibDevice.ReadlineTerminationMode readlineTerminationMode,
+    final int N)
+  {
+    this.controller.addCommand (generateWriteAndReadlnNCommand (bytes, readlineTerminationMode, N));
+  }
+
+  @Override
+  public byte[][] writeAndReadlnNSync (
+    final byte[] bytes,
+    final GpibDevice.ReadlineTerminationMode readlineTerminationMode,
+    final int N,
+    final long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException
+  {
+    final GpibControllerCommand command = generateWriteAndReadlnNCommand (bytes, readlineTerminationMode, N);
+    doControllerCommandSync (command, timeout_ms);
+    return (byte[][]) command.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // atomicSequence
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public GpibControllerCommand generateAtomicSequenceCommand (final GpibControllerCommand[] sequence)
+  {
+    if (sequence == null)
+      throw new IllegalArgumentException ();
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_ATOMIC_SEQUENCE,
+      GpibControllerCommand.CCARG_GPIB_ATOMIC_SEQUENCE, sequence);
+    return command;
+  }
+  
+  @Override
+  public void atomicSequenceAsync (final GpibControllerCommand[] sequence)
+    throws UnsupportedOperationException
+  {
+    this.controller.addCommand (generateAtomicSequenceCommand (sequence));
+  }
+
+  @Override
+  public void atomicSequenceSync (final GpibControllerCommand[] sequence, final long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException
+  {
+    final GpibControllerCommand command = generateAtomicSequenceCommand (sequence);
+    doControllerCommandSync (command, timeout_ms);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // END OF FILE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
 }
