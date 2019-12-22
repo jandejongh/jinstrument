@@ -23,11 +23,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.DefaultInstrumentCommand;
+import org.javajdj.jinstrument.DeviceType;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentCommand;
 import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
+import org.javajdj.jinstrument.InstrumentType;
+import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 
 /** Implementation of {@link Instrument} and {@link SignalGenerator} for the HP-8663A.
  *
@@ -58,6 +61,41 @@ implements SignalGenerator
     super ("HP8663A", device, null, null, true, true, true, false);
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INSTRUMENT TYPE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static InstrumentType INSTRUMENT_TYPE = new InstrumentType ()
+  {
+    
+    @Override
+    public final String getName ()
+    {
+      return "HP8663A [GPIB]";
+    }
+    
+    @Override
+    public final DeviceType getDeviceType ()
+    {
+      return DeviceType_GPIB.getInstance ();
+    }
+
+    @Override
+    public final boolean isValidUrl (final String instrumentUrl)
+    {
+      throw new UnsupportedOperationException ();
+    }
+
+    @Override
+    public final HP8663A_GPIB_Instrument openInstrument (final String instrumentUrl)
+    {
+      throw new UnsupportedOperationException ();
+    }
+    
+  };
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // READ LINE TERMINATION MODE
