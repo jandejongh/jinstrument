@@ -25,6 +25,8 @@ public interface InstrumentTrace
   extends InstrumentReading
 {
   
+  int getTraceLength ();
+  
   double[] getSamples ();
   
 }
