@@ -24,6 +24,10 @@ package org.javajdj.jinstrument;
 public interface ControllerType
 {
   
+  String getName ();
+  
+  BusType getBusType ();
+  
   boolean isValidUrl (final String controllerUrl);
   
   Controller openController (final String controllerUrl);
