@@ -29,6 +29,12 @@ public class ProLogixGpibEthernetControllerType
 implements ControllerType
 {
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // CONSTRUCTOR(S) / FACTORY / CLONING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   private ProLogixGpibEthernetControllerType ()
   {
   }
@@ -40,48 +46,44 @@ implements ControllerType
     return ProLogixGpibEthernetControllerType.INSTANCE;
   }
 
-  @Override
-  public final String getName ()
-  {
-    return "prologix-eth";
-  }
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // NAME / toString
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   @Override
   public String toString ()
   {
-    return getName ();
+    return getControllerTypeUrl ();
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // ControllerType
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static String PROLOGIX_GPIB_ETHERNET_CONTROLLER_TYPE_NAME = "prologix-eth";
+  
+  @Override
+  public final String getControllerTypeUrl ()
+  {
+    return ProLogixGpibEthernetControllerType.PROLOGIX_GPIB_ETHERNET_CONTROLLER_TYPE_NAME;
+  }
+
   @Override
   public final BusType getBusType ()
   {
     return BusType_GPIB.getInstance ();
   }
   
-  public final static String PROLOGIX_URL_PREFIX = "prologix-eth://";
-  
-  public final static boolean isValidUrlStatic (final String controllerUrl)
-  {
-    if (controllerUrl == null)
-      return false;
-    return controllerUrl.trim ().toLowerCase ().startsWith (PROLOGIX_URL_PREFIX);    
-  }
-  
-  @Override
-  public final boolean isValidUrl (final String controllerUrl)
-  {
-    return ProLogixGpibEthernetControllerType.isValidUrlStatic (controllerUrl);
-  }
-
   public final static int DEFAULT_TCP_CONNECT_PORT = 1234;
   
   @Override
-  public final Controller openController (final String controllerUrl)
+  public final Controller openController (final String relativeControllerUrl)
   {
-    if (! isValidUrl (controllerUrl))
-      return null;
-    final String addressAndPortString =
-      controllerUrl.replaceFirst (ProLogixGpibEthernetControllerType.PROLOGIX_URL_PREFIX, "");
+    final String addressAndPortString = relativeControllerUrl;
     final String ipAddress;
     final int tcpConnectPort;
     if (! addressAndPortString.contains (":"))
@@ -106,4 +108,10 @@ implements ControllerType
     return new ProLogixGpibEthernetController (ipAddress, tcpConnectPort);
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // END OF FILE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }
