@@ -24,12 +24,10 @@ package org.javajdj.jinstrument;
 public interface ControllerType
 {
   
-  String getName ();
+  String getControllerTypeUrl ();
   
   BusType getBusType ();
   
-  boolean isValidControllerUrl (final String controllerUrl);
-  
-  Controller openController (final String controllerUrl);
+  Controller openController (final String relativeControllerUrl);
   
 }
