@@ -56,7 +56,7 @@ public final class ProLogixGpibEthernetController
   @Override
   public String getControllerUrl ()
   {
-    return ProLogixGpibEthernetControllerTypeHandler.PROLOGIX_URL_PREFIX + this.ipAddress + ":" + this.tcpConnectPort;
+    return ProLogixGpibEthernetControllerType.PROLOGIX_URL_PREFIX + this.ipAddress + ":" + this.tcpConnectPort;
   }
   
   public final synchronized void resetController ()
