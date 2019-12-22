@@ -35,7 +35,8 @@ public class DefaultControllerCommand
     final String command,
     final String arg1, final Object val1,
     final String arg2, final Object val2,
-    final String arg3, final Object val3)
+    final String arg3, final Object val3,
+    final String arg4, final Object val4)
   {
     super ();
     if (command == null || command.trim ().isEmpty ())
@@ -46,6 +47,8 @@ public class DefaultControllerCommand
       throw new IllegalArgumentException ();
     if (arg3 != null && arg3.trim ().isEmpty ())
       throw new IllegalArgumentException ();
+    if (arg4 != null && arg4.trim ().isEmpty ())
+      throw new IllegalArgumentException ();
     put (ControllerCommand.CC_COMMAND_KEY, command);
     if (arg1 != null)
       put (arg1, val1);
@@ -53,6 +56,17 @@ public class DefaultControllerCommand
       put (arg2, val2);
     if (arg3 != null)
       put (arg3, val3);
+    if (arg4 != null)
+      put (arg4, val4);
+  }
+  
+  public DefaultControllerCommand (
+    final String command,
+    final String arg1, final Object val1,
+    final String arg2, final Object val2,
+    final String arg3, final Object val3)
+  {
+    this (command, arg1, val1, arg2, val2, arg3, val3, null, null);
   }
   
   public DefaultControllerCommand (
@@ -60,19 +74,19 @@ public class DefaultControllerCommand
     final String arg1, final Object val1,
     final String arg2, final Object val2)
   {
-    this (command, arg1, val1, arg2, val2, null, null);
+    this (command, arg1, val1, arg2, val2, null, null, null, null);
   }
   
   public DefaultControllerCommand (
     final String command,
     final String arg1, final Object val1)
   {
-    this (command, arg1, val1, null, null, null, null);
+    this (command, arg1, val1, null, null, null, null, null, null);
   }
   
   public DefaultControllerCommand (final String command)
   {
-    this (command, null, null, null, null, null, null);
+    this (command, null, null, null, null, null, null, null, null);
   }
   
 }
