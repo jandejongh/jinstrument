@@ -28,7 +28,7 @@ public interface ControllerType
   
   BusType getBusType ();
   
-  boolean isValidUrl (final String controllerUrl);
+  boolean isValidControllerUrl (final String controllerUrl);
   
   Controller openController (final String controllerUrl);
   
