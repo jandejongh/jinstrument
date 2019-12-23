@@ -162,6 +162,10 @@ public class JSpectrumAnalyzerSettingsPanel
     atPanel.add (jRfAttenuationCoupledPanel);
     add (atPanel);
     addSwingListeners ();
+    // XXX Beautiful critical race follows below...
+    final InstrumentSettings settings = getInstrument ().getCurrentInstrumentSettings ();
+    if (settings != null)
+      this.instrumentListener.newInstrumentSettings (spectrumAnalyzer, settings);
     getInstrument ().addInstrumentListener (this.instrumentListener);
   }
 
@@ -182,7 +186,7 @@ public class JSpectrumAnalyzerSettingsPanel
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Spectrum Analyzer Settings";
+      return "Default Spectrum Analyzer Settings View";
     }
 
     @Override
@@ -508,6 +512,7 @@ public class JSpectrumAnalyzerSettingsPanel
     @Override
     public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
     {
+      LOG.log (Level.WARNING, "PRE-SETTINGS!!! PRE-SETTINGS!!!");
       if (instrument != JSpectrumAnalyzerSettingsPanel.this.getSpectrumAnalyzer ())
         return;
       SwingUtilities.invokeLater (() ->
@@ -532,6 +537,7 @@ public class JSpectrumAnalyzerSettingsPanel
           }
           else
           {
+            LOG.log (Level.WARNING, "SETTINGS!!! SETTINGS!!!");
             final SpectrumAnalyzerSettings settings = (SpectrumAnalyzerSettings) instrumentSettings;
             JSpectrumAnalyzerSettingsPanel.this.jCenterFrequency_MHz.setNumber (
               settings.getCenterFrequency_MHz ());
