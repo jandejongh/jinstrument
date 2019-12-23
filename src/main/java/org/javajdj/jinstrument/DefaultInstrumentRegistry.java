@@ -163,6 +163,17 @@ public class DefaultInstrumentRegistry
     return Collections.unmodifiableList (new ArrayList<> (this.busTypesCopy));
   }
   
+  @Override
+  public final BusType getBusTypeByUrl (final String url)
+  {
+    if (url == null || url.trim ().isEmpty ())
+      return null;
+    for (final BusType busType : getBusTypes ())
+      if (busType.getBusTypeUrl ().equalsIgnoreCase (url))
+        return busType;
+    return null;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // CONTROLLER TYPES
@@ -228,7 +239,8 @@ public class DefaultInstrumentRegistry
     return Collections.unmodifiableList (new ArrayList<> (this.controllerTypesCopy));
   }
   
-  protected final ControllerType getControllerTypeByUrl (final String url)
+  @Override
+  public final ControllerType getControllerTypeByUrl (final String url)
   {
     if (url == null || url.trim ().isEmpty ())
       return null;
@@ -291,6 +303,17 @@ public class DefaultInstrumentRegistry
   public final List<DeviceType> getDeviceTypes ()
   {
     return Collections.unmodifiableList (new ArrayList<> (this.deviceTypesCopy));
+  }
+  
+  @Override
+  public final DeviceType getDeviceTypeByUrl (final String url)
+  {
+    if (url == null || url.trim ().isEmpty ())
+      return null;
+    for (final DeviceType deviceType : getDeviceTypes ())
+      if (deviceType.getDeviceTypeUrl ().equalsIgnoreCase (url))
+        return deviceType;
+    return null;
   }
   
   @Override
@@ -400,7 +423,8 @@ public class DefaultInstrumentRegistry
     return Collections.unmodifiableList (new ArrayList<> (this.instrumentTypesCopy));
   }
   
-  protected final InstrumentType getInstrumentTypeByUrl (final String url)
+  @Override
+  public final InstrumentType getInstrumentTypeByUrl (final String url)
   {
     if (url == null || url.trim ().isEmpty ())
       return null;
@@ -465,7 +489,8 @@ public class DefaultInstrumentRegistry
     return Collections.unmodifiableList (new ArrayList<> (this.instrumentViewTypesCopy));
   }
   
-  protected final InstrumentViewType getInstrumentViewTypeByUrl (final String url)
+  @Override
+  public final InstrumentViewType getInstrumentViewTypeByUrl (final String url)
   {
     if (url == null || url.trim ().isEmpty ())
       return null;
@@ -540,7 +565,8 @@ public class DefaultInstrumentRegistry
     return Collections.unmodifiableList (new ArrayList<> (this.busesCopy));
   }
   
-  protected final Bus getBusByUrl (final String url)
+  @Override
+  public final Bus getBusByUrl (final String url)
   {
     if (url == null || url.trim ().isEmpty ())
       return null;
@@ -618,6 +644,17 @@ public class DefaultInstrumentRegistry
     return Collections.unmodifiableList (new ArrayList<> (this.controllersCopy));
   }
   
+  @Override
+  public final Controller getControllerByUrl (final String url)
+  {
+    if (url == null || url.trim ().isEmpty ())
+      return null;
+    for (final Controller controller : getControllers ())
+      if (controller.getControllerUrl ().equalsIgnoreCase (url))
+        return controller;
+    return null;    
+  }
+
   protected final Controller getController (final Bus bus)
   {
     if (bus == null)
@@ -705,16 +742,6 @@ public class DefaultInstrumentRegistry
     return controller;
   }
   
-  protected final Controller getControllerByUrl (final String url)
-  {
-    if (url == null || url.trim ().isEmpty ())
-      return null;
-    for (final Controller controller : getControllers ())
-      if (controller.getControllerUrl ().equalsIgnoreCase (url))
-        return controller;
-    return null;    
-  }
-
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DEVICES
@@ -778,6 +805,17 @@ public class DefaultInstrumentRegistry
   public final List<Device> getDevices ()
   {
     return Collections.unmodifiableList (new ArrayList<> (this.devicesCopy));
+  }
+
+  @Override
+  public final Device getDeviceByUrl (final String url)
+  {
+    if (url == null || url.trim ().isEmpty ())
+      return null;
+    for (final Device device : getDevices ())
+      if (device.getDeviceUrl ().equalsIgnoreCase (url))
+        return device;
+    return null;    
   }
 
   @Override
@@ -859,16 +897,6 @@ public class DefaultInstrumentRegistry
     return openDevice (deviceType, bus, busAddressUrl);
   }
 
-  protected final Device getDeviceByUrl (final String url)
-  {
-    if (url == null || url.trim ().isEmpty ())
-      return null;
-    for (final Device device : getDevices ())
-      if (device.getDeviceUrl ().equalsIgnoreCase (url))
-        return device;
-    return null;    
-  }
-
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENTS
@@ -935,6 +963,17 @@ public class DefaultInstrumentRegistry
   }
 
   @Override
+  public final Instrument getInstrumentByUrl (final String url)
+  {
+    if (url == null || url.trim ().isEmpty ())
+      return null;
+    for (final Instrument instrument: getInstruments ())
+      if (instrument.getInstrumentUrl ().equalsIgnoreCase (url))
+        return instrument;
+    return null;    
+  }
+
+  @Override
   public Instrument openInstrument (final String instrumentUrl)
   {
     if (instrumentUrl == null || instrumentUrl.trim ().isEmpty ())
@@ -974,16 +1013,6 @@ public class DefaultInstrumentRegistry
     else
       addInstrument (instrument);
     return instrument;
-  }
-
-  protected final Instrument getInstrumentByUrl (final String url)
-  {
-    if (url == null || url.trim ().isEmpty ())
-      return null;
-    for (final Instrument instrument: getInstruments ())
-      if (instrument.getInstrumentUrl ().equalsIgnoreCase (url))
-        return instrument;
-    return null;    
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1052,6 +1081,17 @@ public class DefaultInstrumentRegistry
   }
 
   @Override
+  public final InstrumentView getInstrumentViewByUrl (final String url)
+  {
+    if (url == null || url.trim ().isEmpty ())
+      return null;
+    for (final InstrumentView instrumentView: getInstrumentViews ())
+      if (instrumentView.getInstrumentViewUrl ().equalsIgnoreCase (url))
+        return instrumentView;
+    return null;
+  }
+
+  @Override
   public final InstrumentView openInstrumentView (String instrumentViewUrl)
   {
     if (instrumentViewUrl == null || instrumentViewUrl.trim ().isEmpty ())
@@ -1091,16 +1131,6 @@ public class DefaultInstrumentRegistry
     else
       addInstrumentView (instrumentView);
     return instrumentView;
-  }
-
-  protected final InstrumentView getInstrumentViewByUrl (final String url)
-  {
-    if (url == null || url.trim ().isEmpty ())
-      return null;
-    for (final InstrumentView instrumentView: getInstrumentViews ())
-      if (instrumentView.getInstrumentViewUrl ().equalsIgnoreCase (url))
-        return instrumentView;
-    return null;
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

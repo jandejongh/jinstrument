@@ -54,6 +54,8 @@ public interface InstrumentRegistry
   
   List<BusType> getBusTypes ();
   
+  BusType getBusTypeByUrl (String busTypeUrl);
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // CONTROLLER TYPES
@@ -66,6 +68,8 @@ public interface InstrumentRegistry
   
   List<ControllerType> getControllerTypes ();
   
+  ControllerType getControllerTypeByUrl (String controllerTypeUrl);
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DEVICE TYPES
@@ -77,6 +81,8 @@ public interface InstrumentRegistry
   void removeDeviceType (DeviceType deviceType);
   
   List<DeviceType> getDeviceTypes ();
+  
+  DeviceType getDeviceTypeByUrl (String deviceTypeUrl);
   
   Device openDevice (DeviceType deviceType, Bus bus, String busAddressUrl);
   
@@ -92,6 +98,8 @@ public interface InstrumentRegistry
   
   List<InstrumentType> getInstrumentTypes ();
   
+  InstrumentType getInstrumentTypeByUrl (String instrumentTypeUrl);
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENT VIEW TYPES
@@ -103,6 +111,8 @@ public interface InstrumentRegistry
   void removeInstrumentViewType (InstrumentViewType instrumentViewType);
   
   List<InstrumentViewType> getInstrumentViewTypes ();
+  
+  InstrumentViewType getInstrumentViewTypeByUrl (String instrumentViewTypeUrl);
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -116,6 +126,8 @@ public interface InstrumentRegistry
   
   List<Bus> getBuses ();
   
+  Bus getBusByUrl (String busUrl);
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // CONTROLLERS
@@ -127,6 +139,8 @@ public interface InstrumentRegistry
   void removeController (Controller controller);
   
   List<Controller> getControllers ();
+  
+  Controller getControllerByUrl (String controllerUrl);
   
   Controller openController (String controllerUrl);
   
@@ -144,6 +158,8 @@ public interface InstrumentRegistry
   
   List<Device> getDevices ();
   
+  Device getDeviceByUrl (String deviceUrl);
+  
   Device openDevice (String deviceUrl);
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -158,6 +174,8 @@ public interface InstrumentRegistry
   
   List<Instrument> getInstruments ();
   
+  Instrument getInstrumentByUrl (String instrumentUrl);
+  
   Instrument openInstrument (String instrumentUrl);
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,6 +189,8 @@ public interface InstrumentRegistry
   void removeInstrumentView (InstrumentView instrumentView);
   
   List<InstrumentView> getInstrumentViews ();
+  
+  InstrumentView getInstrumentViewByUrl (String instrumentViewUrl);
   
   InstrumentView openInstrumentView (String instrumentViewUrl);
   
