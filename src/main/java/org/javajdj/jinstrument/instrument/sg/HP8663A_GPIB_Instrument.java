@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.DefaultInstrumentCommand;
+import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.DeviceType;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentCommand;
@@ -58,7 +59,7 @@ implements SignalGenerator
   
   public HP8663A_GPIB_Instrument (final GpibDevice device)
   {
-    super ("HP8663A", device, null, null, true, true, true, false);
+    super ("HP-8663A", device, null, null, true, true, true, false);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,9 +72,9 @@ implements SignalGenerator
   {
     
     @Override
-    public final String getName ()
+    public final String getInstrumentTypeUrl ()
     {
-      return "HP8663A [GPIB]";
+      return "HP-8663A [GPIB]";
     }
     
     @Override
@@ -83,19 +84,31 @@ implements SignalGenerator
     }
 
     @Override
-    public final boolean isValidUrl (final String instrumentUrl)
+    public final HP8663A_GPIB_Instrument openInstrument (final Device device)
     {
-      throw new UnsupportedOperationException ();
-    }
-
-    @Override
-    public final HP8663A_GPIB_Instrument openInstrument (final String instrumentUrl)
-    {
-      throw new UnsupportedOperationException ();
+      if (device == null || ! (device instanceof GpibDevice))
+      {
+        LOG.log (Level.WARNING, "Incompatible Device (not a GpibDevice): {0}!", device);
+        return null;
+      }
+      return new HP8663A_GPIB_Instrument ((GpibDevice) device);
     }
     
   };
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // Instrument
+  // URL / NAME / toString
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  @Override
+  public String getInstrumentUrl ()
+  {
+    return HP8663A_GPIB_Instrument.INSTRUMENT_TYPE.getInstrumentTypeUrl () + "@" + getDevice ().getDeviceUrl ();
+  }
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // READ LINE TERMINATION MODE
