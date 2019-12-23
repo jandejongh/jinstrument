@@ -24,10 +24,8 @@ package org.javajdj.jinstrument;
 public interface InstrumentViewType
 {
   
-  String getName ();
+  String getInstrumentViewTypeUrl ();
   
-  boolean isValidUrl (final String instrumentViewUrl);
-  
-  InstrumentView openInstrumentView (final String instrumentViewUrl);
+  InstrumentView openInstrumentView (Instrument instrument);
   
 }

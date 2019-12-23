@@ -27,4 +27,6 @@ package org.javajdj.jinstrument;
 public interface InstrumentView
 {
   
+  String getInstrumentViewUrl ();
+  
 }
