@@ -24,10 +24,10 @@ package org.javajdj.jinstrument;
 public interface DeviceType
 {
   
+  String getDeviceTypeUrl ();
+  
   BusType getBusType ();
   
-  boolean isValidUrl (final String deviceUrl);
-  
-  Device openDevice (final String deviceUrl);
+  Device openDevice (Controller controller, String busAddressUrl);
   
 }
