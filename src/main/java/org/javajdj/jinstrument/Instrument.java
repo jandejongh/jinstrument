@@ -27,6 +27,8 @@ public interface Instrument
   extends Service
 {
   
+  String getInstrumentUrl ();
+  
   Device getDevice ();
   
   void addInstrumentListener (InstrumentListener l);
