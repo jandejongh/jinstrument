@@ -25,5 +25,7 @@ public interface BusType
 {
   
   String getBusTypeUrl ();
+ 
+  DeviceType getDeviceType ();
   
 }

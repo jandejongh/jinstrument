@@ -24,4 +24,8 @@ package org.javajdj.jinstrument;
 public interface Bus
 {
   
+  String getBusUrl ();
+  
+  BusType getBusType ();
+  
 }
