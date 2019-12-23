@@ -24,12 +24,10 @@ package org.javajdj.jinstrument;
 public interface InstrumentType
 {
   
-  String getName ();
+  String getInstrumentTypeUrl ();
   
   DeviceType getDeviceType ();
   
-  boolean isValidUrl (final String instrumentUrl);
-  
-  Instrument openInstrument (final String instrumentUrl);
+  Instrument openInstrument (final Device device);
   
 }
