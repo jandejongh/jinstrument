@@ -56,7 +56,40 @@ public final class GpibAddress
 
   public final static GpibAddress fromUrl (final String gpibAddressUrl)
   {
-    return AbstractGpibController.createAddress (gpibAddressUrl);
+    if (gpibAddressUrl == null || ! gpibAddressUrl.trim ().toLowerCase ().startsWith ("gpib:"))
+      return null;
+    final String gpibAddressString = gpibAddressUrl.trim ().replaceFirst (".*:", "");
+    final String padString;
+    final String sadString;
+    if (gpibAddressString.contains (","))
+    {
+      padString = gpibAddressString.replaceFirst (",.*", "");
+      sadString = gpibAddressString.replaceFirst (".*,", "");
+    }
+    else
+    {
+      padString = gpibAddressString;
+      sadString = null;
+    }
+    try
+    {
+      final int pad = Integer.parseInt (padString);
+      if (pad < 0 || pad > 30)
+        return null;
+      if (sadString != null)
+      {
+        final int sad = Integer.parseInt (sadString);
+        if (sad != 0 && (sad < GpibAddress.MIN_NON_ZERO_SAD || sad > GpibAddress.MAX_NON_ZERO_SAD))
+          return null;
+        return new GpibAddress ((byte) pad, (byte) sad);
+      }
+      else
+        return new GpibAddress ((byte) pad);
+    }
+    catch (NumberFormatException nfe)
+    {
+      return null;
+    }
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
