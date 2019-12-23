@@ -203,7 +203,7 @@ public class DefaultInstrumentRegistry
         }
         if (getControllerTypeByUrl (controllerType.getControllerTypeUrl ()) != null)
         {
-          LOG.log (Level.SEVERE, "Controller Type URL \'{0}\' is already registered!", controllerType.getControllerTypeUrl ());
+          LOG.log (Level.SEVERE, "Controller Type URL {0} is already registered!", controllerType.getControllerTypeUrl ());
           throw new IllegalArgumentException ();
         }
         this.controllerTypes.add (controllerType);
@@ -326,7 +326,7 @@ public class DefaultInstrumentRegistry
     }
     if (! getDeviceTypes ().contains (deviceType))
     {
-      LOG.log (Level.WARNING, "Device Type \'{0}\' is unknown / unregistered!", deviceType.getDeviceTypeUrl ());
+      LOG.log (Level.WARNING, "Device Type {0} is unknown / unregistered!", deviceType.getDeviceTypeUrl ());
       return null;      
     }
     if (bus == null)
@@ -336,25 +336,25 @@ public class DefaultInstrumentRegistry
     }
     if (! getBuses ().contains (bus))
     {
-      LOG.log (Level.WARNING, "Bus \'{0}\' is unknown / unregistered!", bus.getBusUrl ());
+      LOG.log (Level.WARNING, "Bus {0} is unknown / unregistered!", bus.getBusUrl ());
       return null;      
     }
     if (! deviceType.getBusType ().equals (bus.getBusType ()))
     {
-      LOG.log (Level.WARNING, "Bus Types for Device (\'{0}\') and Bus (\'{1}\') do not match!",
+      LOG.log (Level.WARNING, "Bus Types for Device ({0}) and Bus ({1}) do not match!",
         new Object[]{deviceType.getBusType ().getBusTypeUrl (), bus.getBusType ().getBusTypeUrl ()});
       return null;      
     }
     final Controller controller = getController (bus);
     if (controller == null)
     {
-      LOG.log (Level.WARNING, "No Controller found for Bus \'{0}\'!", bus.getBusUrl ());
+      LOG.log (Level.WARNING, "No Controller found for Bus {0}!", bus.getBusUrl ());
       return null;            
     }
     final Device device = deviceType.openDevice (controller, busAddressUrl);
     if (device == null)
     {
-      LOG.log (Level.WARNING, "Could not open Device on Bus \'{0}\' with Controller \'{1}\' and Bus Address\'{2}\'!",
+      LOG.log (Level.WARNING, "Could not open Device on Bus {0} with Controller {1} and Bus Address{2}!",
         new Object[]{bus.getBusUrl (), controller.getControllerUrl (), busAddressUrl});
       return null;
     }
@@ -1103,9 +1103,9 @@ public class DefaultInstrumentRegistry
     if (instrumentView != null)
       return instrumentView;
     final String[] instrumentViewUrlParts = instrumentViewUrl.split ("<>");
-    if (instrumentViewUrlParts == null || instrumentViewUrlParts.length > 2)
+    if (instrumentViewUrlParts == null || instrumentViewUrlParts.length != 2)
     {
-      LOG.log (Level.WARNING, "Instrument View URL is invalid (contains no or more that one <>): {0}!", instrumentViewUrl);
+      LOG.log (Level.WARNING, "Instrument View URL is invalid (does not contain exactly one <>): {0}!", instrumentViewUrl);
       return null;      
     }
     final String instrumentViewTypeUrl = instrumentViewUrlParts[0];
@@ -1133,6 +1133,33 @@ public class DefaultInstrumentRegistry
     return instrumentView;
   }
 
+  @Override
+  public final InstrumentView openInstrumentView (final InstrumentViewType instrumentViewType, final Instrument instrument)
+  {
+    if (instrumentViewType == null)
+    {
+      LOG.log (Level.WARNING, "Instrument View Type is null!");
+      return null;
+    }
+    if (! getInstrumentViewTypes ().contains (instrumentViewType))
+    {
+      LOG.log (Level.WARNING, "Instrument View Type {0} is unknown / unregistered!",
+        instrumentViewType.getInstrumentViewTypeUrl ());
+      return null;      
+    }
+    if (instrument == null)
+    {
+      LOG.log (Level.WARNING, "Instrument is null!");
+      return null;
+    }
+    if (! getInstruments ().contains (instrument))
+    {
+      LOG.log (Level.WARNING, "Instrument {0} is unknown / unregistered!", instrument.getInstrumentUrl ());
+      return null;      
+    }
+    return openInstrumentView (instrumentViewType.getInstrumentViewTypeUrl () + "<>" + instrument.getInstrumentUrl ());
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE

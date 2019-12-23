@@ -194,6 +194,8 @@ public interface InstrumentRegistry
   
   InstrumentView openInstrumentView (String instrumentViewUrl);
   
+  InstrumentView openInstrumentView (InstrumentViewType instrumentViewType, Instrument instrument);
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
