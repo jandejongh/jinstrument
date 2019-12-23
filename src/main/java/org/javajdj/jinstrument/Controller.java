@@ -33,9 +33,9 @@ public interface Controller
   
   String getControllerUrl ();
   
-  boolean isDeviceUrl (final String deviceUrl);
+  BusType getBusType ();
   
-  Device openDevice (final String deviceUrl);
+  Bus[] getBuses ();
   
   void addCommand (final ControllerCommand controllerCommand);
 
