@@ -42,14 +42,13 @@ public class DefaultGpibDevice
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public DefaultGpibDevice (final GpibController controller, final GpibAddress address, final String deviceUrl)
+  public DefaultGpibDevice (final GpibController controller, final GpibAddress address)
   {
     super ("DefaultGpibDevice", null, null);
-    if (controller == null || address == null || deviceUrl == null || deviceUrl.trim ().isEmpty ())
+    if (controller == null || address == null)
       throw new IllegalArgumentException ();
     this.controller = controller;
     this.address = address;
-    this.deviceUrl = deviceUrl;
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,25 +66,23 @@ public class DefaultGpibDevice
     return this.controller;
   }
   
-  private String deviceUrl;
-
   @Override
   public final String getDeviceUrl ()
   {
-    return this.deviceUrl;
+    return getController ().getBuses ()[0].getBusUrl () + "#" + getBusAddress ().getBusAddressUrl ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // GpibDevice
-  // ADDRESS
+  // Device/GpibDevice
+  // BUS ADDRESS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   private final GpibAddress address;
   
   @Override
-  public final GpibAddress getAddress ()
+  public final GpibAddress getBusAddress ()
   {
     return this.address;
   }
