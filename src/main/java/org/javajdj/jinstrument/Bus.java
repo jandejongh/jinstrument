@@ -16,7 +16,7 @@
  */
 package org.javajdj.jinstrument;
 
-/** Representation of a physical interconnection of devices and one (or more) controllers.
+/** Representation of a physical (and procedural) interconnection of devices and one (or more) controllers.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
