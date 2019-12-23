@@ -108,7 +108,13 @@ implements SignalGenerator
   {
     return HP8663A_GPIB_Instrument.INSTRUMENT_TYPE.getInstrumentTypeUrl () + "@" + getDevice ().getDeviceUrl ();
   }
-    
+
+  @Override
+  public String toString ()
+  {
+    return getInstrumentUrl ();
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // READ LINE TERMINATION MODE
