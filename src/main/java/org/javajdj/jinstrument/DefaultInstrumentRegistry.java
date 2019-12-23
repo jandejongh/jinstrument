@@ -1015,6 +1015,37 @@ public class DefaultInstrumentRegistry
     return instrument;
   }
 
+  @Override
+  public final InstrumentType getInstrumentType (final Instrument instrument)
+  {
+    if (instrument == null)
+    {
+      LOG.log (Level.WARNING, "Instrument is null!");
+      return null;
+    }
+    if (! getInstruments ().contains (instrument))
+    {
+      LOG.log (Level.WARNING, "Instrument unknown/unregistered: {0}!", instrument.getInstrumentUrl ());
+      return null;      
+    }
+    final String[] instrumentUrlParts = instrument.getInstrumentUrl ().split ("@");
+    if (instrumentUrlParts == null || instrumentUrlParts.length != 2)
+    {
+      LOG.log (Level.SEVERE, "INTERNAL ERROR: Instrument URL is invalid (does not contain exactly one @): {0}!",
+        instrument.getInstrumentUrl ());
+      return null;      
+    }
+    final String instrumentTypeUrl = instrumentUrlParts[0];
+    final InstrumentType instrumentType = getInstrumentTypeByUrl (instrumentTypeUrl);
+    if (instrumentType == null)
+    {
+      LOG.log (Level.SEVERE, "INTERNAL ERROR: Could not retrieve Instrument Type for registered Instrument {0}!",
+        instrument.getInstrumentUrl ());
+      return null;            
+    }
+    return instrumentType;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENT VIEWS

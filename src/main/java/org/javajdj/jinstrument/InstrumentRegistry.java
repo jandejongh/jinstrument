@@ -178,6 +178,8 @@ public interface InstrumentRegistry
   
   Instrument openInstrument (String instrumentUrl);
   
+  InstrumentType getInstrumentType (Instrument instrument);
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENT VIEWS
