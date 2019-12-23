@@ -29,4 +29,6 @@ public interface InstrumentView
   
   String getInstrumentViewUrl ();
   
+  Instrument getInstrument ();
+  
 }
