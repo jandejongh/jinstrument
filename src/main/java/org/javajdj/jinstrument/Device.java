@@ -21,7 +21,8 @@ import org.javajdj.jservice.Service;
 /** A communication endpoint on a {@link Bus} connected to a {@link Controller}.
  * 
  * <p>
- * A device is typically associated with (a physical interface on) an {@link Instrument}.
+ * A device is typically associated with (a physical interface on) an {@link Instrument}, but should be no more than
+ * a precise description of the end point on the bus (in other words, instrument agnostic).
  *
  * <p>
  * A device acts as a bridge between {@link Instrument} and the protocol-specifics of {@link Bus} types and {@link Controller}s.
@@ -38,8 +39,10 @@ public interface Device
   extends Service
 {
   
-  Controller getController ();
-  
   String getDeviceUrl ();
+  
+  BusAddress getBusAddress ();
+  
+  Controller getController ();
   
 }
