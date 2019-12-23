@@ -16,6 +16,8 @@
  */
 package org.javajdj.jinstrument.controller.gpib;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.javajdj.jinstrument.*;
 
 /** Representation of a General-Purpose Interface Bus (GPIB; IEEE-Std-488) {@link DeviceType}.
@@ -26,6 +28,14 @@ import org.javajdj.jinstrument.*;
 public class DeviceType_GPIB
   implements DeviceType
 {
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // LOGGER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private static final Logger LOG = Logger.getLogger (DeviceType_GPIB.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -51,24 +61,74 @@ public class DeviceType_GPIB
     return DeviceType_GPIB.INSTANCE;
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DeviceType
+  // URL / NAME / toString
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public String getDeviceTypeUrl ()
+  {
+    return "gpib";
+  }
+  
+  @Override
+  public String toString ()
+  {
+    return getDeviceTypeUrl ();
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DeviceType
+  // BUS TYPE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   @Override
   public final BusType getBusType ()
   {
     return BusType_GPIB.getInstance ();
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DeviceType
+  // OPEN DEVICE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   @Override
-  public boolean isValidUrl (String controllerUrl)
+  public Device openDevice (final Controller controller, final String busAddressUrl)
   {
-    throw new UnsupportedOperationException ();
+    if (controller == null)
+    {
+      LOG.log (Level.WARNING, "Controller is null!");
+      return null;
+    }
+    if (! BusType_GPIB.getInstance ().equals (controller.getBusType ()))
+    {
+      LOG.log (Level.WARNING, "Bus Type {0} for Controller ({1}) not supported!",
+        new Object[]{controller.getBusType ().getBusTypeUrl (), controller.getControllerUrl ()});
+      return null;
+      
+    }
+    if (! (controller instanceof GpibController))
+    {
+      LOG.log (Level.WARNING, "Controller {0} must be a GpibController!", controller.getControllerUrl ());
+      return null;
+    }
+    final GpibAddress gpibBusAddress = GpibAddress.fromUrl (busAddressUrl);
+    if (gpibBusAddress == null)
+    {
+      LOG.log (Level.WARNING, "Invalid Gpib Bus Address {0}!", busAddressUrl);
+      return null;
+    }
+    return new DefaultGpibDevice ((GpibController) controller, gpibBusAddress);
   }
 
-  @Override
-  public Device openDevice (String deviceUrl)
-  {
-    throw new UnsupportedOperationException ();
-  }
-  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
