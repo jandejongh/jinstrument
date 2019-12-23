@@ -29,7 +29,8 @@ import org.javajdj.jservice.Service;
  * 
  * <p>
  * Note that for simplicity, currently, a device is associated with a single {@link Controller},
- * more or less skipping the notion of a {@link Bus} connecting them.
+ * more or less skipping the notions of a {@link Bus} connecting them,
+ * or of multi-controller (or no-controller) buses.
  * When needed, this will change in future releases.
  * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
