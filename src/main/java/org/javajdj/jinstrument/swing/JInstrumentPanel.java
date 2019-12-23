@@ -24,7 +24,10 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 import org.javajdj.jinstrument.Instrument;
 
-/** A Swing component for interacting with an {@link Instrument}.
+/** A Swing (base) component for interacting with an {@link Instrument}.
+ * 
+ * <p>
+ * Contains utility classes and methods, as well as a notion of 'depth' of the panel.
  *
  * @author {@literal Jan de Jongh <jfcmdejongh@gmail.com>}
  * 
