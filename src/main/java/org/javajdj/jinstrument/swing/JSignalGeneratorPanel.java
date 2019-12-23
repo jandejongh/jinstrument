@@ -19,7 +19,7 @@ package org.javajdj.jinstrument.swing;
 import java.awt.Color;
 import org.javajdj.jinstrument.instrument.sg.SignalGenerator;
 
-/** A Swing component for interacting with a {@link SignalGenerator}.
+/** A Swing (base) component for interacting with a {@link SignalGenerator}.
  *
  * @author {@literal Jan de Jongh <jfcmdejongh@gmail.com>}
  * 
