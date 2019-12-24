@@ -19,17 +19,35 @@ package org.javajdj.jinstrument.swing;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.HeadlessException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonWriter;
+import javax.json.JsonWriterFactory;
+import javax.json.stream.JsonGenerator;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import org.javajdj.jinstrument.Bus;
 import org.javajdj.jinstrument.Controller;
 import org.javajdj.jinstrument.DefaultInstrumentRegistry;
+import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentRegistry;
 import org.javajdj.jinstrument.InstrumentType;
@@ -71,6 +89,7 @@ extends JFrame
     super (title == null ? "JInstrument V0.1-SNAPSHOT" : title);
     
     setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
+    createMenu ();
     
     this.jTabbedPane = new JTabbedPane ();
     getContentPane ().add (this.jTabbedPane, BorderLayout.CENTER);
@@ -147,6 +166,140 @@ extends JFrame
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // [SWING] MENU
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private void createMenu ()
+  {
+    //
+    final JMenuBar jMenuBar = new JMenuBar ();
+    //
+    // File
+    //
+    final JMenu fileMenu = new JMenu ("File");
+    final JMenuItem loadRegistryMenuItem = new JMenuItem ("Load Registry");
+    loadRegistryMenuItem.addActionListener ((ActionEvent) -> { JInstrument.this.loadRegistry (); });
+    fileMenu.add (loadRegistryMenuItem);
+    final JMenuItem saveRegistryMenuItem = new JMenuItem ("Save Registry");
+    saveRegistryMenuItem.addActionListener ((ActionEvent) -> { JInstrument.this.saveRegistry (); });
+    fileMenu.add (saveRegistryMenuItem);
+    final JMenuItem exitMenuItem = new JMenuItem ("Exit");
+    exitMenuItem.addActionListener ((ActionEvent) -> { System.exit (0); });
+    fileMenu.add (exitMenuItem);
+    jMenuBar.add (fileMenu);
+    //
+    // Help
+    //
+    final JMenu helpMenu = new JMenu ("Help");
+    final JMenuItem helpAboutItem = new JMenuItem ("About");
+    helpAboutItem.addActionListener ((ActionEvent) ->
+    {
+      JOptionPane.showMessageDialog (null, "JInstrument was designed and realized by Jan de Jongh [pa3gyf].");
+    });
+    helpMenu.add (helpAboutItem);
+    jMenuBar.add (helpMenu);
+    setJMenuBar (jMenuBar);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // LOAD REGISTRY
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private void loadRegistry ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SAVE REGISTRY
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private void saveRegistry ()
+  {
+    final InstrumentRegistry instrumentRegistry = JInstrument.this.instrumentRegistry;
+    final JFileChooser jFileChooser = new JFileChooser ();
+    if (jFileChooser.showSaveDialog (this) != JFileChooser.APPROVE_OPTION)
+      return;
+    final File file = jFileChooser.getSelectedFile ();
+    try (final FileWriter fileWriter = new FileWriter (file))
+    {
+      //  Buses
+      final JsonArrayBuilder jsonBusesArrayBuilder = Json.createArrayBuilder ();
+      for (final Bus bus : instrumentRegistry.getBuses ())
+      {
+        final JsonObject jsonObject = Json.createObjectBuilder ()
+          .add ("url", bus.getBusUrl ())
+          .add ("typeurl", bus.getBusType ().getBusTypeUrl ())
+          .build ();
+        jsonBusesArrayBuilder.add (jsonObject);
+      }
+      // Controllers
+      final JsonArrayBuilder jsonControllersArrayBuilder = Json.createArrayBuilder ();
+      for (final Controller controller : instrumentRegistry.getControllers ())
+      {
+        final JsonObject jsonObject = Json.createObjectBuilder ()
+          .add ("url", controller.getControllerUrl ())
+          .build ();
+        jsonControllersArrayBuilder.add (jsonObject);
+      }
+      // Devices
+      final JsonArrayBuilder jsonDevicesArrayBuilder = Json.createArrayBuilder ();
+      for (final Device device : instrumentRegistry.getDevices ())
+      {
+        final JsonObject jsonObject = Json.createObjectBuilder ()
+          .add ("url", device.getDeviceUrl ())
+          .build ();
+        jsonDevicesArrayBuilder.add (jsonObject);
+      }
+      // Instruments
+      final JsonArrayBuilder jsonInstrumentsArrayBuilder = Json.createArrayBuilder ();
+      for (final Instrument instrument : instrumentRegistry.getInstruments ())
+      {
+        final JsonObject jsonObject = Json.createObjectBuilder ()
+          .add ("url", instrument.getInstrumentUrl ())
+          .build ();
+        jsonInstrumentsArrayBuilder.add (jsonObject);
+      }
+      // Instrument Views
+      final JsonArrayBuilder jsonInstrumentViewsArrayBuilder = Json.createArrayBuilder ();
+      for (final InstrumentView instrumentView : instrumentRegistry.getInstrumentViews ())
+      {
+        final JsonObject jsonObject = Json.createObjectBuilder ()
+          .add ("url", instrumentView.getInstrumentViewUrl ())
+          .build ();
+        jsonInstrumentViewsArrayBuilder.add (jsonObject);
+      }
+      final JsonObject registryJsonObject = Json.createObjectBuilder ()
+        .add ("buses", jsonBusesArrayBuilder)
+        .add ("controllers", jsonControllersArrayBuilder)
+        .add ("devices", jsonDevicesArrayBuilder)
+        .add ("instruments", jsonInstrumentsArrayBuilder)
+        .add ("instrumentViews", jsonInstrumentViewsArrayBuilder)
+        .build ();
+      final JsonWriterFactory jsonWriterFactory
+        = Json.createWriterFactory (Collections.singletonMap (JsonGenerator.PRETTY_PRINTING, true));
+      try (final JsonWriter jsonWriter = jsonWriterFactory.createWriter (fileWriter))
+      {
+        jsonWriter.writeObject (registryJsonObject);
+      }
+    }
+    catch (FileNotFoundException fnfe)
+    {
+      JOptionPane.showMessageDialog (null, "File Not Found Exception!");
+    }
+    catch (IOException ioe)
+    {
+      JOptionPane.showMessageDialog (null, "I/O Exception!");
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // INSTRUMENT REGISTRY LISTENER
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,7 +342,6 @@ extends JFrame
     {
       final JFrame frame = new JInstrument ();
       frame.setExtendedState (JFrame.MAXIMIZED_BOTH);
-      // frame.setUndecorated (true);
       frame.setVisible (true);
     });
   }
