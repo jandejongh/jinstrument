@@ -180,7 +180,7 @@ public class JDefaultInstrumentManagementView
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Default Instrument Management";
+      return "Default Instrument Management View";
     }
 
     @Override
