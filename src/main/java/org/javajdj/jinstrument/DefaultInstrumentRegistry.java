@@ -316,58 +316,6 @@ public class DefaultInstrumentRegistry
     return null;
   }
   
-  @Override
-  public final Device openDevice (final DeviceType deviceType, final Bus bus, final String busAddressUrl)
-  {
-    if (deviceType == null)
-    {
-      LOG.log (Level.WARNING, "Device Type is null!");
-      return null;
-    }
-    if (! getDeviceTypes ().contains (deviceType))
-    {
-      LOG.log (Level.WARNING, "Device Type {0} is unknown / unregistered!", deviceType.getDeviceTypeUrl ());
-      return null;      
-    }
-    if (bus == null)
-    {
-      LOG.log (Level.WARNING, "Bus is null!");
-      return null;
-    }
-    if (! getBuses ().contains (bus))
-    {
-      LOG.log (Level.WARNING, "Bus {0} is unknown / unregistered!", bus.getBusUrl ());
-      return null;      
-    }
-    if (! deviceType.getBusType ().equals (bus.getBusType ()))
-    {
-      LOG.log (Level.WARNING, "Bus Types for Device ({0}) and Bus ({1}) do not match!",
-        new Object[]{deviceType.getBusType ().getBusTypeUrl (), bus.getBusType ().getBusTypeUrl ()});
-      return null;      
-    }
-    final Controller controller = getController (bus);
-    if (controller == null)
-    {
-      LOG.log (Level.WARNING, "No Controller found for Bus {0}!", bus.getBusUrl ());
-      return null;            
-    }
-    final Device device = deviceType.openDevice (controller, busAddressUrl);
-    if (device == null)
-    {
-      LOG.log (Level.WARNING, "Could not open Device on Bus {0} with Controller {1} and Bus Address{2}!",
-        new Object[]{bus.getBusUrl (), controller.getControllerUrl (), busAddressUrl});
-      return null;
-    }
-    final Device registeredDevice = getDeviceByUrl (device.getDeviceUrl ());
-    if (registeredDevice != null)
-      return registeredDevice;
-    else
-    {
-      addDevice (device);
-      return device;
-    }
-  }
-  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENT TYPES
@@ -897,6 +845,58 @@ public class DefaultInstrumentRegistry
     return openDevice (deviceType, bus, busAddressUrl);
   }
 
+  @Override
+  public final Device openDevice (final DeviceType deviceType, final Bus bus, final String busAddressUrl)
+  {
+    if (deviceType == null)
+    {
+      LOG.log (Level.WARNING, "Device Type is null!");
+      return null;
+    }
+    if (! getDeviceTypes ().contains (deviceType))
+    {
+      LOG.log (Level.WARNING, "Device Type {0} is unknown / unregistered!", deviceType.getDeviceTypeUrl ());
+      return null;      
+    }
+    if (bus == null)
+    {
+      LOG.log (Level.WARNING, "Bus is null!");
+      return null;
+    }
+    if (! getBuses ().contains (bus))
+    {
+      LOG.log (Level.WARNING, "Bus {0} is unknown / unregistered!", bus.getBusUrl ());
+      return null;      
+    }
+    if (! deviceType.getBusType ().equals (bus.getBusType ()))
+    {
+      LOG.log (Level.WARNING, "Bus Types for Device ({0}) and Bus ({1}) do not match!",
+        new Object[]{deviceType.getBusType ().getBusTypeUrl (), bus.getBusType ().getBusTypeUrl ()});
+      return null;      
+    }
+    final Controller controller = getController (bus);
+    if (controller == null)
+    {
+      LOG.log (Level.WARNING, "No Controller found for Bus {0}!", bus.getBusUrl ());
+      return null;            
+    }
+    final Device device = deviceType.openDevice (controller, busAddressUrl);
+    if (device == null)
+    {
+      LOG.log (Level.WARNING, "Could not open Device on Bus {0} with Controller {1} and Bus Address{2}!",
+        new Object[]{bus.getBusUrl (), controller.getControllerUrl (), busAddressUrl});
+      return null;
+    }
+    final Device registeredDevice = getDeviceByUrl (device.getDeviceUrl ());
+    if (registeredDevice != null)
+      return registeredDevice;
+    else
+    {
+      addDevice (device);
+      return device;
+    }
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENTS
@@ -1015,6 +1015,41 @@ public class DefaultInstrumentRegistry
     return instrument;
   }
 
+  @Override
+  public final Instrument openInstrument (final InstrumentType instrumentType, final Device device)
+  {
+    if (instrumentType == null)
+    {
+      LOG.log (Level.WARNING, "Instrument Type is null!");
+      return null;
+    }
+    if (! getInstrumentTypes ().contains (instrumentType))
+    {
+      LOG.log (Level.WARNING, "Instrument Type {0} is unknown / unregistered!", instrumentType.getInstrumentTypeUrl ());
+      return null;
+    }
+    if (device == null)
+    {
+      LOG.log (Level.WARNING, "Device is null!");
+      return null;
+    }
+    if (! getDevices ().contains (device))
+    {
+      LOG.log (Level.WARNING, "Device {0} is unknown / unregistered!", device.getDeviceUrl ());
+      return null;      
+    }
+    final Instrument instrument = instrumentType.openInstrument (device);
+    if (instrument == null)
+    {
+      LOG.log (Level.WARNING, "Could not open Instrument with Type {0} on Device {1}!",
+        new Object[]{instrumentType.getInstrumentTypeUrl (), device.getDeviceUrl ()});
+      return null;
+    }
+    else
+      addInstrument (instrument);
+    return instrument;
+  }
+  
   @Override
   public final InstrumentType getInstrumentType (final Instrument instrument)
   {

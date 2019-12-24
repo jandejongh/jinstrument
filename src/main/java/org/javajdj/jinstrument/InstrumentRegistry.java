@@ -84,8 +84,6 @@ public interface InstrumentRegistry
   
   DeviceType getDeviceTypeByUrl (String deviceTypeUrl);
   
-  Device openDevice (DeviceType deviceType, Bus bus, String busAddressUrl);
-  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENT TYPES
@@ -162,6 +160,8 @@ public interface InstrumentRegistry
   
   Device openDevice (String deviceUrl);
   
+  Device openDevice (DeviceType deviceType, Bus bus, String busAddressUrl);
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENTS
@@ -177,6 +177,8 @@ public interface InstrumentRegistry
   Instrument getInstrumentByUrl (String instrumentUrl);
   
   Instrument openInstrument (String instrumentUrl);
+  
+  Instrument openInstrument (InstrumentType instrumentType, Device device);
   
   InstrumentType getInstrumentType (Instrument instrument);
   
