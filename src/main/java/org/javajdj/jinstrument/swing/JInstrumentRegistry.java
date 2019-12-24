@@ -62,8 +62,7 @@ public class JInstrumentRegistry
   {
     //
     super (null, level);
-    if (instrumentRegistry == null)
-      throw new IllegalArgumentException ();
+    //
     this.instrumentRegistry = instrumentRegistry;
     //
     setLayout (new GridLayout (4, 1));
@@ -165,7 +164,8 @@ public class JInstrumentRegistry
       "Instrument Views");
     add (this.jInstrumentViewsPanel);
     //
-    this.instrumentRegistry.addRegistryListener (this.instrumentRegistryListener);
+    if (this.instrumentRegistry != null)
+      this.instrumentRegistry.addRegistryListener (this.instrumentRegistryListener);
     //
   }
   
@@ -176,7 +176,17 @@ public class JInstrumentRegistry
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final InstrumentRegistry instrumentRegistry;
+  private InstrumentRegistry instrumentRegistry;
+  
+  public final void setInstrumentRegistry (final InstrumentRegistry instrumentRegistry)
+  {
+    if (this.instrumentRegistry != null)
+      this.instrumentRegistry.removeRegistryListener (this.instrumentRegistryListener);
+    this.instrumentRegistry = instrumentRegistry;
+    if (this.instrumentRegistry != null)
+      this.instrumentRegistry.addRegistryListener (this.instrumentRegistryListener);
+    this.instrumentRegistryListener.instrumentRegistryChanged (this.instrumentRegistry);
+  }
   
   private final InstrumentRegistry.Listener instrumentRegistryListener = ((final InstrumentRegistry instrumentRegistry) ->
   {
