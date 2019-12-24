@@ -22,11 +22,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import org.javajdj.jinstrument.Bus;
@@ -429,12 +431,90 @@ public class JInstrumentRegistry
     {
       setLayout (new GridLayout (1, 1));
       JInstrumentRegistry.this.deviceTypesTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
+      JInstrumentRegistry.this.deviceTypesTable.addMouseListener (JInstrumentRegistry.this.deviceTypesPanelMouseListener);
       add (new JScrollPane (JInstrumentRegistry.this.deviceTypesTable));
     }
     
   }
   
   private final JDeviceTypePanel jDeviceTypePanel;
+  
+  private final MouseListener deviceTypesPanelMouseListener = new MouseAdapter ()
+  {
+    @Override
+    public void mousePressed (final MouseEvent mouseEvent)
+    {
+      final JTable table = (JTable) mouseEvent.getSource ();
+      final Point point = mouseEvent.getPoint ();
+      final int row = table.rowAtPoint (point);
+      if (mouseEvent.getClickCount () == 2 && table.getSelectedRow () != -1)
+      {
+        final DeviceType deviceType =
+          JInstrumentRegistry.this.instrumentRegistry.getDeviceTypes ().get (row);
+        if (deviceType == null)
+          return;
+        final List<Bus> buses = JInstrumentRegistry.this.instrumentRegistry.getBuses ();
+        if (buses == null || buses.isEmpty ())
+        {
+          JOptionPane.showConfirmDialog (
+            null,
+            "No Buses!",
+            "Warning",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          return;
+        }
+        final JComboBox<Bus> jcbBuses = new JComboBox (buses.toArray ());
+        final JTextField jtfBusAddress = new JTextField ();
+        final Object[] displayObjects =
+        {
+          "Bus", jcbBuses,
+          "Bus Address", jtfBusAddress
+        };
+        final int option = JOptionPane.showConfirmDialog (
+               null,
+               displayObjects,
+               "New Device",
+               JOptionPane.OK_CANCEL_OPTION,
+               JOptionPane.PLAIN_MESSAGE);
+        if (option != JOptionPane.OK_OPTION)
+          return;
+        final Bus bus = (Bus) jcbBuses.getSelectedItem ();
+        if (bus == null)
+        {
+          JOptionPane.showConfirmDialog (null,
+            "No Bus selected!",
+            "Warning",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          return;
+        }
+        final String busAddressUrl = jtfBusAddress.getText ();
+        if (busAddressUrl == null || busAddressUrl.trim ().isEmpty ())
+        {
+          JOptionPane.showConfirmDialog (null,
+            "No Bus Address entered!",
+            "Warning",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          return;
+        }
+        final Device device = JInstrumentRegistry.this.instrumentRegistry.openDevice (deviceType, bus, busAddressUrl);
+        if (device == null)
+        {
+          JOptionPane.showConfirmDialog (
+            null,
+            "Could not open Device with Type " + deviceType.getDeviceTypeUrl ()
+              + " on Bus " + bus.getBusUrl ()
+              + " with Bus Address " + busAddressUrl + ".",
+            "Warning",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          // return;
+        }
+      }
+    }
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -631,7 +711,7 @@ public class JInstrumentRegistry
         final String[] instrumentStrings = new String[instruments.size ()];
         for (int i = 0; i < instruments.size (); i++)
           instrumentStrings[i] = instruments.get (i).getInstrumentUrl ();
-        final String result = (String) JOptionPane.showInputDialog (
+        final String instrumentUrl = (String) JOptionPane.showInputDialog (
                null,
                "Select Instrument for " + instrumentViewType.getInstrumentViewTypeUrl (),
                "New Instrument View Type",
@@ -639,14 +719,13 @@ public class JInstrumentRegistry
                null,            
                instrumentStrings,
                instrumentStrings[0]);
-        if (result == null)
+        if (instrumentUrl == null)
           return;
-        final Instrument instrument = JInstrumentRegistry.this.instrumentRegistry.getInstrumentByUrl (result);
+        final Instrument instrument = JInstrumentRegistry.this.instrumentRegistry.getInstrumentByUrl (instrumentUrl);
         if (instrument == null)
         {
-          JOptionPane.showConfirmDialog (
-            null,
-            "Instrument " + result + " not found!",
+          JOptionPane.showConfirmDialog (null,
+            "Instrument " + instrumentUrl + " not found!",
             "Warning",
             JOptionPane.OK_CANCEL_OPTION,
             JOptionPane.WARNING_MESSAGE);
@@ -659,7 +738,7 @@ public class JInstrumentRegistry
           JOptionPane.showConfirmDialog (
             null,
             "Could not open Instrument View Type " + instrumentViewType.getInstrumentViewTypeUrl ()
-              + " for Instrument " + instrument.getInstrumentUrl () + ".",
+              + " for Instrument " + instrumentUrl + ".",
             "Warning",
             JOptionPane.OK_CANCEL_OPTION,
             JOptionPane.WARNING_MESSAGE);
@@ -673,7 +752,6 @@ public class JInstrumentRegistry
             "Warning",
             JOptionPane.OK_CANCEL_OPTION,
             JOptionPane.WARNING_MESSAGE);
-          return;
         }
       }
     }
