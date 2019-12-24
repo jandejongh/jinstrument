@@ -71,11 +71,11 @@ public class JInstrumentRegistry
     // Types
     //
     final JPanel jTypesPanel = new JPanel ();
-    JInstrumentPanel.setPanelBorder (
-      jTypesPanel,
-      level + 1,
-      JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR,
-      "Types");
+//    JInstrumentPanel.setPanelBorder (
+//      jTypesPanel,
+//      level + 1,
+//      JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR,
+//      "Types");
     jTypesPanel.setLayout (new GridLayout (1, 5));
     this.jBusTypePanel = new JBusTypePanel ();
     JInstrumentPanel.setPanelBorder (
@@ -116,34 +116,36 @@ public class JInstrumentRegistry
     //
     // Instances
     //
-    final JPanel jInstancesPanel = new JPanel ();
-    JInstrumentPanel.setPanelBorder (jInstancesPanel,
-      level + 1,
-      JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR,
-      "Instances");
-    jInstancesPanel.setLayout (new GridLayout (1, 3));
+    final JPanel jBusesControllersDevicesPanel = new JPanel ();
+//    JInstrumentPanel.setPanelBorder (jBusesControllersDevicesPanel,
+//      level + 1,
+//      JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR,
+//      "");
+    jBusesControllersDevicesPanel.setLayout (new GridLayout (1, 3));
     this.jBusesPanel = new JBusesPanel ();
     JInstrumentPanel.setPanelBorder (
       this.jBusesPanel,
       level + 2,
       JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR,
       "Buses");
-    jInstancesPanel.add (this.jBusesPanel);   
+    jBusesControllersDevicesPanel.add (this.jBusesPanel);   
     this.jControllersPanel = new JControllersPanel ();
     JInstrumentPanel.setPanelBorder (
       this.jControllersPanel,
       level + 2,
       JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR,
       "Controllers");
-    jInstancesPanel.add (this.jControllersPanel);
+    jBusesControllersDevicesPanel.add (this.jControllersPanel);
     this.jDevicesPanel = new JDevicesPanel ();
     JInstrumentPanel.setPanelBorder (
       this.jDevicesPanel,
       level + 2,
       JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR,
       "Devices");
-    jInstancesPanel.add (this.jDevicesPanel);
-    add (jInstancesPanel);
+    jBusesControllersDevicesPanel.add (this.jDevicesPanel);
+    add (jBusesControllersDevicesPanel);
+    //
+    // Instruments
     //
     this.jInstrumentsPanel = new JInstrumentsPanel ();
     JInstrumentPanel.setPanelBorder (
@@ -152,6 +154,9 @@ public class JInstrumentRegistry
       JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR,
       "Instruments");
     add (this.jInstrumentsPanel);
+    //
+    // Instrument Views
+    //
     this.jInstrumentViewsPanel = new JInstrumentViewsPanel ();
     JInstrumentPanel.setPanelBorder (
       this.jInstrumentViewsPanel,
@@ -159,7 +164,6 @@ public class JInstrumentRegistry
       JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR,
       "Instrument Views");
     add (this.jInstrumentViewsPanel);
-    //
     //
     this.instrumentRegistry.addRegistryListener (this.instrumentRegistryListener);
     //
@@ -229,7 +233,7 @@ public class JInstrumentRegistry
       switch (i)
       {
         case 0:
-          return "Name";
+          return "URL";
         default:
           throw new RuntimeException ();
       }
@@ -347,12 +351,76 @@ public class JInstrumentRegistry
     {
       setLayout (new GridLayout (1, 1));
       JInstrumentRegistry.this.controllerTypesTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
+      JInstrumentRegistry.this.controllerTypesTable.addMouseListener (JInstrumentRegistry.this.controllerTypesPanelMouseListener);
       add (new JScrollPane (JInstrumentRegistry.this.controllerTypesTable));
     }
     
   }
   
   private final JControllerTypePanel jControllerTypePanel;
+  
+  private final MouseListener controllerTypesPanelMouseListener = new MouseAdapter ()
+  {
+    @Override
+    public void mousePressed (final MouseEvent mouseEvent)
+    {
+      final JTable table = (JTable) mouseEvent.getSource ();
+      final Point point = mouseEvent.getPoint ();
+      final int row = table.rowAtPoint (point);
+      if (mouseEvent.getClickCount () == 2 && table.getSelectedRow () != -1)
+      {
+        final ControllerType controllerType =
+          JInstrumentRegistry.this.instrumentRegistry.getControllerTypes ().get (row);
+        if (controllerType == null)
+          return;
+        final JTextField jtfControllerUrl = new JTextField (controllerType.getControllerTypeUrl () + "://");
+        final JTextField jtfUserControllerName = new JTextField ();
+        final Object[] displayObjects =
+        {
+          "Controller URL", jtfControllerUrl,
+          "User Instrument Name", jtfUserControllerName
+        };
+        final int option = JOptionPane.showConfirmDialog (
+               null,
+               displayObjects,
+               "New Controller",
+               JOptionPane.OK_CANCEL_OPTION,
+               JOptionPane.PLAIN_MESSAGE);
+        if (option != JOptionPane.OK_OPTION)
+          return;
+        final String controllerUrl = jtfControllerUrl.getText ();
+        if (controllerUrl == null || controllerUrl.trim ().isEmpty ())
+        {
+          JOptionPane.showConfirmDialog (null,
+            "No Controller URL entered!",
+            "Warning",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          return;
+        }
+        final String userControllerName = jtfUserControllerName.getText ();
+        if (userControllerName == null || userControllerName.trim ().isEmpty ())
+        {
+          JOptionPane.showConfirmDialog (null,
+            "No User Controller Name entered!",
+            "Warning",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          return;
+        }
+        final Controller controller = JInstrumentRegistry.this.instrumentRegistry.openController (controllerUrl);
+        if (controller == null)
+        {
+          JOptionPane.showConfirmDialog (null,
+            "Could not open Controller with URL " + controllerUrl + "!",
+            "Warning",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          // return;
+        }
+      }
+    }
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -395,7 +463,7 @@ public class JInstrumentRegistry
       switch (i)
       {
         case 0:
-          return "Name";
+          return "URL";
         case 1:
           return "Bus Type";
         default:
@@ -557,7 +625,7 @@ public class JInstrumentRegistry
       switch (i)
       {
         case 0:
-          return "Name";
+          return "URL";
         case 1:
           return "Device Type";
         default:
@@ -717,7 +785,7 @@ public class JInstrumentRegistry
       switch (i)
       {
         case 0:
-          return "Name";
+          return "URL";
         default:
           throw new RuntimeException ();
       }
@@ -873,7 +941,7 @@ public class JInstrumentRegistry
       switch (i)
       {
         case 0:
-          return "Bus URL";
+          return "URL";
         default:
           throw new RuntimeException ();
       }
