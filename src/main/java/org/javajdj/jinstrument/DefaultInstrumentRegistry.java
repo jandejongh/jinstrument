@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  * 
  */
 public class DefaultInstrumentRegistry
-  implements InstrumentRegistry
+  implements InstrumentRegistry, Cloneable
 {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,22 +47,56 @@ public class DefaultInstrumentRegistry
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private DefaultInstrumentRegistry ()
+  public DefaultInstrumentRegistry ()
   {
   }
   
-  private volatile static DefaultInstrumentRegistry INSTANCE = null;
-  
-  private final static Object INSTANCE_LOCK = new Object ();
-  
-  public final static DefaultInstrumentRegistry getInstance ()
+  public DefaultInstrumentRegistry withSameTypesButInstancesFromUrlLists (
+    final List<String> busUrls,
+    final List<String> controllerUrls,
+    final List<String> deviceUrls,
+    final List<String> instrumentUrls,
+    final List<String> instrumentViewUrls)
   {
-    synchronized (DefaultInstrumentRegistry.INSTANCE_LOCK)
+    try
     {
-      if (DefaultInstrumentRegistry.INSTANCE == null)
-        DefaultInstrumentRegistry.INSTANCE = new DefaultInstrumentRegistry ();  
+      final DefaultInstrumentRegistry thisClone = new DefaultInstrumentRegistry ();
+      for (final BusType busType : getBusTypes ())
+        thisClone.addBusType (busType);
+      for (final ControllerType controllerType : getControllerTypes ())
+        thisClone.addControllerType (controllerType);
+      for (final DeviceType deviceType : getDeviceTypes ())
+        thisClone.addDeviceType (deviceType);
+      for (final InstrumentType instrumentType : getInstrumentTypes ())
+        thisClone.addInstrumentType (instrumentType);
+      for (final InstrumentViewType instrumentViewType : getInstrumentViewTypes ())
+        thisClone.addInstrumentViewType (instrumentViewType);
+      // First create the controllers, as this will create their buses as well.
+      // XXX At this time, we only support single-controller buses;
+      // these buses themselves are created and named by their controller.
+      for (final String controllerUrl : controllerUrls)
+        if (thisClone.openController (controllerUrl) == null)
+          return null;
+      for (final String busUrl : busUrls)
+        if (thisClone.openBus (busUrl) == null)
+          return null;
+      for (final String deviceUrl : deviceUrls)
+        if (thisClone.openDevice (deviceUrl) == null)
+          return null;
+      for (final String instrumentUrl : instrumentUrls)
+        if (thisClone.openInstrument (instrumentUrl) == null)
+          return null;
+      for (final String instrumentViewUrl : instrumentViewUrls)
+        if (thisClone.openInstrumentView (instrumentViewUrl) == null)
+          return null;
+      return thisClone;
     }
-    return DefaultInstrumentRegistry.INSTANCE;
+    catch (Exception e)
+    {
+      LOG.log (Level.SEVERE, "Failed to copy types into new registry, or enter new instances from URL lists: Exception {0}",
+        e.getStackTrace ());
+      return null;
+    }
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +207,7 @@ public class DefaultInstrumentRegistry
         return busType;
     return null;
   }
-  
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // CONTROLLER TYPES
@@ -522,6 +556,22 @@ public class DefaultInstrumentRegistry
       if (bus.getBusUrl ().equalsIgnoreCase (url))
         return bus;
     return null;    
+  }
+  
+  @Override
+  public final Bus openBus (final String busUrl)
+  {
+    if (busUrl == null || busUrl.trim ().isEmpty ())
+    {
+      LOG.log (Level.WARNING, "Bus URL is null or empty!");
+      return null;
+    }
+    Bus bus = getBusByUrl (busUrl);
+    if (bus != null)
+      return bus;
+    // XXX
+    LOG.log (Level.WARNING, "Opening a Bus from scratch is not supported!");
+    throw new UnsupportedOperationException ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
