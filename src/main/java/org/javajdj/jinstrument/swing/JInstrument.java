@@ -21,8 +21,12 @@ import java.awt.Component;
 import java.awt.HeadlessException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.text.ParseException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,8 +34,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.json.JsonWriter;
 import javax.json.JsonWriterFactory;
 import javax.json.stream.JsonGenerator;
@@ -94,50 +100,74 @@ extends JFrame
     this.jTabbedPane = new JTabbedPane ();
     getContentPane ().add (this.jTabbedPane, BorderLayout.CENTER);
     
-    this.instrumentRegistry = DefaultInstrumentRegistry.getInstance ();
-    
-    this.instrumentRegistry.addRegistryListener (this.instrumentRegistryListener);
-    
+    this.instrumentRegistry = new DefaultInstrumentRegistry ();
     this.instrumentRegistry.addBusType (BusType_GPIB.getInstance ());
-    
     this.instrumentRegistry.addControllerType (ProLogixGpibEthernetControllerType.getInstance ());
-    
     this.instrumentRegistry.addDeviceType (DeviceType_GPIB.getInstance ());
-    
     this.instrumentRegistry.addInstrumentType (HP8566B_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP8663A_GPIB_Instrument.INSTRUMENT_TYPE);
-    
     this.instrumentRegistry.addInstrumentViewType (JDefaultInstrumentManagementView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JSpectrumAnalyzerTraceDisplay.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultSignalGeneratorView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JSpectrumAnalyzerSettingsPanel.INSTRUMENT_VIEW_TYPE);
     
-    final Controller defaultController = this.instrumentRegistry.openController (JInstrument.DEFAULT_CONTROLLER_URL);
-    if (defaultController == null)
-      LOG.log (Level.WARNING, "Could not open default controller: \'{0}\'!", JInstrument.DEFAULT_CONTROLLER_URL);
-    this.jTabbedPane.addTab ("Registry", new JInstrumentRegistry (this.instrumentRegistry, 0));
+    this.jInstrumentRegistry = new JInstrumentRegistry (this.instrumentRegistry, 0);
+    this.jTabbedPane.addTab ("Registry", this.jInstrumentRegistry);
     
-    final String hp8566bDeviceUrl = JInstrument.DEFAULT_CONTROLLER_URL + "/1#" + "gpib:22";
-    final GpibDevice hp8566bDevice = (GpibDevice) this.instrumentRegistry.openDevice (hp8566bDeviceUrl);
-    final String hp8566bInstrumentUrl = HP8566B_GPIB_Instrument.INSTRUMENT_TYPE.getInstrumentTypeUrl () + "@" + hp8566bDeviceUrl;
-    final Instrument hp8566bInstrument = this.instrumentRegistry.openInstrument (hp8566bInstrumentUrl);
+    this.instrumentRegistry.addRegistryListener (this.instrumentRegistryListener);
+    this.instrumentRegistryListener.instrumentRegistryChanged (this.instrumentRegistry);
+    
+    boolean considerDefaults = true;
+    if (checkUserConfigDir ())
+    {
+      final boolean userConfigFileExists = Files.exists (new File (DEFAULT_USER_INSTRUMENT_REGISTRY_PATH).toPath ());
+      if (checkUserInstrumentRegistry ())
+      {
+        this.syncInstrumentRegistryToUserConfigDir = true;
+        JOptionPane.showMessageDialog (null, "Welcome to JInstrument!\n\n"
+          + (userConfigFileExists ? " Found and loaded" : "Created")
+          + " user configuration file "
+          + JInstrument.DEFAULT_USER_INSTRUMENT_REGISTRY_PATH
+          + " and will keep it in sync!");
+        considerDefaults = false;
+      }
+    }
 
-    final String hp8663aDeviceUrl = JInstrument.DEFAULT_CONTROLLER_URL + "/1#" + "gpib:19";
-    final GpibDevice hp8663aDevice = (GpibDevice) this.instrumentRegistry.openDevice (hp8663aDeviceUrl);
-    final String hp8663aInstrumentUrl = HP8663A_GPIB_Instrument.INSTRUMENT_TYPE.getInstrumentTypeUrl () + "@" + hp8663aDeviceUrl;
-    final Instrument hp8663aInstrument = this.instrumentRegistry.openInstrument (hp8663aInstrumentUrl);
-    
-    //
-    // final GpibDevice hp70000Device = controller.openDevice ("gpib:3"); // hp70900a
-    // final GpibDevice hp70000Device = controller.openDevice ("gpib:18"); // hp70900b
-    // final HP70000_GPIB  hp70000Instrument = new HP70000_GPIB (hp70000Device);
-    // tabbedPane.addTab ("HP70000[1]", new JDefaultSpectrumAnalyzerView (hp70000Instrument));
-    //
-    // final GpibDevice hp54502aDevice = controller.openDevice ("gpib:1"); // hp54502a
-    // final HP54502A_GPIB hp54502aInstrument = new HP54502A_GPIB (hp54502aDevice);
-    // tabbedPane.addTab ("HP54502A[1]", createHp54502aTab (controller, hp54502aInstrument));
-    //
+    if (considerDefaults)
+    {
+      if (JOptionPane.showConfirmDialog (this,
+        "Do you want to the load the (compile-time, and my personal favorite) default Instrument Registry?",
+        "Nothing loaded thus far...",
+        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+      {
+        //
+        final String DEFAULT_CONTROLLER_URL = "prologix-eth://ham-prologix.jdj:1234";
+        final Controller defaultController = this.instrumentRegistry.openController (DEFAULT_CONTROLLER_URL);
+        if (defaultController == null)
+          LOG.log (Level.WARNING, "Could not open default controller: {0}!", DEFAULT_CONTROLLER_URL);
+        //
+        final String hp8566bDeviceUrl = DEFAULT_CONTROLLER_URL + "/1#" + "gpib:22";
+        final GpibDevice hp8566bDevice = (GpibDevice) this.instrumentRegistry.openDevice (hp8566bDeviceUrl);
+        final String hp8566bInstrumentUrl = HP8566B_GPIB_Instrument.INSTRUMENT_TYPE.getInstrumentTypeUrl ()
+          + "@" + hp8566bDeviceUrl;
+        final Instrument hp8566bInstrument = this.instrumentRegistry.openInstrument (hp8566bInstrumentUrl);
+        //
+        final String hp8663aDeviceUrl = DEFAULT_CONTROLLER_URL + "/1#" + "gpib:19";
+        final GpibDevice hp8663aDevice = (GpibDevice) this.instrumentRegistry.openDevice (hp8663aDeviceUrl);
+        final String hp8663aInstrumentUrl = HP8663A_GPIB_Instrument.INSTRUMENT_TYPE.getInstrumentTypeUrl ()
+          +"@" + hp8663aDeviceUrl;
+        final Instrument hp8663aInstrument = this.instrumentRegistry.openInstrument (hp8663aInstrumentUrl);
+        //
+        // final GpibDevice hp70000Device = controller.openDevice ("gpib:3"); // hp70900a
+        // final GpibDevice hp70000Device = controller.openDevice ("gpib:18"); // hp70900b
+        // final HP70000_GPIB  hp70000Instrument = new HP70000_GPIB (hp70000Device);
+        //
+        // final GpibDevice hp54502aDevice = controller.openDevice ("gpib:1"); // hp54502a
+        // final HP54502A_GPIB hp54502aInstrument = new HP54502A_GPIB (hp54502aDevice);
+        //
+      }
+    }
     
     pack ();
     
@@ -162,7 +192,15 @@ extends JFrame
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  private final DefaultInstrumentRegistry instrumentRegistry;
+  private DefaultInstrumentRegistry instrumentRegistry;
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // [SWING] INSTRUMENT REGISTRY
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final JInstrumentRegistry jInstrumentRegistry;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -179,10 +217,10 @@ extends JFrame
     //
     final JMenu fileMenu = new JMenu ("File");
     final JMenuItem loadRegistryMenuItem = new JMenuItem ("Load Registry");
-    loadRegistryMenuItem.addActionListener ((ActionEvent) -> { JInstrument.this.loadRegistry (); });
+    loadRegistryMenuItem.addActionListener ((ActionEvent) -> { JInstrument.this.loadRegistry (null, true, true); });
     fileMenu.add (loadRegistryMenuItem);
     final JMenuItem saveRegistryMenuItem = new JMenuItem ("Save Registry");
-    saveRegistryMenuItem.addActionListener ((ActionEvent) -> { JInstrument.this.saveRegistry (); });
+    saveRegistryMenuItem.addActionListener ((ActionEvent) -> { JInstrument.this.saveRegistry (null, true); });
     fileMenu.add (saveRegistryMenuItem);
     final JMenuItem exitMenuItem = new JMenuItem ("Exit");
     exitMenuItem.addActionListener ((ActionEvent) -> { System.exit (0); });
@@ -204,13 +242,215 @@ extends JFrame
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // DEFAULT SYSTEM INSTRUMENT REGISTRY PATH
+  // DEFAULT USER INSTRUMENT REGISTRY PATH
+  //
+  // CHECK USER CONFIG DIR
+  // CHECK USER INSTRUMENT REGISTRY
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static String DEFAULT_SYSTEM_INSTRUMENT_REGISTRY_PATH = "/etc/jinstrument/registry.json";
+  
+  public final static String DEFAULT_USER_CONFIG_DIR = System.getProperty ("user.home") + "/.jinstrument/";
+  
+  public final static String DEFAULT_USER_INSTRUMENT_REGISTRY_PATH = DEFAULT_USER_CONFIG_DIR + "instrumentRegistry.json";
+  
+  private boolean checkUserConfigDir ()
+  {
+    if (! Files.exists (new File (DEFAULT_USER_CONFIG_DIR).toPath ()))
+    {
+      if (JOptionPane.showConfirmDialog (this,
+        "Default JInstrument configuration directory " + DEFAULT_USER_CONFIG_DIR + " does not exist, create it?",
+        "Welcome to JInstrument",
+        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+      {
+        if (new File (DEFAULT_USER_CONFIG_DIR).mkdir ())
+          return true;
+        else
+        {
+          JOptionPane.showMessageDialog (this,
+            "Sorry; I could not create your user configuration directory!\n\n"
+            + "JInstrument will run just fine without the (user) configuration directory!\n\n"
+            + "Just remember to manually save and load settings via the menu!\n\n",
+            "Could not create directory!",
+            JOptionPane.INFORMATION_MESSAGE);
+          return false;
+        }
+      }
+      else
+      {
+        JOptionPane.showMessageDialog (this,
+          "No problem, really!\n\n"
+            + "JInstrument will run just fine without the (user) configuration directory!\n\n"
+            + "Just remember to manually save and load settings via the menu!\n\n",
+          "No Problem!",
+          JOptionPane.INFORMATION_MESSAGE);
+        return false;      
+      }
+    }
+    else
+      return true;
+  }
+  
+  private boolean checkUserInstrumentRegistry ()
+  {
+    if (Files.exists (new File (DEFAULT_USER_INSTRUMENT_REGISTRY_PATH).toPath ()))
+    {
+      if (loadRegistry (DEFAULT_USER_INSTRUMENT_REGISTRY_PATH, true, false) == null)
+      {
+        JOptionPane.showMessageDialog (this,
+          "Error while loading the default user configuration (registry) file at "
+            + DEFAULT_USER_INSTRUMENT_REGISTRY_PATH + "!\n\n"
+            + "JInstrument will run just fine without the (user) configuration file!\n\n"
+            + "Just remember to manually save and load settings via the menu!\n\n",
+          "Error loading deafult user configuration (registry) file!",
+          JOptionPane.ERROR_MESSAGE);
+        return false;
+      }
+      else
+        return true;
+    }
+    else
+    {
+      if (JOptionPane.showConfirmDialog (this,
+        "Default JInstrument configuration directory " + DEFAULT_USER_CONFIG_DIR + " exists, but no registry found."
+          + " create an empty one?",
+        "Instrument Registry not found",
+        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+      {
+        return saveRegistry (DEFAULT_USER_INSTRUMENT_REGISTRY_PATH, true);
+      }
+      else
+        return false;
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // LOAD REGISTRY
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  private void loadRegistry ()
+  private DefaultInstrumentRegistry loadRegistry (
+    final String fileName,
+    final boolean switchRegistry,
+    final boolean reportFailure)
   {
-    throw new UnsupportedOperationException ();
+    final File file;
+    if (fileName == null)
+    {
+      final JFileChooser jFileChooser = new JFileChooser ();
+      if (jFileChooser.showOpenDialog (this) != JFileChooser.APPROVE_OPTION)
+        return null;
+      file = new File (jFileChooser.getSelectedFile ().getAbsolutePath ());
+    }
+    else
+      file = new File (fileName);
+    try (final FileReader fileReader = new FileReader (file))
+    {
+      final JsonReader jsonReader = Json.createReader (fileReader);
+      final JsonObject topLevelJsonObject = jsonReader.readObject ();
+      jsonReader.close ();
+      try
+      {
+        final String magic = topLevelJsonObject.getString ("magic");
+        if (! "org.javajdj.jinstrument-instrumentRegistry-json".equals (magic))
+          throw new ParseException ("magic", 0);
+        final int fileFormatVersion = topLevelJsonObject.getInt ("fileFormatVersion");
+        if (fileFormatVersion != 1)
+          throw new ParseException ("fileFormatVersion", 0);
+        final JsonObject registryObject = (JsonObject) topLevelJsonObject.get ("registry");
+        final JsonArray busesArray = (JsonArray) registryObject.get ("buses");
+        final List<String> busUrls = new ArrayList<> ();
+        for (int b = 0; b < busesArray.size (); b++)
+        {
+          final JsonObject busOject = busesArray.getJsonObject (b);
+          final String busUrl = busOject.getString ("url");
+          busUrls.add (busUrl);
+        }
+        final JsonArray controllersArray = (JsonArray) registryObject.get ("controllers");
+        final List<String> controllerUrls = new ArrayList<> ();
+        for (int c = 0; c < controllersArray.size (); c++)
+        {
+          final JsonObject controllerOject = controllersArray.getJsonObject (c);
+          final String controllerUrl = controllerOject.getString ("url");
+          controllerUrls.add (controllerUrl);
+        }
+        final JsonArray devicesArray = (JsonArray) registryObject.get ("devices");
+        final List<String> deviceUrls = new ArrayList<> ();
+        for (int d = 0; d < devicesArray.size (); d++)
+        {
+          final JsonObject deviceOject = devicesArray.getJsonObject (d);
+          final String deviceUrl = deviceOject.getString ("url");
+          deviceUrls.add (deviceUrl);
+        }
+        final JsonArray instrumentsArray = (JsonArray) registryObject.get ("instruments");
+        final List<String> instrumentUrls = new ArrayList<> ();
+        for (int i = 0; i < instrumentsArray.size (); i++)
+        {
+          final JsonObject instrumentOject = instrumentsArray.getJsonObject (i);
+          final String instrumentUrl = instrumentOject.getString ("url");
+          instrumentUrls.add (instrumentUrl);
+        } 
+        final JsonArray instrumentViewsArray = (JsonArray) registryObject.get ("instrumentViews");
+        final List<String> instrumentViewUrls = new ArrayList<> ();
+        for (int iv = 0; iv < instrumentViewsArray.size (); iv++)
+        {
+          final JsonObject instrumentViewOject = instrumentViewsArray.getJsonObject (iv);
+          final String instrumentViewUrl = instrumentViewOject.getString ("url");
+          instrumentViewUrls.add (instrumentViewUrl);
+        }
+        final DefaultInstrumentRegistry instrumentRegistry = this.instrumentRegistry.withSameTypesButInstancesFromUrlLists
+          (busUrls, controllerUrls, deviceUrls, instrumentUrls, instrumentViewUrls);
+        if (instrumentRegistry == null)
+          throw new ParseException ("registry", 0);
+        if (switchRegistry)
+          switchRegistry (instrumentRegistry);
+        return instrumentRegistry;
+      }
+      catch (ParseException pe)
+      {
+        throw pe;
+      }
+      catch (Exception e)
+      {
+        throw new ParseException ("json", 0);
+      }
+    }
+    catch (FileNotFoundException fnfe)
+    {
+      if (reportFailure)
+        JOptionPane.showMessageDialog (null, "File Not Found Exception!");
+      return null;      
+    }
+    catch (IOException ioe)
+    {
+      if (reportFailure)
+        JOptionPane.showMessageDialog (null, "I/O Exception!");
+      return null;
+    }
+    catch  (ParseException pe)
+    {
+      if (reportFailure)
+        JOptionPane.showMessageDialog (null, "Parse Exception!");
+      return null;
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWITCH REGISTRY
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private void switchRegistry (final DefaultInstrumentRegistry newInstrumentRegistry)
+  {
+    this.instrumentRegistry.removeRegistryListener (this.instrumentRegistryListener);
+    this.instrumentRegistry = newInstrumentRegistry;
+    this.instrumentRegistry.addRegistryListener (this.instrumentRegistryListener);
+    this.instrumentRegistryListener.instrumentRegistryChanged (this.instrumentRegistry);
+    this.jInstrumentRegistry.setInstrumentRegistry (this.instrumentRegistry);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,13 +459,19 @@ extends JFrame
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  private void saveRegistry ()
+  private boolean saveRegistry (final String fileName, final boolean reportFailures)
   {
+    final File file;
+    if (fileName == null)
+    {
+      final JFileChooser jFileChooser = new JFileChooser ();
+      if (jFileChooser.showSaveDialog (this) != JFileChooser.APPROVE_OPTION)
+        return false;
+      file = jFileChooser.getSelectedFile ();
+    }
+    else
+      file = new File (fileName);
     final InstrumentRegistry instrumentRegistry = JInstrument.this.instrumentRegistry;
-    final JFileChooser jFileChooser = new JFileChooser ();
-    if (jFileChooser.showSaveDialog (this) != JFileChooser.APPROVE_OPTION)
-      return;
-    final File file = jFileChooser.getSelectedFile ();
     try (final FileWriter fileWriter = new FileWriter (file))
     {
       //  Buses
@@ -281,29 +527,43 @@ extends JFrame
         .add ("instruments", jsonInstrumentsArrayBuilder)
         .add ("instrumentViews", jsonInstrumentViewsArrayBuilder)
         .build ();
+      final JsonObject topLevelJsonObject = Json.createObjectBuilder ()
+        .add ("magic", "org.javajdj.jinstrument-instrumentRegistry-json")
+        .add ("date", Instant.now ().toString ())
+        .add ("fileFormatVersion", 1)
+        .add ("registry", registryJsonObject)
+        .build ();
       final JsonWriterFactory jsonWriterFactory
         = Json.createWriterFactory (Collections.singletonMap (JsonGenerator.PRETTY_PRINTING, true));
       try (final JsonWriter jsonWriter = jsonWriterFactory.createWriter (fileWriter))
       {
-        jsonWriter.writeObject (registryJsonObject);
+        jsonWriter.writeObject (topLevelJsonObject);
       }
+      return true;
     }
     catch (FileNotFoundException fnfe)
     {
-      JOptionPane.showMessageDialog (null, "File Not Found Exception!");
+      if (reportFailures)
+        JOptionPane.showMessageDialog (null, "File Not Found Exception!");
+      return false;
     }
     catch (IOException ioe)
     {
-      JOptionPane.showMessageDialog (null, "I/O Exception!");
+      if (reportFailures)
+        JOptionPane.showMessageDialog (null, "I/O Exception!");
+      return false;
     }
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // SYNC INSTRUMENT REGISTRY TO USER CONFIG DIR
   // INSTRUMENT REGISTRY LISTENER
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  private boolean syncInstrumentRegistryToUserConfigDir = false;
+  
   private final InstrumentRegistry.Listener instrumentRegistryListener = (final InstrumentRegistry instrumentRegistry) ->
   {
     SwingUtilities.invokeLater (() ->
@@ -319,16 +579,10 @@ extends JFrame
             JInstrument.this.jTabbedPane.add (instrumentType.getInstrumentTypeUrl (), (JComponent) instrumentView);
           }
       // XXX TODO: Remove InstrumentViews...
+      if (JInstrument.this.syncInstrumentRegistryToUserConfigDir)
+        JInstrument.this.saveRegistry (JInstrument.DEFAULT_USER_INSTRUMENT_REGISTRY_PATH, true);
     });
   };
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // DEFAULT CONTROLLER
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  public final static String DEFAULT_CONTROLLER_URL = "prologix-eth://ham-prologix.jdj:1234";
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
