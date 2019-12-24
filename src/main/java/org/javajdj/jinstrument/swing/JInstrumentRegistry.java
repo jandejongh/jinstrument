@@ -593,12 +593,89 @@ public class JInstrumentRegistry
     {
       setLayout (new GridLayout (1, 1));
       JInstrumentRegistry.this.instrumentTypesTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
+      JInstrumentRegistry.this.instrumentTypesTable.addMouseListener (JInstrumentRegistry.this.instrumentTypesPanelMouseListener);
       add (new JScrollPane (JInstrumentRegistry.this.instrumentTypesTable));
     }
     
   }
   
   private final JInstrumentTypePanel jInstrumentTypePanel;
+  
+  private final MouseListener instrumentTypesPanelMouseListener = new MouseAdapter ()
+  {
+    @Override
+    public void mousePressed (final MouseEvent mouseEvent)
+    {
+      final JTable table = (JTable) mouseEvent.getSource ();
+      final Point point = mouseEvent.getPoint ();
+      final int row = table.rowAtPoint (point);
+      if (mouseEvent.getClickCount () == 2 && table.getSelectedRow () != -1)
+      {
+        final InstrumentType instrumentType =
+          JInstrumentRegistry.this.instrumentRegistry.getInstrumentTypes ().get (row);
+        if (instrumentType == null)
+          return;
+        final List<Device> devices = JInstrumentRegistry.this.instrumentRegistry.getDevices ();
+        if (devices == null || devices.isEmpty ())
+        {
+          JOptionPane.showConfirmDialog (
+            null,
+            "No Devices!",
+            "Warning",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          return;
+        }
+        final JComboBox<Device> jcbDevices = new JComboBox (devices.toArray ());
+        final JTextField jtfUserInstrumentName = new JTextField ();
+        final Object[] displayObjects =
+        {
+          "Device", jcbDevices,
+          "User Instrument Name", jtfUserInstrumentName
+        };
+        final int option = JOptionPane.showConfirmDialog (
+               null,
+               displayObjects,
+               "New Instrument",
+               JOptionPane.OK_CANCEL_OPTION,
+               JOptionPane.PLAIN_MESSAGE);
+        if (option != JOptionPane.OK_OPTION)
+          return;
+        final Device device = (Device) jcbDevices.getSelectedItem ();
+        if (device == null)
+        {
+          JOptionPane.showConfirmDialog (null,
+            "No Device selected!",
+            "Warning",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          return;
+        }
+        final String userInstrumentName = jtfUserInstrumentName.getText ();
+        if (userInstrumentName == null || userInstrumentName.trim ().isEmpty ())
+        {
+          JOptionPane.showConfirmDialog (null,
+            "No User Instrument Name entered!",
+            "Warning",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          return;
+        }
+        final Instrument instrument = JInstrumentRegistry.this.instrumentRegistry.openInstrument (instrumentType, device);
+        if (instrument == null)
+        {
+          JOptionPane.showConfirmDialog (
+            null,
+            "Could not open Instrument with Type " + instrumentType.getInstrumentTypeUrl ()
+              + " for Device " + device.getDeviceUrl () + ".",
+            "Warning",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+          // return;
+        }
+      }
+    }
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
