@@ -152,7 +152,7 @@ public class JTinyCDIStatusAndControl
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Tiny Controller, Device and Instrument Status and Control";
+      return "Tiny Con Dev Ins S&C";
     }
 
     @Override
