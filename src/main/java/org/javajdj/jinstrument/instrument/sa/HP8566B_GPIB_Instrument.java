@@ -88,7 +88,7 @@ public class HP8566B_GPIB_Instrument
     {
       if (device == null || ! (device instanceof GpibDevice))
       {
-        LOG.log (Level.WARNING, "Incompatible Device (not a GpibDevice): \'{0}\'!", device);
+        LOG.log (Level.WARNING, "Incompatible Device (not a GpibDevice): {0}!", device);
         return null;
       }
       return new HP8566B_GPIB_Instrument ((GpibDevice) device);
