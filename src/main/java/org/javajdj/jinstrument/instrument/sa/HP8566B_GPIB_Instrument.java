@@ -432,7 +432,7 @@ public class HP8566B_GPIB_Instrument
     final double[] samples = new double[strings.length];
     for (int s = 0; s < samples.length; s++)
       samples[s] = Double.parseDouble (strings[s]);
-    return new DefaultSpectrumAnalyzerTrace (settings, samples, true, NAME_PROPERTY_NAME, true, true);
+    return new DefaultSpectrumAnalyzerTrace (settings, samples, true, null, true, true);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
