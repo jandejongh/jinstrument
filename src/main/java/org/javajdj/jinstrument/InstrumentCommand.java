@@ -20,6 +20,7 @@ import java.util.Map;
 
 /** A command for an {@link Instrument}.
  * 
+ * <p>
  * Instrument commands are {@code Map}s from {@link String}s to {@link Object}s.
  * The interface provides {@code String} definitions for the most command commands and
  * their arguments.
@@ -114,5 +115,8 @@ public interface InstrumentCommand
   public final static String ICARG_RF_ATTENUATION_DB = "rfAttenuation_dB";
 
   public final static String IC_SET_RF_ATTENUATION_COUPLED = "commandSetRfAttenuationCoupled";
+  
+  public final static String IC_MEASUREMENT_MODE = "commandMeasurementMode";
+  public final static String ICARG_MEASUREMENT_MODE = "measurementMode";
   
 }
