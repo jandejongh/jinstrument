@@ -62,6 +62,7 @@ import org.javajdj.jinstrument.controller.gpib.BusType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.controller.gpib.ProLogixGpibEthernetControllerType;
+import org.javajdj.jinstrument.instrument.none.NONE_GPIB_Instrument;
 import org.javajdj.jinstrument.instrument.sa.HP8566B_GPIB_Instrument;
 import org.javajdj.jinstrument.instrument.sg.HP8663A_GPIB_Instrument;
 
@@ -104,6 +105,7 @@ extends JFrame
     this.instrumentRegistry.addBusType (BusType_GPIB.getInstance ());
     this.instrumentRegistry.addControllerType (ProLogixGpibEthernetControllerType.getInstance ());
     this.instrumentRegistry.addDeviceType (DeviceType_GPIB.getInstance ());
+    this.instrumentRegistry.addInstrumentType (NONE_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP8566B_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP8663A_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultInstrumentManagementView.INSTRUMENT_VIEW_TYPE);
