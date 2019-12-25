@@ -113,6 +113,8 @@ public class JInstrumentPanel
       case 1: lineThickness = 2; break;
       case 2: lineThickness = 1; break;
       case 3: lineThickness = 1; break;
+      case 4: lineThickness = 1; break;
+      case 5: lineThickness = 1; break;
       default: throw new IllegalArgumentException ();
     }
     if (title != null)
