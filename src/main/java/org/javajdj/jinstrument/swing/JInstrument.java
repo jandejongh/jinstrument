@@ -113,6 +113,7 @@ extends JFrame
     this.instrumentRegistry.addInstrumentViewType (JSpectrumAnalyzerSettingsPanel.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JGpibDeviceConsole.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultInstrumentManagementUrlsView.INSTRUMENT_VIEW_TYPE);
+    this.instrumentRegistry.addInstrumentViewType (JTinyCDIStatusAndControl.INSTRUMENT_VIEW_TYPE);
     
     this.jInstrumentRegistry = new JInstrumentRegistry (this.instrumentRegistry, 0);
     this.jTabbedPane.addTab ("Registry", this.jInstrumentRegistry);
