@@ -7,6 +7,9 @@ Maven, but you'll need to manually install dependency artefacts (all available f
 ## Installation
 Either through Maven, or by simply picking up a release's jinstrument-X.Y-jar-with-dependencies.jar file. A working example ~/.jinstrument/instrumentRegistry.json (holding persistent definitions of devices, instruments and views) is there as well.
 
+## License
+Apache v2.0.
+
 ## Release 0.1 [20191226]
 Very basis support for
 - Prologix GPIB-Ethernet
