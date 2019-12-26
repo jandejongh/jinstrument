@@ -19,6 +19,8 @@ package org.javajdj.jinstrument.swing;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -234,6 +236,80 @@ extends JFrame
     exitMenuItem.addActionListener ((ActionEvent) -> { System.exit (0); });
     fileMenu.add (exitMenuItem);
     jMenuBar.add (fileMenu);
+    //
+    // View
+    //
+    final JMenu viewMenu = new JMenu ("View");
+    final JMenuItem openViewMenuItem = new JMenuItem ("Open View");
+    openViewMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    viewMenu.add (openViewMenuItem);
+    final JMenuItem closeCurrentViewMenuItem = new JMenuItem ("Close Current View");
+    closeCurrentViewMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    viewMenu.add (closeCurrentViewMenuItem);
+    final JMenuItem closeViewsMenuItem = new JMenuItem ("Close View(s)");
+    closeViewsMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    viewMenu.add (closeViewsMenuItem);
+    jMenuBar.add (viewMenu);
+    //
+    // Instrument
+    //
+    final JMenu instrumentMenu = new JMenu ("Instrument");
+    final JMenuItem openInstrumentMenuItem = new JMenuItem ("Open Instrument");
+    openInstrumentMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    instrumentMenu.add (openInstrumentMenuItem);
+    final JMenuItem closeInstrumentMenuItem = new JMenuItem ("Close Instrument");
+    closeInstrumentMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    instrumentMenu.add (closeInstrumentMenuItem);
+    jMenuBar.add (instrumentMenu);
+    //
+    // Device
+    //
+    final JMenu deviceMenu = new JMenu ("Device");
+    final JMenuItem openDeviceMenuItem = new JMenuItem ("Open Device");
+    openDeviceMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    deviceMenu.add (openDeviceMenuItem);
+    final JMenuItem closeDeviceMenuItem = new JMenuItem ("Close Device");
+    closeDeviceMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    deviceMenu.add (closeDeviceMenuItem);
+    jMenuBar.add (deviceMenu);
+    //
+    // Controller
+    //
+    final JMenu controllerMenu = new JMenu ("Controller");
+    final JMenuItem openControllerMenuItem = new JMenuItem ("Open Controller");
+    openControllerMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    controllerMenu.add (openControllerMenuItem);
+    final JMenuItem closeControllerMenuItem = new JMenuItem ("Close Controller");
+    closeControllerMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    controllerMenu.add (closeControllerMenuItem);
+    jMenuBar.add (controllerMenu);
     //
     // Help
     //
