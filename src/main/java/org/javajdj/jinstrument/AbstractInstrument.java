@@ -17,6 +17,7 @@
 package org.javajdj.jinstrument;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -207,6 +208,7 @@ implements Instrument
   
   private final Runnable instrumentStatusCollector = () ->
   {
+    LOG.log (Level.INFO, "Starting Instrument Status Collector on {0}.", AbstractInstrument.this.toString ());
     while (! Thread.currentThread ().isInterrupted ())
     {
       try
@@ -224,33 +226,45 @@ implements Instrument
         // Find out the remaining time to wait in order to respect the given period.
         final long remainingSleep_ms = ((long) AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000) - sojourn_ms;
         if (remainingSleep_ms < 0)
-          LOG.log (Level.WARNING, "Cannot meet timing settings on {0}.", this);
+          LOG.log (Level.WARNING, "Instrument Status Collector cannot meet timing settings in on {0}.",
+            AbstractInstrument.this.toString ());
         if (remainingSleep_ms > 0)
           Thread.sleep (remainingSleep_ms);
       }
       catch (InterruptedException ie)
       {
-        LOG.log (Level.INFO, "InterruptedException while acquiring instrument status: {0}.", ie.getStackTrace ());
+        LOG.log (Level.INFO, "Terminating (by request) Instrument Status Collector on {0}.",
+          AbstractInstrument.this.toString ());
         return;
+      }
+      catch (TimeoutException te)
+      {
+        LOG.log (Level.WARNING, "TimeoutException (ignored) in Instrument Status Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
       }
       catch (IOException ioe)
       {
-        LOG.log (Level.WARNING, "IOException while acquiring instrument status: {0}.", ioe.getStackTrace ());
+        LOG.log (Level.WARNING, "Terminating (IOException) Instrument Status Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (ioe.getStackTrace ())});
         error ();
         return;
       }
       catch (UnsupportedOperationException usoe)
       {
-        LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument status: {0}.", usoe.getStackTrace ());
+        LOG.log (Level.WARNING, "Terminating (UnsupportedOperationException) Instrument Status Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (usoe.getStackTrace ())});
         error ();
         return;
       }
       catch (Exception e)
       {
-        LOG.log (Level.WARNING, "Exception while acquiring instrument status: {0}.", e.getStackTrace ());
+        LOG.log (Level.WARNING, "Terminating (Exception) Instrument Status Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
         error ();
         return;
       }
+      LOG.log (Level.INFO, "Terminating (by request) Instrument Status Collector on {0}.",
+        AbstractInstrument.this.toString ());
     }
   };
   
@@ -307,7 +321,7 @@ implements Instrument
     if (instrumentStatus == null)
       throw new IllegalArgumentException ();
     if (! this.statusReadQueue.offer (instrumentStatus))
-      LOG.log (Level.WARNING, "Overflow on status-read buffer on {0}.", this);
+      LOG.log (Level.WARNING, "Overflow on Instrument Status Queue on {0}.", this);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -318,6 +332,7 @@ implements Instrument
   
   private final Runnable instrumentStatusDispatcher = () ->
   {
+    LOG.log (Level.INFO, "Starting Instrument Status Dispatcher on {0}.", AbstractInstrument.this.toString ());
     while (! Thread.currentThread ().isInterrupted ())
     {
       try
@@ -336,15 +351,18 @@ implements Instrument
       }
       catch (InterruptedException ie)
       {
-        LOG.log (Level.WARNING, "InterruptedException while dispatching instrument status: {0}.", ie.getStackTrace ());
+        LOG.log (Level.INFO, "Terminating (by request) Instrument Status Dispatcher on {0}.",
+          AbstractInstrument.this.toString ());
         return;
       }
-      // Prevent termination of the Thread due to a misbehaving listener.
       catch (Exception e)
       {
-        LOG.log (Level.WARNING, "Exception while dispatching instrument status: {0}.", e.getStackTrace ());
+        LOG.log (Level.WARNING, "Exception (ignored) in Instrument Status Dispatcher on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
       }
     }
+    LOG.log (Level.INFO, "Terminating (by request) Instrument Status Dispatcher on {0}.",
+      AbstractInstrument.this.toString ());
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -390,6 +408,7 @@ implements Instrument
   
   private final Runnable instrumentSettingsCollector = () ->
   {
+    LOG.log (Level.INFO, "Starting Instrument Settings Collector on {0}.", AbstractInstrument.this.toString ());
     while (! Thread.currentThread ().isInterrupted ())
     {
       try
@@ -407,35 +426,46 @@ implements Instrument
         // Find out the remaining time to wait in order to respect the given period.
         final long remainingSleep_ms = ((long) AbstractInstrument.this.getSettingsCollectorPeriod_s () * 1000) - sojourn_ms;
         if (remainingSleep_ms < 0)
-          LOG.log (Level.WARNING, "Cannot meet timing settings on {0}.", this);
+          LOG.log (Level.WARNING, "Instrument Settings Collector cannot meet timing settings on {0}.",
+            AbstractInstrument.this.toString ());
         if (remainingSleep_ms > 0)
           Thread.sleep (remainingSleep_ms);
       }
       catch (InterruptedException ie)
       {
-        LOG.log (Level.INFO, "InterruptedException while acquiring instrument settings: {0}.", ie.getStackTrace ());
+        LOG.log (Level.INFO, "Terminating (by request) Instrument Settings Collector on {0}.",
+          AbstractInstrument.this.toString ());
         return;
+      }
+      catch (TimeoutException te)
+      {
+        LOG.log (Level.WARNING, "TimeoutException (ignored) in Instrument Settings Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
       }
       catch (IOException ioe)
       {
-        LOG.log (Level.WARNING, "IOException while acquiring instrument settings: {0}.", ioe.getStackTrace ());
+        LOG.log (Level.WARNING, "Terminating (IOException) Instrument Settings Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (ioe.getStackTrace ())});
         error ();
         return;
       }
       catch (UnsupportedOperationException usoe)
       {
-        LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument settings: {0}.",
-          usoe.getStackTrace ());
+        LOG.log (Level.WARNING, "Terminating (UnsupportedOperationException) Instrument Settings Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (usoe.getStackTrace ())});
         error ();
         return;
       }
       catch (Exception e)
       {
-        LOG.log (Level.WARNING, "Exception while acquiring instrument settings: {0}.", e.getStackTrace ());
+        LOG.log (Level.WARNING, "Terminating (Exception) Instrument Settings Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
         error ();
         return;
       }
     }
+    LOG.log (Level.INFO, "Terminating (by request) Instrument Settings Collector on {0}.",
+      AbstractInstrument.this.toString ());
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -492,7 +522,7 @@ implements Instrument
     if (instrumentSettings == null)
       throw new IllegalArgumentException ();
     if (! this.settingsReadQueue.offer (instrumentSettings))
-      LOG.log (Level.WARNING, "Overflow on settings-read buffer on {0}.", this);
+      LOG.log (Level.WARNING, "Overflow on Instrument Settings Queue on {0}.", this);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -503,6 +533,7 @@ implements Instrument
   
   private final Runnable instrumentSettingsDispatcher = () ->
   {
+    LOG.log (Level.INFO, "Starting Instrument Settings Dispatcher on {0}.", AbstractInstrument.this.toString ());
     while (! Thread.currentThread ().isInterrupted ())
     {
       try
@@ -521,15 +552,18 @@ implements Instrument
       }
       catch (InterruptedException ie)
       {
-        LOG.log (Level.WARNING, "InterruptedException while dispatching instrument settings: {0}.", ie.getStackTrace ());
+        LOG.log (Level.INFO, "Terminating (by request) Instrument Settings Dispatcher on {0}.",
+          AbstractInstrument.this.toString ());
         return;
       }
-      // Prevent termination of the Thread due to a misbehaving listener.
       catch (Exception e)
       {
-        LOG.log (Level.WARNING, "Exception while dispatching instrument settings: {0}.", e.getStackTrace ());
+        LOG.log (Level.WARNING, "Exception (ignored) in Instrument Settings Dispatcher on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
       }
     }
+    LOG.log (Level.INFO, "Terminating (by request) Instrument Settings Dispatcher on {0}.",
+      AbstractInstrument.this.toString ());
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -548,7 +582,7 @@ implements Instrument
     if (instrumentCommand == null)
       throw new IllegalArgumentException ();
     if (! this.commandQueue.offer (instrumentCommand))
-      LOG.log (Level.WARNING, "Overflow on command buffer on {0}.", this);
+      LOG.log (Level.WARNING, "Overflow on Instrument Command Queue on {0}.", this);
   }
   
   protected abstract void processCommand (final InstrumentCommand instrumentCommand)
@@ -561,7 +595,8 @@ implements Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   private final Runnable instrumentCommandProcessor = () ->
-  {    
+  {
+    LOG.log (Level.INFO, "Starting Instrument Command Processor on {0}.", AbstractInstrument.this.toString ());
     while (! Thread.currentThread ().isInterrupted ())
     {
       try
@@ -571,23 +606,33 @@ implements Instrument
       }
       catch (InterruptedException ie)
       {
-        LOG.log (Level.WARNING, "InterruptedException while processing command: {0}.", ie.getStackTrace ());
+        LOG.log (Level.INFO, "Terminating (by request) Instrument Command Processor on {0}.",
+          AbstractInstrument.this.toString ());
         return;
+      }
+      catch (TimeoutException te)
+      {
+        LOG.log (Level.WARNING, "TimeoutException (ignored) in Instrument Command Processor on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
       }
       catch (IOException ioe)
       {
-        LOG.log (Level.WARNING, "IOException while processing command: {0}.", ioe.getStackTrace ());
+        LOG.log (Level.WARNING, "IOException (ignored) in Instrument Command Processor on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (ioe.getStackTrace ())});
       }
       catch (UnsupportedOperationException uoe)
       {
-        LOG.log (Level.WARNING, "UnsupportedOperationException while processing command: {0}.", uoe.getStackTrace ());
+        LOG.log (Level.WARNING, "UnsupportedOperationException (ignored) in Instrument Command Processor on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (uoe.getStackTrace ())});
       }
-      // Prevent termination of the Thread due to a misbehaving implementation of processCommand.
       catch (Exception e)
       {
-        LOG.log (Level.WARNING, "Exception while processing command: {0}.", e.getStackTrace ());
+        LOG.log (Level.WARNING, "Exception (ignored) in Instrument Command Processor on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
       }
     }
+    LOG.log (Level.INFO, "Terminating (by request) Instrument Command Processor on {0}.",
+      AbstractInstrument.this.toString ());
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -632,7 +677,8 @@ implements Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   private final Runnable instrumentReadingCollector = () ->
-  { 
+  {
+    LOG.log (Level.INFO, "Starting Instrument Reading Collector on {0}.", AbstractInstrument.this.toString ());
     while (! Thread.currentThread ().isInterrupted ())
     {
       try
@@ -650,35 +696,46 @@ implements Instrument
         // Find out the remaining time to wait in order to respect the given period.
         final long remainingSleep_ms = ((long) AbstractInstrument.this.getReadingCollectorPeriod_s () * 1000) - sojourn_ms;
         if (remainingSleep_ms < 0)
-          LOG.log (Level.WARNING, "Cannot meet timing reading on {0}.", this);
+          LOG.log (Level.WARNING, "Instrument Reading Collector cannot meet timing reading on {0}.",
+            AbstractInstrument.this.toString ());
         if (remainingSleep_ms > 0)
           Thread.sleep (remainingSleep_ms);
       }
       catch (InterruptedException ie)
       {
-        LOG.log (Level.INFO, "InterruptedException while acquiring instrument reading: {0}.", ie.getStackTrace ());
+        LOG.log (Level.INFO, "Terminating (by request) Instrument Reading Collector on {0}.",
+          AbstractInstrument.this.toString ());
         return;
+      }
+      catch (TimeoutException te)
+      {
+        LOG.log (Level.WARNING, "TimeoutException (ignored) in Instrument Reading Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
       }
       catch (IOException ioe)
       {
-        LOG.log (Level.WARNING, "IOException while acquiring instrument reading: {0}.", ioe.getStackTrace ());
+        LOG.log (Level.WARNING, "Terminating (IOException) Instrument Reading Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (ioe.getStackTrace ())});
         error ();
         return;
       }
       catch (UnsupportedOperationException usoe)
       {
-        LOG.log (Level.WARNING, "UnsupportedOperationException while acquiring instrument reading: {0}.",
-          usoe.getStackTrace ());
+        LOG.log (Level.WARNING, "Terminating (UnsupportedOperationException) Instrument Reading Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (usoe.getStackTrace ())});
         error ();
         return;
       }
       catch (Exception e)
       {
-        LOG.log (Level.WARNING, "Exception while acquiring instrument reading: {0}.", e.getStackTrace ());
+        LOG.log (Level.WARNING, "Terminating (Exception) Instrument Reading Collector on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
         error ();
         return;
       }
     }
+    LOG.log (Level.INFO, "Terminating (by request) Instrument Reading Collector on {0}.",
+      AbstractInstrument.this.toString ());
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -735,7 +792,7 @@ implements Instrument
     if (instrumentReading == null)
       throw new IllegalArgumentException ();
     if (! this.readingReadQueue.offer (instrumentReading))
-      LOG.log (Level.WARNING, "Overflow on reading-read buffer on {0}.", this);
+      LOG.log (Level.WARNING, "Overflow on Instrument Reading Queue on {0}.", this);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -746,6 +803,7 @@ implements Instrument
   
   private final Runnable instrumentReadingDispatcher = () ->
   {
+    LOG.log (Level.INFO, "Starting Instrument Reading Dispatcher on {0}.", AbstractInstrument.this.toString ());
     while (! Thread.currentThread ().isInterrupted ())
     {
       try
@@ -759,15 +817,18 @@ implements Instrument
       }
       catch (InterruptedException ie)
       {
-        LOG.log (Level.WARNING, "InterruptedException while dispatching instrument reading: {0}.", ie.getStackTrace ());
+        LOG.log (Level.INFO, "Terminating (by request) Instrument Reading Dispatcher on {0}.",
+          AbstractInstrument.this.toString ());
         return;
       }
-      // Prevent termination of the Thread due to a misbehaving listener.
       catch (Exception e)
       {
-        LOG.log (Level.WARNING, "Exception while dispatching instrument reading: {0}.", e.getStackTrace ());
+        LOG.log (Level.WARNING, "Exception (ignored) in Instrument Reading Dispatcher on {0}: {1}.",
+          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
       }
     }
+    LOG.log (Level.INFO, "Terminating (by request) Instrument Reading Dispatcher on {0}.",
+      AbstractInstrument.this.toString ());
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
