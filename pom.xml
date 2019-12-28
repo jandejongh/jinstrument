@@ -6,7 +6,7 @@
 
   <groupId>org.javajdj</groupId>
   <artifactId>jinstrument</artifactId>
-  <version>0.2</version>
+  <version>0.3-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>jinstrument</name>
