@@ -166,7 +166,7 @@ public class HP8566B_GPIB_Instrument
   private GpibControllerCommand generateGetTraceCommandO3 ()
   {
     final GpibControllerCommand getTraceCommandO3 = ((GpibDevice) getDevice ()).generateWriteAndReadlnNCommand (
-      "S2;TS;O3;TA\n".getBytes (Charset.forName ("US-ASCII")),
+      "S2;TS;O3;TA;\n".getBytes (Charset.forName ("US-ASCII")),
       HP8566B_GPIB_Instrument.READLINE_TERMINATION_MODE,
       HP8566B_GPIB_Instrument.TRACE_LENGTH);
     return getTraceCommandO3;
