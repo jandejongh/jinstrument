@@ -263,9 +263,9 @@ implements Instrument
         error ();
         return;
       }
-      LOG.log (Level.INFO, "Terminating (by request) Instrument Status Collector on {0}.",
-        AbstractInstrument.this.toString ());
     }
+    LOG.log (Level.INFO, "Terminating (by request) Instrument Status Collector on {0}.",
+      AbstractInstrument.this.toString ());
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
