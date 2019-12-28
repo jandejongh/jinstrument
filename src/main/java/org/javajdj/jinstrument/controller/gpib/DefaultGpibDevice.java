@@ -158,29 +158,29 @@ public class DefaultGpibDevice
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // read
+  // readEOI
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
-  public GpibControllerCommand generateReadCommand ()
+  public GpibControllerCommand generateReadEOICommand ()
   {
-    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_READ,
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_READ_EOI,
       GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address);
     return command;
   }
   
   @Override
-  public void readAsync ()
+  public void readEOIAsync ()
   {
-    this.controller.addCommand (generateReadCommand ());
+    this.controller.addCommand (generateReadEOICommand ());
   }
 
   @Override
-  public byte[] readSync (final long timeout_ms)
+  public byte[] readEOISync (final long timeout_ms)
     throws InterruptedException, IOException, TimeoutException
   {
-    final GpibControllerCommand command = generateReadCommand ();
+    final GpibControllerCommand command = generateReadEOICommand ();
     doControllerCommandSync (command, timeout_ms);
     return (byte[]) command.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
   }
@@ -280,30 +280,30 @@ public class DefaultGpibDevice
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // writeAndRead
+  // writeAndReadEOI
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
-  public GpibControllerCommand generateWriteAndReadCommand (final byte[] bytes)
+  public GpibControllerCommand generateWriteAndReadEOICommand (final byte[] bytes)
   {
-    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READ,
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_WRITE_AND_READ_EOI,
       GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
       GpibControllerCommand.CCARG_GPIB_WRITE_BYTES, bytes);
     return command;
   }
   
   @Override
-  public void writeAndReadAsync (final byte[] bytes)
+  public void writeAndReadEOIAsync (final byte[] bytes)
   {
-    this.controller.addCommand (generateWriteAndReadCommand (bytes));
+    this.controller.addCommand (generateWriteAndReadEOICommand (bytes));
   }
 
   @Override
-  public byte[] writeAndReadSync (final byte[] bytes, final long timeout_ms)
+  public byte[] writeAndReadEOISync (final byte[] bytes, final long timeout_ms)
     throws InterruptedException, IOException, TimeoutException
   {
-    final GpibControllerCommand command = generateWriteAndReadCommand (bytes);
+    final GpibControllerCommand command = generateWriteAndReadEOICommand (bytes);
     doControllerCommandSync (command, timeout_ms);
     return (byte[]) command.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
   }
