@@ -192,6 +192,7 @@ public class JInstrumentRegistry
   {
     if (instrumentRegistry != JInstrumentRegistry.this.instrumentRegistry)
       return;
+    // XXX Invoke on Swing EDT???
     JInstrumentRegistry.this.busTypesTableModel.fireTableDataChanged ();
     JInstrumentRegistry.this.controllerTypesTableModel.fireTableDataChanged ();
     JInstrumentRegistry.this.deviceTypesTableModel.fireTableDataChanged ();
