@@ -197,7 +197,7 @@ public class HP3478A_GPIB_Instrument
   private GpibControllerCommand generateGetSettingsCommandB ()
   {
     final GpibControllerCommand getSettingsCommandB =
-      ((GpibDevice) getDevice ()).generateWriteAndReadNCommand ("B\n".getBytes (Charset.forName ("US-ASCII")),
+      ((GpibDevice) getDevice ()).generateWriteAndReadNCommand ("B\r\n".getBytes (Charset.forName ("US-ASCII")),
       HP3478A_GPIB_Instrument.B_LENGTH);
     return getSettingsCommandB;
   }
