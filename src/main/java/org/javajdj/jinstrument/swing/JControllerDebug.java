@@ -303,13 +303,23 @@ public class JControllerDebug
           case 2:
             return logEntry.controllerCommand;
           case 3:
-            return logEntry.message;
+            if (logEntry.controllerCommand != null)
+              return logEntry.controllerCommand.get (ControllerCommand.CC_COMMAND_KEY);
+            else
+              return null;
           case 4:
+            if (logEntry.controllerCommand != null)
+              return logEntry.controllerCommand.get (ControllerCommand.CC_EXCEPTION_KEY);
+            else
+              return null;
+          case 5:
+            return logEntry.message;
+          case 6:
           {
             final byte[] bytes = logEntry.bytes;
             return bytes != null ? Util.bytesToHex (bytes) : null;
           }
-          case 5:
+          case 7:
           {
             final byte[] bytes = logEntry.bytes;
             return bytes != null ? new String (bytes, Charset.forName ("US-ASCII")) : null;
@@ -338,12 +348,16 @@ public class JControllerDebug
         case 1:
           return "Type";
         case 2:
-          return "Command";
+          return "Command Object";
         case 3:
-          return "Message";
+          return "Command Name";
         case 4:
-          return "Bytes [HEX]";
+          return "Command Exception";
         case 5:
+          return "Message";
+        case 6:
+          return "Bytes [HEX]";
+        case 7:
           return "Bytes [ASCII]";
         default:
           throw new RuntimeException ();
@@ -353,7 +367,7 @@ public class JControllerDebug
     @Override
     public int getColumnCount ()
     {
-      return 6;
+      return 8;
     }
 
     @Override
