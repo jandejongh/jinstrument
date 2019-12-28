@@ -20,7 +20,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -112,6 +111,7 @@ extends JFrame
     this.instrumentRegistry.addInstrumentType (HP3478A_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP8566B_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP8663A_GPIB_Instrument.INSTRUMENT_TYPE);
+    this.instrumentRegistry.addInstrumentViewType (JControllerDebug.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JGpibDeviceConsole.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultInstrumentManagementUrlsView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultInstrumentManagementView.INSTRUMENT_VIEW_TYPE);
