@@ -38,5 +38,7 @@ public interface Controller
   Bus[] getBuses ();
   
   void addCommand (final ControllerCommand controllerCommand);
+  
+  default Service getLoggingService () { return null; }
 
 }
