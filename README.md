@@ -20,6 +20,11 @@ Very basis support for
 
 Reasonable framework for buses, controllers, devices, instruments and instrument views.
 
+## Release 0.2 [20191228]
+Most important changes:
+- Revamped ProLogix controller implementation.
+- Added GPIB Controller logging + Swing component.
+
 More detailed documentation will follow once the framework has stabilized (notably, the support for channels is still lacking).
 
 ## Status [20191129]
