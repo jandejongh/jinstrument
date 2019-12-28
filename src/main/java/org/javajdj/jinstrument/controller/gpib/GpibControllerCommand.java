@@ -27,11 +27,11 @@ public interface GpibControllerCommand
   extends ControllerCommand
 {
   
-  public final static String CC_GPIB_READ = "gpibCommandRead";
+  public final static String CC_GPIB_READ_EOI = "gpibCommandReadEOI";
   public final static String CC_GPIB_READLN = "gpibCommandReadln";
   public final static String CC_GPIB_READ_N = "gpibCommandReadN";
   public final static String CC_GPIB_WRITE = "gpibCommandWrite";
-  public final static String CC_GPIB_WRITE_AND_READ = "gpibCommandWriteAndRead";
+  public final static String CC_GPIB_WRITE_AND_READ_EOI = "gpibCommandWriteAndReadEOI";
   public final static String CC_GPIB_WRITE_AND_READLN = "gpibCommandWriteAndReadln";
   public final static String CC_GPIB_WRITE_AND_READ_N = "gpibCommandWriteAndReadN";
   public final static String CC_GPIB_WRITE_AND_READLN_N = "gpibCommandWriteAndReadlnN";
@@ -44,4 +44,6 @@ public interface GpibControllerCommand
   public final static String CCARG_GPIB_WRITE_BYTES = "gpibArgWriteBytes";
   public final static String CCARG_GPIB_ATOMIC_SEQUENCE = "gpibArgAtomicSequence";
   
+  public final static String CCARG_GPIB_TIMEOUT_MS = "gpibArgTimeout_ms";
+    
 }
