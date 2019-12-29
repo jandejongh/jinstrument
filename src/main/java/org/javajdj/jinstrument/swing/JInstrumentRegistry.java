@@ -1319,7 +1319,7 @@ public class JInstrumentRegistry
       final JPanel buttonPanel = new JPanel ();
       setPanelBorder (buttonPanel, 2, Color.black, "Operations [on Selection]");
       buttonPanel.setLayout (new FlowLayout (FlowLayout.CENTER));
-      final JButton removeButton = new JButton ("Remove");
+      final JButton removeButton = new JButton ("Close");
       removeButton.addActionListener ((final ActionEvent ae) ->
       {
         final int index = JInstrumentRegistry.this.instrumentViewsTable.getSelectedRow ();
