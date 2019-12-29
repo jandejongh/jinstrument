@@ -648,24 +648,46 @@ extends JFrame
 
   private boolean syncInstrumentRegistryToUserConfigDir = false;
   
-  private final InstrumentRegistry.Listener instrumentRegistryListener = (final InstrumentRegistry instrumentRegistry) ->
+  private final InstrumentRegistry.Listener instrumentRegistryListener = new InstrumentRegistry.Listener ()
   {
-    SwingUtilities.invokeLater (() ->
+    
+    @Override
+    public void instrumentRegistryChanged (final InstrumentRegistry instrumentRegistry)
     {
-      final List<InstrumentView> instrumentViews = instrumentRegistry.getInstrumentViews ();
-      final List<Component> components = new ArrayList<> (Arrays.asList (JInstrument.this.jTabbedPane.getComponents ()));
-      for (final InstrumentView instrumentView : instrumentViews)
-        if (instrumentView instanceof JComponent)
-          if (! components.contains ((Component) instrumentView))
-          {
-            final Instrument instrument = instrumentView.getInstrument ();
-            final InstrumentType instrumentType  = JInstrument.this.instrumentRegistry.getInstrumentType (instrument);
-            JInstrument.this.jTabbedPane.add (instrumentType.getInstrumentTypeUrl (), (JComponent) instrumentView);
-          }
-      // XXX TODO: Remove InstrumentViews...
-      if (JInstrument.this.syncInstrumentRegistryToUserConfigDir)
-        JInstrument.this.saveRegistry (JInstrument.DEFAULT_USER_INSTRUMENT_REGISTRY_PATH, true);
-    });
+      SwingUtilities.invokeLater (() ->
+      {
+        final List<InstrumentView> instrumentViews = instrumentRegistry.getInstrumentViews ();
+        final List<Component> components = new ArrayList<> (Arrays.asList (JInstrument.this.jTabbedPane.getComponents ()));
+        for (final InstrumentView instrumentView : instrumentViews)
+          if (instrumentView instanceof JComponent)
+            if (! components.contains ((Component) instrumentView))
+            {
+              final Instrument instrument = instrumentView.getInstrument ();
+              final InstrumentType instrumentType  = JInstrument.this.instrumentRegistry.getInstrumentType (instrument);
+              JInstrument.this.jTabbedPane.add (instrumentType.getInstrumentTypeUrl (), (JComponent) instrumentView);
+            }
+        // XXX TODO: Remove InstrumentViews...
+        if (JInstrument.this.syncInstrumentRegistryToUserConfigDir)
+          JInstrument.this.saveRegistry (JInstrument.DEFAULT_USER_INSTRUMENT_REGISTRY_PATH, true);
+      });
+    }
+    
+    @Override
+    public void instrumentRegistrySetSelectedInstrumentView (
+      final InstrumentRegistry instrumentRegistry,
+      final InstrumentView instrumentView)
+    {
+      SwingUtilities.invokeLater (() ->
+      {
+        if (instrumentRegistry != null && instrumentRegistry == JInstrument.this.instrumentRegistry && instrumentView != null)
+        {
+          for (final Component component: JInstrument.this.jTabbedPane.getComponents ())
+            if (component == instrumentView)
+              JInstrument.this.jTabbedPane.setSelectedComponent (component);        
+        }
+      });
+    }
+    
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

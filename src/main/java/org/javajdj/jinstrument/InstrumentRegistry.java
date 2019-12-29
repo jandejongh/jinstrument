@@ -35,7 +35,13 @@ public interface InstrumentRegistry
   @FunctionalInterface
   interface Listener
   {
+    
     void instrumentRegistryChanged (InstrumentRegistry instrumentRegistry);
+    
+    default void instrumentRegistrySetSelectedInstrumentView (
+      final InstrumentRegistry instrumentRegistry,
+      InstrumentView instrumentView) { }
+    
   }
   
   void addRegistryListener (Listener l);
@@ -202,6 +208,8 @@ public interface InstrumentRegistry
   
   InstrumentView openInstrumentView (InstrumentViewType instrumentViewType, Instrument instrument);
   
+  void setSelectedInstrumentView (InstrumentView instrumentView);
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE

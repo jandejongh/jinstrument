@@ -142,6 +142,14 @@ public class DefaultInstrumentRegistry
       l.instrumentRegistryChanged (this);
   }
   
+  protected final void fireInstrumentRegistrySetSelectedInstrumentView (final InstrumentView instrumentView)
+  {
+    // References are atomic.
+    final Set<InstrumentRegistry.Listener> listeners = this.instrumentRegistryListenersCopy;
+    for (final InstrumentRegistry.Listener l : listeners)
+      l.instrumentRegistrySetSelectedInstrumentView (this, instrumentView);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // BUS TYPES
@@ -1274,6 +1282,12 @@ public class DefaultInstrumentRegistry
       return null;      
     }
     return openInstrumentView (instrumentViewType.getInstrumentViewTypeUrl () + "<>" + instrument.getInstrumentUrl ());
+  }
+
+  @Override
+  public final void setSelectedInstrumentView (final InstrumentView instrumentView)
+  {
+    fireInstrumentRegistrySetSelectedInstrumentView (instrumentView);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

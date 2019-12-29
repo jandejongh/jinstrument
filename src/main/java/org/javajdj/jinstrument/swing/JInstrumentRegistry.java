@@ -1306,12 +1306,30 @@ public class JInstrumentRegistry
     {
       setLayout (new GridLayout (1, 1));
       JInstrumentRegistry.this.instrumentViewsTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
+      JInstrumentRegistry.this.instrumentViewsTable.addMouseListener (JInstrumentRegistry.this.instrumentViewsPanelMouseListener);
       add (new JScrollPane (JInstrumentRegistry.this.instrumentViewsTable));
     }
     
   }
   
   private final JInstrumentViewsPanel jInstrumentViewsPanel;
+  
+  private final MouseListener instrumentViewsPanelMouseListener = new MouseAdapter ()
+  {
+    @Override
+    public void mousePressed (final MouseEvent mouseEvent)
+    {
+      final JTable table = (JTable) mouseEvent.getSource ();
+      final Point point = mouseEvent.getPoint ();
+      final int row = table.rowAtPoint (point);
+      if (mouseEvent.getClickCount () == 2 && table.getSelectedRow () != -1)
+      {
+        final InstrumentView instrumentView =
+          JInstrumentRegistry.this.instrumentRegistry.getInstrumentViews ().get (row);
+        JInstrumentRegistry.this.instrumentRegistry.setSelectedInstrumentView (instrumentView);
+      }
+    }
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
