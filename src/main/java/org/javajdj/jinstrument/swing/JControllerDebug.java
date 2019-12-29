@@ -21,12 +21,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -136,6 +138,28 @@ public class JControllerDebug
       jControllerLogger.add (jUnsupportedLabel);
     }
     northNorthPanel.add (jControllerLogger);
+    //
+    final JPanel buttonPanel = new JPanel ();
+    setPanelBorder (buttonPanel, level + 2, subPanelColor, "Actions");
+    buttonPanel.setLayout (new GridLayout (3, 3)); // For now, to keep single button centered and not being blown up.
+    buttonPanel.setMinimumSize (new Dimension (300, 100));
+    buttonPanel.setPreferredSize (new Dimension (300, 100));
+    buttonPanel.add (new JLabel ());
+    buttonPanel.add (new JLabel ());
+    buttonPanel.add (new JLabel ());
+    buttonPanel.add (new JLabel ());
+    final JButton clearLogButton = new JButton ("Clear");
+    buttonPanel.add (clearLogButton);
+    buttonPanel.add (new JLabel ());
+    buttonPanel.add (new JLabel ());
+    buttonPanel.add (new JLabel ());
+    buttonPanel.add (new JLabel ());
+    clearLogButton.addActionListener ((final ActionEvent ae) ->
+    {
+      JControllerDebug.this.logEntries.clear ();
+      JControllerDebug.this.logTableModel.fireTableDataChanged ();
+    });
+    northNorthPanel.add (buttonPanel);
     //
     northPanel.add (northNorthPanel, BorderLayout.NORTH);    
     //
