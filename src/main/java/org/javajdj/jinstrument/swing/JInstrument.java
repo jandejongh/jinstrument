@@ -666,7 +666,15 @@ extends JFrame
               final InstrumentType instrumentType  = JInstrument.this.instrumentRegistry.getInstrumentType (instrument);
               JInstrument.this.jTabbedPane.add (instrumentType.getInstrumentTypeUrl (), (JComponent) instrumentView);
             }
-        // XXX TODO: Remove InstrumentViews...
+        for (final Component component : components)
+        {
+          if (component != null
+            && (component instanceof InstrumentView)
+            && ! instrumentViews.contains ((InstrumentView) component))
+          {
+            JInstrument.this.jTabbedPane.remove (component);
+          }
+        }
         if (JInstrument.this.syncInstrumentRegistryToUserConfigDir)
           JInstrument.this.saveRegistry (JInstrument.DEFAULT_USER_INSTRUMENT_REGISTRY_PATH, true);
       });

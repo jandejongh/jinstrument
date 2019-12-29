@@ -16,12 +16,17 @@
  */
 package org.javajdj.jinstrument.swing;
 
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -30,6 +35,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import org.javajdj.jinstrument.Bus;
 import org.javajdj.jinstrument.BusType;
@@ -192,17 +198,19 @@ public class JInstrumentRegistry
   {
     if (instrumentRegistry != JInstrumentRegistry.this.instrumentRegistry)
       return;
-    // XXX Invoke on Swing EDT???
-    JInstrumentRegistry.this.busTypesTableModel.fireTableDataChanged ();
-    JInstrumentRegistry.this.controllerTypesTableModel.fireTableDataChanged ();
-    JInstrumentRegistry.this.deviceTypesTableModel.fireTableDataChanged ();
-    JInstrumentRegistry.this.instrumentTypesTableModel.fireTableDataChanged ();
-    JInstrumentRegistry.this.instrumentViewTypesTableModel.fireTableDataChanged ();
-    JInstrumentRegistry.this.busesTableModel.fireTableDataChanged ();
-    JInstrumentRegistry.this.controllersTableModel.fireTableDataChanged ();
-    JInstrumentRegistry.this.devicesTableModel.fireTableDataChanged ();
-    JInstrumentRegistry.this.instrumentsTableModel.fireTableDataChanged ();
-    JInstrumentRegistry.this.instrumentViewsTableModel.fireTableDataChanged ();
+    SwingUtilities.invokeLater (() ->
+    {
+      JInstrumentRegistry.this.busTypesTableModel.fireTableDataChanged ();
+      JInstrumentRegistry.this.controllerTypesTableModel.fireTableDataChanged ();
+      JInstrumentRegistry.this.deviceTypesTableModel.fireTableDataChanged ();
+      JInstrumentRegistry.this.instrumentTypesTableModel.fireTableDataChanged ();
+      JInstrumentRegistry.this.instrumentViewTypesTableModel.fireTableDataChanged ();
+      JInstrumentRegistry.this.busesTableModel.fireTableDataChanged ();
+      JInstrumentRegistry.this.controllersTableModel.fireTableDataChanged ();
+      JInstrumentRegistry.this.devicesTableModel.fireTableDataChanged ();
+      JInstrumentRegistry.this.instrumentsTableModel.fireTableDataChanged ();
+      JInstrumentRegistry.this.instrumentViewsTableModel.fireTableDataChanged ();
+    });
   });
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1304,10 +1312,26 @@ public class JInstrumentRegistry
     
     public JInstrumentViewsPanel ()
     {
-      setLayout (new GridLayout (1, 1));
+      setLayout (new BoxLayout (this, BoxLayout.X_AXIS));
       JInstrumentRegistry.this.instrumentViewsTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
       JInstrumentRegistry.this.instrumentViewsTable.addMouseListener (JInstrumentRegistry.this.instrumentViewsPanelMouseListener);
       add (new JScrollPane (JInstrumentRegistry.this.instrumentViewsTable));
+      final JPanel buttonPanel = new JPanel ();
+      setPanelBorder (buttonPanel, 2, Color.black, "Operations [on Selection]");
+      buttonPanel.setLayout (new FlowLayout (FlowLayout.CENTER));
+      final JButton removeButton = new JButton ("Remove");
+      removeButton.addActionListener ((final ActionEvent ae) ->
+      {
+        final int index = JInstrumentRegistry.this.instrumentViewsTable.getSelectedRow ();
+        if (index < 0)
+          return;
+        final List<InstrumentView> instrumentViews = JInstrumentRegistry.this.instrumentRegistry.getInstrumentViews ();
+        if (index >= instrumentViews.size ())
+          return;
+        JInstrumentRegistry.this.instrumentRegistry.closeInstrumentView (instrumentViews.get (index));
+      });
+      buttonPanel.add (removeButton);
+      add (buttonPanel);
     }
     
   }

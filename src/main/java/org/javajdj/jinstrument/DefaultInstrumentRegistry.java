@@ -1285,6 +1285,13 @@ public class DefaultInstrumentRegistry
   }
 
   @Override
+  public final void closeInstrumentView (final InstrumentView instrumentView)
+  {
+    if (instrumentView != null)
+      removeInstrumentView (instrumentView);
+  }
+
+  @Override
   public final void setSelectedInstrumentView (final InstrumentView instrumentView)
   {
     fireInstrumentRegistrySetSelectedInstrumentView (instrumentView);

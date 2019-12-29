@@ -208,6 +208,8 @@ public interface InstrumentRegistry
   
   InstrumentView openInstrumentView (InstrumentViewType instrumentViewType, Instrument instrument);
   
+  void closeInstrumentView (InstrumentView instrumentView);
+  
   void setSelectedInstrumentView (InstrumentView instrumentView);
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
