@@ -374,6 +374,7 @@ public final class ProLogixGpibEthernetController
         bytes[i++] = b;
       LOG.log (Level.WARNING, "Draining bytes {0}.", Util.bytesToHex (bytes));
       queueLogRx (Instant.now (), bytes);
+      queueLogMessage (Instant.now (), "Draining bytes " + Util.bytesToHex (bytes) + ".");
     }
   }
   
