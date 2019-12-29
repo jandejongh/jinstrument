@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.instrument.dmm;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,10 +62,10 @@ public class HP3478A_GPIB_Instrument
   public HP3478A_GPIB_Instrument (final GpibDevice device)
   {
     super ("HP-3478A", device, null, null,
-      false,  // XXX Status
-      true,   // Setings
-      true,   // Command Processor
-      false); // XXX Acquisition
+      false, // XXX Status
+      true,  // Setings
+      true,  // Command Processor
+      true); // Acquisition
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,6 +203,13 @@ public class HP3478A_GPIB_Instrument
     return getSettingsCommandB;
   }
   
+  private GpibControllerCommand generateGetReadingCommand ()
+  {
+    final GpibControllerCommand getReadingCommand =
+      ((GpibDevice) getDevice ()).generateReadlnCommand (HP3478A_GPIB_Instrument.READLINE_TERMINATION_MODE);
+    return getReadingCommand;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // Instrument
@@ -278,10 +286,8 @@ public class HP3478A_GPIB_Instrument
       throw new IllegalArgumentException ();
     }
     // XXX Sanity checks!
-    LOG.log (Level.WARNING, "bytes = {0}", Util.bytesToHex (b));
-    LOG.log (Level.WARNING, "b[0]={0}!", Util.bytesToHex (new byte[]{b[0]}));
+    LOG.log (Level.WARNING, "B bytes = {0}", Util.bytesToHex (b));
     final int measurentModeInt = ((b[0] & 0xe0) >>> 5) & 0x07;
-    LOG.log (Level.WARNING, "MeasurementModeInt={0}!", measurentModeInt);
     final MeasurementMode measurementMode;
     switch (measurentModeInt)
     {
@@ -290,7 +296,7 @@ public class HP3478A_GPIB_Instrument
       case 3: measurementMode = MeasurementMode.RESISTANCE_2W; break;
       case 4: measurementMode = MeasurementMode.RESISTANCE_4W; break;
       case 5: measurementMode = MeasurementMode.DC_CURRENT;    break;
-      case 6: measurementMode = MeasurementMode.AC_VOLTAGE;    break;
+      case 6: measurementMode = MeasurementMode.AC_CURRENT;    break;
       case 7:
       {
         LOG.log (Level.WARNING, "The EXTENDED OHMS mode on the HP3478A is not supported on this Instrument!");
@@ -317,13 +323,40 @@ public class HP3478A_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  private final static int TRACE_LENGTH = 1001;
-  
   @Override
   protected final InstrumentReading getReadingFromInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
-    throw new UnsupportedOperationException ();
+    final GpibControllerCommand preSettingsCommand = generateGetSettingsCommandB ();
+    final GpibControllerCommand readingCommand = generateGetReadingCommand ();
+    final GpibControllerCommand postSettingsCommand = generateGetSettingsCommandB ();
+    ((GpibDevice) getDevice ()).atomicSequenceSync (
+      new GpibControllerCommand[] {preSettingsCommand, readingCommand, postSettingsCommand},
+      HP3478A_GPIB_Instrument.READLINE_TIMEOUT_MS);
+    final byte[] preSettingsBytes  = (byte[]) preSettingsCommand.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
+    final byte[] readingBytes      = (byte[]) readingCommand.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
+    final byte[] postSettingsBytes = (byte[]) preSettingsCommand.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
+    // Make sure settings are non-null and equal.
+    if (preSettingsBytes == null || postSettingsBytes == null || ! Arrays.equals (preSettingsBytes, postSettingsBytes))
+    {
+      LOG.log (Level.WARNING, "Digital MultiMeter Settings samples before and after taking a reading do NOT match!");
+      // Given the fact that we used an atomic sequence, it is justified to throw an IOException at this point.
+      throw new IOException ();
+    }
+    // Collect settings and make sure they are valid.
+    final DigitalMultiMeterSettings settings = settingsFromB (preSettingsBytes);
+    // Collect the actual reading.
+    final double readingValue;
+    final String readingString = new String (readingBytes, Charset.forName ("US-ASCII"));
+    try
+    {
+      readingValue = Double.parseDouble (readingString);      
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IOException (nfe);
+    }
+    return new DefaultDigitalMultiMeterReading (settings, false, null, false, false, readingValue);
   }
 
   @Override
@@ -375,12 +408,12 @@ public class HP3478A_GPIB_Instrument
             throw new UnsupportedOperationException ();
           switch (measurementMode)
           {
-            case DC_VOLTAGE:    writeAsync ("F1\n"); break;
-            case AC_VOLTAGE:    writeAsync ("F2\n"); break;
-            case RESISTANCE_2W: writeAsync ("F3\n"); break;
-            case RESISTANCE_4W: writeAsync ("F4\n"); break;
-            case DC_CURRENT:    writeAsync ("F5\n"); break;
-            case AC_CURRENT:    writeAsync ("F6\n"); break;
+            case DC_VOLTAGE:    writeAsync ("F1\r\n"); break;
+            case AC_VOLTAGE:    writeAsync ("F2\r\n"); break;
+            case RESISTANCE_2W: writeAsync ("F3\r\n"); break;
+            case RESISTANCE_4W: writeAsync ("F4\r\n"); break;
+            case DC_CURRENT:    writeAsync ("F5\r\n"); break;
+            case AC_CURRENT:    writeAsync ("F6\r\n"); break;
             default:
               throw new UnsupportedOperationException ();
           }
