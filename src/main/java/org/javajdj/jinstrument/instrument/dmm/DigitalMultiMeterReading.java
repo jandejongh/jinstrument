@@ -27,6 +27,9 @@ public interface DigitalMultiMeterReading
   extends InstrumentReading
 {
 
+  @Override
+  public DigitalMultiMeterSettings getInstrumentSettings ();
+
   double getMultiMeterReading ();
   
 }
