@@ -998,7 +998,7 @@ public final class ProLogixGpibEthernetController
           final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
           final GpibDevice.ReadlineTerminationMode readlineTerminationMode =
             (GpibDevice.ReadlineTerminationMode) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE);
-          final byte[] bytesRead = processCommand_readln (address, readlineTerminationMode, timeout_ms, true, false);
+          final byte[] bytesRead = processCommand_readln (address, readlineTerminationMode, timeout_ms, true, true);
           controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, bytesRead);
           break;
         }
