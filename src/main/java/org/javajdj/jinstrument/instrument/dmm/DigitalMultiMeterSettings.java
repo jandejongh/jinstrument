@@ -32,6 +32,12 @@ public interface DigitalMultiMeterSettings
   
   byte[] getBytes ();
   
+  DigitalMultiMeter.NumberOfDigits getResolution ();
+  
   DigitalMultiMeter.MeasurementMode getMeasurementMode ();
+  
+  boolean isAutoRange ();
+  
+  DigitalMultiMeter.Range getRange ();
   
 }
