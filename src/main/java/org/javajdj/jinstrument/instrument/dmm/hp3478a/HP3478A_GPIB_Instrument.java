@@ -31,7 +31,6 @@ import org.javajdj.jinstrument.DeviceType;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentCommand;
 import org.javajdj.jinstrument.InstrumentReading;
-import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
@@ -39,7 +38,6 @@ import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
 import org.javajdj.jinstrument.instrument.dmm.AbstractDigitalMultiMeter;
 import org.javajdj.jinstrument.instrument.dmm.DefaultDigitalMultiMeterReading;
-import org.javajdj.jinstrument.instrument.dmm.DefaultDigitalMultiMeterSettings;
 import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeter;
 import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeterSettings;
 
@@ -67,13 +65,16 @@ public class HP3478A_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  public final static double DEFAULT_HP3478A_READING_COLLECTOR_PERIOD_S = 2;
+  
   public HP3478A_GPIB_Instrument (final GpibDevice device)
   {
     super ("HP-3478A", device, null, null,
-      false, // XXX Status
+      false, // Status (not needed; they come with the Settings!)
       true,  // Setings
       true,  // Command Processor
       true); // Acquisition
+    setReadingCollectorPeriod_s (HP3478A_GPIB_Instrument.DEFAULT_HP3478A_READING_COLLECTOR_PERIOD_S);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -233,7 +234,7 @@ public class HP3478A_GPIB_Instrument
     
   }
   
-  private static final Map<MeasurementMode, List<Range>> SUPPORTED_RANGES_MAP =
+  public final static Map<MeasurementMode, List<Range>> SUPPORTED_RANGES_MAP =
     Arrays.stream (new Object[][]
     {
       { MeasurementMode.DC_VOLTAGE, Arrays.asList (new Range[] {
@@ -300,7 +301,7 @@ public class HP3478A_GPIB_Instrument
   {
     final GpibControllerCommand getSettingsCommandB =
       ((GpibDevice) getDevice ()).generateWriteAndReadNCommand ("B\r\n".getBytes (Charset.forName ("US-ASCII")),
-      HP3478A_GPIB_Instrument.B_LENGTH);
+      HP3478A_GPIB_Settings.B_LENGTH);
     return getSettingsCommandB;
   }
   
@@ -358,8 +359,6 @@ public class HP3478A_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final static int B_LENGTH = 5;
-  
   @Override
   protected void requestSettingsFromInstrumentASync () throws UnsupportedOperationException, IOException
   {
@@ -367,109 +366,19 @@ public class HP3478A_GPIB_Instrument
   }
   
   @Override
-  public synchronized DigitalMultiMeterSettings getSettingsFromInstrumentSync ()
+  public synchronized HP3478A_GPIB_Settings getSettingsFromInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
     final GpibControllerCommand getSettingsCommand = generateGetSettingsCommandB ();
     ((GpibDevice) getDevice ()).doControllerCommandSync (getSettingsCommand, READLINE_TIMEOUT_MS);
     final byte[] b = (byte[]) getSettingsCommand.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
-    final DigitalMultiMeterSettings settings = HP3478A_GPIB_Instrument.settingsFromB (b);
+    final HP3478A_GPIB_Settings settings = HP3478A_GPIB_Settings.fromB (b);
     // LOG message for debugging the OL output.
     LOG.log (Level.INFO, "Settings received.");
+    statusReadFromInstrument (HP3478A_GPIB_Status.fromSettings (settings));
     return settings;
   }
  
-  private static DigitalMultiMeterSettings settingsFromB (final byte[] b)
-  {
-    if (b == null || b.length != HP3478A_GPIB_Instrument.B_LENGTH)
-    {
-      LOG.log (Level.WARNING, "Null B object or unexpected number of bytes read for Settings.");
-      throw new IllegalArgumentException ();
-    }
-    // XXX Sanity checks!
-    // LOG.log (Level.WARNING, "B bytes = {0}", Util.bytesToHex (b));
-    final int resolutionInt = (b[0] & 0x03);
-    final NumberOfDigits resolution;
-    switch (resolutionInt)
-    {
-      case 1:
-        resolution = NumberOfDigits.DIGITS_5_5;
-        break;
-      case 2:
-        resolution = NumberOfDigits.DIGITS_4_5;
-        break;
-      case 3:
-        resolution = NumberOfDigits.DIGITS_3_5;
-        break;
-      default:
-        throw new RuntimeException ();
-    }
-    final int measurentModeInt = ((b[0] & 0xe0) >>> 5) & 0x07;
-    final MeasurementMode measurementMode;
-    switch (measurentModeInt)
-    {
-      case 1: measurementMode = MeasurementMode.DC_VOLTAGE;    break;
-      case 2: measurementMode = MeasurementMode.AC_VOLTAGE;    break;
-      case 3: measurementMode = MeasurementMode.RESISTANCE_2W; break;
-      case 4: measurementMode = MeasurementMode.RESISTANCE_4W; break;
-      case 5: measurementMode = MeasurementMode.DC_CURRENT;    break;
-      case 6: measurementMode = MeasurementMode.AC_CURRENT;    break;
-      case 7:
-      {
-        LOG.log (Level.WARNING, "The EXTENDED OHMS mode on the HP3478A is not supported on this Instrument!");
-        measurementMode = MeasurementMode.UNSUPPORTED;
-        break;
-      }
-      default:
-      {
-        LOG.log (Level.WARNING, "The Measurement Mode numbered {0} is not supported (and unexpected) on this Instrument!",
-          measurentModeInt);
-        throw new IllegalArgumentException ();
-      }
-    }
-    final int rangeInt = ((b[0] & 0x1c) >>> 2) & 0x07;
-    if (rangeInt == 0)
-    {
-      LOG.log (Level.WARNING, "The Range numbered {0} is not supported (and unexpected) on this Instrument!",
-        rangeInt);
-      throw new IllegalArgumentException ();        
-    }
-    final List<Range> ranges = SUPPORTED_RANGES_MAP.get (measurementMode);
-    final Range range;
-    switch (measurementMode)
-    {
-      case DC_VOLTAGE:
-        if (rangeInt >= 6)
-          throw new IllegalArgumentException ();
-        range = ranges.get (rangeInt - 1);
-        break;
-      case AC_VOLTAGE:
-        if (rangeInt >= 5)
-          throw new IllegalArgumentException ();
-        range = ranges.get (rangeInt - 1);
-        break;
-      case RESISTANCE_2W:
-      case RESISTANCE_4W:
-        range = ranges.get (rangeInt - 1);
-        break;
-      case DC_CURRENT:
-      case AC_CURRENT:
-        if (rangeInt >= 3)
-          throw new IllegalArgumentException ();
-        range = ranges.get (rangeInt - 1);
-        break;
-      default:
-        throw new RuntimeException ();
-    }
-    final boolean autoRange = (b[1] & 0x02) != 0;
-    return new DefaultDigitalMultiMeterSettings (
-      b,
-      resolution,
-      measurementMode,
-      autoRange,
-      range);
-  }
-  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -498,7 +407,7 @@ public class HP3478A_GPIB_Instrument
       throw new IOException ();
     }
     // Collect settings and make sure they are valid.
-    final DigitalMultiMeterSettings settings = settingsFromB (preSettingsBytes);
+    final DigitalMultiMeterSettings settings = HP3478A_GPIB_Settings.fromB (preSettingsBytes);
     // Collect the actual reading.
     final double readingValue;
     final String readingString = new String (readingBytes, Charset.forName ("US-ASCII"));
@@ -549,7 +458,7 @@ public class HP3478A_GPIB_Instrument
     if (commandString.trim ().isEmpty ())
       throw new IllegalArgumentException ();
     final GpibDevice device = (GpibDevice) getDevice ();
-    InstrumentSettings newInstrumentSettings = null;
+    HP3478A_GPIB_Settings newInstrumentSettings = null;
     try
     {
       switch (commandString)
@@ -689,7 +598,10 @@ public class HP3478A_GPIB_Instrument
       // EMPTY
     }
     if (newInstrumentSettings != null)
+    {
       settingsReadFromInstrument (newInstrumentSettings);
+      statusReadFromInstrument (HP3478A_GPIB_Status.fromSettings (newInstrumentSettings));
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
