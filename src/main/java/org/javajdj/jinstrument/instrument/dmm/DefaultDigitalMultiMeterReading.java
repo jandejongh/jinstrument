@@ -52,10 +52,12 @@ public class DefaultDigitalMultiMeterReading
     final String errorMessage,
     final boolean uncalibrated,
     final boolean uncorrected,
-    final double reading)
+    final double reading, 
+    final DigitalMultiMeter.NumberOfDigits resolution)
   {
     super (settings, error, errorMessage, uncalibrated, uncorrected);
     this.reading = reading;
+    this.resolution = resolution;
   }
 
   @Override
@@ -91,6 +93,21 @@ public class DefaultDigitalMultiMeterReading
   public final double getMultiMeterReading ()
   {
     return this.reading;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DigitalMultiMeterReading
+  // RESOLUTION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final DigitalMultiMeter.NumberOfDigits resolution;
+
+  @Override
+  public final DigitalMultiMeter.NumberOfDigits getResolution ()
+  {
+    return this.resolution;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
