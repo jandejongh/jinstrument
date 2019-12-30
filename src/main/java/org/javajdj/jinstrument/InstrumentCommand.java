@@ -116,7 +116,15 @@ public interface InstrumentCommand
 
   public final static String IC_SET_RF_ATTENUATION_COUPLED = "commandSetRfAttenuationCoupled";
   
+  public final static String IC_RESOLUTION = "commandResolution";
+  public final static String ICARG_RESOLUTION = "resolution";
+  
   public final static String IC_MEASUREMENT_MODE = "commandMeasurementMode";
   public final static String ICARG_MEASUREMENT_MODE = "measurementMode";
+  
+  public final static String IC_AUTO_RANGE = "commandAutoRange";
+
+  public final static String IC_RANGE = "commandRange";
+  public final static String ICARG_RANGE = "range";
   
 }
