@@ -17,12 +17,13 @@
 package org.javajdj.jinstrument.swing;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -44,6 +45,7 @@ import org.javajdj.jinstrument.instrument.dmm.DefaultDigitalMultiMeterReading;
 import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeter;
 import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeterReading;
 import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeterSettings;
+import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
 /** A one-size-fits-all Swing panel for control and status of a generic {@link DigitalMultiMeter}.
@@ -75,10 +77,6 @@ public class JDefaultDigitalMultiMeterView
     //
     super (digitalMultiMeter, level);
     this.digitalMultiMeter = digitalMultiMeter;
-    this.measurementModes = new ArrayList<> ();
-    for (final DigitalMultiMeter.MeasurementMode measurementMode : DigitalMultiMeter.MeasurementMode.values ())
-      if (this.digitalMultiMeter.supportsMeasurementMode (measurementMode))
-        this.measurementModes.add (measurementMode);
     //
     setOpaque (true);
     setLayout (new GridLayout (2, 2));
@@ -98,14 +96,17 @@ public class JDefaultDigitalMultiMeterView
     add (triggerPanel);
     //
     final JPanel controlPanel = new JPanel ();
-    setPanelBorder (controlPanel, level + 1, JInstrumentPanel.getGuiPreferencesManagementColor (), "Mode/Range");
-    controlPanel.setLayout (new GridLayout (1, 2));
+    setPanelBorder (controlPanel, level + 1, JInstrumentPanel.getGuiPreferencesManagementColor (), "Resolution/Mode/Range");
+    controlPanel.setLayout (new GridLayout (1, 3));
+    this.jResolution = new JResolutionPanel ();
+    setPanelBorder (this.jResolution, level + 2, JInstrumentPanel.getGuiPreferencesManagementColor (), "Resolution");
+    controlPanel.add (this.jResolution);
     final JPanel modePanel = new JPanel ();
     setPanelBorder (modePanel, level + 2, JInstrumentPanel.getGuiPreferencesManagementColor (), "Mode");
-    modePanel.setLayout (new GridLayout (this.measurementModes.size (), 1));
+    modePanel.setLayout (new GridLayout (digitalMultiMeter.getSupportedMeasurementModes ().size (), 1));
     this.modeButtonGroup = new ButtonGroup ();
     this.modeButtonMap = new HashMap<> ();
-    for (final DigitalMultiMeter.MeasurementMode measurementMode : this.measurementModes)
+    for (final DigitalMultiMeter.MeasurementMode measurementMode : digitalMultiMeter.getSupportedMeasurementModes ())
     {
       final JRadioButton modeButton = new JRadioButton (measurementMode.toString ());
       this.modeButtonMap.put (modeButton, measurementMode);
@@ -116,21 +117,29 @@ public class JDefaultDigitalMultiMeterView
     controlPanel.add (modePanel);
     final JPanel rangePanel = new JPanel ();
     setPanelBorder (rangePanel, level + 2, JInstrumentPanel.getGuiPreferencesManagementColor (), "Range");
-    rangePanel.setLayout (new GridLayout (1,1));
-    final JLabel rangeTbdLabel = new JLabel ("TBD");
-    rangeTbdLabel.setHorizontalAlignment (SwingConstants.CENTER);
-    rangePanel.add (rangeTbdLabel);
+    rangePanel.setLayout (new GridLayout (2,1));
+    final JPanel jAutoRangePanel = new JPanel ();
+    jAutoRangePanel.setLayout (new GridLayout (1, 1));
+    this.jAutoRange = new JColorCheckBox<> ((t) -> t != null && t ? Color.green : null);
+    this.jAutoRange.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jAutoRange.setVerticalAlignment (SwingConstants.CENTER);
+    jAutoRangePanel.add (this.jAutoRange);
+    this.jAutoRange.addActionListener (this.autoRangeActionListener);
+    setPanelBorder (jAutoRangePanel, level + 3, Color.black, "Auto");
+    rangePanel.add (jAutoRangePanel);
+    this.jRangePanel = new JRangePanel ();
+    this.jRangePanel.setAlignmentX (Component.CENTER_ALIGNMENT);
+    rangePanel.add (this.jRangePanel);
     controlPanel.add (rangePanel);
     add (controlPanel);
     //
     final JPanel readingPanel = new JPanel ();
     setPanelBorder (readingPanel, level + 1, JInstrumentPanel.getGuiPreferencesManagementColor (), "Reading");
-    readingPanel.setLayout (new GridLayout (2, 1));
+    readingPanel.setLayout (new GridLayout (3, 1));
+    readingPanel.add (new JLabel ());
     this.jReadingValue7 = new JSevenSegmentNumber (Color.red, 0, 1000, 1e-6); // XXX Arbitrary argument values!
     readingPanel.add (this.jReadingValue7);
-    this.jReadingValue = new JLabel ();
-    this.jReadingValue.setHorizontalAlignment (SwingConstants.CENTER);
-    readingPanel.add (this.jReadingValue);
+    readingPanel.add (new JLabel ());
     add (readingPanel);
     //
     getDigitalMultiMeter ().addInstrumentListener (this.instrumentListener);
@@ -198,14 +207,59 @@ public class JDefaultDigitalMultiMeterView
   
   private final DigitalMultiMeter digitalMultiMeter;
   
-  private final List<DigitalMultiMeter.MeasurementMode> measurementModes;
-  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SWING
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  private class JResolutionPanel
+    extends JPanel
+  {
+    
+    public JResolutionPanel ()
+    {
+      final List<DigitalMultiMeter.NumberOfDigits> resolutions =
+        JDefaultDigitalMultiMeterView.this.digitalMultiMeter.getSupportedResolutions ();
+      setLayout (new GridLayout (resolutions.size (), 2));
+      this.resolutionsMap = new LinkedHashMap<> ();
+      for (final DigitalMultiMeter.NumberOfDigits resolution : resolutions)
+      {
+        final JColorCheckBox<Boolean> jccb = new JColorCheckBox<> ((t) -> (t != null && t) ? Color.red : null);
+        this.resolutionsMap.put (resolution, jccb);
+        add (jccb);
+        add (new JLabel (resolution.toString ()));
+        jccb.addActionListener ((ActionEvent ae) ->
+        {
+          try
+          {
+            JDefaultDigitalMultiMeterView.this.digitalMultiMeter.setResolution (resolution);
+          }
+          catch (Exception e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting resolution {0} on instrument {1}: {2}.",        
+              new Object[]
+                {resolution, JDefaultDigitalMultiMeterView.this.digitalMultiMeter, Arrays.toString (e.getStackTrace ())});
+          }
+        });
+      }
+    }
+    
+    private final Map<DigitalMultiMeter.NumberOfDigits, JColorCheckBox> resolutionsMap;
+    
+    public void setResolution (DigitalMultiMeter.NumberOfDigits newResolution)
+    {
+      for (final DigitalMultiMeter.NumberOfDigits resolution : this.resolutionsMap.keySet ())
+      {
+        this.resolutionsMap.get (resolution).setDisplayedValue (resolution == newResolution);
+        this.resolutionsMap.get (resolution).repaint ();
+      }
+    }
+    
+  }
+  
+  private final JResolutionPanel jResolution;
+  
   private final ButtonGroup modeButtonGroup;  
   
   private final Map<JRadioButton, DigitalMultiMeter.MeasurementMode> modeButtonMap;
@@ -229,7 +283,7 @@ public class JDefaultDigitalMultiMeterView
     }
   }
   
-  private ActionListener modeButtonActionListener = (final ActionEvent ae) ->
+  private final ActionListener modeButtonActionListener = (final ActionEvent ae) ->
   {
     final JRadioButton modeButton = (JRadioButton) ae.getSource ();
     final DigitalMultiMeter.MeasurementMode newMeasurementMode = JDefaultDigitalMultiMeterView.this.modeButtonMap.get (modeButton);
@@ -245,7 +299,151 @@ public class JDefaultDigitalMultiMeterView
     }
   };
   
-  private JLabel jReadingValue;
+  private final ActionListener autoRangeActionListener = (final ActionEvent ae) ->
+  {
+    try
+    {
+      JDefaultDigitalMultiMeterView.this.digitalMultiMeter.setAutoRange ();
+    }
+    catch (Exception e)
+    {
+      LOG.log (Level.INFO, "Caught exception while setting Auto Range on instrument {0}: {1}.",        
+        new Object[]
+          {JDefaultDigitalMultiMeterView.this.digitalMultiMeter, Arrays.toString (e.getStackTrace ())});
+    }
+  };
+  
+  private JColorCheckBox<Boolean> jAutoRange;
+  
+  private class JRangePanelSingleMeasurementMode
+    extends JPanel
+  {
+    
+
+    public JRangePanelSingleMeasurementMode (DigitalMultiMeter.MeasurementMode measurementMode)
+    {
+      if (measurementMode == null)
+        throw new IllegalArgumentException ();
+      this.measurementMode = measurementMode;
+      this.rangesMap = new LinkedHashMap<> ();
+      final List<DigitalMultiMeter.Range> ranges = getDigitalMultiMeter ().getSupportedRanges (measurementMode);
+      setLayout (new GridLayout (ranges.size (), 3));
+      for (final DigitalMultiMeter.Range range : ranges)
+      {
+        final JColorCheckBox<Boolean> jccb = new JColorCheckBox<> ((t) -> (t != null && t) ? Color.red : null);
+        this.rangesMap.put (range, jccb);
+        add (jccb);
+        add (new JLabel (Double.toString (range.getValue ())));
+        add (new JLabel (range.getUnit ().toString ()));
+        jccb.addActionListener ((ActionEvent ae) ->
+        {
+          try
+          {
+            JDefaultDigitalMultiMeterView.this.digitalMultiMeter.setRange (range);
+          }
+          catch (Exception e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting range {0} on instrument {1}: {2}.",        
+              new Object[]
+                {range, JDefaultDigitalMultiMeterView.this.digitalMultiMeter, Arrays.toString (e.getStackTrace ())});
+          }
+        });
+      }
+      this.currentRange = null;
+    }
+    
+    private final DigitalMultiMeter.MeasurementMode measurementMode;
+    
+    private final Map<DigitalMultiMeter.Range, JColorCheckBox> rangesMap;
+    
+    private DigitalMultiMeter.Range currentRange;
+    
+    public void setRange (final DigitalMultiMeter.Range range)
+    {
+      if (range != this.currentRange)
+      {
+        if (this.currentRange != null)
+        {
+          this.rangesMap.get (this.currentRange).setDisplayedValue (false);
+          this.rangesMap.get (this.currentRange).repaint ();
+        }
+        if (range != null && this.rangesMap.containsKey (range))
+        {
+          this.rangesMap.get (range).setDisplayedValue (true);
+          this.rangesMap.get (range).repaint ();
+        }
+        this.currentRange = range;
+        repaint ();
+      }
+    }
+    
+  }
+
+  private class JRangePanel
+    extends JPanel
+  {
+    
+    public JRangePanel ()
+    {
+      setLayout (new GridLayout (1, 1));
+      add (new JLabel ("Unknown"));
+      this.modePanels = new LinkedHashMap<> ();
+      final List<DigitalMultiMeter.MeasurementMode> modes =
+        JDefaultDigitalMultiMeterView.this.getDigitalMultiMeter ().getSupportedMeasurementModes ();
+      for (final DigitalMultiMeter.MeasurementMode mode : modes)
+      {
+        this.modePanels.put (mode, new JRangePanelSingleMeasurementMode (mode));
+      }
+    }
+    
+    private DigitalMultiMeterSettings settings;
+    
+    private final Map<DigitalMultiMeter.MeasurementMode, JRangePanelSingleMeasurementMode> modePanels;
+    
+    public void setDigitalMultiMeterSettings (DigitalMultiMeterSettings settings)
+    {
+      if (settings != this.settings)
+      {
+        if (settings == null)
+        {
+          removeAll ();
+          add (new JLabel ("Unknown"));
+          this.settings = settings;
+          revalidate ();
+          repaint ();
+        }
+        else if (this.settings != null && settings.getMeasurementMode () == this.settings.getMeasurementMode ())
+        {
+          final JRangePanelSingleMeasurementMode subPanel = this.modePanels.get (settings.getMeasurementMode ());
+          subPanel.setRange (settings.getRange ());
+          this.settings = settings;
+          repaint ();
+        }
+        else if (this.modePanels.containsKey (settings.getMeasurementMode ()))
+        {
+          final JRangePanelSingleMeasurementMode subPanel = this.modePanels.get (settings.getMeasurementMode ());
+          removeAll ();
+          add (subPanel);
+          subPanel.setRange (settings.getRange ());
+          this.settings = settings;
+          revalidate ();
+          repaint ();
+        }
+        else
+        {
+          removeAll ();
+          add (new JLabel ("Unsupported"));
+          revalidate ();
+          repaint ();
+        }
+      }
+    }
+    
+  }
+  
+  private JRangePanel jRangePanel;
+  
+  // private JLabel jReadingValue;
   
   private JSevenSegmentNumber jReadingValue7;
   
@@ -278,7 +476,10 @@ public class JDefaultDigitalMultiMeterView
         //
         try
         {
+          JDefaultDigitalMultiMeterView.this.jResolution.setResolution (settings.getResolution ());
           JDefaultDigitalMultiMeterView.this.setMeasurementMode (settings.getMeasurementMode ());
+          JDefaultDigitalMultiMeterView.this.jAutoRange.setDisplayedValue (settings.isAutoRange ());
+          JDefaultDigitalMultiMeterView.this.jRangePanel.setDigitalMultiMeterSettings (settings);
         }
         finally
         {
@@ -299,7 +500,6 @@ public class JDefaultDigitalMultiMeterView
       {
         final double readingValue = digitalMultiMeterReading.getMultiMeterReading ();
         JDefaultDigitalMultiMeterView.this.jReadingValue7.setNumber (readingValue);
-        JDefaultDigitalMultiMeterView.this.jReadingValue.setText (Double.toString (readingValue));
       });
     }
     
