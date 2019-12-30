@@ -17,6 +17,7 @@
 package org.javajdj.jinstrument.instrument.dmm;
 
 import java.io.IOException;
+import java.util.List;
 import org.javajdj.jinstrument.Instrument;
 
 /** Extension of {@link Instrument} for single-channel multi-meters.
@@ -28,7 +29,41 @@ public interface DigitalMultiMeter
 extends Instrument
 {
 
-  public enum MeasurementMode
+  enum NumberOfDigits
+  {
+    DIGITS_1,
+    DIGITS_1_5,
+    DIGITS_2,
+    DIGITS_2_5,
+    DIGITS_3,
+    DIGITS_3_5,
+    DIGITS_4,
+    DIGITS_4_5,
+    DIGITS_5,
+    DIGITS_5_5,
+    DIGITS_6,
+    DIGITS_6_5,
+    DIGITS_7,
+    DIGITS_7_5,
+    DIGITS_8,
+    DIGITS_8_5,
+    DIGITS_9,
+    DIGITS_9_5,
+    DIGITS_10,
+    DIGITS_10_5,
+    DIGITS_11,
+    DIGITS_11_5,
+    DIGITS_12,
+    DIGITS_12_5,
+    DIGITS_13,
+    DIGITS_13_5,
+    DIGITS_14,
+    DIGITS_14_5,
+    DIGITS_15,
+    DIGITS_15_5;
+  }
+  
+  enum MeasurementMode
   {
     NONE,
     UNKNOWN,
@@ -46,9 +81,56 @@ extends Instrument
     TEMPERATURE;
   }
   
+  enum Unit
+  {
+    //
+    UNIT_pV,
+    UNIT_nV,
+    UNIT_muV,
+    UNIT_mV,
+    UNIT_V,
+    UNIT_kV,
+    //
+    UNIT_pA,
+    UNIT_nA,
+    UNIT_muA,
+    UNIT_mA,
+    UNIT_A,
+    UNIT_kA,
+    //
+    UNIT_muOhm,
+    UNIT_mOhm,
+    UNIT_Ohm,
+    UNIT_kOhm,
+    UNIT_MOhm,
+    UNIT_GOhm
+    ;
+  }
+  
+  interface Range
+  {
+    double getValue ();
+    Unit getUnit ();
+  }
+  
+  List<NumberOfDigits> getSupportedResolutions ();
+  
+  List<MeasurementMode> getSupportedMeasurementModes ();
+  
+  List<Range> getSupportedRanges (MeasurementMode measurementMode);
+
   boolean supportsMeasurementMode (MeasurementMode measurementMode);
   
+  void setResolution (NumberOfDigits resolution)
+    throws IOException, InterruptedException;
+    
   void setMeasurementMode (MeasurementMode measurementMode)
     throws IOException, InterruptedException;
-
+  
+  void setAutoRange ()
+    throws IOException, InterruptedException;
+  
+  void setRange (Range range)
+    throws IOException, InterruptedException;
+  
 }
