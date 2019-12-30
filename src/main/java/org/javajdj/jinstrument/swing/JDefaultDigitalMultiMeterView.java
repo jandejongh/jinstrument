@@ -87,13 +87,17 @@ public class JDefaultDigitalMultiMeterView
     instrumentManagementPanel.setPanelBorder (JInstrumentPanel.getGuiPreferencesManagementColor (), "Management");
     add (instrumentManagementPanel);
     //
-    final JPanel triggerPanel = new JPanel ();
-    setPanelBorder (triggerPanel, level + 1, JInstrumentPanel.getGuiPreferencesManagementColor (), "Trigger");
-    triggerPanel.setLayout (new GridLayout (1,1));
-    final JLabel triggerTbdLabel = new JLabel ("TBD");
-    triggerTbdLabel.setHorizontalAlignment (SwingConstants.CENTER);
-    triggerPanel.add (triggerTbdLabel);
-    add (triggerPanel);
+    this.jInstrumentSpecificPanel = new JPanel ();
+    setPanelBorder (
+      this.jInstrumentSpecificPanel,
+      level + 1,
+      JInstrumentPanel.getGuiPreferencesManagementColor (),
+      "Instrument Specific");
+    this.jInstrumentSpecificPanel.setLayout (new GridLayout (1,1));
+    final JLabel jInstrumentSpecificLabel = new JLabel ("Not Supported");
+    jInstrumentSpecificLabel.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jInstrumentSpecificPanel.add (jInstrumentSpecificLabel);
+    add (this.jInstrumentSpecificPanel);
     //
     final JPanel controlPanel = new JPanel ();
     setPanelBorder (controlPanel, level + 1, JInstrumentPanel.getGuiPreferencesManagementColor (), "Resolution/Mode/Range");
@@ -205,7 +209,7 @@ public class JDefaultDigitalMultiMeterView
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final DigitalMultiMeter digitalMultiMeter;
+  protected final DigitalMultiMeter digitalMultiMeter;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -443,7 +447,7 @@ public class JDefaultDigitalMultiMeterView
   
   private JRangePanel jRangePanel;
   
-  // private JLabel jReadingValue;
+  protected final JPanel jInstrumentSpecificPanel;
   
   private JSevenSegmentNumber jReadingValue7;
   
