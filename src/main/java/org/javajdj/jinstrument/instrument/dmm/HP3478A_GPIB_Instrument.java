@@ -19,9 +19,13 @@ package org.javajdj.jinstrument.instrument.dmm;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.DeviceType;
 import org.javajdj.jinstrument.Instrument;
@@ -30,7 +34,6 @@ import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
-import org.javajdj.jinstrument.Util;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
@@ -124,10 +127,52 @@ public class HP3478A_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DigitalMultiMeter
-  // MEASUREMENT MODE SUPPORT
+  // RESOLUTION
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  private final static NumberOfDigits[] SUPPORTED_RESOLUTIONS = new NumberOfDigits[]
+  {
+    NumberOfDigits.DIGITS_3_5,
+    NumberOfDigits.DIGITS_4_5,
+    NumberOfDigits.DIGITS_5_5
+  };
+  
+  private final static List<NumberOfDigits> SUPPORTED_RESOLUTIONS_AS_LIST
+    = Collections.unmodifiableList (Arrays.asList (HP3478A_GPIB_Instrument.SUPPORTED_RESOLUTIONS));
+  
+  @Override
+  public final List<NumberOfDigits> getSupportedResolutions ()
+  {
+    return HP3478A_GPIB_Instrument.SUPPORTED_RESOLUTIONS_AS_LIST;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DigitalMultiMeter
+  // MEASUREMENT MODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final static MeasurementMode[] SUPPORTED_MEASUREMENT_MODES = new MeasurementMode[]
+  {
+    MeasurementMode.DC_VOLTAGE,
+    MeasurementMode.AC_VOLTAGE,
+    MeasurementMode.RESISTANCE_2W,
+    MeasurementMode.RESISTANCE_4W,
+    MeasurementMode.DC_CURRENT,
+    MeasurementMode.AC_CURRENT
+  };
+  
+  private final static List<MeasurementMode> SUPPORTED_MEASUREMENT_MODES_AS_LIST =
+    Collections.unmodifiableList (Arrays.asList (HP3478A_GPIB_Instrument.SUPPORTED_MEASUREMENT_MODES));
+  
+  @Override
+  public final List<MeasurementMode> getSupportedMeasurementModes ()
+  {
+    return HP3478A_GPIB_Instrument.SUPPORTED_MEASUREMENT_MODES_AS_LIST;
+  }
+  
   @Override
   public final boolean supportsMeasurementMode (final MeasurementMode measurementMode)
   {
@@ -146,6 +191,88 @@ public class HP3478A_GPIB_Instrument
         return false;
     }
   }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DigitalMultiMeter
+  // RANGE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private static class DefaultRange
+    implements Range
+  {
+    
+    private final double value;
+    private final Unit unit;
+
+    public DefaultRange (final double value, final Unit unit)
+    {
+      if (unit == null)
+        throw new IllegalArgumentException ();
+      this.value = value;
+      this.unit = unit;
+    }
+
+    @Override
+    public final double getValue ()
+    {
+      return this.value;
+    }
+
+    @Override
+    public final Unit getUnit ()
+    {
+      return this.unit;
+    }
+    
+  }
+  
+  private static final Map<MeasurementMode, List<Range>> SUPPORTED_RANGES_MAP =
+    Arrays.stream (new Object[][]
+    {
+      { MeasurementMode.DC_VOLTAGE, Arrays.asList (new Range[] {
+          new DefaultRange (30, Unit.UNIT_mV),
+          new DefaultRange (300, Unit.UNIT_mV),
+          new DefaultRange (3, Unit.UNIT_V),
+          new DefaultRange (30, Unit.UNIT_V),
+          new DefaultRange (300, Unit.UNIT_V)})},
+      { MeasurementMode.AC_VOLTAGE, Arrays.asList (new Range[] {
+          new DefaultRange (300, Unit.UNIT_mV),
+          new DefaultRange (3, Unit.UNIT_V),
+          new DefaultRange (30, Unit.UNIT_V),
+          new DefaultRange (300, Unit.UNIT_V)})},
+      { MeasurementMode.RESISTANCE_2W, Arrays.asList (new Range[] {
+          new DefaultRange (30, Unit.UNIT_Ohm),
+          new DefaultRange (300, Unit.UNIT_Ohm),
+          new DefaultRange (3, Unit.UNIT_kOhm),
+          new DefaultRange (30, Unit.UNIT_kOhm),
+          new DefaultRange (300, Unit.UNIT_kOhm),
+          new DefaultRange (3, Unit.UNIT_MOhm),
+          new DefaultRange (30, Unit.UNIT_MOhm)})},
+      { MeasurementMode.RESISTANCE_4W, Arrays.asList (new Range[] {
+          new DefaultRange (30, Unit.UNIT_Ohm),
+          new DefaultRange (300, Unit.UNIT_Ohm),
+          new DefaultRange (3, Unit.UNIT_kOhm),
+          new DefaultRange (30, Unit.UNIT_kOhm),
+          new DefaultRange (300, Unit.UNIT_kOhm),
+          new DefaultRange (3, Unit.UNIT_MOhm),
+          new DefaultRange (30, Unit.UNIT_MOhm)})},
+      { MeasurementMode.DC_CURRENT, Arrays.asList (new Range[] {
+          new DefaultRange (300, Unit.UNIT_mA),
+          new DefaultRange (3, Unit.UNIT_A)})},
+      { MeasurementMode.AC_CURRENT, Arrays.asList (new Range[] {
+          new DefaultRange (300, Unit.UNIT_mA),
+          new DefaultRange (3, Unit.UNIT_A)})}
+    }).collect (Collectors.toMap (kv -> (MeasurementMode) kv[0], kv -> (List<Range>) kv[1]));
+
+  @Override
+  public final List<Range> getSupportedRanges (final MeasurementMode measurementMode)
+  {
+    if (measurementMode == null)
+      return null;
+    return SUPPORTED_RANGES_MAP.get (measurementMode);
+  }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -162,37 +289,6 @@ public class HP3478A_GPIB_Instrument
   private void writeAsync (final String string)
   {
     ((GpibDevice) getDevice ()).writeAsync (string.getBytes (Charset.forName ("US-ASCII")));
-  }
-  
-  private String writeAndReadlnSync (final String string)
-    throws InterruptedException, IOException, TimeoutException
-  {
-    final byte[] bytes = ((GpibDevice) getDevice ()).writeAndReadlnSync (string.getBytes (Charset.forName ("US-ASCII")),
-      HP3478A_GPIB_Instrument.READLINE_TERMINATION_MODE,
-      HP3478A_GPIB_Instrument.READLINE_TIMEOUT_MS);
-    return new String (bytes, Charset.forName ("US-ASCII"));
-  }
-  
-  private byte[] writeAndReadNSync (final String string, final int N)
-    throws InterruptedException, IOException, TimeoutException
-  {
-    final byte[] bytes = ((GpibDevice) getDevice ()).writeAndReadNSync (string.getBytes (Charset.forName ("US-ASCII")),
-      N,
-      HP3478A_GPIB_Instrument.READLINE_TIMEOUT_MS);
-    return bytes;
-  }
-  
-  private String[] writeAndReadlnNSync (final String string, final int N)
-    throws InterruptedException, IOException, TimeoutException
-  {
-    final byte[][] bytes = ((GpibDevice) getDevice ()).writeAndReadlnNSync (string.getBytes (Charset.forName ("US-ASCII")),
-      HP3478A_GPIB_Instrument.READLINE_TERMINATION_MODE,
-      N,
-      HP3478A_GPIB_Instrument.READLINE_TIMEOUT_MS);
-    final String[] strings = new String[bytes.length];
-    for (int s = 0; s < strings.length; s++)
-      strings[s] = new String (bytes[s], Charset.forName ("US-ASCII"));
-    return strings;
   }
   
   private GpibControllerCommand generateGetSettingsCommandB ()
@@ -286,7 +382,23 @@ public class HP3478A_GPIB_Instrument
       throw new IllegalArgumentException ();
     }
     // XXX Sanity checks!
-    LOG.log (Level.WARNING, "B bytes = {0}", Util.bytesToHex (b));
+    // LOG.log (Level.WARNING, "B bytes = {0}", Util.bytesToHex (b));
+    final int resolutionInt = (b[0] & 0x03);
+    final NumberOfDigits resolution;
+    switch (resolutionInt)
+    {
+      case 1:
+        resolution = NumberOfDigits.DIGITS_5_5;
+        break;
+      case 2:
+        resolution = NumberOfDigits.DIGITS_4_5;
+        break;
+      case 3:
+        resolution = NumberOfDigits.DIGITS_3_5;
+        break;
+      default:
+        throw new RuntimeException ();
+    }
     final int measurentModeInt = ((b[0] & 0xe0) >>> 5) & 0x07;
     final MeasurementMode measurementMode;
     switch (measurentModeInt)
@@ -307,13 +419,50 @@ public class HP3478A_GPIB_Instrument
       {
         LOG.log (Level.WARNING, "The Measurement Mode numbered {0} is not supported (and unexpected) on this Instrument!",
           measurentModeInt);
-        measurementMode = MeasurementMode.UNKNOWN;
+        throw new IllegalArgumentException ();
       }
     }
-    LOG.log (Level.INFO, "MeasurementMode={0}", measurementMode);
+    final int rangeInt = ((b[0] & 0x1c) >>> 2) & 0x07;
+    if (rangeInt == 0)
+    {
+      LOG.log (Level.WARNING, "The Range numbered {0} is not supported (and unexpected) on this Instrument!",
+        rangeInt);
+      throw new IllegalArgumentException ();        
+    }
+    final List<Range> ranges = SUPPORTED_RANGES_MAP.get (measurementMode);
+    final Range range;
+    switch (measurementMode)
+    {
+      case DC_VOLTAGE:
+        if (rangeInt >= 6)
+          throw new IllegalArgumentException ();
+        range = ranges.get (rangeInt - 1);
+        break;
+      case AC_VOLTAGE:
+        if (rangeInt >= 5)
+          throw new IllegalArgumentException ();
+        range = ranges.get (rangeInt - 1);
+        break;
+      case RESISTANCE_2W:
+      case RESISTANCE_4W:
+        range = ranges.get (rangeInt - 1);
+        break;
+      case DC_CURRENT:
+      case AC_CURRENT:
+        if (rangeInt >= 3)
+          throw new IllegalArgumentException ();
+        range = ranges.get (rangeInt - 1);
+        break;
+      default:
+        throw new RuntimeException ();
+    }
+    final boolean autoRange = (b[1] & 0x02) != 0;
     return new DefaultDigitalMultiMeterSettings (
       b,
-      measurementMode);
+      resolution,
+      measurementMode,
+      autoRange,
+      range);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -356,7 +505,14 @@ public class HP3478A_GPIB_Instrument
     {
       throw new IOException (nfe);
     }
-    return new DefaultDigitalMultiMeterReading (settings, false, null, false, false, readingValue);
+    return new DefaultDigitalMultiMeterReading (
+      settings,
+      false,
+      null,
+      false,
+      false,
+      readingValue,
+      settings.getResolution ());
   }
 
   @Override
@@ -400,6 +556,26 @@ public class HP3478A_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
+        case InstrumentCommand.IC_RESOLUTION:
+        {
+          final NumberOfDigits resolution = (NumberOfDigits) instrumentCommand.get (InstrumentCommand.ICARG_RESOLUTION);
+          final List<NumberOfDigits> supportedResolutions = HP3478A_GPIB_Instrument.SUPPORTED_RESOLUTIONS_AS_LIST;
+          if (! supportedResolutions.contains (resolution))
+          {
+            LOG.log (Level.WARNING, "Resolution {0} is not supported on HP3478A.",
+              new Object[]{resolution});
+            throw new UnsupportedOperationException ();
+          }
+          switch (resolution)
+          {
+            case DIGITS_5_5: writeAsync ("N5\r\n"); break;
+            case DIGITS_4_5: writeAsync ("N4\r\n"); break;
+            case DIGITS_3_5: writeAsync ("N3\r\n"); break;
+            default:         throw new RuntimeException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
         case InstrumentCommand.IC_MEASUREMENT_MODE:
         {
           final MeasurementMode measurementMode =
@@ -416,6 +592,85 @@ public class HP3478A_GPIB_Instrument
             case AC_CURRENT:    writeAsync ("F6\r\n"); break;
             default:
               throw new UnsupportedOperationException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_AUTO_RANGE:
+        {
+          writeAsync ("RA\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_RANGE:
+        {
+          final DigitalMultiMeterSettings settings = getSettingsFromInstrumentSync ();
+          final Range range = (Range) instrumentCommand.get (InstrumentCommand.ICARG_RANGE);
+          final MeasurementMode mode = settings.getMeasurementMode ();
+          final List<Range> supportedRanges = SUPPORTED_RANGES_MAP.get (mode);
+          if (! supportedRanges.contains (range))
+          {
+            LOG.log (Level.WARNING, "Range {0} is not supported on HP3478A in mode {1}.",
+              new Object[]{range, mode});
+            throw new UnsupportedOperationException ();
+          }
+          final int rangeIndex = supportedRanges.indexOf (range);
+          switch (mode)
+          {
+            case DC_VOLTAGE:
+            {
+              switch (rangeIndex)
+              {
+                case 0:  writeAsync ("R-2\r\n"); break;
+                case 1:  writeAsync ("R-1\r\n"); break;
+                case 2:  writeAsync ("R0\r\n");  break;
+                case 3:  writeAsync ("R1\r\n");  break;
+                case 4:  writeAsync ("R2\r\n");  break;
+                default: throw new UnsupportedOperationException ();
+              }
+              break;
+            }
+            case AC_VOLTAGE:
+            {
+              switch (rangeIndex)
+              {
+                case 0:  writeAsync ("R-1\r\n"); break;
+                case 1:  writeAsync ("R0\r\n");  break;
+                case 2:  writeAsync ("R1\r\n");  break;
+                case 3:  writeAsync ("R2\r\n");  break;
+                default: throw new UnsupportedOperationException ();
+              }
+              break;
+            }
+            case RESISTANCE_2W:
+            case RESISTANCE_4W:
+            {
+              switch (rangeIndex)
+              {
+                case 0:  writeAsync ("R1\r\n"); break;
+                case 1:  writeAsync ("R2\r\n"); break;
+                case 2:  writeAsync ("R3\r\n"); break;
+                case 3:  writeAsync ("R4\r\n"); break;
+                case 4:  writeAsync ("R5\r\n"); break;
+                case 5:  writeAsync ("R6\r\n"); break;
+                case 6:  writeAsync ("R7\r\n"); break;
+                default: throw new UnsupportedOperationException ();
+              }
+              break;
+            }
+            case AC_CURRENT:
+            case DC_CURRENT:
+            {
+              switch (rangeIndex)
+              {
+                case 0:  writeAsync ("R-1\r\n"); break;
+                case 1:  writeAsync ("R0\r\n");  break;
+                default: throw new UnsupportedOperationException ();
+              }
+              break;
+            }
+            default:
+              throw new RuntimeException ();
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
