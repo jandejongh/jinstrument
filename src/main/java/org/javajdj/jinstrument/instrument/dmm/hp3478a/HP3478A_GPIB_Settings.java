@@ -29,7 +29,7 @@ import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeterSettings;
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class HP3478A_GPIB_Settings
+public final class HP3478A_GPIB_Settings
   extends DefaultDigitalMultiMeterSettings
   implements DigitalMultiMeterSettings
 {
@@ -53,9 +53,27 @@ public class HP3478A_GPIB_Settings
     final DigitalMultiMeter.NumberOfDigits resolution,
     final DigitalMultiMeter.MeasurementMode measurementMode,
     final boolean autoRange,
-    final DigitalMultiMeter.Range range)
+    final DigitalMultiMeter.Range range,
+    final boolean autoZero,
+    final boolean internalTriggerEnabled,
+    final boolean externalTriggerEnabled,
+    final boolean calRamEnabled,
+    final boolean frontOperation,
+    final boolean freq50HzOperation,
+    final byte serialPollMaskByte,
+    final byte errorByte,
+    final byte dacSettingsByte)
   {
     super (bytes, resolution, measurementMode, autoRange, range);
+    this.autoZero = autoZero;
+    this.internalTriggerEnabled = internalTriggerEnabled;
+    this.externalTriggerEnabled = externalTriggerEnabled;
+    this.calRamEnabled = calRamEnabled;
+    this.frontOperation = frontOperation;
+    this.freq50HzOperation = freq50HzOperation;
+    this.serialPollMaskByte = serialPollMaskByte;
+    this.errorByte = errorByte;
+    this.dacSettingsByte = dacSettingsByte;
   }
 
   public final static int B_LENGTH = 5;
@@ -67,7 +85,9 @@ public class HP3478A_GPIB_Settings
       LOG.log (Level.WARNING, "Null B object or unexpected number of bytes read for Settings.");
       throw new IllegalArgumentException ();
     }
-    // LOG.log (Level.WARNING, "B bytes = {0}", Util.bytesToHex (b));
+    //
+    // BYTE 0: RESOLUTION, MEASUREMENT MODE, RANGE
+    //
     final int resolutionInt = (b[0] & 0x03);
     final DigitalMultiMeter.NumberOfDigits resolution;
     switch (resolutionInt)
@@ -144,13 +164,191 @@ public class HP3478A_GPIB_Settings
       default:
         throw new RuntimeException ();
     }
+    //
+    // BYTE 1: TRIGGER, CAL RAM, FRONT/REAR, 50 HZ, AUTO-ZERO, AUTO-RANGE
+    //
+    if ((b[1] & 0x80) != 0)
+      throw new IllegalArgumentException ();
+    final boolean externalTriggerEnabled = (b[1] & 0x40) != 0;
+    final boolean calRamEnabled = (b[1] & 0x20) != 0;
+    final boolean frontOperation = (b[1] & 0x10) != 0;
+    final boolean freq50HzOperation = (b[1] & 0x08) != 0;
+    final boolean autoZero = (b[1] & 0x04) != 0;
     final boolean autoRange = (b[1] & 0x02) != 0;
+    final boolean internalTriggerEnabled = (b[1] & 0x01) != 0;
+    //
+    // BYTE 2: SERIAL POLL MASK
+    //
+    if ((b[2] & 0x40) != 0)
+      throw new IllegalArgumentException ();
+    final byte serialPollMaskByte = b[2];
+    //
+    // BYTE 3: ERROR INFORMATION
+    //
+    if ((b[3] & 0xc0) != 0)
+      throw new IllegalArgumentException ();
+    final byte errorByte = b[3];
+    //
+    // BYTE 4: DAC SETTINGS
+    //
+    if ((b[4] & 0xc0) != 0)
+      throw new IllegalArgumentException ();
+    final byte dacSettingsByte = b[4];
     return new HP3478A_GPIB_Settings (
       b,
       resolution,
       measurementMode,
       autoRange,
-      range);
+      range,
+      autoZero,
+      internalTriggerEnabled,
+      externalTriggerEnabled,
+      calRamEnabled,
+      frontOperation,
+      freq50HzOperation,
+      serialPollMaskByte,
+      errorByte,
+      dacSettingsByte);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // EQUALS / HASHCODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  public final boolean equals (final Object obj)
+  {
+    return super.equals (obj);
+  }
+
+  @Override
+  public final int hashCode ()
+  {
+    return super.hashCode ();
+  }
+  
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AUTO ZERO
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final boolean autoZero;
+  
+  public final boolean isAutoZero ()
+  {
+    return this.autoZero;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INTERNAL / EXTERNAL TRIGGER ENABLED
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final boolean internalTriggerEnabled;
+  
+  public final boolean isInternalTriggerEnabled ()
+  {
+    return this.internalTriggerEnabled;
+  }
+  
+  private final boolean externalTriggerEnabled;
+  
+  public final boolean isExternalTriggerEnabled ()
+  {
+    return this.externalTriggerEnabled;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // CAL RAM ENABLED
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final boolean calRamEnabled;
+  
+  public final boolean isCalRamEnabled ()
+  {
+    return this.calRamEnabled;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // FRONT / REAR OPERATION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final boolean frontOperation;
+  
+  public final boolean isFrontOperation ()
+  {
+    return this.frontOperation;
+  }
+  
+  public final boolean isRearOperation ()
+  {
+    return ! this.frontOperation;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // 50/60 HZ OPERATION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final boolean freq50HzOperation;
+  
+  public final boolean is50HzOperation ()
+  {
+    return this.freq50HzOperation;
+  }
+  
+  public final boolean is60HzOperation ()
+  {
+    return ! this.freq50HzOperation;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SERIAL POLL MASK BYTE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final byte serialPollMaskByte;
+  
+  public final byte getSerialPollMaskByte ()
+  {
+    return this.serialPollMaskByte;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // ERROR BYTE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final byte errorByte;
+  
+  public final byte getErrorByte ()
+  {
+    return this.errorByte;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DAC SETTINGS BYTE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final byte dacSettingsByte;
+  
+  public final byte getDacSettingsByte ()
+  {
+    return this.dacSettingsByte;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
