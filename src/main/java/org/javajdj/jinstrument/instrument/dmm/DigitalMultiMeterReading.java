@@ -32,4 +32,6 @@ public interface DigitalMultiMeterReading
 
   double getMultiMeterReading ();
   
+  DigitalMultiMeter.NumberOfDigits getResolution ();
+  
 }
