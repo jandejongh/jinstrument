@@ -127,4 +127,10 @@ public interface InstrumentCommand
   public final static String IC_RANGE = "commandRange";
   public final static String ICARG_RANGE = "range";
   
+  public final static String IC_AUTO_ZERO = "commandAutoZero";
+  public final static String ICARG_AUTO_ZERO = "autoZero";
+  
+  public final static String IC_TRIGGER_MODE = "commandTriggerMode";
+  public final static String ICARG_TRIGGER_MODE = "triggerMode";
+  
 }
