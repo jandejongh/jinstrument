@@ -63,7 +63,7 @@ import org.javajdj.jinstrument.controller.gpib.BusType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.controller.gpib.ProLogixGpibEthernetControllerType;
-import org.javajdj.jinstrument.instrument.dmm.HP3478A_GPIB_Instrument;
+import org.javajdj.jinstrument.instrument.dmm.hp3478a.HP3478A_GPIB_Instrument;
 import org.javajdj.jinstrument.instrument.none.NONE_GPIB_Instrument;
 import org.javajdj.jinstrument.instrument.sa.HP8566B_GPIB_Instrument;
 import org.javajdj.jinstrument.instrument.sg.HP8663A_GPIB_Instrument;
