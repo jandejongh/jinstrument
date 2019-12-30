@@ -47,10 +47,16 @@ public class DefaultDigitalMultiMeterSettings
   
   public DefaultDigitalMultiMeterSettings (
     final byte[] bytes,
-    final DigitalMultiMeter.MeasurementMode measurementMode)
+    final DigitalMultiMeter.NumberOfDigits resolution,
+    final DigitalMultiMeter.MeasurementMode measurementMode,
+    final boolean autoRange,
+    final DigitalMultiMeter.Range range)
   {
     this.bytes = bytes;
+    this.resolution = resolution;
     this.measurementMode = measurementMode;
+    this.autoRange = autoRange;
+    this.range = range;
   }
 
   @Override
@@ -77,6 +83,21 @@ public class DefaultDigitalMultiMeterSettings
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DigitalMultiMeterSettings
+  // RESOLUTION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final DigitalMultiMeter.NumberOfDigits resolution;
+  
+  @Override
+  public final DigitalMultiMeter.NumberOfDigits getResolution ()
+  {
+    return this.resolution;
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DigitalMultiMeterSettings
   // MEASUREMENT MODE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,6 +108,30 @@ public class DefaultDigitalMultiMeterSettings
   public final DigitalMultiMeter.MeasurementMode getMeasurementMode ()
   {
     return this.measurementMode;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DigitalMultiMeterSettings
+  // AUTORANGE
+  // RANGE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final boolean autoRange;
+  
+  @Override
+  public final boolean isAutoRange ()
+  {
+    return this.autoRange;
+  }
+  
+  private final DigitalMultiMeter.Range range;
+  
+  @Override
+  public final DigitalMultiMeter.Range getRange ()
+  {
+    return this.range;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
