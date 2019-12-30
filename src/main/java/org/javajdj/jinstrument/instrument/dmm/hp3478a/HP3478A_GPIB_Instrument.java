@@ -26,6 +26,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.javajdj.jinstrument.DefaultInstrumentCommand;
 import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.DeviceType;
 import org.javajdj.jinstrument.Instrument;
@@ -278,6 +279,37 @@ public class HP3478A_GPIB_Instrument
     if (measurementMode == null)
       return null;
     return SUPPORTED_RANGES_MAP.get (measurementMode);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP3478A_GPIB_Instrument
+  // AUTO ZERO
+  // TRIGGER MODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public void setAutoZero (final boolean autoZero) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_AUTO_ZERO,
+      InstrumentCommand.ICARG_AUTO_ZERO, autoZero));
+  }
+  
+  public enum HP3478ATriggerMode
+  {
+    T1_INTERNAL_TRIGGER,
+    T2_EXTERNAL_TRIGGER,
+    T3_SINGLE_TRIGGER,
+    T4_TRIGGER_HOLD,
+    T5_FAST_TRIGGER;
+  }
+  
+  public void setTriggerMode (final HP3478ATriggerMode triggerMode) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TRIGGER_MODE,
+      InstrumentCommand.ICARG_TRIGGER_MODE, triggerMode));
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -585,6 +617,29 @@ public class HP3478A_GPIB_Instrument
             }
             default:
               throw new RuntimeException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_AUTO_ZERO:
+        {
+          final boolean autoZero = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_AUTO_ZERO);
+          writeAsync (autoZero ? "Z1\r\n" : "Z0\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TRIGGER_MODE:
+        {
+          final HP3478ATriggerMode triggerMode = (HP3478ATriggerMode) instrumentCommand.get (InstrumentCommand.ICARG_TRIGGER_MODE);
+          switch (triggerMode)
+          {
+            case T1_INTERNAL_TRIGGER: writeAsync ("T1\r\n"); break;
+            case T2_EXTERNAL_TRIGGER: writeAsync ("T2\r\n"); break;
+            case T3_SINGLE_TRIGGER:   writeAsync ("T3\r\n"); break;
+            case T4_TRIGGER_HOLD:     writeAsync ("T4\r\n"); break;
+            case T5_FAST_TRIGGER:     writeAsync ("T5\r\n"); break;
+            default:
+              throw new UnsupportedOperationException ();
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
