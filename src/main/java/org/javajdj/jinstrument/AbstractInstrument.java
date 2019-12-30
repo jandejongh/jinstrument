@@ -72,13 +72,13 @@ implements Instrument
     if (addStatusServices)
     {
       addRunnable (this.instrumentStatusCollector);
-      addRunnable (this.instrumentStatusDispatcher);      
     }
+    addRunnable (this.instrumentStatusDispatcher);      
     if (addSettingsServices)
     {
       addRunnable (this.instrumentSettingsCollector);
-      addRunnable (this.instrumentSettingsDispatcher);
     }
+    addRunnable (this.instrumentSettingsDispatcher);
     if (addCommandProcessorServices)
     {
       addRunnable (this.instrumentCommandProcessor);      
@@ -86,8 +86,8 @@ implements Instrument
     if (addAcquisitionServices)
     {
       addRunnable (this.instrumentReadingCollector);
-      addRunnable (this.instrumentReadingDispatcher);      
     }
+    addRunnable (this.instrumentReadingDispatcher);      
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
