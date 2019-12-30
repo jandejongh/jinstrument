@@ -70,15 +70,37 @@ implements DigitalMultiMeter
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
+  public void setResolution (final NumberOfDigits resolution) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RESOLUTION,
+      InstrumentCommand.ICARG_RESOLUTION, resolution));
+  }
+  
+  @Override
   public void setMeasurementMode (final MeasurementMode measurementMode)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
       InstrumentCommand.IC_MEASUREMENT_MODE,
-      InstrumentCommand.ICARG_MEASUREMENT_MODE,
-      measurementMode));
+      InstrumentCommand.ICARG_MEASUREMENT_MODE, measurementMode));
   }
 
+  @Override
+  public void setAutoRange () throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_AUTO_RANGE));
+  }
+  
+  @Override
+  public void setRange (final Range range) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RANGE,
+      InstrumentCommand.ICARG_RANGE, range));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
