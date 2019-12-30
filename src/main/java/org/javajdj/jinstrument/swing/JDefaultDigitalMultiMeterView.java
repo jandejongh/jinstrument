@@ -124,7 +124,7 @@ public class JDefaultDigitalMultiMeterView
     rangePanel.setLayout (new GridLayout (2,1));
     final JPanel jAutoRangePanel = new JPanel ();
     jAutoRangePanel.setLayout (new GridLayout (1, 1));
-    this.jAutoRange = new JColorCheckBox<> ((t) -> t != null && t ? Color.green : null);
+    this.jAutoRange = new JColorCheckBox<> ((t) -> t != null && t ? Color.red : null);
     this.jAutoRange.setHorizontalAlignment (SwingConstants.CENTER);
     this.jAutoRange.setVerticalAlignment (SwingConstants.CENTER);
     jAutoRangePanel.add (this.jAutoRange);
