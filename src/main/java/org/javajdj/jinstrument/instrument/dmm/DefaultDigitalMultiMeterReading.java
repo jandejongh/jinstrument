@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.instrument.dmm;
 
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.AbstractInstrumentReading;
+import org.javajdj.jinstrument.Unit;
 
 /** Default implementation of {@link DigitalMultiMeterReading}.
  * 
@@ -48,15 +49,17 @@ public class DefaultDigitalMultiMeterReading
   
   public DefaultDigitalMultiMeterReading (
     final DigitalMultiMeterSettings settings,
+    final double readingValue,
+    final Unit unit,
     final boolean error,
     final String errorMessage,
     final boolean uncalibrated,
     final boolean uncorrected,
-    final double reading, 
     final DigitalMultiMeter.NumberOfDigits resolution)
   {
-    super (settings, error, errorMessage, uncalibrated, uncorrected);
-    this.reading = reading;
+    super (settings, readingValue, unit, error, errorMessage, uncalibrated, uncorrected);
+    if (unit == null)
+      throw new IllegalArgumentException ();
     this.resolution = resolution;
   }
 
@@ -87,12 +90,16 @@ public class DefaultDigitalMultiMeterReading
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final double reading;
+  @Override
+  public Double getReadingValue ()
+  {
+    return (Double) super.getReadingValue ();
+  }
 
   @Override
-  public final double getMultiMeterReading ()
+  public double getMultiMeterReading ()
   {
-    return this.reading;
+    return getReadingValue ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
