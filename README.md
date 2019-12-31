@@ -25,20 +25,27 @@ Most important changes:
 - Revamped ProLogix controller implementation.
 - Added GPIB Controller logging + Swing component.
 
+## Release 0.3 [20191231]
+Most important changes:
+- Selecting and removing Instrument Views from the Registry.
+- Full-blown HP3478A support (only lacking a few trigger options).
+
 More detailed documentation will follow once the framework has stabilized (notably, the support for channels is still lacking).
 
-## Status [20191129]
-Very alpha... Currently working on:
-- ProLogix Ethernet-GPIB support (works);
-- HP54502A Digitizing Oscilloscope (does something but lot more effort needed here);
-- HP70000 Spectrum Analyzer (hp70900b lo and 70300a tg) -> works but much to be desired;
-- HP8566B Spectrum Analyzer -> same;
-- HP8663A Synthesized Signal Generator -> Very immature, but capable of reading/setting frequency/output power.
+## Status [20191231]
+Beta:
+- ProLogix GPIB Ethernet
+- HP-3478A Digital MultiMeter
 
-And pending:
-- HP8550 Sweep Oscillator;
-- HP3478A Digital Multimeter;
-- Various HP Power Supply Units (a.o. hp6205c);
+Alpha:
+- HP-8566B Spectrum Analyzer
+- HP-8663A Synthesized Signal Generator
+
+Work in Progress [target for V1.0 Release]:
+- HP-54502A Digitizing Oscilloscope
+- HP-70000 Spectrum Analyzer
+- HP-8550 Sweep Oscillator
+- HP-3586A Selective Level Meter
+- HP-8116A Programmable Pulse/Function Generator
 - Wiltron 560A Network Analyzer;
 - Rohde&Schwarz ESH-3 (unit broken though...).
-
