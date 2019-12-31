@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.swing;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,6 +42,7 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
+import org.javajdj.jinstrument.Unit;
 import org.javajdj.jinstrument.instrument.dmm.DefaultDigitalMultiMeterReading;
 import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeter;
 import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeterReading;
@@ -139,11 +141,18 @@ public class JDefaultDigitalMultiMeterView
     //
     final JPanel readingPanel = new JPanel ();
     setPanelBorder (readingPanel, level + 1, JInstrumentPanel.getGuiPreferencesManagementColor (), "Reading");
-    readingPanel.setLayout (new GridLayout (3, 1));
-    readingPanel.add (new JLabel ());
+    readingPanel.setLayout (new GridLayout (2, 1));
     this.jReadingValue7 = new JSevenSegmentNumber (Color.red, 0, 1000, 1e-6); // XXX Arbitrary argument values!
     readingPanel.add (this.jReadingValue7);
-    readingPanel.add (new JLabel ());
+    final JPanel jUnitPanel = new JPanel ();
+    jUnitPanel.setLayout (new GridLayout (1, 1));
+    setPanelBorder (jUnitPanel, level + 2, Color.red, "Unit");
+    this.jUnit = new JLabel ("Unknown");
+    this.jUnit.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jUnit.setForeground (Color.red);
+    this.jUnit.setFont (new Font ("Serif", Font.BOLD, 64));
+    jUnitPanel.add (this.jUnit);
+    readingPanel.add (jUnitPanel);
     add (readingPanel);
     //
     getDigitalMultiMeter ().addInstrumentListener (this.instrumentListener);
@@ -451,6 +460,8 @@ public class JDefaultDigitalMultiMeterView
   
   private JSevenSegmentNumber jReadingValue7;
   
+  private JLabel jUnit;
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENT LISTENER
@@ -504,6 +515,8 @@ public class JDefaultDigitalMultiMeterView
       {
         final double readingValue = digitalMultiMeterReading.getMultiMeterReading ();
         JDefaultDigitalMultiMeterView.this.jReadingValue7.setNumber (readingValue);
+        final Unit unit = digitalMultiMeterReading.getUnit ();
+        JDefaultDigitalMultiMeterView.this.jUnit.setText (unit != null ? unit.toString () : "No Unit Provided [error]");
       });
     }
     
