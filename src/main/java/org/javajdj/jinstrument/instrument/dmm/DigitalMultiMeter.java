@@ -19,6 +19,7 @@ package org.javajdj.jinstrument.instrument.dmm;
 import java.io.IOException;
 import java.util.List;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.Unit;
 
 /** Extension of {@link Instrument} for single-channel multi-meters.
  *
@@ -79,32 +80,6 @@ extends Instrument
     INDUCTANCE,
     IMPEDANCE,
     TEMPERATURE;
-  }
-  
-  enum Unit
-  {
-    //
-    UNIT_pV,
-    UNIT_nV,
-    UNIT_muV,
-    UNIT_mV,
-    UNIT_V,
-    UNIT_kV,
-    //
-    UNIT_pA,
-    UNIT_nA,
-    UNIT_muA,
-    UNIT_mA,
-    UNIT_A,
-    UNIT_kA,
-    //
-    UNIT_muOhm,
-    UNIT_mOhm,
-    UNIT_Ohm,
-    UNIT_kOhm,
-    UNIT_MOhm,
-    UNIT_GOhm
-    ;
   }
   
   interface Range
