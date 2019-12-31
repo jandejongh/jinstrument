@@ -27,6 +27,7 @@ public interface InstrumentTrace
   
   int getTraceLength ();
   
-  double[] getSamples ();
+  @Override
+  double[] getReadingValue ();
   
 }
