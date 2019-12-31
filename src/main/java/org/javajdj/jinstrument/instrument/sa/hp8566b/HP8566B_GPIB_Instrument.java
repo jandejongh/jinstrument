@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.instrument.sa;
+package org.javajdj.jinstrument.instrument.sa.hp8566b;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -29,9 +29,15 @@ import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
+import org.javajdj.jinstrument.Unit;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
+import org.javajdj.jinstrument.instrument.sa.AbstractSpectrumAnalyzer;
+import org.javajdj.jinstrument.instrument.sa.DefaultSpectrumAnalyzerSettings;
+import org.javajdj.jinstrument.instrument.sa.DefaultSpectrumAnalyzerTrace;
+import org.javajdj.jinstrument.instrument.sa.SpectrumAnalyzer;
+import org.javajdj.jinstrument.instrument.sa.SpectrumAnalyzerSettings;
 
 /** Implementation of {@link Instrument} and {@link SpectrumAnalyzer} for the HP-8566B.
  *
@@ -372,6 +378,7 @@ public class HP8566B_GPIB_Instrument
       });
     return new DefaultSpectrumAnalyzerSettings (
       ol,
+      Unit.UNIT_dBm,
       f_MHz,
       span_MHz,
       resolutionBandwidth_Hz,
