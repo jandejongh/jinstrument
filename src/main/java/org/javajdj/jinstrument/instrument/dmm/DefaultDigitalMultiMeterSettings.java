@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.instrument.dmm;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
+import org.javajdj.jinstrument.Unit;
 
 /** Default implementation of {@link DigitalMultiMeterSettings}.
  * 
@@ -50,13 +51,15 @@ public class DefaultDigitalMultiMeterSettings
     final DigitalMultiMeter.NumberOfDigits resolution,
     final DigitalMultiMeter.MeasurementMode measurementMode,
     final boolean autoRange,
-    final DigitalMultiMeter.Range range)
+    final DigitalMultiMeter.Range range,
+    final Unit readingUnit)
   {
     this.bytes = bytes;
     this.resolution = resolution;
     this.measurementMode = measurementMode;
     this.autoRange = autoRange;
     this.range = range;
+    this.readingUnit = readingUnit;
   }
 
   @Override
@@ -67,7 +70,22 @@ public class DefaultDigitalMultiMeterSettings
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // SpectrumAnalyzerSettings
+  // InstrumentSettings
+  // READING UNIT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Unit readingUnit;
+  
+  @Override
+  public Unit getReadingUnit ()
+  {
+    return this.readingUnit;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DigitalMultiMeterSettings
   // BYTES
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
