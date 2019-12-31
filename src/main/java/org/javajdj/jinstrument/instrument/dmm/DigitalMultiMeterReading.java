@@ -30,6 +30,9 @@ public interface DigitalMultiMeterReading
   @Override
   public DigitalMultiMeterSettings getInstrumentSettings ();
 
+  @Override
+  Double getReadingValue ();
+
   double getMultiMeterReading ();
   
   DigitalMultiMeter.NumberOfDigits getResolution ();
