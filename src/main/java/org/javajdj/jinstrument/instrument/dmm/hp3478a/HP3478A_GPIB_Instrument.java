@@ -34,6 +34,7 @@ import org.javajdj.jinstrument.InstrumentCommand;
 import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
+import org.javajdj.jinstrument.Unit;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
@@ -453,11 +454,12 @@ public class HP3478A_GPIB_Instrument
     }
     return new DefaultDigitalMultiMeterReading (
       settings,
+      readingValue,
+      settings.getReadingUnit (),
       false,
       null,
       false,
       false,
-      readingValue,
       settings.getResolution ());
   }
 
