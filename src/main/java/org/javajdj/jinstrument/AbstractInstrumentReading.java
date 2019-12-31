@@ -43,12 +43,18 @@ public abstract class AbstractInstrumentReading
   
   protected AbstractInstrumentReading (
     final InstrumentSettings instrumentSettings,
+    final Object readingValue,
+    final Unit unit,
     final boolean error,
     final String errorMessage,
     final boolean uncalibrated,
     final boolean uncorrected)
   {
+    if (instrumentSettings == null || readingValue == null)
+      throw new IllegalArgumentException ();
     this.instrumentSettings = instrumentSettings;
+    this.readingValue = readingValue;
+    this.unit = unit;
     this.error = error;
     this.errorMessage = errorMessage;
     this.uncalibrated = uncalibrated;
@@ -68,6 +74,30 @@ public abstract class AbstractInstrumentReading
   public InstrumentSettings getInstrumentSettings ()
   {
     return this.instrumentSettings;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // InstrumentReading
+  // READING VALUE
+  // UNIT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Object readingValue;
+  
+  @Override
+  public Object getReadingValue ()
+  {
+    return this.readingValue;
+  }
+  
+  private final Unit unit;
+  
+  @Override
+  public final Unit getUnit ()
+  {
+    return this.unit;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
