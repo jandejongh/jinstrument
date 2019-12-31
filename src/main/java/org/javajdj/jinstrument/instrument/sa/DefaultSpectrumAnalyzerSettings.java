@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.instrument.sa;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
+import org.javajdj.jinstrument.Unit;
 
 /** Default implementation of {@link SpectrumAnalyzerSettings}.
  * 
@@ -47,6 +48,7 @@ public class DefaultSpectrumAnalyzerSettings
   
   public DefaultSpectrumAnalyzerSettings (
     final byte[] bytes,
+    final Unit unit,
     final double centerFrequency_MHz,
     final double span_MHz,
     final double resolutionBandwitdh_Hz,
@@ -60,6 +62,7 @@ public class DefaultSpectrumAnalyzerSettings
     final boolean rfAttenuationCoupled)
   {
     this.bytes = bytes;
+    this.unit = unit;
     this.centerFrequency_MHz = centerFrequency_MHz;
     this.span_MHz = span_MHz;
     this.resolutionBandwidth_Hz = resolutionBandwitdh_Hz;
@@ -79,6 +82,21 @@ public class DefaultSpectrumAnalyzerSettings
     return (SpectrumAnalyzerSettings) super.clone ();
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // InstrumentSettings
+  // READING UNIT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final Unit unit;
+  
+  @Override
+  public Unit getReadingUnit ()
+  {
+    return this.unit;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SpectrumAnalyzerSettings
