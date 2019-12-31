@@ -30,6 +30,10 @@ public interface InstrumentReading
   
   InstrumentSettings getInstrumentSettings ();
 
+  Object getReadingValue ();
+  
+  Unit getUnit ();
+  
   boolean isError ();
   
   String getErrorMessage ();
