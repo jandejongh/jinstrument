@@ -33,4 +33,6 @@ public interface InstrumentSettings
   
   InstrumentSettings clone () throws CloneNotSupportedException;
   
+  Unit getReadingUnit ();
+  
 }
