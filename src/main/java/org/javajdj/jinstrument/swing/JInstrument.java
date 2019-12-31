@@ -65,8 +65,8 @@ import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.controller.gpib.ProLogixGpibEthernetControllerType;
 import org.javajdj.jinstrument.instrument.dmm.hp3478a.HP3478A_GPIB_Instrument;
 import org.javajdj.jinstrument.instrument.none.NONE_GPIB_Instrument;
-import org.javajdj.jinstrument.instrument.sa.HP8566B_GPIB_Instrument;
-import org.javajdj.jinstrument.instrument.sg.HP8663A_GPIB_Instrument;
+import org.javajdj.jinstrument.instrument.sa.hp8566b.HP8566B_GPIB_Instrument;
+import org.javajdj.jinstrument.instrument.sg.hp8663a.HP8663A_GPIB_Instrument;
 
 /** Swing {@code JFrame} for opening and interacting with instruments like RF signal generators, spectrum analyzers, etc.
  * 
