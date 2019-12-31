@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.InstrumentSettings;
+import org.javajdj.jinstrument.Unit;
 import org.javajdj.jinstrument.instrument.dmm.DefaultDigitalMultiMeterSettings;
 import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeter;
 import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeterSettings;
@@ -48,6 +49,28 @@ public final class HP3478A_GPIB_Settings
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  private static Unit getReadingUnit (final DigitalMultiMeter.MeasurementMode measurementMode)
+  {
+    if (measurementMode == null)
+      throw new IllegalArgumentException ();
+    switch (measurementMode)
+    {
+      case DC_VOLTAGE:
+      case AC_VOLTAGE:
+        return Unit.UNIT_V;
+      case RESISTANCE_2W:
+      case RESISTANCE_4W:
+        // XXX Is this correct? Always?
+        return Unit.UNIT_Ohm;
+      case DC_CURRENT:
+      case AC_CURRENT:
+        // XXX Is this correct? Always?
+        return Unit.UNIT_A;
+      default:
+        throw new IllegalArgumentException ();
+    }
+  }
+  
   private HP3478A_GPIB_Settings (
     final byte[] bytes,
     final DigitalMultiMeter.NumberOfDigits resolution,
@@ -64,7 +87,7 @@ public final class HP3478A_GPIB_Settings
     final byte errorByte,
     final byte dacSettingsByte)
   {
-    super (bytes, resolution, measurementMode, autoRange, range);
+    super (bytes, resolution, measurementMode, autoRange, range, getReadingUnit (measurementMode));
     this.autoZero = autoZero;
     this.internalTriggerEnabled = internalTriggerEnabled;
     this.externalTriggerEnabled = externalTriggerEnabled;
