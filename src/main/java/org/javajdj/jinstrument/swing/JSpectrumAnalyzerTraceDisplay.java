@@ -467,7 +467,7 @@ public class JSpectrumAnalyzerTraceDisplay
     g2d.fillRect (mouseX - 3, mouseY - 3, 7, 7);
     if (this.enableTrace)
     {
-      final double St_dBm = trace.getSamples ()[s];
+      final double St_dBm = trace.getReadingValue ()[s];
       final int y_trace = SToY (St_dBm);
       g2d.setColor (TRACE_COLOR);
       g2d.fillRect (mouseX - 3, y_trace - 3, 7, 7);
@@ -476,7 +476,7 @@ public class JSpectrumAnalyzerTraceDisplay
 //    if (this.avgTrace != null && this.enableAvgTrace)
 //    {
 //      // XXX Locking!!
-//      final double SavgT_dBm = this.avgTrace.getSamples ()[s];
+//      final double SavgT_dBm = this.avgTrace.getReadingValue ()[s];
 //      final int y_trace = SToY (SavgT_dBm);
 //      g2d.setColor (AVG_TRACE_COLOR);
 //      g2d.fillRect (mouseX - 3, y_trace - 3, 7, 7);
@@ -485,7 +485,7 @@ public class JSpectrumAnalyzerTraceDisplay
 //    if (this.avgFTrace != null && this.enableAvgFTrace)
 //    {
 //      // XXX Locking!!
-//      final double SavgFT_dBm = this.avgFTrace.getSamples ()[s];
+//      final double SavgFT_dBm = this.avgFTrace.getReadingValue ()[s];
 //      final int y_trace = SToY (SavgFT_dBm);
 //      g2d.setColor (AVG_F_TRACE_COLOR);
 //      g2d.fillRect (mouseX - 3, y_trace - 3, 7, 7);
@@ -506,7 +506,7 @@ public class JSpectrumAnalyzerTraceDisplay
     textY += lineSeparation;
     if (this.enableTrace)
     {
-      final double St_dBm = trace.getSamples ()[s];
+      final double St_dBm = trace.getReadingValue ()[s];
       g2d.setColor (TRACE_COLOR);
       g2d.drawString ("S = " + St_dBm + " [dBm]", startTextX, textY);
       textY += lineSeparation;
@@ -514,7 +514,7 @@ public class JSpectrumAnalyzerTraceDisplay
 //    if (this.avgTrace != null && this.enableAvgTrace)
 //    {
 //      // XXX Locking!!
-//      final double SavgT_dBm = this.avgTrace.getSamples ()[s];
+//      final double SavgT_dBm = this.avgTrace.getReadingValue ()[s];
 //      g2d.setColor (AVG_TRACE_COLOR);
 //      g2d.drawString ("S = " + SavgT_dBm + " [dBm]", startTextX, textY);
 //      textY += lineSeparation;
@@ -522,7 +522,7 @@ public class JSpectrumAnalyzerTraceDisplay
 //    if (this.avgFTrace != null && this.enableAvgFTrace)
 //    {
 //      // XXX Locking!!
-//      final double SavgFT_dBm = this.avgFTrace.getSamples ()[s];
+//      final double SavgFT_dBm = this.avgFTrace.getReadingValue ()[s];
 //      g2d.setColor (AVG_F_TRACE_COLOR);
 //      g2d.drawString ("S = " + SavgFT_dBm + " [dBm]", startTextX, textY);
 //      textY += lineSeparation;
@@ -608,7 +608,7 @@ public class JSpectrumAnalyzerTraceDisplay
       {
         final double f_MHz_s = trace.sampleIndexToFrequency_MHz (s);
         final double x_s = f_MHzToX (f_MHz_s); // XXX Use width??
-        double y_s = (((referenceLevel_dBm - trace.getSamples ()[s]) / 100.0) * height);
+        double y_s = (((referenceLevel_dBm - trace.getReadingValue ()[s]) / 100.0) * height);
         if (y_s < 0)
         {
           g2d.setColor (CLIP_COLOR);
