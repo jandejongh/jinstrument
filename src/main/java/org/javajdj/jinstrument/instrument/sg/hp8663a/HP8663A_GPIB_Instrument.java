@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.instrument.sg;
+package org.javajdj.jinstrument.instrument.sg.hp8663a;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -32,6 +32,10 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
+import org.javajdj.jinstrument.instrument.sg.AbstractSignalGenerator;
+import org.javajdj.jinstrument.instrument.sg.DefaultSignalGeneratorSettings;
+import org.javajdj.jinstrument.instrument.sg.SignalGenerator;
+import org.javajdj.jinstrument.instrument.sg.SignalGeneratorSettings;
 
 /** Implementation of {@link Instrument} and {@link SignalGenerator} for the HP-8663A.
  *

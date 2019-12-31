@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.instrument.sg;
+package org.javajdj.jinstrument.instrument.sg.hp8663a;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
