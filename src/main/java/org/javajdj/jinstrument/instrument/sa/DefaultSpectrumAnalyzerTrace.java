@@ -16,6 +16,8 @@
  */
 package org.javajdj.jinstrument.instrument.sa;
 
+import org.javajdj.jinstrument.Unit;
+
 /** Default implementation of a {@link SpectrumAnalyzerTrace}.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
@@ -69,7 +71,8 @@ implements SpectrumAnalyzerTrace
   //
   // InstrumentTrace
   // TRACE LENGTH
-  // SAMPLES
+  // READING VALUE
+  // UNIT
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -83,9 +86,15 @@ implements SpectrumAnalyzerTrace
   private final double [] samples;
   
   @Override
-  public final double[] getSamples ()
+  public final double[] getReadingValue ()
   {
     return this.samples;
+  }
+
+  @Override
+  public Unit getUnit ()
+  {
+    return Unit.UNIT_dBm;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
