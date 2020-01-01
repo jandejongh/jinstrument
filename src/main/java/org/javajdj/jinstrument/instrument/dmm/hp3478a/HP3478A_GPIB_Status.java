@@ -22,6 +22,11 @@ import org.javajdj.jinstrument.InstrumentStatus;
 
 /** Implementation of {@link InstrumentStatus} for the HP-3478A.
  *
+ * <p>
+ * This implementation requires both the status byte of a GPIB Serial Poll,
+ * as well as the Error Byte present in the result from the 'B' command on the HP-3478A.
+ * Both values should be obtained as close in time as possible.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
@@ -37,18 +42,36 @@ public class HP3478A_GPIB_Status
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private HP3478A_GPIB_Status (final HP3478A_GPIB_Settings settings)
+  private HP3478A_GPIB_Status (final byte serialPollStatusByte, final HP3478A_GPIB_Settings settings)
   {
+    this.serialPollStatusByte = serialPollStatusByte;
     this.errorByte = settings.getBytes ()[3];
+    if ((this.serialPollStatusByte & 0x20) != 0)
+      throw new IllegalArgumentException ();
     if ((this.errorByte & 0xc0) != 0)
       throw new IllegalArgumentException ();
     if (this.errorByte != 0)
       LOG.log (Level.WARNING, "The HP3478A_GPIB instrument reports an error!");
   }
   
-  public final static HP3478A_GPIB_Status fromSettings (final HP3478A_GPIB_Settings settings)
+  public final static HP3478A_GPIB_Status fromSerialPollStatusByteAndSettings (
+    final byte serialPollStatusByte,
+    final HP3478A_GPIB_Settings settings)
   {
-    return new HP3478A_GPIB_Status (settings);
+    return new HP3478A_GPIB_Status (serialPollStatusByte, settings);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SERIAL POLL STATUS BYTE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final byte serialPollStatusByte;
+  
+  public final byte getSerialPollStatusByte ()
+  {
+    return this.serialPollStatusByte;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,6 +82,11 @@ public class HP3478A_GPIB_Status
   
   private final byte errorByte;
   
+  public final byte getErrorByte ()
+  {
+    return this.errorByte;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // NAME / toString
@@ -68,12 +96,54 @@ public class HP3478A_GPIB_Status
   @Override
   public String toString ()
   {
-    return "0x" + Integer.toHexString (Byte.toUnsignedInt (this.errorByte));
+    return "SPoll=0x" + Integer.toHexString (Byte.toUnsignedInt (this.serialPollStatusByte))
+      + ", Err=0x" + Integer.toHexString (Byte.toUnsignedInt (this.errorByte));
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // ERROR DISSECTION
+  // STATUS DISSECTION [SERIAL POLL STATUS BYTE]
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final boolean isPowerOnReset ()
+  {
+    return (this.serialPollStatusByte & 0x80) != 0;
+  }
+    
+  public final boolean isServiceRequest ()
+  {
+    return (this.serialPollStatusByte & 0x40) != 0;    
+  }
+  
+  public final boolean isCalibrationFailed ()
+  {
+    return (this.serialPollStatusByte & 0x20) != 0;
+  }
+  
+  public final boolean isFrontPanelServiceRequest ()
+  {
+    return (this.serialPollStatusByte & 0x10) != 0;        
+  }
+  
+  public final boolean isHardwareError ()
+  {
+    return (this.serialPollStatusByte & 0x08) != 0;    
+  }
+  
+  public final boolean isSyntaxError ()
+  {
+    return (this.serialPollStatusByte & 0x04) != 0;    
+  }
+  
+  public final boolean isDataReady ()
+  {
+    return (this.serialPollStatusByte & 0x01) != 0;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // ERROR DISSECTION [ERROR BYTE]
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
