@@ -36,6 +36,7 @@ public interface GpibControllerCommand
   public final static String CC_GPIB_WRITE_AND_READ_N = "gpibCommandWriteAndReadN";
   public final static String CC_GPIB_WRITE_AND_READLN_N = "gpibCommandWriteAndReadlnN";
   public final static String CC_GPIB_ATOMIC_SEQUENCE = "gpibCommandAtomicSequence";
+  public final static String CC_GPIB_SERIAL_POLL = "gpibCommandSerialPoll";
   
   public final static String CCARG_GPIB_ADDRESS = "gpibArgAddress";
   public final static String CCARG_GPIB_READLN_TERMINATION_MODE = "gpibArgReadlnTerminationMode";

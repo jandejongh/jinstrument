@@ -452,6 +452,36 @@ public class DefaultGpibDevice
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // serialPoll
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public GpibControllerCommand generateSerialPollCommand ()
+  {
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CC_GPIB_SERIAL_POLL,
+      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address);
+    return command;
+  }
+  
+  @Override
+  public void serialPollAsync ()
+    throws UnsupportedOperationException
+  {
+    this.controller.addCommand (generateSerialPollCommand ());
+  }
+
+  @Override
+  public byte serialPollSync (final long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException
+  {
+    final GpibControllerCommand command = generateSerialPollCommand ();
+    doControllerCommandSync (command, timeout_ms);
+    return (byte) command.get (GpibControllerCommand.CCARG_GPIB_READ_BYTES);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // END OF FILE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

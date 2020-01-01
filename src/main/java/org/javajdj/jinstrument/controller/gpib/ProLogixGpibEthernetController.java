@@ -662,6 +662,8 @@ public final class ProLogixGpibEthernetController
   private final String READ_LF_COMMAND = "++read 10";
   private final String READ_CR_COMMAND = "++read 13";
   
+  private final String SERIAL_POLL_COMMAND = "++spoll";
+  
   private final byte DEFAULT_EOT = (byte) 0xFF;
   
   private byte[] processCommand_ReadEOI (
@@ -963,6 +965,37 @@ public final class ProLogixGpibEthernetController
       processCommand (controllerCommand, timeout_ms);
   }
   
+  private byte processCommand_serialPoll (
+    final GpibAddress gpibAddress,
+    final Integer timeout_ms,
+    final boolean topLevel)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (gpibAddress == null)
+      throw new IOException ();
+    if (topLevel)
+    {
+      proLogixClearReadBuffer ();
+      proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+    }
+    proLogixCommandWritelnControllerCommand (SERIAL_POLL_COMMAND);
+    final String statusByteString = new String (processCommand_readln (
+      gpibAddress,
+      GpibDevice.ReadlineTerminationMode.OPTCR_LF,
+      timeout_ms,
+      true,
+      false), Charset.forName ("US-ASCII"));
+    try
+    {
+      final int statusByteInt = Integer.parseInt (statusByteString);
+      return (byte) (statusByteInt & 0xff);
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IOException (nfe);
+    }
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractController
@@ -1062,6 +1095,13 @@ public final class ProLogixGpibEthernetController
           System.arraycopy (sequence, 0, controllerCommands, 0, controllerCommands.length);
           // XXX Check for cycles? -> Way too complicated...
           processCommand_atomicSequence (controllerCommands, timeout_ms, true);
+          break;
+        }
+        case GpibControllerCommand.CC_GPIB_SERIAL_POLL:
+        {
+          final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
+          final byte statusByte = processCommand_serialPoll (address, timeout_ms, true);
+          controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, statusByte);
           break;
         }
         default:
