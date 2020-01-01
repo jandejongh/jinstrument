@@ -184,6 +184,48 @@ public class HP3478A_GPIB_Status
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // EQUALS / HASH CODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  public int hashCode ()
+  {
+    int hash = 7;
+    hash = 53 * hash + this.serialPollStatusByte;
+    hash = 53 * hash + this.errorByte;
+    return hash;
+  }
+
+  @Override
+  public boolean equals (Object obj)
+  {
+    if (this == obj)
+    {
+      return true;
+    }
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass () != obj.getClass ())
+    {
+      return false;
+    }
+    final HP3478A_GPIB_Status other = (HP3478A_GPIB_Status) obj;
+    if (this.serialPollStatusByte != other.serialPollStatusByte)
+    {
+      return false;
+    }
+    if (this.errorByte != other.errorByte)
+    {
+      return false;
+    }
+    return true;
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // END OF FILE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
