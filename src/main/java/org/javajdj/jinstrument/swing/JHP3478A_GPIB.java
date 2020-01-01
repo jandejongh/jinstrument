@@ -35,6 +35,8 @@ import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.instrument.dmm.hp3478a.HP3478A_GPIB_Instrument;
 import org.javajdj.jinstrument.instrument.dmm.hp3478a.HP3478A_GPIB_Settings;
+import org.javajdj.jinstrument.instrument.dmm.hp3478a.HP3478A_GPIB_Status;
+import org.javajdj.jswing.jbyte.JByte;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
 /** A Swing panel for (complete) control and status of a {@link HP3478A_GPIB_Instrument} Digital MultiMeter.
@@ -66,7 +68,29 @@ public class JHP3478A_GPIB
     super (digitalMultiMeter, level);
     this.jInstrumentSpecificPanel.removeAll ();
     setPanelBorder (this.jInstrumentSpecificPanel, level + 1, DEFAULT_MANAGEMENT_COLOR, "HP-3478A Specific");
-    this.jInstrumentSpecificPanel.setLayout (new GridLayout (4, 2));
+    this.jInstrumentSpecificPanel.setLayout (new GridLayout (5, 2));
+    //
+    final JPanel jSerialPollStatusPanel = new JPanel ();
+    setPanelBorder (jSerialPollStatusPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Serial Poll Status [Read-Only]");
+    jSerialPollStatusPanel.setLayout (new GridLayout (2, 1));
+    this.jSerialPollStatus = new JByte ();
+    jSerialPollStatusPanel.add (this.jSerialPollStatus);
+    final JPanel jSerialPollTags = new JPanel ();
+    jSerialPollTags.setLayout (new GridLayout (1, 8));
+    jSerialPollTags.add (new JLabel ("POR"));
+    jSerialPollTags.add (new JLabel ("SRQ"));
+    jSerialPollTags.add (new JLabel ("CALF"));
+    jSerialPollTags.add (new JLabel ("FSRQ"));
+    jSerialPollTags.add (new JLabel ("HWE"));
+    jSerialPollTags.add (new JLabel ("STX"));
+    jSerialPollTags.add (new JLabel ("NU"));
+    jSerialPollTags.add (new JLabel ("DRDY"));
+    jSerialPollStatusPanel.add (jSerialPollTags);
+    this.jInstrumentSpecificPanel.add (jSerialPollStatusPanel);
+    //
+    final JPanel jReserved = new JPanel ();
+    setPanelBorder (jReserved, level + 2, DEFAULT_MANAGEMENT_COLOR, "Reserved");
+    this.jInstrumentSpecificPanel.add (jReserved);
     //
     final JPanel jAutoZeroPanel = new JPanel ();
     jAutoZeroPanel.setLayout (new GridLayout (1, 1));
@@ -218,6 +242,8 @@ public class JHP3478A_GPIB
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  private final JByte jSerialPollStatus;
+  
   private final JColorCheckBox<Boolean> jAutoZero;
   
   private final ActionListener jAutoZeroListener = (final ActionEvent ae) ->
@@ -300,7 +326,15 @@ public class JHP3478A_GPIB
     @Override
     public void newInstrumentStatus (final Instrument instrument, final InstrumentStatus instrumentStatus)
     {
-      // EMPTY
+      if (instrument != JHP3478A_GPIB.this.getDigitalMultiMeter () || instrumentStatus == null)
+        throw new IllegalArgumentException ();
+      if (! (instrumentStatus instanceof HP3478A_GPIB_Status))
+        throw new IllegalArgumentException ();
+      SwingUtilities.invokeLater (() ->
+      {
+        JHP3478A_GPIB.this.jSerialPollStatus.setDisplayedValue (
+          ((HP3478A_GPIB_Status) instrumentStatus).getSerialPollStatusByte ());
+      });
     }
     
     @Override
