@@ -39,7 +39,7 @@ public interface ControllerListener
    * The result of processing the command, including failure indications, are present in the command argument,
    * but its precise structure is implementation dependent.
    * 
-   * @param controller        The controller, non-{@code null}.
+   * @param controller        The controller issuing the notification, non-{@code null}.
    * @param controllerCommand The command, non-{@code null}.
    * 
    */
@@ -53,11 +53,14 @@ public interface ControllerListener
   
   /** Notification of logging (debug) output from a controller.
    * 
-   * @param controller The controller, non-{@code null}.
+   * <p>
+   * The default implementation is empty.
+   * 
+   * @param controller The controller issuing the notification, non-{@code null}.
    * @param logEntry   The log entry, non-{@code null}.
    * 
    */
-  default void controllerLogEntry (Controller controller, LogEntry logEntry) { }
+  default void controllerLogEntry (final Controller controller, final LogEntry logEntry) { }
   
   /** A log entry type.
    * 
