@@ -209,10 +209,18 @@ implements Instrument
   private final Runnable instrumentStatusCollector = () ->
   {
     LOG.log (Level.INFO, "Starting Instrument Status Collector on {0}.", AbstractInstrument.this.toString ());
+    boolean hadException = false;
     while (! Thread.currentThread ().isInterrupted ())
     {
       try
       {
+        if (hadException)
+        {
+          // Quick and dirty method to prevent continuous operation in case of (early) ignored Exceptions.
+          // We should actually compensate for the time spent already...
+          Thread.sleep ((long) AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000);
+          hadException = false;
+        }
         // Mark start of sojourn.
         final long timeBeforeRead_ms = System.currentTimeMillis ();
         // Obtain current settings from the instrument.
@@ -241,6 +249,7 @@ implements Instrument
       {
         LOG.log (Level.WARNING, "TimeoutException (ignored) in Instrument Status Collector on {0}: {1}.",
           new Object[]{AbstractInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
+        hadException = true;
       }
       catch (IOException ioe)
       {
@@ -409,10 +418,18 @@ implements Instrument
   private final Runnable instrumentSettingsCollector = () ->
   {
     LOG.log (Level.INFO, "Starting Instrument Settings Collector on {0}.", AbstractInstrument.this.toString ());
+    boolean hadException = false;
     while (! Thread.currentThread ().isInterrupted ())
     {
       try
       {
+        if (hadException)
+        {
+          // Quick and dirty method to prevent continuous operation in case of (early) ignored Exceptions.
+          // We should actually compensate for the time spent already...
+          Thread.sleep ((long) AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000);
+          hadException = false;
+        }
         // Mark start of sojourn.
         final long timeBeforeRead_ms = System.currentTimeMillis ();
         // Obtain current settings from the instrument.
@@ -441,6 +458,7 @@ implements Instrument
       {
         LOG.log (Level.WARNING, "TimeoutException (ignored) in Instrument Settings Collector on {0}: {1}.",
           new Object[]{AbstractInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
+        hadException = true;
       }
       catch (IOException ioe)
       {
@@ -679,10 +697,18 @@ implements Instrument
   private final Runnable instrumentReadingCollector = () ->
   {
     LOG.log (Level.INFO, "Starting Instrument Reading Collector on {0}.", AbstractInstrument.this.toString ());
+    boolean hadException = false;
     while (! Thread.currentThread ().isInterrupted ())
     {
       try
       {
+        if (hadException)
+        {
+          // Quick and dirty method to prevent continuous operation in case of (early) ignored Exceptions.
+          // We should actually compensate for the time spent already...
+          Thread.sleep ((long) AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000);
+          hadException = false;
+        }
         // Mark start of sojourn.
         final long timeBeforeRead_ms = System.currentTimeMillis ();
         // Obtain current reading from the instrument.
@@ -711,6 +737,7 @@ implements Instrument
       {
         LOG.log (Level.WARNING, "TimeoutException (ignored) in Instrument Reading Collector on {0}: {1}.",
           new Object[]{AbstractInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
+        hadException = true;
       }
       catch (IOException ioe)
       {
