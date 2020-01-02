@@ -41,6 +41,7 @@ import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
+import org.javajdj.jinstrument.controller.gpib.ReadlineTerminationMode;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
 /** A console for text-oriented communication with a {@link GpibDevice}.
@@ -109,7 +110,7 @@ public class JGpibDeviceConsole
     this.jCTermMode.setSelectedItem (DEFAULT_COMMAND_TERMINATION_MODE);
     setPanelBorder (this.jCTermMode, level + 2, subPanelColor, "Command Termination Mode");
     terminationModesPanel.add (this.jCTermMode);
-    this.jRlTermMode = new JComboBox<> (GpibDevice.ReadlineTerminationMode.values ());
+    this.jRlTermMode = new JComboBox<> (ReadlineTerminationMode.values ());
     this.jRlTermMode.setSelectedItem (DEFAULT_READLINE_TERMINATION_MODE);
     setPanelBorder (this.jRlTermMode, level + 2, subPanelColor, "Readline Termination Mode");
     terminationModesPanel.add (this.jRlTermMode);
@@ -167,7 +168,7 @@ public class JGpibDeviceConsole
           {
             final byte[] returnBytes = JGpibDeviceConsole.this.device.writeAndReadlnSync (
               commandString.getBytes (Charset.forName ("US-ASCII")),
-              (GpibDevice.ReadlineTerminationMode) JGpibDeviceConsole.this.jRlTermMode.getSelectedItem (),
+              (ReadlineTerminationMode) JGpibDeviceConsole.this.jRlTermMode.getSelectedItem (),
               1000L * JGpibDeviceConsole.this.jTimeout.getValue ());
             jTextArea.append (new String (returnBytes, Charset.forName ("US-ASCII")) + "\n");
             jTextField.setText ("");
@@ -339,10 +340,10 @@ public class JGpibDeviceConsole
     }
   }
   
-  private final JComboBox<GpibDevice.ReadlineTerminationMode> jRlTermMode;
+  private final JComboBox<ReadlineTerminationMode> jRlTermMode;
   
-  public static final GpibDevice.ReadlineTerminationMode DEFAULT_READLINE_TERMINATION_MODE =
-    GpibDevice.ReadlineTerminationMode.CR_LF;
+  public static final ReadlineTerminationMode DEFAULT_READLINE_TERMINATION_MODE =
+    ReadlineTerminationMode.CR_LF;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
