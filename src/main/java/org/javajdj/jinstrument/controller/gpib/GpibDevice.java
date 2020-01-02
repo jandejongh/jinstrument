@@ -61,7 +61,7 @@ public interface GpibDevice
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  void addCommand (
+  void doControllerCommandAsync (
     GpibControllerCommand command,
     Long queueingTimeout_ms,
     Long processingTimeout_ms,
