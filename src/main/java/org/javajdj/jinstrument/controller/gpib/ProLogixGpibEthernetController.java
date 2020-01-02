@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.Bus;
@@ -134,6 +135,13 @@ public final class ProLogixGpibEthernetController
 
   private volatile Socket socket = null;
 
+  public final static long DEFAULT_COMMAND_PROCESSING_TIMEOUT_MS = 10000L;
+  
+  public final long getFallbackCommandProcessingTimeout_ms ()
+  {
+    return ProLogixGpibEthernetController.DEFAULT_COMMAND_PROCESSING_TIMEOUT_MS;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SOCKET MANAGER
@@ -616,14 +624,6 @@ public final class ProLogixGpibEthernetController
     proLogixWriteRaw (command + new String (new byte[]{COMMAND_TERMINATOR_TO_PROLOGIX}, Charset.forName ("US-ASCII")));
   }
   
-  private void proLogixCommandResetController ()
-    throws IOException, InterruptedException
-  {
-    LOG.log (Level.INFO, "Resetting ProLogix controller...");
-    proLogixCommandWritelnControllerCommand ("++rst");
-    LOG.log (Level.INFO, "ProLogix controller has been reset (apparently).");
-  }
-  
   private void proLogixCommandSwitchCurrentDeviceAddress (final GpibAddress address)
   throws IOException, InterruptedException
   {
@@ -655,7 +655,7 @@ public final class ProLogixGpibEthernetController
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final int DEFAULT_TIMEOUT_MS = 1000;
+  private final String RESET_CONTROLLER_COMMAND = "++rst";
   
   private final String READ_COMMAND = "++read";
   private final String READ_EOI_COMMAND = "++read eoi";
@@ -666,26 +666,49 @@ public final class ProLogixGpibEthernetController
   
   private final byte DEFAULT_EOT = (byte) 0xFF;
   
+  private void processCommand_ResetController (
+    final long timeout_ms,
+    final boolean topLevel)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    proLogixCommandWritelnControllerCommand (RESET_CONTROLLER_COMMAND);    
+  }
+  
+  private void processCommand_Nop (
+    final long timeout_ms,
+    final boolean topLevel)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+  }
+  
   private byte[] processCommand_ReadEOI (
     final GpibAddress gpibAddress,
-    final Integer timeout_ms,
+    final long timeout_ms,
     final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
   {
     if (gpibAddress == null)
       throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
     if (topLevel)
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      proLogixCommandSetReadAfterWrite (false);
+      proLogixCommandSetEOT (true, DEFAULT_EOT);
     }
-    proLogixCommandSetEOT (true, DEFAULT_EOT);
+    proLogixCommandWritelnControllerCommand (READ_EOI_COMMAND);
     final ByteArrayOutputStream baos = new ByteArrayOutputStream ();
     for (;;)
     {
       // First, we hunt for an EOT...
-      final int byteRead;
-      byteRead = proLogixReadByte (1000L /* XXX */);
+      final byte byteRead = proLogixReadByte (deadline_millis - System.currentTimeMillis ());
       // XXX
       // For now, throw the uoe, as we do not have any use for this yet.
       throw new UnsupportedOperationException ();
@@ -695,17 +718,21 @@ public final class ProLogixGpibEthernetController
   private byte[] processCommand_readln (
     final GpibAddress gpibAddress,
     final GpibDevice.ReadlineTerminationMode readlineTerminationMode,
-    final Integer timeout_ms,
+    final long timeout_ms,
     final boolean topLevel,
     final boolean ask)
     throws IOException, InterruptedException, TimeoutException
   {
     if (gpibAddress == null || readlineTerminationMode ==null)
       throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
     if (topLevel)
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      proLogixCommandSetReadAfterWrite (false);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     if (ask)
@@ -728,8 +755,16 @@ public final class ProLogixGpibEthernetController
     final ByteArrayOutputStream baos = new ByteArrayOutputStream ();
     for (;;)
     {
+      long now_millis = System.currentTimeMillis ();
+      if (now_millis >= deadline_millis)
+      {
+        if (baos.size () > 0)
+          queueLogRx (Instant.now (), baos.toByteArray ());
+        throw new TimeoutException ();
+      }
       final int byteRead;
-      byteRead = proLogixReadByte (1000L /* XXX */);
+      byteRead = proLogixReadByte (deadline_millis - now_millis);
+      now_millis = System.currentTimeMillis ();
       switch (readlineTerminationMode)
       {
         case CR:
@@ -737,7 +772,8 @@ public final class ProLogixGpibEthernetController
           if (byteRead == 0x0d)
           {
             final byte[] bytesRead = baos.toByteArray ();
-            queueLogRx (Instant.now (), bytesRead);
+            baos.write (byteRead);
+            queueLogRx (Instant.now (), baos.toByteArray ());
             return bytesRead;
           }
           else
@@ -749,7 +785,8 @@ public final class ProLogixGpibEthernetController
           if (byteRead == 0x0a)
           {
             final byte[] bytesRead = baos.toByteArray ();
-            queueLogRx (Instant.now (), bytesRead);
+            baos.write (byteRead);
+            queueLogRx (Instant.now (), baos.toByteArray ());
             return bytesRead;
           }
           else
@@ -760,11 +797,13 @@ public final class ProLogixGpibEthernetController
         {
           if (byteRead == 0x0d)
           {
-            // XXX Missing the character in logging here?
-            if (proLogixReadByte (1000L /* XXX */) == 0x0a)
+            final byte nextByteRead = proLogixReadByte (deadline_millis - now_millis);
+            if (nextByteRead == 0x0a)
             {
               final byte[] bytesRead = baos.toByteArray ();
-              queueLogRx (Instant.now (), bytesRead);
+              baos.write (byteRead);
+              baos.write (nextByteRead);
+              queueLogRx (Instant.now (), baos.toByteArray ());
               return bytesRead;
             }
             else
@@ -779,18 +818,27 @@ public final class ProLogixGpibEthernetController
           switch (byteRead)
           {
             case 0x0d:
-              if (proLogixReadByte (1000L /* XXX */) == 0x0a)
+              final byte nextByteRead = proLogixReadByte (deadline_millis - now_millis);
+              if (nextByteRead == 0x0a)
               {
                 final byte[] bytesRead = baos.toByteArray ();
-                queueLogRx (Instant.now (), bytesRead);
+                baos.write (byteRead);
+                baos.write (nextByteRead);
+                queueLogRx (Instant.now (), baos.toByteArray ());
                 return bytesRead;
               }
               else
+              {
+                baos.write (byteRead);
+                baos.write (nextByteRead);
+                queueLogRx (Instant.now (), baos.toByteArray ());
                 throw new IOException ();
+              }
             case 0x0a:
             {
               final byte[] bytesRead = baos.toByteArray ();
-              queueLogRx (Instant.now (), bytesRead);
+              baos.write (byteRead);
+              queueLogRx (Instant.now (), baos.toByteArray ());
               return bytesRead;
             }
             default:
@@ -803,14 +851,22 @@ public final class ProLogixGpibEthernetController
         {
           if (byteRead == 0x0a)
           {
-            if (proLogixReadByte (1000L /* XXX */) == 0x0d)
+            final byte nextByteRead = proLogixReadByte (deadline_millis - now_millis);
+            if (nextByteRead == 0x0d)
             {
               final byte[] bytesRead = baos.toByteArray ();
-              queueLogRx (Instant.now (), bytesRead);
+              baos.write (byteRead);
+              baos.write (nextByteRead);
+              queueLogRx (Instant.now (), baos.toByteArray ());
               return bytesRead;
             }
             else
+            {
+              baos.write (byteRead);
+              baos.write (nextByteRead);
+              queueLogRx (Instant.now (), baos.toByteArray ());
               throw new IOException ();
+            }
           }
           else
             baos.write (byteRead);
@@ -825,22 +881,43 @@ public final class ProLogixGpibEthernetController
   private byte[] processCommand_readN (
     final GpibAddress gpibAddress,
     final int N,
-    final Integer timeout_ms,
+    final long timeout_ms,
     final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
   {
-    if (N < 0)
+    if (gpibAddress == null || N < 0)
       throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
     if (topLevel)
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      proLogixCommandSetEOT (false, LF_BYTE);
     }
-    proLogixCommandSetEOT (false, LF_BYTE);
     proLogixCommandWritelnControllerCommand (READ_EOI_COMMAND);
     final byte[] bytes = new byte[N];
     for (int i = 0; i < N; i++)
-      bytes[i] = proLogixReadByte (1000L /* XXX */);
+    {
+      try
+      {
+        long now_millis = System.currentTimeMillis ();
+        if (now_millis >= deadline_millis)
+          throw new TimeoutException ();
+        bytes[i] = proLogixReadByte (deadline_millis - now_millis);
+      }
+      catch (Exception e)
+      {
+        if (i > 0)
+        {
+          final byte[] bytesRead = new byte[i];
+          System.arraycopy (bytes, 0, bytesRead, 0, i);
+          queueLogRx (Instant.now (), bytesRead);
+        }
+        throw (e);
+      }
+    }
     queueLogRx (Instant.now (), bytes);
     return bytes;
   }
@@ -848,12 +925,14 @@ public final class ProLogixGpibEthernetController
   private void processCommand_write (
     final GpibAddress gpibAddress,
     final byte[] bytes,
-    final Integer timeout_ms,
+    final long timeout_ms,
     final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
   {
     if (gpibAddress == null)
       throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
     if (topLevel)
     {
       proLogixClearReadBuffer ();
@@ -865,45 +944,68 @@ public final class ProLogixGpibEthernetController
   private byte[] processCommand_writeAndReadEOI (
     final GpibAddress gpibAddress,
     final byte[] bytes,
-    final Integer timeout_ms,
+    final long timeout_ms,
     final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
   {
+    if (gpibAddress == null)
+      throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
+    if (topLevel)
+    {
+      proLogixClearReadBuffer ();
+      proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+    }
     processCommand_write (gpibAddress, bytes, timeout_ms, false);
-    return processCommand_ReadEOI (gpibAddress, timeout_ms, false);
+    return processCommand_ReadEOI (gpibAddress, deadline_millis - System.currentTimeMillis (), false);
   }
   
   private byte[] processCommand_writeAndReadln (
     final GpibAddress gpibAddress,
     final byte[] bytes,
     final GpibDevice.ReadlineTerminationMode readlineTerminationMode,
-    final Integer timeout_ms,
+    final long timeout_ms,
     final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
   {
+    if (gpibAddress == null)
+      throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
     if (topLevel)
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      // XXX I thought we never did this!!
+      // XXX Now we must set it to false everywhere else??
       proLogixCommandSetReadAfterWrite (true);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     processCommand_write (gpibAddress, bytes, timeout_ms, false);
-    return processCommand_readln (gpibAddress, readlineTerminationMode, timeout_ms, false, true);
+    return processCommand_readln (
+      gpibAddress,
+      readlineTerminationMode,
+      deadline_millis - System.currentTimeMillis (),
+      false,
+      true);
   }
   
   private byte[] processCommand_writeAndReadN (
     final GpibAddress gpibAddress,
     final byte[] bytes,
     final int N,
-    final Integer timeout_ms,
+    final long timeout_ms,
     final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
   {
-    if (gpibAddress == null)
-      throw new IOException ();
-    if (N < 0)
+    if (gpibAddress == null || N < 0)
       throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
     if (topLevel)
     {
       proLogixClearReadBuffer ();
@@ -912,12 +1014,7 @@ public final class ProLogixGpibEthernetController
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     processCommand_write (gpibAddress, bytes, timeout_ms, false);
-    proLogixCommandWritelnControllerCommand (READ_EOI_COMMAND);
-    final byte[] bytesRead = new byte[N];
-    for (int i = 0; i < N; i++)
-      bytesRead[i] = proLogixReadByte (1000L /* XXX */);
-    queueLogRx (Instant.now (), bytesRead);
-    return bytesRead;
+    return processCommand_readN (gpibAddress, N, deadline_millis - System.currentTimeMillis (), false);
   }
   
   private byte[][] processCommand_writeAndReadlnN (
@@ -925,14 +1022,15 @@ public final class ProLogixGpibEthernetController
     final byte[] bytes,
     final GpibDevice.ReadlineTerminationMode readlineTerminationMode,
     final int N,
-    final Integer timeout_ms,
+    final long timeout_ms,
     final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
   {
-    if (gpibAddress == null)
-      throw new IOException ();
-    if (N < 0)
+    if (gpibAddress == null || N < 0)
       throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
     if (topLevel)
     {
       proLogixClearReadBuffer ();
@@ -942,48 +1040,62 @@ public final class ProLogixGpibEthernetController
     }
     final byte[][] bytesRead = new byte[N][];
     processCommand_write (gpibAddress, bytes, timeout_ms, false);
-    // XXX??
     proLogixCommandWritelnControllerCommand (READ_COMMAND);
     for (int n = 0; n < N; n++)
-    {
-      bytesRead[n] = processCommand_readln (gpibAddress, readlineTerminationMode, timeout_ms, false, false);
-      // LOG.log (Level.WARNING, "n={0}, read: {1} ({2}).",
-      //   new Object[]{n, Util.bytesToHex (bytesRead[n]), new String (bytesRead[n], Charset.forName ("US-ASCII"))});
-    }
+      bytesRead[n] = processCommand_readln (
+        gpibAddress, readlineTerminationMode, deadline_millis - System.currentTimeMillis (), false, false);
     return bytesRead;
   }
   
   private void processCommand_atomicSequence (
-    final ControllerCommand[] sequence,
-    final Integer timeout_ms,
-    final boolean topLevel)
-    throws IOException, InterruptedException, TimeoutException
-  {
-    if (sequence == null)
-      return;
-    for (final ControllerCommand controllerCommand : sequence)
-      processCommand (controllerCommand, timeout_ms);
-  }
-  
-  private byte processCommand_serialPoll (
     final GpibAddress gpibAddress,
-    final Integer timeout_ms,
+    final ControllerCommand[] sequence,
+    final long timeout_ms,
     final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
   {
     if (gpibAddress == null)
-      throw new IOException ();
+      throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    // If there is no sequence, we are already done...
+    if (sequence == null)
+      return;
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
     if (topLevel)
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      proLogixCommandSetReadAfterWrite (false);
+      proLogixCommandSetEOT (false, LF_BYTE);
+    }
+    for (final ControllerCommand controllerCommand : sequence)
+      processCommand (controllerCommand, deadline_millis - System.currentTimeMillis (), false);
+  }
+  
+  private byte processCommand_serialPoll (
+    final GpibAddress gpibAddress,
+    final long timeout_ms,
+    final boolean topLevel)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (gpibAddress == null)
+      throw new IllegalArgumentException ();
+    if (gpibAddress == null)
+      throw new IllegalArgumentException ();
+    if (topLevel)
+    {
+      proLogixClearReadBuffer ();
+      proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      proLogixCommandSetReadAfterWrite (false);
+      proLogixCommandSetEOT (false, LF_BYTE);
     }
     proLogixCommandWritelnControllerCommand (SERIAL_POLL_COMMAND);
     final String statusByteString = new String (processCommand_readln (
       gpibAddress,
       GpibDevice.ReadlineTerminationMode.OPTCR_LF,
       timeout_ms,
-      true,
+      topLevel,
       false), Charset.forName ("US-ASCII"));
     try
     {
@@ -996,6 +1108,37 @@ public final class ProLogixGpibEthernetController
     }
   }
   
+  private void processCommand_atomicRepeatUntil (
+    final GpibAddress gpibAddress,
+    final GpibControllerCommand commandToRepeat,
+    final Function<GpibControllerCommand, Boolean> condition,
+    final long timeout_ms,
+    final boolean topLevel)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (gpibAddress == null)
+      throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    // If there is no command to repeat, we are already finished.
+    if (commandToRepeat == null)
+      return;
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
+    if (topLevel)
+    {
+      proLogixClearReadBuffer ();
+      proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      proLogixCommandSetReadAfterWrite (false);
+      proLogixCommandSetEOT (false, LF_BYTE);
+    }
+    boolean conditionMet = true;
+    while (conditionMet)
+    {
+      processCommand (commandToRepeat, deadline_millis - System.currentTimeMillis (), false);
+      conditionMet = (condition == null || condition.apply (commandToRepeat));
+    }
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractController
@@ -1004,25 +1147,34 @@ public final class ProLogixGpibEthernetController
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
   @Override
-  protected final void processCommand (final ControllerCommand controllerCommand, final Integer caller_timeout_ms)
+  protected final void processCommand (final ControllerCommand controllerCommand, final long timeout_ms)
+    throws UnsupportedOperationException, IOException, InterruptedException, TimeoutException
+  {
+    processCommand (controllerCommand, timeout_ms, true);
+  }
+  
+  protected final void processCommand (final ControllerCommand controllerCommand, final long timeout_ms, final boolean topLevel)
     throws UnsupportedOperationException, IOException, InterruptedException, TimeoutException
   {
     final String commandString = (String) controllerCommand.get (ControllerCommand.CC_COMMAND_KEY);
     try
     {
-      // Optional timeout argument to multiple operations.
-      final Integer command_timeout_ms = (Integer) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_TIMEOUT_MS);
-      final Integer timeout_ms = (command_timeout_ms != null ? command_timeout_ms : caller_timeout_ms);
+      if (timeout_ms <= 0)
+        throw new TimeoutException ();
       switch (commandString)
       {
-        case ControllerCommand.CC_NOP_KEY:
+        case ControllerCommand.CCCMD_RESET_CONTROLLER:
+          processCommand_ResetController (timeout_ms, topLevel);
           break;
-        case ControllerCommand.CC_GET_SETTINGS_KEY:
+        case ControllerCommand.CCCMD_NOP:
+          processCommand_Nop (timeout_ms, topLevel);
+          break;
+        case ControllerCommand.CCCMD_GET_SETTINGS:
           throw new UnsupportedOperationException ();
         case GpibControllerCommand.CC_GPIB_READ_EOI:
         {
           final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
-          final byte[] bytesRead = processCommand_ReadEOI (address, timeout_ms, true);
+          final byte[] bytesRead = processCommand_ReadEOI (address, timeout_ms, topLevel);
           controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, bytesRead);
           break;
         }
@@ -1031,7 +1183,7 @@ public final class ProLogixGpibEthernetController
           final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
           final GpibDevice.ReadlineTerminationMode readlineTerminationMode =
             (GpibDevice.ReadlineTerminationMode) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE);
-          final byte[] bytesRead = processCommand_readln (address, readlineTerminationMode, timeout_ms, true, true);
+          final byte[] bytesRead = processCommand_readln (address, readlineTerminationMode, timeout_ms, topLevel, true);
           controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, bytesRead);
           break;
         }
@@ -1039,7 +1191,7 @@ public final class ProLogixGpibEthernetController
         {
           final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
           final int N = (int) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READ_N);
-          final byte[] bytesRead = processCommand_readN (address, N, timeout_ms, true);
+          final byte[] bytesRead = processCommand_readN (address, N, timeout_ms, topLevel);
           controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, bytesRead);
           break;
         }
@@ -1047,14 +1199,14 @@ public final class ProLogixGpibEthernetController
         {
           final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
           final byte[] bytes = (byte[]) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_WRITE_BYTES);
-          processCommand_write (address, bytes, timeout_ms, true);
+          processCommand_write (address, bytes, timeout_ms, topLevel);
           break;
         }
         case GpibControllerCommand.CC_GPIB_WRITE_AND_READ_EOI:
         {
           final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
           final byte[] bytes = (byte[]) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_WRITE_BYTES);
-          final byte[] bytesRead = processCommand_writeAndReadEOI (address, bytes, timeout_ms, true);
+          final byte[] bytesRead = processCommand_writeAndReadEOI (address, bytes, timeout_ms, topLevel);
           controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, bytesRead);
           break;
         }
@@ -1064,7 +1216,7 @@ public final class ProLogixGpibEthernetController
           final byte[] bytes = (byte[]) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_WRITE_BYTES);
           final GpibDevice.ReadlineTerminationMode readlineTerminationMode =
             (GpibDevice.ReadlineTerminationMode) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE);
-          final byte[] bytesRead = processCommand_writeAndReadln (address, bytes, readlineTerminationMode, timeout_ms, true);
+          final byte[] bytesRead = processCommand_writeAndReadln (address, bytes, readlineTerminationMode, timeout_ms, topLevel);
           controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, bytesRead);
           break;
         }
@@ -1073,7 +1225,7 @@ public final class ProLogixGpibEthernetController
           final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
           final byte[] bytes = (byte[]) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_WRITE_BYTES);
           final int N = (int) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READ_N);
-          final byte[] bytesRead = processCommand_writeAndReadN (address, bytes, N, timeout_ms, true);
+          final byte[] bytesRead = processCommand_writeAndReadN (address, bytes, N, timeout_ms, topLevel);
           controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, bytesRead);
           break;
         }
@@ -1084,24 +1236,35 @@ public final class ProLogixGpibEthernetController
           final GpibDevice.ReadlineTerminationMode readlineTerminationMode =
             (GpibDevice.ReadlineTerminationMode) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READLN_TERMINATION_MODE);
           final int N = (int) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_READ_N);
-          final byte[][] bytesRead = processCommand_writeAndReadlnN (address, bytes, readlineTerminationMode, N, timeout_ms, true);
+          final byte[][] bytesRead = processCommand_writeAndReadlnN (
+            address, bytes, readlineTerminationMode, N, timeout_ms, topLevel);
           controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, bytesRead);
           break;
         }
         case GpibControllerCommand.CC_GPIB_ATOMIC_SEQUENCE:
         {
+          final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
           final Object sequence = controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ATOMIC_SEQUENCE);
           final ControllerCommand[] controllerCommands = new ControllerCommand[Array.getLength (sequence)];
           System.arraycopy (sequence, 0, controllerCommands, 0, controllerCommands.length);
-          // XXX Check for cycles? -> Way too complicated...
-          processCommand_atomicSequence (controllerCommands, timeout_ms, true);
+          processCommand_atomicSequence (address, controllerCommands, timeout_ms, topLevel);
           break;
         }
         case GpibControllerCommand.CC_GPIB_SERIAL_POLL:
         {
           final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
-          final byte statusByte = processCommand_serialPoll (address, timeout_ms, true);
+          final byte statusByte = processCommand_serialPoll (address, timeout_ms, topLevel);
           controllerCommand.put (GpibControllerCommand.CCARG_GPIB_READ_BYTES, statusByte);
+          break;
+        }
+        case GpibControllerCommand.CC_GPIB_ATOMIC_REPEAT_UNTIL:
+        {
+          final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
+          final GpibControllerCommand commandToRepeat =
+            (GpibControllerCommand) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ATOMIC_REPEAT_UNTIL_COMMAND);
+          final Function<GpibControllerCommand, Boolean> condition =
+            (Function) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ATOMIC_REPEAT_UNTIL_CONDITION);
+          processCommand_atomicRepeatUntil (address, commandToRepeat, condition, timeout_ms, topLevel);
           break;
         }
         default:
