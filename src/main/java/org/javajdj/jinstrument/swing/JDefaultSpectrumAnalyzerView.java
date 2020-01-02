@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
-import org.javajdj.jinstrument.instrument.sa.SpectrumAnalyzer;
+import org.javajdj.jinstrument.SpectrumAnalyzer;
 
 /** A one-size-fits-all Swing panel for control and status of a generic {@link SpectrumAnalyzer}.
  *
