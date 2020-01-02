@@ -26,7 +26,7 @@ import org.javajdj.jinstrument.gpib.AbstractGpibInstrument;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jservice.Service;
 
-/** Abstract base implementation of a {@link DigitalMultiMeter}.
+/** Abstract base implementation of a {@link DigitalMultiMeter} for GPIB instruments.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
