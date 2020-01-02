@@ -34,8 +34,8 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
-import org.javajdj.jinstrument.instrument.sa.SpectrumAnalyzer;
-import org.javajdj.jinstrument.instrument.sa.SpectrumAnalyzerSettings;
+import org.javajdj.jinstrument.SpectrumAnalyzer;
+import org.javajdj.jinstrument.SpectrumAnalyzerSettings;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
