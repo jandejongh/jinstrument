@@ -33,9 +33,9 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
-import org.javajdj.jinstrument.instrument.dmm.hp3478a.HP3478A_GPIB_Instrument;
-import org.javajdj.jinstrument.instrument.dmm.hp3478a.HP3478A_GPIB_Settings;
-import org.javajdj.jinstrument.instrument.dmm.hp3478a.HP3478A_GPIB_Status;
+import org.javajdj.jinstrument.gpib.dmm.hp3478a.HP3478A_GPIB_Instrument;
+import org.javajdj.jinstrument.gpib.dmm.hp3478a.HP3478A_GPIB_Settings;
+import org.javajdj.jinstrument.gpib.dmm.hp3478a.HP3478A_GPIB_Status;
 import org.javajdj.jswing.jbyte.JByte;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
@@ -131,13 +131,13 @@ public class JHP3478A_GPIB
     setPanelBorder (j50_60HzPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "50/60 Hz [Read-Only]");
     final JPanel j50HzPanel = new JPanel ();
     j50HzPanel.setLayout (new GridLayout (1, 1));
-    setPanelBorder (j50HzPanel, level + 3, Color.black, "Front");
+    setPanelBorder (j50HzPanel, level + 3, Color.black, "50 Hz");
     this.j50Hz = new JColorCheckBox<> ((t) -> (t != null && t) ? Color.red : null);
     j50HzPanel.add (this.j50Hz);
     j50_60HzPanel.add (j50HzPanel);
     final JPanel j60HzdPanel = new JPanel ();
     j60HzdPanel.setLayout (new GridLayout (1, 1));
-    setPanelBorder (j60HzdPanel, level + 3, Color.black, "Rear");
+    setPanelBorder (j60HzdPanel, level + 3, Color.black, "60 Hz");
     this.j60Hz = new JColorCheckBox<> ((t) -> (t != null && t) ? Color.red : null);
     j60HzdPanel.add (this.j60Hz);
     j50_60HzPanel.add (j60HzdPanel);
