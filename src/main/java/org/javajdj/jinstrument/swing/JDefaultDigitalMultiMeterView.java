@@ -43,10 +43,10 @@ import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.Unit;
-import org.javajdj.jinstrument.instrument.dmm.DefaultDigitalMultiMeterReading;
-import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeter;
-import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeterReading;
-import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeterSettings;
+import org.javajdj.jinstrument.DefaultDigitalMultiMeterReading;
+import org.javajdj.jinstrument.DigitalMultiMeter;
+import org.javajdj.jinstrument.DigitalMultiMeterReading;
+import org.javajdj.jinstrument.DigitalMultiMeterSettings;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
