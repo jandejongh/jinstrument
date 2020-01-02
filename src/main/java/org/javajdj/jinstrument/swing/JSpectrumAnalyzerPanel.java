@@ -17,7 +17,7 @@
 package org.javajdj.jinstrument.swing;
 
 import java.awt.Color;
-import org.javajdj.jinstrument.instrument.sa.SpectrumAnalyzer;
+import org.javajdj.jinstrument.SpectrumAnalyzer;
 
 /** A Swing (base) component for interacting with a {@link SpectrumAnalyzer}.
  *
