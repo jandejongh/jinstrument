@@ -42,9 +42,9 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
-import org.javajdj.jinstrument.instrument.sg.SignalGenerator;
-import org.javajdj.jinstrument.instrument.sg.SignalGenerator.ModulationSource;
-import org.javajdj.jinstrument.instrument.sg.SignalGeneratorSettings;
+import org.javajdj.jinstrument.SignalGenerator;
+import org.javajdj.jinstrument.SignalGenerator.ModulationSource;
+import org.javajdj.jinstrument.SignalGeneratorSettings;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
