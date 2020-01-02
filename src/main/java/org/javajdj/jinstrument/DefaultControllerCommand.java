@@ -16,7 +16,10 @@
  */
 package org.javajdj.jinstrument;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.LinkedHashMap;
+import java.util.logging.Logger;
 
 /** Default implementation of a {@link ControllerCommand}.
  * 
@@ -31,6 +34,20 @@ public class DefaultControllerCommand
   implements ControllerCommand
 {
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // LOGGER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private static final Logger LOG = Logger.getLogger (DefaultControllerCommand.class.getName ());
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // CONSTRUCTOR(S) / FACTORY / CLONING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   public DefaultControllerCommand (
     final String command,
     final String arg1, final Object val1,
@@ -88,5 +105,115 @@ public class DefaultControllerCommand
   {
     this (command, null, null, null, null, null, null, null, null);
   }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // CONTROLLER COMMAND SOJOURN ADMINISTRATION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  public final void resetCommandSojournAdministration ()
+  {
+    remove (ControllerCommand.CCADMIN_CONTROLLER_ARRIVAL_TIME);
+    remove (ControllerCommand.CCADMIN_CONTROLLER_START_TIME);
+    remove (ControllerCommand.CCADMIN_CONTROLLER_DEPARTURE_TIME);
+  }
   
+  @Override
+  public final Instant getArriveAtControllerTime ()
+  {
+    return (Instant) get (ControllerCommand.CCADMIN_CONTROLLER_ARRIVAL_TIME);
+  }
+
+  @Override
+  public final void markArrivalAtController (final Controller controller)
+  {
+    if (getArriveAtControllerTime () != null)
+      throw new IllegalStateException ();
+    put (ControllerCommand.CCADMIN_CONTROLLER_ARRIVAL_TIME, Instant.now ());
+  }
+
+  @Override
+  public final Instant getStartAtControllerTime ()
+  {
+    return (Instant) get (ControllerCommand.CCADMIN_CONTROLLER_START_TIME);
+  }
+
+  @Override
+  public final void markStartAtController (final Controller controller)
+  {
+    if (getArriveAtControllerTime () == null || getStartAtControllerTime () != null)
+      throw new IllegalStateException ();
+    put (ControllerCommand.CCADMIN_CONTROLLER_START_TIME, Instant.now ());
+  }
+
+  @Override
+  public final Instant getDepartureAtControllerTime ()
+  {
+    return (Instant) get (ControllerCommand.CCADMIN_CONTROLLER_DEPARTURE_TIME);
+  }
+
+  @Override
+  public final void markDepartureAtController (final Controller controller)
+  {
+    if (getArriveAtControllerTime () == null || getDepartureAtControllerTime () != null)
+      throw new IllegalStateException ();
+    put (ControllerCommand.CCADMIN_CONTROLLER_DEPARTURE_TIME, Instant.now ());
+  }
+
+  @Override
+  public final Duration getQueueingTimeout ()
+  {
+    return (Duration) get (ControllerCommand.CCADMIN_CONTROLLER_QUEUEING_TIMEOUT);    
+  }
+
+  @Override
+  public void setQueueingTimeout (final Duration queueingTimeout)
+  {
+    if (queueingTimeout == null || queueingTimeout.isNegative () || queueingTimeout.isZero ())
+      throw new IllegalArgumentException ();
+    if (getArriveAtControllerTime () != null)
+      throw new IllegalStateException ();
+    put (ControllerCommand.CCADMIN_CONTROLLER_QUEUEING_TIMEOUT, queueingTimeout);
+  }
+
+  @Override
+  public final Duration getProcessingTimeout ()
+  {
+    return (Duration) get (ControllerCommand.CCADMIN_CONTROLLER_PROCESSING_TIMEOUT);
+  }
+
+  @Override
+  public void setProcessingTimeout (final Duration processingTimeout)
+  {
+    if (processingTimeout == null || processingTimeout.isNegative () || processingTimeout.isZero ())
+      throw new IllegalArgumentException ();
+    if (getStartAtControllerTime () != null)
+      throw new IllegalStateException ();
+    put (ControllerCommand.CCADMIN_CONTROLLER_PROCESSING_TIMEOUT, processingTimeout);
+  }
+
+  @Override
+  public final Duration getSojournTimeout ()
+  {
+    return (Duration) get (ControllerCommand.CCADMIN_CONTROLLER_SOJOURN_TIMEOUT);
+  }
+  
+  @Override
+  public void setSojournTimeout (final Duration sojournTimeout)
+  {
+    if (sojournTimeout == null || sojournTimeout.isNegative () || sojournTimeout.isZero ())
+      throw new IllegalArgumentException ();
+    if (getArriveAtControllerTime ()!= null)
+      throw new IllegalStateException ();
+    put (ControllerCommand.CCADMIN_CONTROLLER_SOJOURN_TIMEOUT, sojournTimeout);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // END OF FILE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
 }
