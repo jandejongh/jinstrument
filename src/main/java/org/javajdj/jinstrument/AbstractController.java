@@ -148,7 +148,7 @@ implements Controller
     {
       LOG.log (Level.WARNING, "Overflow on Controller Command Queue on {0}.", this.toString ());
       queueLogMessage (Instant.now (), "Overflow on Controller Command Queue");
-      controllerCommand.put (ControllerCommand.CC_EXCEPTION_KEY, new BufferOverflowException ());
+      controllerCommand.put (ControllerCommand.CCRET_EXCEPTION_KEY, new BufferOverflowException ());
       controllerCommand.markDepartureAtController (this);
       queueLogEndCommand (controllerCommand.getDepartureAtControllerTime (), controllerCommand);
       error ();
@@ -242,7 +242,7 @@ implements Controller
         queueLogMessage (Instant.now (), "Terminating Controller Command Processor");
         if (nextCommand != null)
         {
-          nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, ie);
+          nextCommand.put (ControllerCommand.CCRET_EXCEPTION_KEY, ie);
           nextCommand.markDepartureAtController (this);
           queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
         }
@@ -257,7 +257,7 @@ implements Controller
         {
           if (nextCommand.getStartAtControllerTime () != null)
             queueLogMessage (Instant.now (), "Processing Timeout");
-          nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, te);
+          nextCommand.put (ControllerCommand.CCRET_EXCEPTION_KEY, te);
           nextCommand.markDepartureAtController (this);
           queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
         }
@@ -269,7 +269,7 @@ implements Controller
         queueLogMessage (Instant.now (), "I/O Exception");
         if (nextCommand != null)
         {
-          nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, ioe);
+          nextCommand.put (ControllerCommand.CCRET_EXCEPTION_KEY, ioe);
           nextCommand.markDepartureAtController (this);
           queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
         }
@@ -282,7 +282,7 @@ implements Controller
         queueLogMessage (Instant.now (), "UnsupportedOperationException");
         if (nextCommand != null)
         {
-          nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, uoe);
+          nextCommand.put (ControllerCommand.CCRET_EXCEPTION_KEY, uoe);
           nextCommand.markDepartureAtController (this);
           queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
         }
@@ -294,7 +294,7 @@ implements Controller
         queueLogMessage (Instant.now (), "Exception");
         if (nextCommand != null)
         {
-          nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, e);
+          nextCommand.put (ControllerCommand.CCRET_EXCEPTION_KEY, e);
           nextCommand.markDepartureAtController (this);
           queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
         }
@@ -305,7 +305,7 @@ implements Controller
         {
           LOG.log (Level.WARNING, "Overflow in Command Result Queue on {0}.", AbstractController.this.toString ());
           queueLogMessage (Instant.now (), "Overflow on Command Result Queue");
-          nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, new BufferOverflowException ());
+          nextCommand.put (ControllerCommand.CCRET_EXCEPTION_KEY, new BufferOverflowException ());
           nextCommand.markDepartureAtController (this);
           queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
           error = true;
