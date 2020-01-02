@@ -333,7 +333,7 @@ public class JControllerDebug
               return null;
           case 4:
             if (logEntry.controllerCommand != null)
-              return logEntry.controllerCommand.get (ControllerCommand.CC_EXCEPTION_KEY);
+              return logEntry.controllerCommand.get (ControllerCommand.CCRET_EXCEPTION_KEY);
             else
               return null;
           case 5:
