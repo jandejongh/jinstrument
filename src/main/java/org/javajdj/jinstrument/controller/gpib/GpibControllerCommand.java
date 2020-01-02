@@ -27,24 +27,24 @@ public interface GpibControllerCommand
   extends ControllerCommand
 {
   
-  public final static String CC_GPIB_READ_EOI = "gpibCommandReadEOI";
-  public final static String CC_GPIB_READLN = "gpibCommandReadln";
-  public final static String CC_GPIB_READ_N = "gpibCommandReadN";
-  public final static String CC_GPIB_WRITE = "gpibCommandWrite";
-  public final static String CC_GPIB_WRITE_AND_READ_EOI = "gpibCommandWriteAndReadEOI";
-  public final static String CC_GPIB_WRITE_AND_READLN = "gpibCommandWriteAndReadln";
-  public final static String CC_GPIB_WRITE_AND_READ_N = "gpibCommandWriteAndReadN";
-  public final static String CC_GPIB_WRITE_AND_READLN_N = "gpibCommandWriteAndReadlnN";
-  public final static String CC_GPIB_ATOMIC_SEQUENCE = "gpibCommandAtomicSequence";
-  public final static String CC_GPIB_SERIAL_POLL = "gpibCommandSerialPoll";
+  public final static String CCCMD_GPIB_READ_EOI = "gpibCommandReadEOI";
+  public final static String CCCMD_GPIB_READLN = "gpibCommandReadln";
+  public final static String CCCMD_GPIB_READ_N = "gpibCommandReadN";
+  public final static String CCCMD_GPIB_WRITE = "gpibCommandWrite";
+  public final static String CCCMD_GPIB_WRITE_AND_READ_EOI = "gpibCommandWriteAndReadEOI";
+  public final static String CCCMD_GPIB_WRITE_AND_READLN = "gpibCommandWriteAndReadln";
+  public final static String CCCMD_GPIB_WRITE_AND_READ_N = "gpibCommandWriteAndReadN";
+  public final static String CCCMD_GPIB_WRITE_AND_READLN_N = "gpibCommandWriteAndReadlnN";
+  public final static String CCCMD_GPIB_ATOMIC_SEQUENCE = "gpibCommandAtomicSequence";
+  public final static String CCCMD_GPIB_SERIAL_POLL = "gpibCommandSerialPoll";
+  public final static String CCCMD_GPIB_ATOMIC_REPEAT_UNTIL = "gpibCommandAtomicRepeatUntil";
   
   public final static String CCARG_GPIB_ADDRESS = "gpibArgAddress";
   public final static String CCARG_GPIB_READLN_TERMINATION_MODE = "gpibArgReadlnTerminationMode";
-  public final static String CCARG_GPIB_READ_BYTES = "gpibArgReadBytes";
   public final static String CCARG_GPIB_READ_N = "gpibArgReadN";
   public final static String CCARG_GPIB_WRITE_BYTES = "gpibArgWriteBytes";
   public final static String CCARG_GPIB_ATOMIC_SEQUENCE = "gpibArgAtomicSequence";
+  public final static String CCARG_GPIB_ATOMIC_REPEAT_UNTIL_COMMAND = "gpibArgAtomicRepeatUntilCommand";
+  public final static String CCARG_GPIB_ATOMIC_REPEAT_UNTIL_CONDITION = "gpibArgAtomicRepeatUntilCondition";
   
-  public final static String CCARG_GPIB_TIMEOUT_MS = "gpibArgTimeout_ms";
-    
 }
