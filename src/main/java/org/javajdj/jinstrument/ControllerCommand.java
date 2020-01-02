@@ -16,13 +16,21 @@
  */
 package org.javajdj.jinstrument;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 
 /** A command for a {@link Controller}.
  * 
+ * <p>
  * Controller commands are {@code Map}s from {@link String}s to {@link Object}s.
  * The interface provides {@code String} definitions for the most common commands and
  * their arguments.
+ * 
+ * <p>
+ * A controller command features a set of closely related methods dealing with the administration of the sojourn
+ * of the command at a specific controller, and the applicable timeout values.
+ * Implementations must store the related values under given keys.
  * 
  * @see Controller#addCommand
  *
@@ -46,5 +54,51 @@ public interface ControllerCommand
   public final static String CC_PROPE_KEY = "commandProbe";
   
   public final static String CC_GET_SETTINGS_KEY = "commandGetSettings";
+  
+  public final static String CCADMIN_CONTROLLER_ARRIVAL_TIME = "controllerAdminArrivalTime";
+  public final static String CCADMIN_CONTROLLER_START_TIME = "controllerAdminStartTime";
+  public final static String CCADMIN_CONTROLLER_DEPARTURE_TIME = "controllerAdminDepartureTime";
+
+  public final static String CCADMIN_CONTROLLER_QUEUEING_TIMEOUT = "controllerAdminQueueingTimeout";
+  public final static String CCADMIN_CONTROLLER_PROCESSING_TIMEOUT = "controllerAdminProcessingTimeout";
+  public final static String CCADMIN_CONTROLLER_SOJOURN_TIMEOUT = "controllerAdminSojournTimeout";
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // CONTROLLER COMMAND SOJOURN ADMINISTRATION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  void resetCommandSojournAdministration ();
+  
+  Instant getArriveAtControllerTime ();
+
+  void markArrivalAtController (Controller controller);
+  
+  Instant getStartAtControllerTime ();
+
+  void markStartAtController (Controller controller);
+  
+  Instant getDepartureAtControllerTime ();
+  
+  void markDepartureAtController (Controller controller);
+  
+  Duration getQueueingTimeout ();
+  
+  void setQueueingTimeout (Duration queueingTimeout);
+  
+  Duration getProcessingTimeout ();
+  
+  void setProcessingTimeout (Duration processingTimeout);
+  
+  Duration getSojournTimeout ();
+  
+  void setSojournTimeout (Duration sojournTimeout);
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // END OF FILE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
 }
