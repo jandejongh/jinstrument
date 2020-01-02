@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.controller.gpib;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import org.javajdj.jinstrument.Device;
 
 /** A device on a GPIB (General Purpose Interface Bus).
@@ -60,7 +61,11 @@ public interface GpibDevice
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  void addCommand (final GpibControllerCommand command)
+  void addCommand (
+    GpibControllerCommand command,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
   void doControllerCommandSync (GpibControllerCommand command, final long timeout_ms)
@@ -75,7 +80,10 @@ public interface GpibDevice
   GpibControllerCommand generateReadEOICommand ()
     throws UnsupportedOperationException;
   
-  void readEOIAsync ()
+  void readEOIAsync (
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
   byte[] readEOISync (long timeout_ms)
@@ -90,7 +98,11 @@ public interface GpibDevice
   GpibControllerCommand generateReadlnCommand (ReadlineTerminationMode readlineTerminationMode)
     throws UnsupportedOperationException;
   
-  void readlnAsync (ReadlineTerminationMode readlineTerminationMode)
+  void readlnAsync (
+    ReadlineTerminationMode readlineTerminationMode,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
   byte[] readlnSync (ReadlineTerminationMode readlineTerminationMode, long timeout_ms)
@@ -105,7 +117,11 @@ public interface GpibDevice
   GpibControllerCommand generateReadNCommand (int N)
     throws UnsupportedOperationException;
   
-  void readNAsync (int N)
+  void readNAsync (
+    int N,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
   byte[] readNSync (int N, long timeout_ms)
@@ -120,7 +136,11 @@ public interface GpibDevice
   GpibControllerCommand generateWriteCommand (byte[] bytes)
     throws UnsupportedOperationException;
   
-  void writeAsync (byte[] bytes)
+  void writeAsync (
+    byte[] bytes,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
   void writeSync (byte[] bytes, long timeout_ms)
@@ -135,7 +155,11 @@ public interface GpibDevice
   GpibControllerCommand generateWriteAndReadEOICommand (byte[] bytes)
     throws UnsupportedOperationException;
   
-  void writeAndReadEOIAsync (byte[] bytes)
+  void writeAndReadEOIAsync (
+    byte[] bytes,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
   byte[] writeAndReadEOISync (byte[] bytes, long timeout_ms)
@@ -150,7 +174,12 @@ public interface GpibDevice
   GpibControllerCommand generateWriteAndReadlnCommand (byte[] bytes, ReadlineTerminationMode readlineTerminationMode)
     throws UnsupportedOperationException;
   
-  void writeAndReadlnAsync (byte[] bytes, ReadlineTerminationMode readlineTerminationMode)
+  void writeAndReadlnAsync (
+    byte[] bytes,
+    ReadlineTerminationMode readlineTerminationMode,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
   byte[] writeAndReadlnSync (byte[] bytes, ReadlineTerminationMode readlineTerminationMode, long timeout_ms)
@@ -165,7 +194,12 @@ public interface GpibDevice
   GpibControllerCommand generateWriteAndReadNCommand (byte[] bytes, int N)
     throws UnsupportedOperationException;
   
-  void writeAndReadNAsync (byte[] bytes, int N)
+  void writeAndReadNAsync (
+    byte[] bytes,
+    int N,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
   byte[] writeAndReadNSync (byte[] bytes, int N, long timeout_ms)
@@ -180,7 +214,13 @@ public interface GpibDevice
   GpibControllerCommand generateWriteAndReadlnNCommand (byte[] bytes, ReadlineTerminationMode readlineTerminationMode, int N)
     throws UnsupportedOperationException;
   
-  void writeAndReadlnNAsync (byte[] bytes, ReadlineTerminationMode readlineTerminationMode, int N)
+  void writeAndReadlnNAsync (
+    byte[] bytes,
+    ReadlineTerminationMode readlineTerminationMode,
+    int N,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
   byte[][] writeAndReadlnNSync (byte[] bytes, ReadlineTerminationMode readlineTerminationMode, int N, long timeout_ms)
@@ -195,7 +235,11 @@ public interface GpibDevice
   GpibControllerCommand generateAtomicSequenceCommand (GpibControllerCommand[] sequence)
     throws UnsupportedOperationException;
   
-  void atomicSequenceAsync (GpibControllerCommand[] sequence)
+  void atomicSequenceAsync (
+    GpibControllerCommand[] sequence,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
   void atomicSequenceSync (GpibControllerCommand[] sequence, long timeout_ms)
@@ -210,10 +254,37 @@ public interface GpibDevice
   GpibControllerCommand generateSerialPollCommand ()
     throws UnsupportedOperationException;
   
-  void serialPollAsync ()
+  void serialPollAsync (
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
   byte serialPollSync (long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException;
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // atomicRepeatUntil
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  GpibControllerCommand generateAtomicRepeatUntilCommand (
+    GpibControllerCommand commandToRepeat,
+    Function<GpibControllerCommand, Boolean> condition);
+  
+  void atomicRepeatUntilAsync (
+    GpibControllerCommand commandToRepeat,
+    Function<GpibControllerCommand, Boolean> condition,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
+    throws UnsupportedOperationException;
+  
+  void atomicRepeatUntilSync (
+    GpibControllerCommand commandToRepeat,
+    Function<GpibControllerCommand, Boolean> condition,
+    long timeout_ms)
     throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException;
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
