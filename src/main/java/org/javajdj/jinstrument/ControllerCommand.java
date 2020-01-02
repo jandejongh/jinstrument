@@ -43,17 +43,14 @@ public interface ControllerCommand
   
   public final static String CC_COMMAND_KEY = "command";
   
-  public final static String CC_EXCEPTION_KEY = "exception";
+  public final static String CCRET_EXCEPTION_KEY = "commandReturnException";
+  public final static String CCRET_STATUS_KEY = "commandReturnStatus";
+  public final static String CCRET_VALUE_KEY = "commandReturnValue";
   
-  public final static String CC_RETURN_STATUS_KEY = "returnStatus";
-  
-  public final static String CC_RETURN_VALUE_KEY = "returnValue";
-  
-  public final static String CC_NOP_KEY = "commandNop";
-  
-  public final static String CC_PROPE_KEY = "commandProbe";
-  
-  public final static String CC_GET_SETTINGS_KEY = "commandGetSettings";
+  public final static String CCCMD_RESET_CONTROLLER = "commandResetController";
+  public final static String CCCMD_NOP = "commandNop";
+  public final static String CCCMD_PROPE = "commandProbe";
+  public final static String CCCMD_GET_SETTINGS = "commandGetSettings";
   
   public final static String CCADMIN_CONTROLLER_ARRIVAL_TIME = "controllerAdminArrivalTime";
   public final static String CCADMIN_CONTROLLER_START_TIME = "controllerAdminStartTime";
