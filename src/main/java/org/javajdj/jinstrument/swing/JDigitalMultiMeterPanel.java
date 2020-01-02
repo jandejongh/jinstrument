@@ -17,7 +17,7 @@
 package org.javajdj.jinstrument.swing;
 
 import java.awt.Color;
-import org.javajdj.jinstrument.instrument.dmm.DigitalMultiMeter;
+import org.javajdj.jinstrument.DigitalMultiMeter;
 
 /** A Swing (base) component for interacting with a {@link DigitalMultiMeter}.
  *
