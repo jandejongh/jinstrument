@@ -34,9 +34,9 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
-import org.javajdj.jinstrument.instrument.sa.SpectrumAnalyzer;
-import org.javajdj.jinstrument.instrument.sa.SpectrumAnalyzerSettings;
-import org.javajdj.jinstrument.instrument.sa.SpectrumAnalyzerTrace;
+import org.javajdj.jinstrument.SpectrumAnalyzer;
+import org.javajdj.jinstrument.SpectrumAnalyzerSettings;
+import org.javajdj.jinstrument.SpectrumAnalyzerTrace;
 
 /** Panel showing the (latest) {@link SpectrumAnalyzerTrace} from a {@link SpectrumAnalyzer}.
  *
@@ -133,7 +133,7 @@ public class JSpectrumAnalyzerTraceDisplay
   
   private volatile SpectrumAnalyzerTrace trace = null;
   
-  public final synchronized void setTrace (final SpectrumAnalyzerTrace trace)
+  public final void setTrace (final SpectrumAnalyzerTrace trace)
   {
     this.trace = trace;
     SwingUtilities.invokeLater (() ->
