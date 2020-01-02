@@ -155,7 +155,7 @@ implements Controller
     }
   }
   
-  protected abstract void processCommand (final ControllerCommand controllerCommand, final Long timeout_ms)
+  protected abstract void processCommand (final ControllerCommand controllerCommand, final long timeout_ms)
     throws UnsupportedOperationException, IOException, InterruptedException, TimeoutException;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
