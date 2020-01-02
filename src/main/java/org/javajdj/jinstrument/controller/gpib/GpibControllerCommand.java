@@ -27,6 +27,8 @@ public interface GpibControllerCommand
   extends ControllerCommand
 {
   
+  public final static String CCCMD_GPIB_SELECTED_DEVICE_CLEAR = "gpibCommandSelectedDeviceClear";
+  public final static String CCCMD_GPIB_SERIAL_POLL = "gpibCommandSerialPoll";
   public final static String CCCMD_GPIB_READ_EOI = "gpibCommandReadEOI";
   public final static String CCCMD_GPIB_READLN = "gpibCommandReadln";
   public final static String CCCMD_GPIB_READ_N = "gpibCommandReadN";
@@ -36,7 +38,6 @@ public interface GpibControllerCommand
   public final static String CCCMD_GPIB_WRITE_AND_READ_N = "gpibCommandWriteAndReadN";
   public final static String CCCMD_GPIB_WRITE_AND_READLN_N = "gpibCommandWriteAndReadlnN";
   public final static String CCCMD_GPIB_ATOMIC_SEQUENCE = "gpibCommandAtomicSequence";
-  public final static String CCCMD_GPIB_SERIAL_POLL = "gpibCommandSerialPoll";
   public final static String CCCMD_GPIB_ATOMIC_REPEAT_UNTIL = "gpibCommandAtomicRepeatUntil";
   
   public final static String CCARG_GPIB_ADDRESS = "gpibArgAddress";

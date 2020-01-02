@@ -208,6 +208,44 @@ public class DefaultGpibDevice
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // GpibDevice
+  // SELECTED DEVICE CLEAR
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  public GpibControllerCommand generateSelectedDeviceClearCommand ()
+  {
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (
+      GpibControllerCommand.CCCMD_GPIB_SELECTED_DEVICE_CLEAR,
+      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address);
+    return command;
+  }
+  
+  @Override
+  public void selectedDeviceCLearAsync (
+    final Long queueingTimeout_ms,
+    final Long processingTimeout_ms,
+    final Long sojournTimeout_ms)
+    throws UnsupportedOperationException
+  {
+    doControllerCommandAsync (
+      generateSelectedDeviceClearCommand (),
+      queueingTimeout_ms,
+      processingTimeout_ms,
+      sojournTimeout_ms);
+  }
+
+  @Override
+  public void selectedDeviceClearSync (final long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException
+  {
+    final GpibControllerCommand command = generateSelectedDeviceClearCommand ();
+    doControllerCommandSync (command, timeout_ms);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GpibDevice
   // SERIAL POLL
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
