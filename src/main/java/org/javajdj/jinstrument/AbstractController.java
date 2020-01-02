@@ -17,6 +17,8 @@
 package org.javajdj.jinstrument;
 
 import java.io.IOException;
+import java.nio.BufferOverflowException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -140,12 +142,20 @@ implements Controller
   {
     if (controllerCommand == null)
       throw new IllegalArgumentException ();
+    controllerCommand.markArrivalAtController (this);
+    queueLogQueueCommand (controllerCommand.getArriveAtControllerTime (), controllerCommand);
     if (! this.commandQueue.offer (controllerCommand))
-      LOG.log (Level.WARNING, "Overflow on Controller Command Queue on {0}.", this);
-    queueLogQueueCommand (Instant.now (), controllerCommand);
+    {
+      LOG.log (Level.WARNING, "Overflow on Controller Command Queue on {0}.", this.toString ());
+      queueLogMessage (Instant.now (), "Overflow on Controller Command Queue");
+      controllerCommand.put (ControllerCommand.CC_EXCEPTION_KEY, new BufferOverflowException ());
+      controllerCommand.markDepartureAtController (this);
+      queueLogEndCommand (controllerCommand.getDepartureAtControllerTime (), controllerCommand);
+      error ();
+    }
   }
   
-  protected abstract void processCommand (final ControllerCommand controllerCommand, final Integer timeout_ms)
+  protected abstract void processCommand (final ControllerCommand controllerCommand, final Long timeout_ms)
     throws UnsupportedOperationException, IOException, InterruptedException, TimeoutException;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,11 +164,12 @@ implements Controller
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final static int DEFAULT_COMMAND_TIMEOUT_MS = 3000;
+  private final static long DEFAULT_COMMAND_TIMEOUT_MS = 3000;
   
   private final Runnable commandProcessor = () ->
   {
     LOG.log (Level.INFO, "Starting Controller Command Processor on {0}.", AbstractController.this.toString ());
+    queueLogMessage (Instant.now (), "Starting Controller Command Processor");
     while (! Thread.currentThread ().isInterrupted ())
     {
       boolean error = false;
@@ -167,18 +178,73 @@ implements Controller
       try
       {
         nextCommand = AbstractController.this.commandQueue.take ();
-        queueLogStartCommand (Instant.now (), nextCommand);
-        AbstractController.this.processCommand (nextCommand, DEFAULT_COMMAND_TIMEOUT_MS);
-        queueLogEndCommand (Instant.now (), nextCommand);
+        final Instant now = Instant.now ();
+        final Duration sojournTime = Duration.between (nextCommand.getArriveAtControllerTime (), now);
+        final Duration queueingTimeout = nextCommand.getQueueingTimeout ();
+        final Duration processingTimeout = nextCommand.getProcessingTimeout ();
+        final Duration sojournTimeout = nextCommand.getSojournTimeout ();
+        Duration remainingTimeout = null;
+        if (queueingTimeout != null)
+        {
+          final Duration remainingHere = queueingTimeout.minus (sojournTime);
+          if (remainingHere.isNegative () || remainingHere.isZero ())
+          {
+            LOG.log (Level.WARNING, "Controller {0} dropped command {1} at start due to queueing timeout!",
+              new Object[]{AbstractController.this.toString (), nextCommand});
+            queueLogMessage (Instant.now (), "Queueing Timeout");
+            throw new TimeoutException ();
+          }
+          else
+            remainingTimeout = (remainingTimeout == null || remainingHere.minus (remainingTimeout).isNegative ())
+              ? remainingHere
+              : remainingTimeout;
+        }
+        if (sojournTimeout != null)
+        {
+          final Duration remainingHere = sojournTimeout.minus (sojournTime);
+          if (remainingHere.isNegative () || remainingHere.isZero ())
+          {
+            LOG.log (Level.WARNING, "Controller {0} dropped command {1} at start due to sojourn timeout!",
+              new Object[]{AbstractController.this.toString (), nextCommand});
+            queueLogMessage (Instant.now (), "Sojourn Timeout");
+            throw new TimeoutException ();
+          }
+          else
+            remainingTimeout = (remainingTimeout == null || remainingHere.minus (remainingTimeout).isNegative ())
+              ? remainingHere
+              : remainingTimeout;
+        }
+        if (processingTimeout != null)
+        {
+          final Duration remainingHere = processingTimeout;
+          remainingTimeout = (remainingTimeout == null || remainingHere.minus (remainingTimeout).isNegative ())
+            ? remainingHere
+            : remainingTimeout;
+        }
+        if (remainingTimeout == null)
+        {
+          LOG.log (Level.WARNING, "Controller {0} has no processing timeout for command {1} at start,"
+            + " using default controller settings {2} ms instead!",
+            new Object[]{AbstractController.this.toString (), nextCommand, AbstractController.DEFAULT_COMMAND_TIMEOUT_MS});
+          queueLogMessage (Instant.now (), "No Timeout Set");
+          remainingTimeout = Duration.ofMillis (AbstractController.DEFAULT_COMMAND_TIMEOUT_MS);
+        }
+        nextCommand.markStartAtController (this);
+        queueLogStartCommand (nextCommand.getStartAtControllerTime (), nextCommand);
+        AbstractController.this.processCommand (nextCommand, remainingTimeout.toMillis ());
+        nextCommand.markDepartureAtController (this);
+        queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
       }
       catch (InterruptedException ie)
       {
         LOG.log (Level.INFO, "Terminating (by request) Controller Command Processor on {0}.",
           AbstractController.this.toString ());
+        queueLogMessage (Instant.now (), "Terminating Controller Command Processor");
         if (nextCommand != null)
         {
           nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, ie);
-          queueLogEndCommand (Instant.now (), nextCommand);
+          nextCommand.markDepartureAtController (this);
+          queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
         }
         error = false;
         mustStop = true;
@@ -189,18 +255,23 @@ implements Controller
           new Object[]{AbstractController.this.toString (), Arrays.toString (te.getStackTrace ())});
         if (nextCommand != null)
         {
+          if (nextCommand.getStartAtControllerTime () != null)
+            queueLogMessage (Instant.now (), "Processing Timeout");
           nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, te);
-          queueLogEndCommand (Instant.now (), nextCommand);
+          nextCommand.markDepartureAtController (this);
+          queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
         }
       }
       catch (IOException ioe)
       {
         LOG.log (Level.WARNING, "IOException (ignored; noted on command) in Controller Command Processor on {0}: {1}.",
           new Object[]{AbstractController.this.toString (), Arrays.toString (ioe.getStackTrace ())});
+        queueLogMessage (Instant.now (), "I/O Exception");
         if (nextCommand != null)
         {
           nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, ioe);
-          queueLogEndCommand (Instant.now (), nextCommand);
+          nextCommand.markDepartureAtController (this);
+          queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
         }
       }
       catch (UnsupportedOperationException uoe)
@@ -208,27 +279,35 @@ implements Controller
         LOG.log (Level.WARNING, "UnsupportedOoperationException (ignored; noted on command) "
           + "in Controller Command Processor on {0}: {1}.",
           new Object[]{AbstractController.this.toString (), Arrays.toString (uoe.getStackTrace ())});
+        queueLogMessage (Instant.now (), "UnsupportedOperationException");
         if (nextCommand != null)
         {
           nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, uoe);
-          queueLogEndCommand (Instant.now (), nextCommand);
+          nextCommand.markDepartureAtController (this);
+          queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
         }
       }
       catch (Exception e)
       {
         LOG.log (Level.WARNING, "Exception (ignored; noted on command) in Controller Command Processor on {0}: {1}.",
           new Object[]{AbstractController.this.toString (), Arrays.toString (e.getStackTrace ())});
+        queueLogMessage (Instant.now (), "Exception");
         if (nextCommand != null)
         {
           nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, e);
-          queueLogEndCommand (Instant.now (), nextCommand);
+          nextCommand.markDepartureAtController (this);
+          queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
         }
       }
       finally
       {
         if (nextCommand != null && ! this.commandResultQueue.offer (nextCommand))
         {
-          LOG.log (Level.WARNING, "Overflow in Command Result Queue on {0}.", AbstractController.this);
+          LOG.log (Level.WARNING, "Overflow in Command Result Queue on {0}.", AbstractController.this.toString ());
+          queueLogMessage (Instant.now (), "Overflow on Command Result Queue");
+          nextCommand.put (ControllerCommand.CC_EXCEPTION_KEY, new BufferOverflowException ());
+          nextCommand.markDepartureAtController (this);
+          queueLogEndCommand (nextCommand.getDepartureAtControllerTime (), nextCommand);
           error = true;
           mustStop = true;
         }
@@ -242,6 +321,7 @@ implements Controller
     }
     LOG.log (Level.INFO, "Terminating (by request) Controller Command Processor on {0}.",
       AbstractController.this.toString ());
+    queueLogMessage (Instant.now (), "Terminating Controller Command Processor");
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
