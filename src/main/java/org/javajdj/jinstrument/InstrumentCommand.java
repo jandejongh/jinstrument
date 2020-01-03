@@ -133,4 +133,10 @@ public interface InstrumentCommand
   public final static String IC_TRIGGER_MODE = "commandTriggerMode";
   public final static String ICARG_TRIGGER_MODE = "triggerMode";
   
+  public final static String IC_WAVEFORM = "commandWaveform";
+  public final static String ICARG_WAVEFORM = "waveform"; 
+  
+  public final static String IC_LF_FREQUENCY = "commandLfFrequency";
+  public final static String ICARG_LF_FREQUENCY_HZ = "lfFrequency_Hz"; 
+  
 }
