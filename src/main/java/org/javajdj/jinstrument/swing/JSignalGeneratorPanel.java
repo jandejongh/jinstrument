@@ -57,7 +57,7 @@ public class JSignalGeneratorPanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public final SignalGenerator signalGenerator ()
+  public final SignalGenerator getSignalGenerator ()
   {
     return (SignalGenerator) getInstrument ();
   }
