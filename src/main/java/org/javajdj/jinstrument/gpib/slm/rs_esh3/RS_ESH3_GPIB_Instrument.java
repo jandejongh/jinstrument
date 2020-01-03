@@ -33,7 +33,7 @@ import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.SelectiveLevelMeter;
 import org.javajdj.jinstrument.gpib.slm.AbstractGpibSelectiveLevelMeter;
 
-/** Implementation of {@link Instrument} and {@link SelectiveLevelMeter} for the Rohde&Schwarz ESH3.
+/** Implementation of {@link Instrument} and {@link SelectiveLevelMeter} for the Rohde{@code &}Schwarz ESH3.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
