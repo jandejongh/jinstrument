@@ -641,13 +641,6 @@ public final class ProLogixGpibEthernetController
     proLogixCommandWritelnControllerCommand (switchDeviceCommandString);
   }
 
-  private void proLogixCommandSetReadAfterWrite (final boolean readAfterWrite)
-  throws IOException, InterruptedException
-  {
-    final String readAfterWriteCommandString = "++auto " + (readAfterWrite ? "1" : "0");
-    proLogixCommandWritelnControllerCommand (readAfterWriteCommandString);
-  }
-  
   private void proLogixCommandSetEOT (final boolean eotEnable, final byte eotChar)
     throws IOException, InterruptedException
   {
@@ -710,7 +703,6 @@ public final class ProLogixGpibEthernetController
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
-      proLogixCommandSetReadAfterWrite (false);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     proLogixCommandWritelnControllerCommand (SELECTED_DEVICE_CLEAR_COMMAND);
@@ -730,7 +722,6 @@ public final class ProLogixGpibEthernetController
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
-      proLogixCommandSetReadAfterWrite (false);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     proLogixCommandWritelnControllerCommand (SERIAL_POLL_COMMAND);
@@ -765,7 +756,6 @@ public final class ProLogixGpibEthernetController
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
-      proLogixCommandSetReadAfterWrite (false);
       proLogixCommandSetEOT (true, DEFAULT_EOT);
     }
     proLogixCommandWritelnControllerCommand (READ_EOI_COMMAND);
@@ -797,7 +787,6 @@ public final class ProLogixGpibEthernetController
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
-      proLogixCommandSetReadAfterWrite (false);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     if (ask)
@@ -1045,9 +1034,6 @@ public final class ProLogixGpibEthernetController
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
-      // XXX I thought we never did this!!
-      // XXX Now we must set it to false everywhere else??
-      proLogixCommandSetReadAfterWrite (true);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     processCommand_write (gpibAddress, bytes, timeout_ms, false);
@@ -1076,7 +1062,6 @@ public final class ProLogixGpibEthernetController
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
-      proLogixCommandSetReadAfterWrite (false);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     processCommand_write (gpibAddress, bytes, timeout_ms, false);
@@ -1101,7 +1086,6 @@ public final class ProLogixGpibEthernetController
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
-      proLogixCommandSetReadAfterWrite (false);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     final byte[][] bytesRead = new byte[N][];
@@ -1132,7 +1116,6 @@ public final class ProLogixGpibEthernetController
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
-      proLogixCommandSetReadAfterWrite (false);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     for (final ControllerCommand controllerCommand : sequence)
@@ -1159,7 +1142,6 @@ public final class ProLogixGpibEthernetController
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
-      proLogixCommandSetReadAfterWrite (false);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     boolean conditionMet = true;
