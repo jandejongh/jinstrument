@@ -32,7 +32,7 @@ Most important changes:
 
 More detailed documentation will follow once the framework has stabilized (notably, the support for channels is still lacking).
 
-## Status [20191231]
+## Status [20200103 - 0.4-SNAPSHOT]
 Beta:
 - ProLogix GPIB Ethernet
 - HP-3478A Digital MultiMeter
@@ -42,10 +42,13 @@ Alpha:
 - HP-8663A Synthesized Signal Generator
 
 Work in Progress [target for V1.0 Release]:
+- HP-3586A Selective Level Meter
+- HP-5316A Frequency Counter
+- HP-5328A [Option 011] Frequency Counter
+- HP-8116A Programmable Pulse/Function Generator
+- HP-8350 Sweep Oscillator
 - HP-54502A Digitizing Oscilloscope
 - HP-70000 Spectrum Analyzer
-- HP-8550 Sweep Oscillator
-- HP-3586A Selective Level Meter
-- HP-8116A Programmable Pulse/Function Generator
-- Wiltron 560A Network Analyzer;
 - Rohde&Schwarz ESH-3 (unit broken though...).
+- Tek-2440 Digital Storage Oscilloscope
+- Wiltron 560A Network Analyzer;
