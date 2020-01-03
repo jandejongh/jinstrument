@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.gpib.sna.wiltron560a;
+package org.javajdj.jinstrument.gpib.sna;
 
 import java.util.List;
 import org.javajdj.jinstrument.ScalarNetworkAnalyzer;
