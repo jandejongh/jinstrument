@@ -20,9 +20,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -30,9 +33,11 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -415,7 +420,7 @@ public class JControllerDebug
     {
       setLayout (new GridLayout (1, 1));
       JControllerDebug.this.logTable.setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
-      JControllerDebug.this.logTable.addMouseListener (JControllerDebug.this.logPanelMouseListener);
+      JControllerDebug.this.logTable.addMouseListener (JControllerDebug.this.logTableMouseListener);
       add (new JScrollPane (JControllerDebug.this.logTable));
     }
     
@@ -423,8 +428,61 @@ public class JControllerDebug
   
   private final JLogPanel jLogPanel;
   
-  private final MouseListener logPanelMouseListener = new MouseAdapter ()
+  private final MouseListener logTableMouseListener = new MouseAdapter ()
   {
+    @Override
+    public void mousePressed (final MouseEvent mouseEvent)
+    {
+      final JTable table = (JTable) mouseEvent.getSource ();
+      if (table != JControllerDebug.this.logTable)
+        return;
+      final Point point = mouseEvent.getPoint ();
+      final int row = table.rowAtPoint (point);
+      if (mouseEvent.getClickCount () == 2 && table.getSelectedRow () != -1)
+      {
+        if (row < 0 && row >= JControllerDebug.this.logEntries.size ())
+          return;
+        final ControllerListener.LogEntry logEntry = JControllerDebug.this.logEntries.get (row);
+        if (logEntry == null)
+          return;
+        final String commandString = (logEntry.controllerCommand == null ? null : (""
+          + "Command             : " + logEntry.controllerCommand.get (ControllerCommand.CC_COMMAND_KEY) + "\n"
+          + "  Arrrival          : " + logEntry.controllerCommand.getArriveAtControllerTime () + "\n"
+          + "  Start             : " + logEntry.controllerCommand.getStartAtControllerTime () + "\n"
+          + "  Departure         : " + logEntry.controllerCommand.getDepartureAtControllerTime () + "\n"
+          + "  Queueing Timeout  : " + logEntry.controllerCommand.getQueueingTimeout () + "\n"
+          + "  Processing Timeout: " + logEntry.controllerCommand.getProcessingTimeout () + "\n"
+          + "  Sojourn Timeout   : " + logEntry.controllerCommand.getSojournTimeout () + "\n"
+          + "  Return Status     : " + logEntry.controllerCommand.get (ControllerCommand.CCRET_STATUS_KEY) + "\n"
+          + "  Return Exception  : " + logEntry.controllerCommand.get (ControllerCommand.CCRET_EXCEPTION_KEY) + "\n"
+          + "  Return Value      : " + logEntry.controllerCommand.get (ControllerCommand.CCRET_VALUE_KEY) + "\n"
+          ));
+        final String bytesAsciiString = (logEntry.bytes == null ? null : ("\n"
+          + "Bytes [ASCII]:\n\n"
+          + new String (logEntry.bytes, Charset.forName ("US-ASCII")) + "\n"
+          ));
+        final String bytesHexString = (logEntry.bytes == null ? null : ("\n"
+          + "Bytes [HEX]:\n\n"
+          + Util.bytesToHex (logEntry.bytes) + "\n\n"
+          ));
+        final JTextArea jTextArea = new JTextArea (""
+          + "Row                 : " + row + "\n"
+          + "Date                : " + logEntry.instant + "\n"
+          + "Type                : " + logEntry.logEntryType + "\n"
+          + (commandString != null ? commandString : "")
+          + "Message             : " + logEntry.message + "\n"
+          + (bytesAsciiString != null ? bytesAsciiString : "")
+          + (bytesHexString != null ? bytesHexString : "")
+          );
+        jTextArea.setFont (new Font (Font.MONOSPACED, Font.PLAIN, 14));
+        jTextArea.setColumns (80);
+        jTextArea.setRows (32);
+        jTextArea.setOpaque (false);
+        jTextArea.setEditable (false);
+        jTextArea.setLineWrap (true);
+        JOptionPane.showMessageDialog (JControllerDebug.this, jTextArea, "Log Entry " + row, JOptionPane.INFORMATION_MESSAGE);
+      }
+    }    
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
