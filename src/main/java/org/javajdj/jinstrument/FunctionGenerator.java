@@ -38,7 +38,8 @@ public interface FunctionGenerator
     PULSE;
   }
 
-  void setWaveform (Waveform Waveform);
+  void setWaveform (Waveform Waveform)
+    throws IOException, InterruptedException;
   
   void setFrequency_Hz (double centerFrequency_Hz)
     throws IOException, InterruptedException;
