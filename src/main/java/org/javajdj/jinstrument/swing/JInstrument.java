@@ -71,6 +71,7 @@ import org.javajdj.jinstrument.gpib.fc.hp5316a.HP5316A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.fc.hp5328a.HP5328A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.fg.hp8116a.HP8116A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.none.NONE_GPIB_Instrument;
+import org.javajdj.jinstrument.gpib.oa.hp8156a.HP8156A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.psu.hp6033a.HP6033A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.sa.hp70000.HP70000_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.sa.hp8566b.HP8566B_GPIB_Instrument;
@@ -127,6 +128,7 @@ extends JFrame
     this.instrumentRegistry.addInstrumentType (HP6033A_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP6050A_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP8116A_GPIB_Instrument.INSTRUMENT_TYPE);
+    this.instrumentRegistry.addInstrumentType (HP8156A_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP8350_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP8566B_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP8663A_GPIB_Instrument.INSTRUMENT_TYPE);
