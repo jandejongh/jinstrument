@@ -45,6 +45,7 @@ Work in Progress [target for V1.0 Release]:
 - HP-3586A Selective Level Meter
 - HP-5316A Frequency Counter
 - HP-5328A [Option 011] Frequency Counter
+- HP-6050A Electronic Load Mainframe [DC Load]
 - HP-8116A Programmable Pulse/Function Generator
 - HP-8350 Sweep Oscillator
 - HP-54502A Digitizing Oscilloscope
