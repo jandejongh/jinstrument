@@ -75,6 +75,7 @@ import org.javajdj.jinstrument.gpib.sa.hp8566b.HP8566B_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.sg.hp8350.HP8350_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.sg.hp8663a.HP8663A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.slm.hp3586.HP3586_GPIB_Instrument;
+import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Instrument;
 
 /** Swing {@code JFrame} for opening and interacting with instruments like RF signal generators, spectrum analyzers, etc.
  * 
@@ -126,6 +127,7 @@ extends JFrame
     this.instrumentRegistry.addInstrumentType (HP8663A_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP54502A_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP70000_GPIB_Instrument.INSTRUMENT_TYPE);
+    this.instrumentRegistry.addInstrumentType (RS_ESH3_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (Tek2440_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JControllerDebug.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JGpibDeviceConsole.INSTRUMENT_VIEW_TYPE);
