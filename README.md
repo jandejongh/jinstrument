@@ -48,6 +48,7 @@ Work in Progress [target for V1.0 Release]:
 - HP-6033A DC Power Supply Unit [System Power Supply]
 - HP-6050A Electronic Load Mainframe [DC Load]
 - HP-8116A Programmable Pulse/Function Generator
+- HP-8156A Optical Attenuator
 - HP-8350 Sweep Oscillator
 - HP-54502A Digitizing Oscilloscope
 - HP-70000 Spectrum Analyzer
