@@ -108,7 +108,7 @@ extends JFrame
   throws HeadlessException
   {
     
-    super (title == null ? "JInstrument V0.4-SNAPSHOT" : title);
+    super (title == null ? "JInstrument V0.4" : title);
     
     setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
     createMenu ();
