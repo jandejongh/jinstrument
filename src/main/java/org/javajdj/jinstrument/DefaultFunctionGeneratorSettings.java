@@ -49,13 +49,13 @@ public class DefaultFunctionGeneratorSettings
     final byte[] bytes,
     final FunctionGenerator.Waveform waveform,
     final double frequency_Hz,
-    final double amplitude_V,
+    final double amplitude_Vpp,
     final double dcOffset_V)
   {
     this.bytes = bytes;
     this.waveform = waveform;
     this.frequency_Hz = frequency_Hz;
-    this.amplitude_V = amplitude_V;
+    this.amplitude_Vpp = amplitude_Vpp;
     this.dcOffset_V = dcOffset_V;
   }
 
@@ -130,12 +130,12 @@ public class DefaultFunctionGeneratorSettings
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final double amplitude_V;
+  private final double amplitude_Vpp;
   
   @Override
-  public final double getAmplitude_V ()
+  public final double getAmplitude_Vpp ()
   {
-    return this.amplitude_V;
+    return this.amplitude_Vpp;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
