@@ -33,9 +33,9 @@ public class HP8116A_GPIB_Status
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public HP8116A_GPIB_Status (final byte sPollByte)
+  public HP8116A_GPIB_Status (final byte serialPollStatusByte)
   {
-    this.sPollByte = sPollByte;
+    this.serialPollStatusByte = serialPollStatusByte;
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,8 +44,13 @@ public class HP8116A_GPIB_Status
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final byte sPollByte;
+  private final byte serialPollStatusByte;
 
+  public final byte getSerialPollStatusByte ()
+  {
+    return this.serialPollStatusByte;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // NAME / toString
@@ -55,7 +60,7 @@ public class HP8116A_GPIB_Status
   @Override
   public String toString ()
   {
-    return "0x" + Integer.toHexString (Byte.toUnsignedInt (this.sPollByte));
+    return "0x" + Integer.toHexString (Byte.toUnsignedInt (this.serialPollStatusByte));
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +73,7 @@ public class HP8116A_GPIB_Status
   public int hashCode ()
   {
     int hash = 5;
-    hash = 89 * hash + this.sPollByte;
+    hash = 89 * hash + this.serialPollStatusByte;
     return hash;
   }
 
@@ -88,7 +93,7 @@ public class HP8116A_GPIB_Status
       return false;
     }
     final HP8116A_GPIB_Status other = (HP8116A_GPIB_Status) obj;
-    if (this.sPollByte != other.sPollByte)
+    if (this.serialPollStatusByte != other.serialPollStatusByte)
     {
       return false;
     }
