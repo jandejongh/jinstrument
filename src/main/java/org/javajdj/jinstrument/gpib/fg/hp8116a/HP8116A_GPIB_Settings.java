@@ -53,47 +53,45 @@ public class HP8116A_GPIB_Settings
     final byte[] bytes,
     final FunctionGenerator.Waveform waveform,
     final double frequency_Hz,
+    final double amplitude_Vpp,
+    final double dcOffset_V,
     final String cstString)
   {
-    super (bytes, waveform, frequency_Hz);
+    super (bytes, waveform, frequency_Hz, amplitude_Vpp, dcOffset_V);
     this.cstString = cstString;
   }
 
-  /** The length of the CST string returned WITHOUT Option 001 installed.
+  /** The maximum length of the CST string returned WITHOUT Option 001 installed.
    * 
    */
-  private final static int CST_LENGTH_PLAIN = 88; // XXX VALUE GUESSED!! I APPEAR TO HAVE OPTION 001 INSTALLED! SEE BELOW XXX!
+  private final static int CST_LENGTH_PLAIN = 89;
   
-  /** The length of the CST string returned with Option 001 installed.
+  /** The maximum length of the CST string returned with Option 001 installed.
    * 
    * <p>
    * With option 001 installed, the documented maximum length of the CST string returned is 161
    * (HP Part Number 08116-90003, d.d. Aug 1990).
-   * Examination on my unit (with Option 001 installed) reveals that the array is actually 162 bytes in length,
+   * 
+   * <p>
+   * Examination on my unit (with Option 001 installed) reveals that the array is sometimes actually 162 bytes in length,
    * including the two terminating bytes {@code 0x0a} and {@code 0x0d}.
-   * It makes (some) sense that HP reported 161 bytes in case their BASIC implementation 
    * 
    * <p>
    * After Java creation of a {@code String} from the byte array, the resulting {@code String} size is 160.
    * The creation apparently removes both termination bytes.
    * 
    * <p>
-   * At this time, I do not know whether the array can vary in size, but we'll soon find out.
-   * If it varies, we're in some trouble, and we better remove the length check.
-   * 
-   * <p>
-   * Update: Well, it can change! Just found out while working in the mHz range.
+   * Note that the size of the returned CST array, either in bytes or as a {@code String} is
+   * <i>not</i> always of the same length.
    * 
    */
-  private final static int CST_LENGTH_OPTION001 = 160;
+  private final static int CST_MAX_LENGTH_OPTION001 = 161;
   
   public final static HP8116A_GPIB_Settings fromCstString (final String cstString)
   {
     if (cstString == null)
       throw new IllegalArgumentException ();
-//    if (cstString.length () != CST_LENGTH_OPTION001 /* XXX FIX ME for 001 NOT installed! */)
-//      throw new IllegalArgumentException ();
-    // Assumption: The CST[001] String consists of 20 comma-separated parts (0-19).
+    // Assumption: The CST[Option001] String consists of 20 comma-separated parts (0-19).
     final String[] cstParts = cstString.split (Pattern.quote (","));
     if (cstParts == null || cstParts.length != 20)
       throw new IllegalArgumentException ();
@@ -189,11 +187,89 @@ public class HP8116A_GPIB_Settings
     // Part 17: Pulse Width: WID <double> <time unit>
     // Part 18: Amplitude OR High Level: AMP <int/double?> <voltage units> OR HIL <double> <voltage unit>
     // Part 19: DC Offset OR Low Level: OFS <int/double?> <voltage units> OR LOL <double> <voltage unit>
-    LOG.log (Level.WARNING, "Waveform={0}, Frequency={1}Hz.", new Object[]{waveform, frequency_Hz});
+    final double amplitude_Vpp;
+    final double dcOffset_V;
+    if (cstParts[18].trim ().startsWith ("AMP") && cstParts[19].trim ().startsWith ("OFS"))
+    {
+      final String amplitudeValueString;
+      final double amplitudeConversionFactor;
+      if (cstParts[18].trim ().endsWith ("MV"))
+      {
+        amplitudeValueString = cstParts[18].trim ().substring (3, cstParts[18].trim ().length () - 2);
+        amplitudeConversionFactor = 1e-3;        
+      }
+      else if (cstParts[18].trim ().endsWith ("V"))
+      {
+        amplitudeValueString = cstParts[18].trim ().substring (3, cstParts[18].trim ().length () - 1);
+        amplitudeConversionFactor = 1;        
+      }
+      else
+        throw new IllegalArgumentException ();
+      try
+      {
+        amplitude_Vpp = amplitudeConversionFactor * Double.parseDouble (amplitudeValueString);
+      }
+      catch (NumberFormatException nfe)
+      {
+        throw new IllegalArgumentException (nfe);
+      }
+      final String offsetValueString;
+      final double offsetConversionFactor;
+      if (cstParts[19].trim ().endsWith ("MV"))
+      {
+        offsetValueString = cstParts[19].trim ().substring (3, cstParts[19].trim ().length () - 2);
+        offsetConversionFactor = 1e-3;        
+      }
+      else if (cstParts[19].trim ().endsWith ("V"))
+      {
+        offsetValueString = cstParts[19].trim ().substring (3, cstParts[19].trim ().length () - 1);
+        offsetConversionFactor = 1;
+      }
+      else
+        throw new IllegalArgumentException ();
+      try
+      {
+        dcOffset_V = offsetConversionFactor * Double.parseDouble (offsetValueString);
+      }
+      catch (NumberFormatException nfe)
+      {
+        throw new IllegalArgumentException (nfe);
+      }
+    }
+    else if (cstParts[18].trim ().startsWith ("HIL") && cstParts[19].trim ().startsWith ("LOL"))
+    {
+      final double hil_V;
+      final double lol_V;
+      if (! cstParts[18].trim ().endsWith ("V"))
+        throw new IllegalArgumentException ();
+      if (! cstParts[19].trim ().endsWith ("V"))
+        throw new IllegalArgumentException ();
+      try
+      {
+        hil_V = Double.parseDouble (cstParts[18].trim ().substring (3, cstParts[18].trim ().length () - 1));
+        lol_V = Double.parseDouble (cstParts[19].trim ().substring (3, cstParts[19].trim ().length () - 1));
+        // Assumption is that hil_V ALWAYS >= lol_V.
+        if (hil_V < lol_V)
+          throw new UnsupportedOperationException ();
+        // Assumption is peak-to-peak value!
+        amplitude_Vpp = hil_V - lol_V;
+        dcOffset_V = 0.5 * (hil_V + lol_V); // XXX Is this always correct (pulse)?
+      }
+      catch (NumberFormatException nfe)
+      {
+        throw new IllegalArgumentException (nfe);
+      }
+    }
+    else
+      throw new IllegalArgumentException ();
+    LOG.log (Level.WARNING, "Waveform={0}, Frequency={1}Hz, Amplitude={2}Vpp, DC Offset={3}V.",
+      new Object[]{waveform, frequency_Hz, amplitude_Vpp, dcOffset_V});
     return new HP8116A_GPIB_Settings (
       cstString.getBytes (Charset.forName ("US-ASCII")),
       waveform,
       frequency_Hz,
+      amplitude_Vpp,
+      dcOffset_V,
       cstString);
   }
   
