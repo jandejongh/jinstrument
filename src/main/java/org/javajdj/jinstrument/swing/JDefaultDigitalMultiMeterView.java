@@ -85,29 +85,45 @@ public class JDefaultDigitalMultiMeterView
     final JDefaultInstrumentManagementView instrumentManagementPanel= new JDefaultInstrumentManagementView (
       JDefaultDigitalMultiMeterView.this.getInstrument (),
       JDefaultDigitalMultiMeterView.this.getLevel () + 1);
-    instrumentManagementPanel.setPanelBorder (JInstrumentPanel.getGuiPreferencesManagementColor (), "Management");
+    setPanelBorder (
+      instrumentManagementPanel,
+      getLevel () + 1,
+      JInstrumentPanel.getGuiPreferencesManagementColor (),
+      "Management");
     add (instrumentManagementPanel);
     //
     this.jInstrumentSpecificPanel = new JPanel ();
     setPanelBorder (
       this.jInstrumentSpecificPanel,
-      level + 1,
+      getLevel () + 1,
       JInstrumentPanel.getGuiPreferencesManagementColor (),
       "Instrument Specific");
     this.jInstrumentSpecificPanel.setLayout (new GridLayout (1,1));
-    final JLabel jInstrumentSpecificLabel = new JLabel ("Not Supported");
+    final JLabel jInstrumentSpecificLabel = new JLabel ("Not Supported in this View");
     jInstrumentSpecificLabel.setHorizontalAlignment (SwingConstants.CENTER);
     this.jInstrumentSpecificPanel.add (jInstrumentSpecificLabel);
     add (this.jInstrumentSpecificPanel);
     //
     final JPanel controlPanel = new JPanel ();
-    setPanelBorder (controlPanel, level + 1, JInstrumentPanel.getGuiPreferencesManagementColor (), "Resolution/Mode/Range");
+    setPanelBorder (
+      controlPanel,
+      getLevel () + 1,
+      JInstrumentPanel.getGuiPreferencesAmplitudeColor (),
+      "Resolution/Mode/Range");
     controlPanel.setLayout (new GridLayout (1, 3));
     this.jResolution = new JResolutionPanel ();
-    setPanelBorder (this.jResolution, level + 2, JInstrumentPanel.getGuiPreferencesManagementColor (), "Resolution");
+    setPanelBorder (
+      this.jResolution,
+      getLevel () + 2,
+      JInstrumentPanel.getGuiPreferencesAmplitudeColor (),
+      "Resolution");
     controlPanel.add (this.jResolution);
     final JPanel modePanel = new JPanel ();
-    setPanelBorder (modePanel, level + 2, JInstrumentPanel.getGuiPreferencesManagementColor (), "Mode");
+    setPanelBorder (
+      modePanel,
+      getLevel () + 2,
+      JInstrumentPanel.getGuiPreferencesAmplitudeColor (),
+      "Mode");
     modePanel.setLayout (new GridLayout (digitalMultiMeter.getSupportedMeasurementModes ().size (), 1));
     this.modeButtonGroup = new ButtonGroup ();
     this.modeButtonMap = new HashMap<> ();
@@ -121,7 +137,11 @@ public class JDefaultDigitalMultiMeterView
     }
     controlPanel.add (modePanel);
     final JPanel rangePanel = new JPanel ();
-    setPanelBorder (rangePanel, level + 2, JInstrumentPanel.getGuiPreferencesManagementColor (), "Range");
+    setPanelBorder (
+      rangePanel,
+      getLevel () + 2,
+      JInstrumentPanel.getGuiPreferencesAmplitudeColor (),
+      "Range");
     rangePanel.setLayout (new GridLayout (2,1));
     final JPanel jAutoRangePanel = new JPanel ();
     jAutoRangePanel.setLayout (new GridLayout (1, 1));
@@ -130,7 +150,11 @@ public class JDefaultDigitalMultiMeterView
     this.jAutoRange.setVerticalAlignment (SwingConstants.CENTER);
     jAutoRangePanel.add (this.jAutoRange);
     this.jAutoRange.addActionListener (this.autoRangeActionListener);
-    setPanelBorder (jAutoRangePanel, level + 3, Color.black, "Auto");
+    setPanelBorder (
+      jAutoRangePanel,
+      getLevel () + 3,
+      JInstrumentPanel.getGuiPreferencesAmplitudeColor (),
+      "Auto");
     rangePanel.add (jAutoRangePanel);
     this.jRangePanel = new JRangePanel ();
     this.jRangePanel.setAlignmentX (Component.CENTER_ALIGNMENT);
@@ -139,16 +163,23 @@ public class JDefaultDigitalMultiMeterView
     add (controlPanel);
     //
     final JPanel readingPanel = new JPanel ();
-    setPanelBorder (readingPanel, level + 1, JInstrumentPanel.getGuiPreferencesManagementColor (), "Reading");
+    setPanelBorder (
+      readingPanel, getLevel () + 1,
+      JInstrumentPanel.getGuiPreferencesAmplitudeColor (),
+      "Reading");
     readingPanel.setLayout (new GridLayout (2, 1));
-    this.jReadingValue7 = new JSevenSegmentNumber (Color.red, 0, 1000, 1e-6); // XXX Arbitrary argument values!
+    this.jReadingValue7 = new JSevenSegmentNumber (getGuiPreferencesAmplitudeColor (), 0, 1000, 1e-6); // XXX Arbitrary values!!
     readingPanel.add (this.jReadingValue7);
     final JPanel jUnitPanel = new JPanel ();
     jUnitPanel.setLayout (new GridLayout (1, 1));
-    setPanelBorder (jUnitPanel, level + 2, Color.red, "Unit");
+    setPanelBorder (
+      jUnitPanel,
+      getLevel () + 2,
+      getGuiPreferencesAmplitudeColor (),
+      "Unit");
     this.jUnit = new JLabel ("Unknown");
     this.jUnit.setHorizontalAlignment (SwingConstants.CENTER);
-    this.jUnit.setForeground (Color.red);
+    this.jUnit.setForeground (getGuiPreferencesAmplitudeColor ());
     this.jUnit.setFont (new Font ("Serif", Font.BOLD, 64));
     jUnitPanel.add (this.jUnit);
     readingPanel.add (jUnitPanel);
