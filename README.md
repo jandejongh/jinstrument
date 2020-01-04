@@ -39,7 +39,7 @@ Most important changes:
 
 More detailed documentation will follow once the framework has stabilized (notably, the support for channels is still lacking).
 
-## Status [20200104 - 0.4]
+## Status [20200104 - v0.4]
 
 ### Beta:
 - ProLogix GPIB Ethernet
