@@ -30,24 +30,32 @@ Most important changes:
 - Selecting and removing Instrument Views from the Registry.
 - Full-blown HP3478A support (only lacking a few trigger options).
 
+## Release 0.4 [20190104]
+Most important changes:
+- Timeout handling.
+- Added many instrument classes and concrete (placeholder) classes.
+- HP-8116A [partial] enters beta.
+- Improvements to (notably) Controller Debugger.
+
 More detailed documentation will follow once the framework has stabilized (notably, the support for channels is still lacking).
 
-## Status [20200103 - 0.4-SNAPSHOT]
-Beta:
+## Status [20200104 - 0.4]
+
+### Beta:
 - ProLogix GPIB Ethernet
 - HP-3478A Digital MultiMeter
+- 8116A 50MHz Programmable Pulse/Function Generator [only FunctionGenerator interface, but usefull and works OK]
 
-Alpha:
+### Alpha:
 - HP-8566B Spectrum Analyzer
 - HP-8663A Synthesized Signal Generator
 
-Work in Progress [target for V1.0 Release]:
+### Work in Progress [target for V1.0 Release]:
 - HP-3586A Selective Level Meter
 - HP-5316A Frequency Counter
 - HP-5328A [Option 011] Frequency Counter
 - HP-6033A DC Power Supply Unit [System Power Supply]
 - HP-6050A Electronic Load Mainframe [DC Load]
-- HP-8116A Programmable Pulse/Function Generator
 - HP-8156A Optical Attenuator
 - HP-8350 Sweep Oscillator
 - HP-54502A Digitizing Oscilloscope
