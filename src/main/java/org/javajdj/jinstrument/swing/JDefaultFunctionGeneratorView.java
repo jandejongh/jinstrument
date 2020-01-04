@@ -17,6 +17,7 @@
 package org.javajdj.jinstrument.swing;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -24,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -31,11 +33,11 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.javajdj.jinstrument.FunctionGenerator;
 import org.javajdj.jinstrument.FunctionGeneratorSettings;
 import org.javajdj.jinstrument.Instrument;
@@ -88,43 +90,24 @@ public class JDefaultFunctionGeneratorView
     
     final JPanel waveformPanel = new JPanel ();
     setPanelBorder (waveformPanel, 1, "Waveform");
-    waveformPanel.setLayout (new FlowLayout (FlowLayout.CENTER));
+    waveformPanel.setLayout (new GridLayout (1, 1));
+    final JPanel jWaveformPanel = new JPanel ();
+    // setPanelBorder (jWaveformPanel, 2, DEFAULT_AMPLITUDE_COLOR, "Waveform");
+    jWaveformPanel.setLayout (new FlowLayout ());
+    jWaveformPanel.setAlignmentY (Component.CENTER_ALIGNMENT);
     this.jWaveform = new JComboBox (getFunctionGenerator ().getSupportedWaveforms ().toArray ());
     this.jWaveform.setSelectedItem (null);
     this.jWaveform.addActionListener (this.jWaveformListener);
-    waveformPanel.add (this.jWaveform);
+    jWaveformPanel.add (this.jWaveform);
+    waveformPanel.add (jWaveformPanel);
     add (waveformPanel);
-    
+
     final JPanel frequencyPanel = new JPanel ();
     frequencyPanel.setOpaque (true);
     frequencyPanel.setLayout (new GridLayout (5, 1));
-    //
     this.jFreq = new JSevenSegmentNumber (JInstrumentPanel.getGuiPreferencesFrequencyColor (), false, 11, 7);
-    this.jFreq.addMouseListener (new MouseAdapter ()
-    {
-      @Override
-      public void mouseClicked (final MouseEvent me)
-      {
-        final Double newFrequency_Hz = getFrequencyFromDialog_Hz ("Enter Frequency [Hz]", null);
-        if (newFrequency_Hz != null)
-          try
-          {
-            JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setFrequency_Hz (newFrequency_Hz);
-          }
-          catch (InterruptedException ie)
-          {
-             LOG.log (Level.INFO, "Caught InterruptedException while setting frequency on instrument: {0}.",
-               ie.getStackTrace ());
-          }
-          catch (IOException ioe)
-          {
-             LOG.log (Level.INFO, "Caught IOException while setting frequency on instrument: {0}.",
-               ioe.getStackTrace ());
-          }
-      }
-    });
+    this.jFreq.addMouseListener (this.jFreqMouseListener);
     frequencyPanel.add (this.jFreq);
-    //
     this.jFreqSlider_MHz = new JSlider (0, (int) Math.ceil (getFunctionGenerator ().getMaxFrequency_Hz () / 1.0e6), 0);
     this.jFreqSlider_kHz = new JSlider (0, 999, 0);
     this.jFreqSlider_Hz = new JSlider (0, 999, 0);
@@ -134,119 +117,88 @@ public class JDefaultFunctionGeneratorView
     this.jFreqSlider_MHz.setMinorTickSpacing (1);
     this.jFreqSlider_MHz.setPaintTicks (true);
     this.jFreqSlider_MHz.setPaintLabels (true);
-    this.jFreqSlider_MHz.addChangeListener ((final ChangeEvent ce) ->
-    {
-      JSlider source = (JSlider) ce.getSource ();
-      if (! source.getValueIsAdjusting ())
-      {
-        if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
-          try
-          {
-            LOG.log (Level.INFO, "Setting frequency on instrument from slider to {0} MHz.", source.getValue ());
-            JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setFrequency_Hz (
-              + 1.0e6 * source.getValue ()
-              + 1.0e3 * this.jFreqSlider_kHz.getValue ()
-              + 1.0 * this.jFreqSlider_Hz.getValue ()
-              + 1.0e-3 * this.jFreqSlider_mHz.getValue ());
-          }
-          catch (IOException | InterruptedException e)
-          {
-            LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} MHz: {1}.",
-              new Object[]{source.getValue (), e});          
-          }
-      }
-      else
-        source.setToolTipText (Integer.toString (source.getValue ()));
-    });
+    this.jFreqSlider_MHz.addChangeListener (this.jFreqSlider_MHzChangeListener);
     setSubPanelBorder (JInstrumentPanel.getGuiPreferencesFrequencyColor (), this.jFreqSlider_MHz, "[MHz]");
     frequencyPanel.add (this.jFreqSlider_MHz);
-    //
     this.jFreqSlider_kHz.setToolTipText ("-");
     this.jFreqSlider_kHz.setMajorTickSpacing (100);
     this.jFreqSlider_kHz.setMinorTickSpacing (10);
     this.jFreqSlider_kHz.setPaintTicks (true);
-    this.jFreqSlider_kHz.addChangeListener ((final ChangeEvent ce) ->
-    {
-      JSlider source = (JSlider) ce.getSource ();
-      if (! source.getValueIsAdjusting ()) {
-        if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
-          try
-          {
-            JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setFrequency_Hz (
-                1.0e6 * this.jFreqSlider_MHz.getValue ()
-              + 1.0e3 * source.getValue ()
-              + 1.0 * this.jFreqSlider_Hz.getValue ()
-              + 1.0e-3 * this.jFreqSlider_mHz.getValue ());
-          }
-          catch (IOException | InterruptedException e)
-          {
-            LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} kHz: {1}.",
-              new Object[]{source.getValue (), e});          
-          }
-      }
-    });
+    this.jFreqSlider_kHz.addChangeListener (this.jFreqSlider_kHzChangeListener);
     setSubPanelBorder (JInstrumentPanel.getGuiPreferencesFrequencyColor (), this.jFreqSlider_kHz, "[kHz]");
     frequencyPanel.add (this.jFreqSlider_kHz);
-    //
     this.jFreqSlider_Hz.setToolTipText ("-");
     this.jFreqSlider_Hz.setMajorTickSpacing (100);
     this.jFreqSlider_Hz.setMinorTickSpacing (10);
     this.jFreqSlider_Hz.setPaintTicks (true);
-    this.jFreqSlider_Hz.addChangeListener ((final ChangeEvent ce) ->
-    {
-      JSlider source = (JSlider) ce.getSource ();
-      if (! source.getValueIsAdjusting ()) {
-        if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
-          try
-          {
-            JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setFrequency_Hz (
-                1.0e6 * this.jFreqSlider_MHz.getValue ()
-              + 1.0e3 * this.jFreqSlider_kHz.getValue ()
-              + 1.0 * source.getValue ()
-              + 1.0e-3 * this.jFreqSlider_mHz.getValue ());
-          }
-          catch (IOException | InterruptedException e)
-          {
-            LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} Hz: {1}.",
-              new Object[]{source.getValue (), e});          
-          }
-      }
-    });
+    this.jFreqSlider_Hz.addChangeListener (this.jFreqSlider_HzChangeListener);
     setSubPanelBorder (JInstrumentPanel.getGuiPreferencesFrequencyColor (), this.jFreqSlider_Hz, "[Hz]");
     frequencyPanel.add (this.jFreqSlider_Hz);
-    //
     this.jFreqSlider_mHz.setToolTipText ("-");
     this.jFreqSlider_mHz.setMajorTickSpacing (100);
     this.jFreqSlider_mHz.setMinorTickSpacing (10);
     this.jFreqSlider_mHz.setPaintTicks (true);
-    this.jFreqSlider_mHz.addChangeListener ((final ChangeEvent ce) ->
-    {
-      JSlider source = (JSlider) ce.getSource ();
-      if (! source.getValueIsAdjusting ()) {
-        if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
-          try
-          {
-            // LOG.log (Level.INFO, "Setting frequency on instrument from slider to {0} mHz.", source.getValue ());
-            JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setFrequency_Hz (
-                1.0e6 * this.jFreqSlider_MHz.getValue ()
-              + 1.0e3 * this.jFreqSlider_kHz.getValue ()
-              + 1.0 * this.jFreqSlider_Hz.getValue ()
-              + 1.0e-3 * source.getValue ());
-          }
-          catch (IOException | InterruptedException e)
-          {
-            LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} mHz: {1}.",
-              new Object[]{source.getValue (), e});          
-          }
-      }
-    });
+    this.jFreqSlider_mHz.addChangeListener (this.jFreqSlider_mHzChangeListener);
     setSubPanelBorder (JInstrumentPanel.getGuiPreferencesFrequencyColor (), this.jFreqSlider_mHz, "[mHz]");
     frequencyPanel.add (this.jFreqSlider_mHz);
-    //
     JInstrumentPanel.setPanelBorder (frequencyPanel, getLevel () + 1, "Frequency [Hz]");
     add (frequencyPanel);
     
-    add (new JLabel ());
+    final JPanel amplitudeOffsetPanel = new JPanel ();
+    setPanelBorder (amplitudeOffsetPanel, 1, "Amplitude (pp), DC Offset");
+    amplitudeOffsetPanel.setLayout (new GridLayout (2, 1));
+    final JPanel amplitudePanel = new JPanel ();
+    setPanelBorder (amplitudePanel, 2, DEFAULT_AMPLITUDE_COLOR, "Amplitude [V] (pp)");
+    amplitudePanel.setLayout (new GridLayout (3, 1));
+    this.jAmp = new JSevenSegmentNumber (DEFAULT_AMPLITUDE_COLOR, false, 5, 1);
+    this.jAmp.addMouseListener (this.jAmpMouseListener);
+    amplitudePanel.add (this.jAmp);
+    this.jAmpSlider_V = new JSlider (0, (int) Math.ceil (getFunctionGenerator ().getMaxAmplitude_Vpp ()), 0);
+    setPanelBorder (this.jAmpSlider_V, 3, DEFAULT_AMPLITUDE_COLOR, "[V]");
+    this.jAmpSlider_V.setToolTipText ("-");
+    this.jAmpSlider_V.setMajorTickSpacing (1);
+    this.jAmpSlider_V.setPaintTicks (true);
+    this.jAmpSlider_V.setPaintLabels (true);
+    this.jAmpSlider_V.addChangeListener (this.jAmpSlider_VChangeListener);
+    amplitudePanel.add (this.jAmpSlider_V);
+    this.jAmpSlider_mV = new JSlider (0, 999, 0);
+    setPanelBorder (this.jAmpSlider_mV, 3, DEFAULT_AMPLITUDE_COLOR, "[mV]");
+    this.jAmpSlider_mV.setToolTipText ("-");
+    this.jAmpSlider_mV.setMajorTickSpacing (100);
+    this.jAmpSlider_mV.setMinorTickSpacing (10);
+    this.jAmpSlider_mV.setPaintTicks (true);
+    this.jAmpSlider_mV.setPaintLabels (false);
+    this.jAmpSlider_mV.addChangeListener (this.jAmpSlider_mVChangeListener);
+    amplitudePanel.add (this.jAmpSlider_mV);
+    amplitudeOffsetPanel.add (amplitudePanel);
+    final JPanel offsetPanel = new JPanel ();
+    setPanelBorder (offsetPanel, 2, Color.yellow, "Offset [V]");
+    offsetPanel.setLayout (new GridLayout (3, 1));
+    this.jOffset = new JSevenSegmentNumber (Color.yellow, true, 5, 1);
+    this.jOffset.addMouseListener (this.jOffsetMouseListener);
+    offsetPanel.add (this.jOffset);
+    this.jOffsetSlider_V = new JSlider (
+      (int) Math.floor (getFunctionGenerator ().getMinDCOffset_V ()),
+      (int) Math.ceil (getFunctionGenerator ().getMaxDCOffset_V ()),
+      0);
+    setPanelBorder (this.jOffsetSlider_V, 3, Color.yellow, "[V]");
+    this.jOffsetSlider_V.setToolTipText ("-");
+    this.jOffsetSlider_V.setMajorTickSpacing (1);
+    this.jOffsetSlider_V.setPaintTicks (true);
+    this.jOffsetSlider_V.setPaintLabels (true);
+    this.jOffsetSlider_V.addChangeListener (this.jOffsetSlider_VChangeListener);
+    offsetPanel.add (this.jOffsetSlider_V);
+    this.jOffsetSlider_mV = new JSlider (0, 999, 0);
+    setPanelBorder (this.jOffsetSlider_mV, 3, Color.yellow, "[mV]");
+    this.jOffsetSlider_mV.setToolTipText ("-");
+    this.jOffsetSlider_mV.setMajorTickSpacing (100);
+    this.jOffsetSlider_mV.setMinorTickSpacing (10);
+    this.jOffsetSlider_mV.setPaintTicks (true);
+    this.jOffsetSlider_mV.setPaintLabels (false);
+    this.jOffsetSlider_mV.addChangeListener (this.jOffsetSlider_mVChangeListener);
+    offsetPanel.add (this.jOffsetSlider_mV);
+    amplitudeOffsetPanel.add (offsetPanel);
+    add (amplitudeOffsetPanel);
     
     getFunctionGenerator ().addInstrumentListener (this.instrumentListener);
     
@@ -309,37 +261,330 @@ public class JDefaultFunctionGeneratorView
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SWING
+  // FREQUENCY
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   private final JSevenSegmentNumber jFreq;
   
+  private final MouseListener jFreqMouseListener = new MouseAdapter ()
+  {
+    @Override
+    public void mouseClicked (final MouseEvent me)
+    {
+      final Double newFrequency_Hz = getFrequencyFromDialog_Hz ("Enter Frequency [Hz]", null);
+      if (newFrequency_Hz != null)
+        try
+        {
+          JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setFrequency_Hz (newFrequency_Hz);
+        }
+        catch (InterruptedException ie)
+        {
+           LOG.log (Level.INFO, "Caught InterruptedException while setting frequency on instrument: {0}.",
+             ie.getStackTrace ());
+        }
+        catch (IOException ioe)
+        {
+           LOG.log (Level.INFO, "Caught IOException while setting frequency on instrument: {0}.",
+             ioe.getStackTrace ());
+        }
+    }
+  };
+    
   private final JSlider jFreqSlider_MHz;
   
+  private final ChangeListener jFreqSlider_MHzChangeListener = (final ChangeEvent ce) ->
+  {
+    JSlider source = (JSlider) ce.getSource ();
+    if (! source.getValueIsAdjusting ())
+    {
+      if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
+        try
+        {
+          JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setFrequency_Hz (
+            + 1.0e6 * source.getValue ()
+            + 1.0e3 * JDefaultFunctionGeneratorView.this.jFreqSlider_kHz.getValue ()
+            + 1.0 * JDefaultFunctionGeneratorView.this.jFreqSlider_Hz.getValue ()
+            + 1.0e-3 * JDefaultFunctionGeneratorView.this.jFreqSlider_mHz.getValue ());
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} MHz: {1}.",
+            new Object[]{source.getValue (), e});          
+        }
+    }
+    else
+      source.setToolTipText (Integer.toString (source.getValue ()));
+  };
+    
   private final JSlider jFreqSlider_kHz;
+  
+  private final ChangeListener jFreqSlider_kHzChangeListener = (final ChangeEvent ce) ->
+  {
+    JSlider source = (JSlider) ce.getSource ();
+    if (! source.getValueIsAdjusting ())
+    {
+      if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
+        try
+        {
+          JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setFrequency_Hz (
+                1.0e6 * JDefaultFunctionGeneratorView.this.jFreqSlider_MHz.getValue ()
+              + 1.0e3 * source.getValue ()
+              + 1.0 * JDefaultFunctionGeneratorView.this.jFreqSlider_Hz.getValue ()
+              + 1.0e-3 * JDefaultFunctionGeneratorView.this.jFreqSlider_mHz.getValue ());
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} kHz: {1}.",
+            new Object[]{source.getValue (), e});          
+        }
+    }
+    else
+      source.setToolTipText (Integer.toString (source.getValue ()));
+  };
   
   private final JSlider jFreqSlider_Hz;
   
+  private final ChangeListener jFreqSlider_HzChangeListener = (final ChangeEvent ce) ->
+  {
+    JSlider source = (JSlider) ce.getSource ();
+    if (! source.getValueIsAdjusting ())
+    {
+      if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
+        try
+        {
+          JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setFrequency_Hz (
+                1.0e6 * JDefaultFunctionGeneratorView.this.jFreqSlider_MHz.getValue ()
+              + 1.0e3 * JDefaultFunctionGeneratorView.this.jFreqSlider_kHz.getValue ()
+              + 1.0 * source.getValue ()
+              + 1.0e-3 * JDefaultFunctionGeneratorView.this.jFreqSlider_mHz.getValue ());
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} Hz: {1}.",
+            new Object[]{source.getValue (), e});          
+        }
+    }
+    else
+      source.setToolTipText (Integer.toString (source.getValue ()));
+  };
+  
   private final JSlider jFreqSlider_mHz;
+  
+  private final ChangeListener jFreqSlider_mHzChangeListener = (final ChangeEvent ce) ->
+  {
+    JSlider source = (JSlider) ce.getSource ();
+    if (! source.getValueIsAdjusting ())
+    {
+      if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
+        try
+        {
+          JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setFrequency_Hz (
+                1.0e6 * JDefaultFunctionGeneratorView.this.jFreqSlider_MHz.getValue ()
+              + 1.0e3 * JDefaultFunctionGeneratorView.this.jFreqSlider_kHz.getValue ()
+              + 1.0 * JDefaultFunctionGeneratorView.this.jFreqSlider_Hz.getValue ()
+              + 1.0e-3 * source.getValue ());
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting frequency from slider to {0} mHz: {1}.",
+            new Object[]{source.getValue (), e});          
+        }
+    }
+    else
+      source.setToolTipText (Integer.toString (source.getValue ()));
+  };
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  // WAVEFORM
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   private final JComboBox<FunctionGenerator.Waveform> jWaveform;
   
   private final ActionListener jWaveformListener = (final ActionEvent ae) ->
   {
-    final FunctionGenerator.Waveform waveform =
-      (FunctionGenerator.Waveform) JDefaultFunctionGeneratorView.this.jWaveform.getSelectedItem ();
-    try
+    if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
     {
-      JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setWaveform (waveform);
-    }
-    catch (Exception e)
-    {
-      LOG.log (Level.WARNING, "Caught exception while setting waveform {0} on instrument {1}: {2}.",        
-        new Object[]
-          {waveform, getInstrument (), Arrays.toString (e.getStackTrace ())});
+      final FunctionGenerator.Waveform waveform =
+        (FunctionGenerator.Waveform) JDefaultFunctionGeneratorView.this.jWaveform.getSelectedItem ();
+      try
+      {
+        JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setWaveform (waveform);
+      }
+      catch (Exception e)
+      {
+        LOG.log (Level.WARNING, "Caught exception while setting waveform {0} on instrument {1}: {2}.",        
+          new Object[]
+            {waveform, getInstrument (), Arrays.toString (e.getStackTrace ())});
+      }
     }
   };
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  // AMPLITUDE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JSevenSegmentNumber jAmp;
+  
+  private final MouseListener jAmpMouseListener = new MouseAdapter ()
+  {
+    @Override
+    public void mouseClicked (final MouseEvent me)
+    {
+      final Double newAmplitude_Vpp = getVoltageFromDialog_V ("Enter Amplitude [V]", null);
+      if (newAmplitude_Vpp != null)
+        try
+        {
+          JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setAmplitude_Vpp (newAmplitude_Vpp);
+        }
+        catch (InterruptedException ie)
+        {
+           LOG.log (Level.INFO, "Caught InterruptedException while setting amplitude on instrument: {0}.",
+             ie.getStackTrace ());
+        }
+        catch (IOException ioe)
+        {
+           LOG.log (Level.INFO, "Caught IOException while setting amplitude on instrument: {0}.",
+             ioe.getStackTrace ());
+        }
+    }
+  };
+    
+  private final JSlider jAmpSlider_V;
+  
+  private final ChangeListener jAmpSlider_VChangeListener = (final ChangeEvent ce) ->
+  {
+    JSlider source = (JSlider) ce.getSource ();
+    if (! source.getValueIsAdjusting ())
+    {
+      if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
+        try
+        {
+          JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setAmplitude_Vpp (
+            + 1.0 * source.getValue ()
+            + 1.0e-3 * JDefaultFunctionGeneratorView.this.jAmpSlider_mV.getValue ());
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting amplitude from slider to {0} V: {1}.",
+            new Object[]{source.getValue (), e});
+        }
+    }
+    else
+      source.setToolTipText (Integer.toString (source.getValue ()));
+  };
+    
+  private final JSlider jAmpSlider_mV;
+
+  private final ChangeListener jAmpSlider_mVChangeListener = (final ChangeEvent ce) ->
+  {
+    JSlider source = (JSlider) ce.getSource ();
+    if (! source.getValueIsAdjusting ())
+    {
+      if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
+        try
+        {
+          JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setAmplitude_Vpp (
+            + 1.0 * JDefaultFunctionGeneratorView.this.jAmpSlider_V.getValue ()
+            + 1.0e-3 * source.getValue ());
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting amplitude from slider to {0} mV: {1}.",
+            new Object[]{source.getValue (), e});
+        }
+    }
+    else
+      source.setToolTipText (Integer.toString (source.getValue ()));
+  };
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  // DC OFFSET
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JSevenSegmentNumber jOffset;
+  
+  private final MouseListener jOffsetMouseListener = new MouseAdapter ()
+  {
+    @Override
+    public void mouseClicked (final MouseEvent me)
+    {
+      final Double newOffset_V = getVoltageFromDialog_V ("Enter Offset [V]", null);
+      if (newOffset_V != null)
+        try
+        {
+          JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setDCOffset_V (newOffset_V);
+        }
+        catch (InterruptedException ie)
+        {
+           LOG.log (Level.INFO, "Caught InterruptedException while setting offset on instrument: {0}.",
+             ie.getStackTrace ());
+        }
+        catch (IOException ioe)
+        {
+           LOG.log (Level.INFO, "Caught IOException while setting offset on instrument: {0}.",
+             ioe.getStackTrace ());
+        }
+    }
+  };
+
+  private final JSlider jOffsetSlider_V;
+  
+  private final ChangeListener jOffsetSlider_VChangeListener = (final ChangeEvent ce) ->
+  {
+    JSlider source = (JSlider) ce.getSource ();
+    if (! source.getValueIsAdjusting ())
+    {
+      if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
+        try
+        {
+          JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setDCOffset_V (
+            + 1.0 * source.getValue ()
+            + 1.0e-3 * JDefaultFunctionGeneratorView.this.jOffsetSlider_mV.getValue ());
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting DC offset from slider to {0} V: {1}.",
+            new Object[]{source.getValue (), e});
+        }
+    }
+    else
+      source.setToolTipText (Integer.toString (source.getValue ()));
+  };
+    
+  private final JSlider jOffsetSlider_mV;
+  
+  private final ChangeListener jOffsetSlider_mVChangeListener = (final ChangeEvent ce) ->
+  {
+    JSlider source = (JSlider) ce.getSource ();
+    if (! source.getValueIsAdjusting ())
+    {
+      if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
+        try
+        {
+          JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setDCOffset_V (
+            + 1.0 * JDefaultFunctionGeneratorView.this.jOffsetSlider_V.getValue ()
+            + 1.0e-3 * source.getValue ());
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting DC offset from slider to {0} mV: {1}.",
+            new Object[]{source.getValue (), e});
+        }
+    }
+    else
+      source.setToolTipText (Integer.toString (source.getValue ()));
+  };
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENT LISTENER
@@ -374,6 +619,26 @@ public class JDefaultFunctionGeneratorView
           final boolean isSupportedWaveform =
             JDefaultFunctionGeneratorView.this.getFunctionGenerator ().isSupportedWaveform (waveform);
           JDefaultFunctionGeneratorView.this.jWaveform.setSelectedItem (isSupportedWaveform ? waveform : null);
+          //
+          final double amplitude_Vpp = settings.getAmplitude_Vpp ();
+          JDefaultFunctionGeneratorView.this.jAmp.setNumber (amplitude_Vpp);
+          final long amplitude_mV_long = Math.round (amplitude_Vpp * 1e3);
+          final int amplitude_int_V = (int) (amplitude_mV_long / 1000L);
+          JDefaultFunctionGeneratorView.this.jAmpSlider_V.setValue (amplitude_int_V);
+          JDefaultFunctionGeneratorView.this.jAmpSlider_V.setToolTipText (Integer.toString (amplitude_int_V));
+          final int amplitude_rem_int_mV = (int) (amplitude_mV_long % 1000L);
+          JDefaultFunctionGeneratorView.this.jAmpSlider_mV.setValue (amplitude_rem_int_mV);
+          JDefaultFunctionGeneratorView.this.jAmpSlider_mV.setToolTipText (Integer.toString (amplitude_rem_int_mV));
+          //
+          final double offset_V = settings.getDCOffset_V ();
+          JDefaultFunctionGeneratorView.this.jOffset.setNumber (offset_V);
+          final long offset_mV_long = Math.round (offset_V * 1e3);
+          final int offset_int_V = (int) Math.floorDiv (offset_mV_long, 1000L);
+          final int offset_rem_int_mV = (int) Math.floorMod (offset_mV_long, 1000L);
+          JDefaultFunctionGeneratorView.this.jOffsetSlider_V.setValue (offset_int_V);
+          JDefaultFunctionGeneratorView.this.jOffsetSlider_V.setToolTipText (Integer.toString (offset_int_V));
+          JDefaultFunctionGeneratorView.this.jOffsetSlider_mV.setValue (offset_rem_int_mV);
+          JDefaultFunctionGeneratorView.this.jOffsetSlider_mV.setToolTipText (Integer.toString (offset_rem_int_mV));
           //
           final double f_Hz = settings.getFrequency_Hz ();
           final long f_mHz_long = Math.round (f_Hz * 1e3);
