@@ -44,7 +44,7 @@ More detailed documentation will follow once the framework has stabilized (notab
 ### Beta:
 - ProLogix GPIB Ethernet
 - HP-3478A Digital MultiMeter
-- 8116A 50MHz Programmable Pulse/Function Generator [only FunctionGenerator interface, but usefull and works OK]
+- HP-8116A 50MHz Programmable Pulse/Function Generator [only FunctionGenerator interface, but usefull and works OK]
 
 ### Alpha:
 - HP-8566B Spectrum Analyzer
