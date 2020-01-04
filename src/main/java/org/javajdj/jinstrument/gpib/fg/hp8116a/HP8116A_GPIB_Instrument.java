@@ -256,6 +256,54 @@ public class HP8116A_GPIB_Instrument
       InstrumentCommand.IC_LF_FREQUENCY,
       InstrumentCommand.ICARG_LF_FREQUENCY_HZ, frequency_Hz));
   }
+
+  @Override
+  public final double getMinAmplitude_Vpp ()
+  {
+    return 0.010;
+  }
+
+  @Override
+  public final double getMaxAmplitude_Vpp ()
+  {
+    return 16;
+  }
+
+  @Override
+  public final void setAmplitude_Vpp (final double amplitude_Vpp)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_AMPLITUDE,
+      InstrumentCommand.ICARG_AMPLITUDE_VPP, amplitude_Vpp));
+  }
+
+  @Override
+  public final boolean supportsDCOffset ()
+  {
+    return true;
+  }
+
+  @Override
+  public final double getMinDCOffset_V ()
+  {
+    return -8;
+  }
+
+  @Override
+  public final double getMaxDCOffset_V ()
+  {
+    return 8;
+  }
+
+  @Override
+  public final void setDCOffset_V (final double dcOffset_V)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_DC_OFFSET,
+      InstrumentCommand.ICARG_DC_OFFSET_V, dcOffset_V));
+  }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -321,7 +369,21 @@ public class HP8116A_GPIB_Instrument
         case InstrumentCommand.IC_LF_FREQUENCY:
         {
           final double frequency_Hz = (double) instrumentCommand.get (InstrumentCommand.ICARG_LF_FREQUENCY_HZ);
-          writeSync ("FRQ " + frequency_Hz + " HZ");
+          writeSync ("FRQ " + frequency_Hz + " HZ\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_AMPLITUDE:
+        {
+          final double amplitude_Vpp = (double) instrumentCommand.get (InstrumentCommand.ICARG_AMPLITUDE_VPP);
+          writeSync ("AMP " + amplitude_Vpp + " V\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_DC_OFFSET:
+        {
+          final double dcOffset_V = (double) instrumentCommand.get (InstrumentCommand.ICARG_DC_OFFSET_V);
+          writeSync ("OFS " + dcOffset_V + " V\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
