@@ -140,7 +140,7 @@ public interface InstrumentCommand
   public final static String ICARG_LF_FREQUENCY_HZ = "lfFrequency_Hz"; 
   
   public final static String IC_AMPLITUDE = "commandAmplitude";
-  public final static String ICARG_AMPLITUDE_V = "amplitude_V";
+  public final static String ICARG_AMPLITUDE_VPP = "amplitude_Vpp";
   
   public final static String IC_DC_OFFSET = "commandDCOffset";
   public final static String ICARG_DC_OFFSET_V = "dcOffset_V";
