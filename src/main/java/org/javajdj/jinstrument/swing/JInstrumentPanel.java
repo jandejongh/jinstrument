@@ -210,19 +210,19 @@ public class JInstrumentPanel
       final double conversionFactor;
       if (unitString != null)
       {
-        if (unitString.equalsIgnoreCase ("Hz"))
+        if (unitString.trim ().equalsIgnoreCase ("Hz"))
         {
           conversionFactor = 1.0;
         }
-        else if (unitString.equalsIgnoreCase ("kHz"))
+        else if (unitString.trim ().equalsIgnoreCase ("kHz"))
         {
           conversionFactor = 1.0e3;
         }
-        else if (unitString.equalsIgnoreCase ("MHz"))
+        else if (unitString.trim ().equalsIgnoreCase ("MHz"))
         {
           conversionFactor = 1.0e6;
         }
-        else if (unitString.equalsIgnoreCase ("GHz"))
+        else if (unitString.trim ().equalsIgnoreCase ("GHz"))
         {
           conversionFactor = 1.0e9;
         }
@@ -268,19 +268,19 @@ public class JInstrumentPanel
       final double conversionFactor;
       if (unitString != null)
       {
-        if (unitString.equalsIgnoreCase ("Hz"))
+        if (unitString.trim ().equalsIgnoreCase ("Hz"))
         {
           conversionFactor = 1.0e-6;
         }
-        else if (unitString.equalsIgnoreCase ("kHz"))
+        else if (unitString.trim ().equalsIgnoreCase ("kHz"))
         {
           conversionFactor = 1.0e-3;
         }
-        else if (unitString.equalsIgnoreCase ("MHz"))
+        else if (unitString.trim ().equalsIgnoreCase ("MHz"))
         {
           conversionFactor = 1.0;
         }
-        else if (unitString.equalsIgnoreCase ("GHz"))
+        else if (unitString.trim ().equalsIgnoreCase ("GHz"))
         {
           conversionFactor = 1.0e3;
         }
@@ -326,25 +326,25 @@ public class JInstrumentPanel
       final double conversionFactor;
       if (unitString != null)
       {
-        if (unitString.equalsIgnoreCase ("s"))
+        if (unitString.trim ().equalsIgnoreCase ("s"))
         {
           conversionFactor = 1.0;
         }
-        else if (unitString.equalsIgnoreCase ("ms"))
+        else if (unitString.trim ().equalsIgnoreCase ("ms"))
         {
           conversionFactor = 1.0e-3;
         }
-        else if (unitString.equalsIgnoreCase ("us"))
+        else if (unitString.trim ().equalsIgnoreCase ("us"))
         {
-          conversionFactor = 1.0-6;
+          conversionFactor = 1.0e-6;
         }
-        else if (unitString.equalsIgnoreCase ("ns"))
+        else if (unitString.trim ().equalsIgnoreCase ("ns"))
         {
-          conversionFactor = 1.0-9;
+          conversionFactor = 1.0e-9;
         }
-        else if (unitString.equalsIgnoreCase ("ps"))
+        else if (unitString.trim ().equalsIgnoreCase ("ps"))
         {
-          conversionFactor = 1.0-12;
+          conversionFactor = 1.0e-12;
         }
         else
         {
@@ -388,7 +388,7 @@ public class JInstrumentPanel
       final double conversionFactor;
       if (unitString != null)
       {
-        if (unitString.equalsIgnoreCase ("dBm"))
+        if (unitString.trim ().equalsIgnoreCase ("dBm"))
         {
           conversionFactor = 1.0;
         }
@@ -434,7 +434,7 @@ public class JInstrumentPanel
       final double conversionFactor;
       if (unitString != null)
       {
-        if (unitString.equalsIgnoreCase ("dB"))
+        if (unitString.trim ().equalsIgnoreCase ("dB"))
         {
           conversionFactor = 1.0;
         }
@@ -459,6 +459,64 @@ public class JInstrumentPanel
         return null;
       }
       return value_dB * conversionFactor;
+    }
+    else
+      return null;
+  }
+  
+  protected Double getVoltageFromDialog_V (final String title, final Double startValue_V)
+  {
+    final String inputString = JOptionPane.showInputDialog (title, startValue_V);
+    if (inputString != null)
+    {
+      final String[] splitString = inputString.split ("\\s+");
+      if (splitString == null || splitString.length == 0 || splitString.length > 2)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + inputString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      final String valueString = splitString[0];
+      final String unitString = splitString.length > 1 ? splitString[1] : null;
+      final double conversionFactor;
+      if (unitString != null)
+      {
+        if (unitString.trim ().equalsIgnoreCase ("uV"))
+        {
+          conversionFactor = 1e-6;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("mV"))
+        {
+          conversionFactor = 1e-3;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("V"))
+        {
+          conversionFactor = 1;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("kV"))
+        {
+          conversionFactor = 1e3;
+        }
+        else
+        {
+          JOptionPane.showMessageDialog (null, "Illegal unit " + unitString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+          return null;
+        }
+      }
+      else
+      {
+        conversionFactor = 1.0;
+      }
+      final double value;
+      try
+      {
+        value = Double.parseDouble (valueString);
+      }
+      catch (NumberFormatException nfe)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + valueString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      return value * conversionFactor;
     }
     else
       return null;
