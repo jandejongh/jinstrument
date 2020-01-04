@@ -78,7 +78,6 @@ public class JDefaultDigitalMultiMeterView
   {
     //
     super (digitalMultiMeter, level);
-    this.digitalMultiMeter = digitalMultiMeter;
     //
     setOpaque (true);
     setLayout (new GridLayout (2, 2));
@@ -213,15 +212,6 @@ public class JDefaultDigitalMultiMeterView
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // DIGITAL MULTI-METER
-  // SUPPORTED MEASUREMENT MODES
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  protected final DigitalMultiMeter digitalMultiMeter;
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
   // SWING
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -232,8 +222,7 @@ public class JDefaultDigitalMultiMeterView
     
     public JResolutionPanel ()
     {
-      final List<DigitalMultiMeter.NumberOfDigits> resolutions =
-        JDefaultDigitalMultiMeterView.this.digitalMultiMeter.getSupportedResolutions ();
+      final List<DigitalMultiMeter.NumberOfDigits> resolutions = getDigitalMultiMeter ().getSupportedResolutions ();
       setLayout (new GridLayout (resolutions.size (), 2));
       this.resolutionsMap = new LinkedHashMap<> ();
       for (final DigitalMultiMeter.NumberOfDigits resolution : resolutions)
@@ -246,13 +235,13 @@ public class JDefaultDigitalMultiMeterView
         {
           try
           {
-            JDefaultDigitalMultiMeterView.this.digitalMultiMeter.setResolution (resolution);
+            getDigitalMultiMeter ().setResolution (resolution);
           }
           catch (Exception e)
           {
             LOG.log (Level.INFO, "Caught exception while setting resolution {0} on instrument {1}: {2}.",        
               new Object[]
-                {resolution, JDefaultDigitalMultiMeterView.this.digitalMultiMeter, Arrays.toString (e.getStackTrace ())});
+                {resolution, getDigitalMultiMeter (), Arrays.toString (e.getStackTrace ())});
           }
         });
       }
@@ -302,13 +291,13 @@ public class JDefaultDigitalMultiMeterView
     final DigitalMultiMeter.MeasurementMode newMeasurementMode = JDefaultDigitalMultiMeterView.this.modeButtonMap.get (modeButton);
     try
     {
-      JDefaultDigitalMultiMeterView.this.digitalMultiMeter.setMeasurementMode (newMeasurementMode);
+      getDigitalMultiMeter ().setMeasurementMode (newMeasurementMode);
     }
     catch (Exception e)
     {
       LOG.log (Level.INFO, "Caught exception while setting measurement mode {0} on instrument {1}: {2}.",        
         new Object[]
-          {newMeasurementMode, JDefaultDigitalMultiMeterView.this.digitalMultiMeter, Arrays.toString (e.getStackTrace ())});
+          {newMeasurementMode, getDigitalMultiMeter (), Arrays.toString (e.getStackTrace ())});
     }
   };
   
@@ -316,13 +305,13 @@ public class JDefaultDigitalMultiMeterView
   {
     try
     {
-      JDefaultDigitalMultiMeterView.this.digitalMultiMeter.setAutoRange ();
+      getDigitalMultiMeter ().setAutoRange ();
     }
     catch (Exception e)
     {
       LOG.log (Level.INFO, "Caught exception while setting Auto Range on instrument {0}: {1}.",        
         new Object[]
-          {JDefaultDigitalMultiMeterView.this.digitalMultiMeter, Arrays.toString (e.getStackTrace ())});
+          {getDigitalMultiMeter (), Arrays.toString (e.getStackTrace ())});
     }
   };
   
@@ -352,13 +341,13 @@ public class JDefaultDigitalMultiMeterView
         {
           try
           {
-            JDefaultDigitalMultiMeterView.this.digitalMultiMeter.setRange (range);
+            getDigitalMultiMeter ().setRange (range);
           }
           catch (Exception e)
           {
             LOG.log (Level.INFO, "Caught exception while setting range {0} on instrument {1}: {2}.",        
               new Object[]
-                {range, JDefaultDigitalMultiMeterView.this.digitalMultiMeter, Arrays.toString (e.getStackTrace ())});
+                {range, getDigitalMultiMeter (), Arrays.toString (e.getStackTrace ())});
           }
         });
       }
