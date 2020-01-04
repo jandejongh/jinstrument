@@ -170,6 +170,13 @@ public class JInstrumentPanel
     return JInstrumentPanel.DEFAULT_MODULATION_COLOR;
   }
   
+  public final static Color DEFAULT_DC_COLOR = Color.yellow;
+  
+  public final static Color getGuiPreferencesDCColor ()
+  {
+    return JInstrumentPanel.DEFAULT_DC_COLOR;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INHIBIT INSTRUMENT CONTROL
