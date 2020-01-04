@@ -48,11 +48,15 @@ public class DefaultFunctionGeneratorSettings
   public DefaultFunctionGeneratorSettings (
     final byte[] bytes,
     final FunctionGenerator.Waveform waveform,
-    final double frequency_Hz)
+    final double frequency_Hz,
+    final double amplitude_V,
+    final double dcOffset_V)
   {
     this.bytes = bytes;
     this.waveform = waveform;
     this.frequency_Hz = frequency_Hz;
+    this.amplitude_V = amplitude_V;
+    this.dcOffset_V = dcOffset_V;
   }
 
   @Override
@@ -117,6 +121,36 @@ public class DefaultFunctionGeneratorSettings
   public final double getFrequency_Hz ()
   {
     return this.frequency_Hz;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // FunctionGeneratorSettings
+  // AMPLITUDE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final double amplitude_V;
+  
+  @Override
+  public final double getAmplitude_V ()
+  {
+    return this.amplitude_V;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // FunctionGeneratorSettings
+  // DC OFFSET
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final double dcOffset_V;
+  
+  @Override
+  public final double getDCOffset_V ()
+  {
+    return this.dcOffset_V;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

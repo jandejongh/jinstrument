@@ -34,4 +34,8 @@ public interface FunctionGeneratorSettings
   
   double getFrequency_Hz ();
   
+  double getAmplitude_V ();
+  
+  double getDCOffset_V ();
+  
 }
