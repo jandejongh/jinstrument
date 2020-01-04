@@ -47,12 +47,14 @@ public class DefaultFunctionGeneratorSettings
   
   public DefaultFunctionGeneratorSettings (
     final byte[] bytes,
+    final boolean outputEnable,
     final FunctionGenerator.Waveform waveform,
     final double frequency_Hz,
     final double amplitude_Vpp,
     final double dcOffset_V)
   {
     this.bytes = bytes;
+    this.outputEnable = outputEnable;
     this.waveform = waveform;
     this.frequency_Hz = frequency_Hz;
     this.amplitude_Vpp = amplitude_Vpp;
@@ -91,6 +93,21 @@ public class DefaultFunctionGeneratorSettings
   public final byte[] getBytes ()
   {
     return this.bytes;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // FunctionGeneratorSettings
+  // OUTPUT ENABLE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final boolean outputEnable;
+
+  @Override
+  public final boolean isOuputEnable ()
+  {
+    return this.outputEnable;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

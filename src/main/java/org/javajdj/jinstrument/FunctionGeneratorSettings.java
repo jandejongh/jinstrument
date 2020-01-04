@@ -30,6 +30,8 @@ public interface FunctionGeneratorSettings
   
   byte[] getBytes ();
   
+  boolean isOuputEnable ();
+  
   FunctionGenerator.Waveform getWaveform ();
   
   double getFrequency_Hz ();
