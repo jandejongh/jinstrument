@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,6 +149,7 @@ extends JFrame
     this.instrumentRegistry.addInstrumentViewType (JDefaultDigitalMultiMeterView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultFunctionGeneratorView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JHP3478A_GPIB.INSTRUMENT_VIEW_TYPE);
+    this.instrumentRegistry.addInstrumentViewType (JHP8116A_GPIB.INSTRUMENT_VIEW_TYPE);
     
     this.jInstrumentRegistry = new JInstrumentRegistry (this.instrumentRegistry, 0);
     this.jTabbedPane.addTab ("Registry", this.jInstrumentRegistry);
