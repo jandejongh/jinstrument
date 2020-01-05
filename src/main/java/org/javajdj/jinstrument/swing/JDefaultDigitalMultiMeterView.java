@@ -168,7 +168,7 @@ public class JDefaultDigitalMultiMeterView
       JInstrumentPanel.getGuiPreferencesAmplitudeColor (),
       "Reading");
     readingPanel.setLayout (new GridLayout (2, 1));
-    this.jReadingValue7 = new JSevenSegmentNumber (getGuiPreferencesAmplitudeColor (), 0, 1000, 1e-6); // XXX Arbitrary values!!
+    this.jReadingValue7 = new JSevenSegmentNumber (getGuiPreferencesAmplitudeColor (), -1000, 1000, 1e-6); // XXX Arbitrary values!!
     readingPanel.add (this.jReadingValue7);
     final JPanel jUnitPanel = new JPanel ();
     jUnitPanel.setLayout (new GridLayout (1, 1));
