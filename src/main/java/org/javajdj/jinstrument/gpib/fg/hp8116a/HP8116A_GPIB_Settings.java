@@ -51,13 +51,14 @@ public class HP8116A_GPIB_Settings
   
   private HP8116A_GPIB_Settings (
     final byte[] bytes,
+    final boolean outputEnable,
     final FunctionGenerator.Waveform waveform,
     final double frequency_Hz,
     final double amplitude_Vpp,
     final double dcOffset_V,
     final String cstString)
   {
-    super (bytes, waveform, frequency_Hz, amplitude_Vpp, dcOffset_V);
+    super (bytes, outputEnable, waveform, frequency_Hz, amplitude_Vpp, dcOffset_V);
     this.cstString = cstString;
   }
 
@@ -129,10 +130,10 @@ public class HP8116A_GPIB_Settings
     switch (cstParts[8].trim ())
     {
       case "D0":
-        outputEnable = false;
+        outputEnable = true;
         break;
       case "D1":
-        outputEnable = true;
+        outputEnable = false;
         break;
       default:
         throw new IllegalArgumentException ();
@@ -262,10 +263,11 @@ public class HP8116A_GPIB_Settings
     }
     else
       throw new IllegalArgumentException ();
-    LOG.log (Level.WARNING, "Waveform={0}, Frequency={1}Hz, Amplitude={2}Vpp, DC Offset={3}V.",
-      new Object[]{waveform, frequency_Hz, amplitude_Vpp, dcOffset_V});
+    LOG.log (Level.WARNING, "OutputEnable={0}, Waveform={1}, Frequency={2}Hz, Amplitude={3}Vpp, DC Offset={4}V.",
+      new Object[]{outputEnable, waveform, frequency_Hz, amplitude_Vpp, dcOffset_V});
     return new HP8116A_GPIB_Settings (
       cstString.getBytes (Charset.forName ("US-ASCII")),
+      outputEnable,
       waveform,
       frequency_Hz,
       amplitude_Vpp,
