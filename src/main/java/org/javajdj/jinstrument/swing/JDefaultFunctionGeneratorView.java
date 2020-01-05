@@ -16,6 +16,7 @@
  */
 package org.javajdj.jinstrument.swing;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -47,6 +48,7 @@ import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import static org.javajdj.jinstrument.swing.JInstrumentPanel.setPanelBorder;
+import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
 /** A one-size-fits-all Swing panel for control and status of a generic {@link FunctionGenerator}.
@@ -103,23 +105,42 @@ public class JDefaultFunctionGeneratorView
     this.jInstrumentSpecificPanel.add (jInstrumentSpecificLabel);
     add (this.jInstrumentSpecificPanel);
     
-    final JPanel waveformPanel = new JPanel ();
-    setPanelBorder (
-      waveformPanel,
+    final JPanel waveformControlPanel = new JPanel ();
+    setPanelBorder (waveformControlPanel,
       getLevel () + 1,
       getGuiPreferencesAmplitudeColor (),
-      "Waveform");
-    waveformPanel.setLayout (new GridLayout (1, 1));
+      "Waveform Control");
+    waveformControlPanel.setLayout (new GridLayout (3, 3));
+    final JPanel jOutputEnablePanel = new JPanel ();
+    setPanelBorder (jOutputEnablePanel,
+      getLevel () + 2,
+      getGuiPreferencesAmplitudeColor (),
+      "Output Enable");
+    this.jOutputEnable = new JColorCheckBox.JBoolean (Color.red);
+    this.jOutputEnable.addActionListener (this.jOutputEnableListener);
+    jOutputEnablePanel.add (this.jOutputEnable);
+    waveformControlPanel.add (jOutputEnablePanel);
     final JPanel jWaveformPanel = new JPanel ();
-    // setPanelBorder (jWaveformPanel, 2, DEFAULT_AMPLITUDE_COLOR, "Waveform");
+    setPanelBorder (
+      jWaveformPanel,
+      getLevel () + 2,
+      getGuiPreferencesAmplitudeColor (),
+      "Waveform");
     jWaveformPanel.setLayout (new FlowLayout ());
     jWaveformPanel.setAlignmentY (Component.CENTER_ALIGNMENT);
     this.jWaveform = new JComboBox (getFunctionGenerator ().getSupportedWaveforms ().toArray ());
     this.jWaveform.setSelectedItem (null);
     this.jWaveform.addActionListener (this.jWaveformListener);
     jWaveformPanel.add (this.jWaveform);
-    waveformPanel.add (jWaveformPanel);
-    add (waveformPanel);
+    waveformControlPanel.add (jWaveformPanel);
+    waveformControlPanel.add (new JLabel ());
+    waveformControlPanel.add (new JLabel ());
+    waveformControlPanel.add (new JLabel ());
+    waveformControlPanel.add (new JLabel ());
+    waveformControlPanel.add (new JLabel ());
+    waveformControlPanel.add (new JLabel ());
+    waveformControlPanel.add (new JLabel ());
+    add (waveformControlPanel);
     
     final JPanel frequencyPanel = new JPanel ();
     setPanelBorder (
@@ -319,6 +340,59 @@ public class JDefaultFunctionGeneratorView
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SWING
+  // OUTPUT ENABLE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JColorCheckBox.JBoolean jOutputEnable;
+  
+  private final ActionListener jOutputEnableListener = (final ActionEvent ae) ->
+  {
+    final Boolean currentValue = JDefaultFunctionGeneratorView.this.jOutputEnable.getDisplayedValue ();
+    final boolean newValue = currentValue == null || (! currentValue);
+    try
+    {
+      getFunctionGenerator ().setOutputEnable (newValue);
+    }
+    catch (Exception e)
+    {
+      LOG.log (Level.WARNING, "Caught exception while setting output enable {0} on instrument {1}: {2}.",        
+        new Object[]
+          {newValue, getInstrument (), Arrays.toString (e.getStackTrace ())});
+    }
+  };
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  // WAVEFORM
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JComboBox<FunctionGenerator.Waveform> jWaveform;
+  
+  private final ActionListener jWaveformListener = (final ActionEvent ae) ->
+  {
+    if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
+    {
+      final FunctionGenerator.Waveform waveform =
+        (FunctionGenerator.Waveform) JDefaultFunctionGeneratorView.this.jWaveform.getSelectedItem ();
+      try
+      {
+        JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setWaveform (waveform);
+      }
+      catch (Exception e)
+      {
+        LOG.log (Level.WARNING, "Caught exception while setting waveform {0} on instrument {1}: {2}.",        
+          new Object[]
+            {waveform, getInstrument (), Arrays.toString (e.getStackTrace ())});
+      }
+    }
+  };
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
   // FREQUENCY
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -451,34 +525,6 @@ public class JDefaultFunctionGeneratorView
     }
     else
       source.setToolTipText (Integer.toString (source.getValue ()));
-  };
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  // WAVEFORM
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final JComboBox<FunctionGenerator.Waveform> jWaveform;
-  
-  private final ActionListener jWaveformListener = (final ActionEvent ae) ->
-  {
-    if (! JDefaultFunctionGeneratorView.this.inhibitInstrumentControl)
-    {
-      final FunctionGenerator.Waveform waveform =
-        (FunctionGenerator.Waveform) JDefaultFunctionGeneratorView.this.jWaveform.getSelectedItem ();
-      try
-      {
-        JDefaultFunctionGeneratorView.this.getFunctionGenerator ().setWaveform (waveform);
-      }
-      catch (Exception e)
-      {
-        LOG.log (Level.WARNING, "Caught exception while setting waveform {0} on instrument {1}: {2}.",        
-          new Object[]
-            {waveform, getInstrument (), Arrays.toString (e.getStackTrace ())});
-      }
-    }
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -681,6 +727,9 @@ public class JDefaultFunctionGeneratorView
         //
         try
         {
+          //
+          final boolean isOutputEnable = settings.isOuputEnable ();
+          JDefaultFunctionGeneratorView.this.jOutputEnable.setDisplayedValue (isOutputEnable);
           //
           final FunctionGenerator.Waveform waveform = settings.getWaveform ();
           final boolean isSupportedWaveform =
