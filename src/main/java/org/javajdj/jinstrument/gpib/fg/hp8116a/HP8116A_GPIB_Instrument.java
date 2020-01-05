@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -209,6 +209,22 @@ public class HP8116A_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  @Override
+  public final boolean supportsOutputEnable ()
+  {
+    return true;
+  }
+
+  @Override
+  public void setOutputEnable (final boolean outputEnable)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RF_OUTPUT_ENABLE,
+      InstrumentCommand.ICARG_RF_OUTPUT_ENABLE,
+      outputEnable));
+  }
+  
   private final static Waveform[] SUPPORTED_WAVEFORMS = new Waveform[]
   {
     Waveform.DC,
@@ -337,6 +353,13 @@ public class HP8116A_GPIB_Instrument
           break;
         case InstrumentCommand.IC_GET_SETTINGS_KEY:
         {
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_RF_OUTPUT_ENABLE:
+        {
+          final boolean outputEnable = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_RF_OUTPUT_ENABLE);
+          writeSync (outputEnable ? "D0\r\n" : "D1\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
