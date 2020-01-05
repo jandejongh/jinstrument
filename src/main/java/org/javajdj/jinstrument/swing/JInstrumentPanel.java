@@ -177,6 +177,13 @@ public class JInstrumentPanel
     return JInstrumentPanel.DEFAULT_DC_COLOR;
   }
   
+  public final static Color DEFAULT_TRIGGER_COLOR = Color.pink;
+  
+  public final static Color getGuiPreferencesTriggerColor ()
+  {
+    return JInstrumentPanel.DEFAULT_TRIGGER_COLOR;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INHIBIT INSTRUMENT CONTROL
@@ -200,6 +207,31 @@ public class JInstrumentPanel
   // SWING UTILITIES [DIALOGS]
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected Integer getIntegerFromDialog (final String title, final Integer startValue)
+  {
+    final String inputString = JOptionPane.showInputDialog (title, startValue);
+    if (inputString != null)
+    {
+      final int value;
+      try
+      {
+        value = Integer.parseInt (inputString.trim ());
+      }
+      catch (NumberFormatException nfe)
+      {
+        JOptionPane.showMessageDialog (
+          null,
+          "Illegal value " + inputString.trim () + "!",
+          "Illegal Input",
+          JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      return value;
+    }
+    else
+      return null;
+  }
   
   protected Double getFrequencyFromDialog_Hz (final String title, final Double startValue_Hz)
   {
@@ -524,6 +556,52 @@ public class JInstrumentPanel
         return null;
       }
       return value * conversionFactor;
+    }
+    else
+      return null;
+  }
+  
+  protected Double getDutyCycleFromDialog_percent (final String title, final Double startValue_percent)
+  {
+    final String inputString = JOptionPane.showInputDialog (title, startValue_percent);
+    if (inputString != null)
+    {
+      final String[] splitString = inputString.split ("\\s+");
+      if (splitString == null || splitString.length == 0 || splitString.length > 2)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + inputString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      final String valueString = splitString[0];
+      final String unitString = splitString.length > 1 ? splitString[1] : null;
+      final double conversionFactor;
+      if (unitString != null)
+      {
+        if (unitString.trim ().equalsIgnoreCase ("%"))
+        {
+          conversionFactor = 1.0;
+        }
+        else
+        {
+          JOptionPane.showMessageDialog (null, "Illegal unit " + unitString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+          return null;
+        }
+      }
+      else
+      {
+        conversionFactor = 1.0;
+      }
+      final double value_percent;
+      try
+      {
+        value_percent = Double.parseDouble (valueString);
+      }
+      catch (NumberFormatException nfe)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + valueString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      return value_percent * conversionFactor;
     }
     else
       return null;
