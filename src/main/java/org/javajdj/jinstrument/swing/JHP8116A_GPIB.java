@@ -175,7 +175,7 @@ public class JHP8116A_GPIB
     {
       if (instrument != JHP8116A_GPIB.this.getFunctionGenerator ()|| instrumentSettings == null)
         throw new IllegalArgumentException ();
-      if (! (instrumentSettings instanceof HP8116A_GPIB_Status))
+      if (! (instrumentSettings instanceof HP8116A_GPIB_Settings))
         throw new IllegalArgumentException ();
       final HP8116A_GPIB_Settings settings = (HP8116A_GPIB_Settings) instrumentSettings;
       SwingUtilities.invokeLater (() ->
