@@ -133,6 +133,45 @@ public interface InstrumentCommand
   public final static String IC_TRIGGER_MODE = "commandTriggerMode";
   public final static String ICARG_TRIGGER_MODE = "triggerMode";
   
+  public final static String IC_TRIGGER_CONTROL = "commandTriggerControl";
+  public final static String ICARG_TRIGGER_CONTROL = "triggerControl";
+  
+  public final static String IC_CONTROL_MODE = "commandControlMode";
+  public final static String ICARG_CONTROL_MODE = "controlMode";
+  
+  public final static String IC_START_PHASE = "commandStartPhase";
+  public final static String ICARG_START_PHASE = "startPhase";
+  
+  public final static String IC_AUTO_VERNIER = "commandAutoVernier";
+  public final static String ICARG_AUTO_VERNIER = "autoVernier";
+  
+  public final static String IC_OUTPUT_LIMITS = "commandOutputLimits";
+  public final static String ICARG_OUTPUT_LIMITS = "outputLimits";
+  
+  public final static String IC_COMPLEMENTARY_OUTPUT = "commandComplementaryOutput";
+  public final static String ICARG_COMPLEMENTARY_OUTPUT = "complementaryOutput";
+  
+  public final static String IC_BURST_LENGTH = "commandBurstLength";
+  public final static String ICARG_BURST_LENGTH = "burstLength";
+  
+  public final static String IC_REPEAT_INTERVAL = "commandRepeatInterval";
+  public final static String ICARG_REPEAT_INTERVAL_S = "repeatInterval_s";
+  
+  public final static String IC_START_FREQUENCY = "commandStartFrequency";
+  public final static String ICARG_START_FREQUENCY_HZ = "startFrequency_Hz";
+  
+  public final static String IC_STOP_FREQUENCY = "commandStopFrequency";
+  public final static String ICARG_STOP_FREQUENCY_HZ = "stopFrequency_Hz";
+  
+  public final static String IC_MARKER_FREQUENCY = "commandMarkerFrequency";
+  public final static String ICARG_MARKER_FREQUENCY_HZ = "markerFrequency_Hz";
+  
+  public final static String IC_DUTY_CYCLE = "commandDutyCycle";
+  public final static String ICARG_DUTY_CYCLE_PERCENT = "dutyCycle_percent";
+  
+  public final static String IC_PULSE_WIDTH = "commandPulseWidth";
+  public final static String ICARG_PULSE_WIDTH_S = "pulseWidth_s";
+  
   public final static String IC_WAVEFORM = "commandWaveform";
   public final static String ICARG_WAVEFORM = "waveform"; 
   
