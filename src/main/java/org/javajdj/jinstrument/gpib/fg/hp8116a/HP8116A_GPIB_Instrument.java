@@ -323,6 +323,249 @@ public class HP8116A_GPIB_Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // HP8116A_GPIB_Instrument
+  // TRIGGER MODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum HP8116ATriggerMode
+  {
+    M1_NORM,
+    M2_TRIG,
+    M3_GATE,
+    M4_E_WID,
+    M5_I_SWP, // Option001
+    M6_E_SWP, // Option001
+    M7_I_BUR, // Option001
+    M8_E_BUR; // Option001
+  }
+  
+  public void setTriggerMode (final HP8116ATriggerMode triggerMode) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TRIGGER_MODE,
+      InstrumentCommand.ICARG_TRIGGER_MODE, triggerMode));
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // TRIGGER MODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum HP8116ATriggerControl
+  {
+    T0_TRIGGER_OFF,
+    T1_POSITIVE_TRIGGER_SLOPE,
+    T2_NEGATIVE_TRIGGER_SLOPE;
+  }
+  
+  public void setTriggerControl (final HP8116ATriggerControl triggerControl) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TRIGGER_CONTROL,
+      InstrumentCommand.ICARG_TRIGGER_CONTROL, triggerControl));
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // CONTROL MODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum HP8116AControlMode
+  {
+    CT0_OFF,
+    CT1_FM,
+    CT2_AM,
+    CT3_PWM,
+    CT4_VCO;
+  }
+  
+  public void setControlMode (final HP8116AControlMode controlMode) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_CONTROL_MODE,
+      InstrumentCommand.ICARG_CONTROL_MODE, controlMode));
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // START PHASE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum HP8116AStartPhase
+  {
+    H0_NORMAL,
+    H1_MINUS_90_DEGREES;
+  }
+  
+  public void setStartPhase (final HP8116AStartPhase startPhase) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_START_PHASE,
+      InstrumentCommand.ICARG_START_PHASE, startPhase));
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // AUTO VERNIER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public void setAutoVernier (final boolean autoVernier) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_AUTO_VERNIER,
+      InstrumentCommand.ICARG_AUTO_VERNIER, autoVernier));
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // OUTPUT LIMITS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public void setOutputLimits (final boolean outputLimits) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_OUTPUT_LIMITS,
+      InstrumentCommand.ICARG_OUTPUT_LIMITS, outputLimits));
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // COMPLEMENTARY OUTPUT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public void setComplementaryOutput (final boolean complementaryOutput) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_COMPLEMENTARY_OUTPUT,
+      InstrumentCommand.ICARG_COMPLEMENTARY_OUTPUT, complementaryOutput));
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // BURST LENGTH
+  // [OPTION001]
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public void setBurstLength (final int burstLength) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_BURST_LENGTH,
+      InstrumentCommand.ICARG_BURST_LENGTH, burstLength));
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // REPEAT INTERVAL
+  // [OPTION001]
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public void setRepeatInterval_s (final double repeatInterval_s) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_REPEAT_INTERVAL,
+      InstrumentCommand.ICARG_REPEAT_INTERVAL_S, repeatInterval_s));
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // START FREQUENCY
+  // STOP FREQUENCY
+  // [OPTION001]
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public void setStartFrequency_Hz (final double startFrequency_Hz) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_START_FREQUENCY,
+      InstrumentCommand.ICARG_START_FREQUENCY_HZ, startFrequency_Hz));
+  }
+  
+  public void setStopFrequency_Hz (final double stopFrequency_Hz) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_STOP_FREQUENCY,
+      InstrumentCommand.ICARG_STOP_FREQUENCY_HZ, stopFrequency_Hz));
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // SWEEP TIME
+  // [OPTION001]
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public void setSweepTime_s (final double sweepTime_s) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_SWEEP_TIME,
+      InstrumentCommand.ICARG_SWEEP_TIME_S, sweepTime_s));
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // MARKER FREQUENCY
+  // [OPTION001]
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public void setMarkerFrequency_Hz (final double markerFrequency_Hz) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_MARKER_FREQUENCY,
+      InstrumentCommand.ICARG_MARKER_FREQUENCY_HZ, markerFrequency_Hz));
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // DUTY CYCLE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public void setDutyCycle_percent (final double dutyCycle_percent) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_DUTY_CYCLE,
+      InstrumentCommand.ICARG_DUTY_CYCLE_PERCENT, dutyCycle_percent));
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP8116A_GPIB_Instrument
+  // PULSE WIDTH
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public void setPulseWidth_s (final double pulseWidth_s) throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_PULSE_WIDTH,
+      InstrumentCommand.ICARG_PULSE_WIDTH_S, pulseWidth_s));
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // AbstractInstrument
   // PROCESS COMMAND
   //
@@ -368,23 +611,12 @@ public class HP8116A_GPIB_Instrument
           final Waveform waveform = (Waveform) instrumentCommand.get (InstrumentCommand.ICARG_WAVEFORM);
           switch (waveform)
           {
-            case DC:
-              writeSync ("W0\r\n");
-              break;
-            case SINE:
-              writeSync ("W1\r\n");
-              break;
-            case TRIANGLE:
-              writeSync ("W2\r\n");
-              break;
-            case SQUARE:
-              writeSync ("W3\r\n");
-              break;
-            case PULSE:
-              writeSync ("W4\r\n");
-              break;
-            default:
-              throw new UnsupportedOperationException ();
+            case DC:       writeSync ("W0\r\n"); break;
+            case SINE:     writeSync ("W1\r\n"); break;
+            case TRIANGLE: writeSync ("W2\r\n"); break;
+            case SQUARE:   writeSync ("W3\r\n"); break;
+            case PULSE:    writeSync ("W4\r\n"); break;
+            default: throw new UnsupportedOperationException ();
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
@@ -407,6 +639,147 @@ public class HP8116A_GPIB_Instrument
         {
           final double dcOffset_V = (double) instrumentCommand.get (InstrumentCommand.ICARG_DC_OFFSET_V);
           writeSync ("OFS " + dcOffset_V + " V\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TRIGGER_MODE:
+        {
+          final HP8116ATriggerMode triggerMode =
+            (HP8116ATriggerMode) instrumentCommand.get (InstrumentCommand.ICARG_TRIGGER_MODE);
+          switch (triggerMode)
+          {
+            case M1_NORM:  writeSync ("M1\r\n"); break;
+            case M2_TRIG:  writeSync ("M2\r\n"); break;
+            case M3_GATE:  writeSync ("M3\r\n"); break;
+            case M4_E_WID: writeSync ("M4\r\n"); break;
+            case M5_I_SWP: writeSync ("M5\r\n"); break;
+            case M6_E_SWP: writeSync ("M6\r\n"); break;
+            case M7_I_BUR: writeSync ("M7\r\n"); break;
+            case M8_E_BUR: writeSync ("M8\r\n"); break;
+            default: throw new RuntimeException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TRIGGER_CONTROL:
+        {
+          final HP8116ATriggerControl triggerControl =
+            (HP8116ATriggerControl) instrumentCommand.get (InstrumentCommand.ICARG_TRIGGER_CONTROL);
+          switch (triggerControl)
+          {
+            case T0_TRIGGER_OFF:            writeSync ("T0\r\n"); break;
+            case T1_POSITIVE_TRIGGER_SLOPE: writeSync ("T1\r\n"); break;
+            case T2_NEGATIVE_TRIGGER_SLOPE: writeSync ("T2\r\n"); break;
+            default: throw new RuntimeException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_CONTROL_MODE:
+        {
+          final HP8116AControlMode controlMode =
+            (HP8116AControlMode) instrumentCommand.get (InstrumentCommand.ICARG_CONTROL_MODE);
+          switch (controlMode)
+          {
+            case CT0_OFF: writeSync ("CT0\r\n"); break;
+            case CT1_FM:  writeSync ("CT1\r\n"); break;
+            case CT2_AM:  writeSync ("CT2\r\n"); break;
+            case CT3_PWM: writeSync ("CT3\r\n"); break;
+            case CT4_VCO: writeSync ("CT4\r\n"); break;
+            default: throw new RuntimeException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;          
+        }
+        case InstrumentCommand.IC_START_PHASE:
+        {
+          final HP8116AStartPhase startPhase =
+            (HP8116AStartPhase) instrumentCommand.get (InstrumentCommand.ICARG_START_PHASE);
+          switch (startPhase)
+          {
+            case H0_NORMAL:           writeSync ("H0\r\n"); break;
+            case H1_MINUS_90_DEGREES: writeSync ("H1\r\n"); break;
+            default: throw new RuntimeException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;          
+        }
+        case InstrumentCommand.IC_AUTO_VERNIER:
+        {
+          final boolean autoVernier = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_AUTO_VERNIER);
+          writeSync (autoVernier ? "A1\r\n" : "A0\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_OUTPUT_LIMITS:
+        {
+          final boolean outputLimits = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_OUTPUT_LIMITS);
+          writeSync (outputLimits ? "L1\r\n" : "L0\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_COMPLEMENTARY_OUTPUT:
+        {
+          final boolean complementaryOutput = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_COMPLEMENTARY_OUTPUT);
+          writeSync (complementaryOutput ? "C1\r\n" : "C0\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_BURST_LENGTH:
+        {
+          final int burstLength = (int) instrumentCommand.get (InstrumentCommand.ICARG_BURST_LENGTH);
+          writeSync ("BUR " + burstLength + " #\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_REPEAT_INTERVAL:
+        {
+          final double repeatInterval_s = (double) instrumentCommand.get (InstrumentCommand.ICARG_REPEAT_INTERVAL_S);          
+          final double repeatInterval_ms = 1000 * repeatInterval_s;
+          writeSync ("RPT " + repeatInterval_ms + " MS\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_START_FREQUENCY:
+        {
+          final double startFrequency_Hz = (double) instrumentCommand.get (InstrumentCommand.ICARG_START_FREQUENCY_HZ);
+          writeSync ("STA " + startFrequency_Hz + " HZ\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_STOP_FREQUENCY:
+        {
+          final double stopFrequency_Hz = (double) instrumentCommand.get (InstrumentCommand.ICARG_STOP_FREQUENCY_HZ);
+          writeSync ("STP " + stopFrequency_Hz + " HZ\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_SWEEP_TIME:
+        {
+          final double sweepTime_s = (double) instrumentCommand.get (InstrumentCommand.ICARG_SWEEP_TIME_S);
+          writeSync ("SWT " + sweepTime_s + " S\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_MARKER_FREQUENCY:
+        {
+          final double markerFrequency_Hz = (double) instrumentCommand.get (InstrumentCommand.ICARG_MARKER_FREQUENCY_HZ);
+          writeSync ("MRK " + markerFrequency_Hz + " HZ\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_DUTY_CYCLE:
+        {
+          final double dutyCycle_percent = (double) instrumentCommand.get (InstrumentCommand.ICARG_DUTY_CYCLE_PERCENT);          
+          writeSync ("DTY " + dutyCycle_percent + " %\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_PULSE_WIDTH:
+        {
+          final double pulseWidth_s = (double) instrumentCommand.get (InstrumentCommand.ICARG_PULSE_WIDTH_S);          
+          final double pulseWidth_ms = 1000 * pulseWidth_s;          
+          writeSync ("WID " + pulseWidth_ms + " MS\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
