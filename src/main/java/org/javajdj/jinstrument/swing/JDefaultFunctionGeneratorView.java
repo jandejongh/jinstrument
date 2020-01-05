@@ -541,7 +541,7 @@ public class JDefaultFunctionGeneratorView
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newAmplitude_Vpp = getVoltageFromDialog_V ("Enter Amplitude [V]", null);
+      final Double newAmplitude_Vpp = getVoltageFromDialog_V ("Enter Amplitude [V] (pp)", null);
       if (newAmplitude_Vpp != null)
         try
         {
@@ -622,7 +622,7 @@ public class JDefaultFunctionGeneratorView
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newOffset_V = getVoltageFromDialog_V ("Enter Offset [V]", null);
+      final Double newOffset_V = getVoltageFromDialog_V ("Enter DC Offset [V]", null);
       if (newOffset_V != null)
         try
         {
@@ -630,12 +630,12 @@ public class JDefaultFunctionGeneratorView
         }
         catch (InterruptedException ie)
         {
-           LOG.log (Level.INFO, "Caught InterruptedException while setting offset on instrument: {0}.",
+           LOG.log (Level.INFO, "Caught InterruptedException while setting DC offset on instrument: {0}.",
              ie.getStackTrace ());
         }
         catch (IOException ioe)
         {
-           LOG.log (Level.INFO, "Caught IOException while setting offset on instrument: {0}.",
+           LOG.log (Level.INFO, "Caught IOException while setting DC offset on instrument: {0}.",
              ioe.getStackTrace ());
         }
     }
