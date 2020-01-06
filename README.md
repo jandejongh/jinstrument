@@ -10,41 +10,12 @@ Either through Maven, or by simply picking up a release's jinstrument-X.Y-jar-wi
 ## License
 Apache v2.0.
 
-## Release 0.1 [20191226]
-Very basis support for
-- Prologix GPIB-Ethernet
-- HP3478A DMM [well, no real support actually]
-- HP8566B SA [basic settings & trace display]
-- HP8663A RF SigGen [basic settings; still lots of trouble reading settings from instrument]
-- A basic GPIB-device console [works OK; very useful]
-
-Reasonable framework for buses, controllers, devices, instruments and instrument views.
-
-## Release 0.2 [20191228]
-Most important changes:
-- Revamped ProLogix controller implementation.
-- Added GPIB Controller logging + Swing component.
-
-## Release 0.3 [20191231]
-Most important changes:
-- Selecting and removing Instrument Views from the Registry.
-- Full-blown HP3478A support (only lacking a few trigger options).
-
-## Release 0.4 [20190104]
-Most important changes:
-- Timeout handling.
-- Added many instrument classes and concrete (placeholder) classes.
-- HP-8116A [partial] enters beta.
-- Improvements to (notably) Controller Debugger.
-
-More detailed documentation will follow once the framework has stabilized (notably, the support for channels is still lacking).
-
-## Status [20200104 - v0.4]
+## Status [20200106 - v0.5]
 
 ### Beta:
 - ProLogix GPIB Ethernet
 - HP-3478A Digital MultiMeter [complete]
-- HP-8116A 50MHz Programmable Pulse/Function Generator [FunctionGenerator only]
+- HP-8116A 50MHz Programmable Pulse/Function Generator [complete - OPTION001 ONLY!]
 
 ### Alpha:
 - HP-8566B Spectrum Analyzer
@@ -63,3 +34,38 @@ More detailed documentation will follow once the framework has stabilized (notab
 - Rohde&Schwarz ESH-3 (unit broken though...)
 - Tek-2440 Digital Storage Oscilloscope
 - Wiltron 560A Network Analyzer
+
+## Release History
+
+### Release 0.1 [20191226]
+Very basis support for
+- Prologix GPIB-Ethernet
+- HP3478A DMM [well, no real support actually]
+- HP8566B SA [basic settings & trace display]
+- HP8663A RF SigGen [basic settings; still lots of trouble reading settings from instrument]
+- A basic GPIB-device console [works OK; very useful]
+
+Reasonable framework for buses, controllers, devices, instruments and instrument views.
+
+### Release 0.2 [20191228]
+Most important changes:
+- Revamped ProLogix controller implementation.
+- Added GPIB Controller logging + Swing component.
+
+### Release 0.3 [20191231]
+Most important changes:
+- Selecting and removing Instrument Views from the Registry.
+- Full-blown HP3478A support (only lacking a few trigger options).
+
+### Release 0.4 [20190104]
+Most important changes:
+- Timeout handling.
+- Added many instrument classes and concrete (placeholder) classes.
+- HP-8116A [partial] enters beta.
+- Improvements to (notably) Controller Debugger.
+
+### Release 0.5 [20190106]
+Most important change:
+- Completed Instrument and InstrumentView implementation for HP-8116A.
+
+More detailed documentation will follow once the framework has stabilized (notably, the support for channels is still lacking).
