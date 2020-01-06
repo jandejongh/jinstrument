@@ -6,7 +6,7 @@
 
   <groupId>org.javajdj</groupId>
   <artifactId>jinstrument</artifactId>
-  <version>0.5-SNAPSHOT</version>
+  <version>0.5</version>
   <packaging>jar</packaging>
 
   <name>jinstrument</name>
@@ -142,7 +142,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jswing</artifactId>
-      <version>0.5-SNAPSHOT</version>
+      <version>0.5</version>
     </dependency>
     <dependency>
       <groupId>javax.json</groupId>
