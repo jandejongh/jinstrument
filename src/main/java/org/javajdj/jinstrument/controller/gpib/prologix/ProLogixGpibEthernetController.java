@@ -670,7 +670,7 @@ public final class ProLogixGpibEthernetController
   
   private final byte DEFAULT_EOT = (byte) 0xFF;
   
-  private void processCommand_ResetController (
+  private void processCommand_resetController (
     final long timeout_ms,
     final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
@@ -680,7 +680,7 @@ public final class ProLogixGpibEthernetController
     proLogixCommandWritelnControllerCommand (RESET_CONTROLLER_COMMAND);    
   }
   
-  private void processCommand_Nop (
+  private void processCommand_nop (
     final long timeout_ms,
     final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
@@ -741,7 +741,7 @@ public final class ProLogixGpibEthernetController
     }
   }
   
-  private byte[] processCommand_ReadEOI (
+  private byte[] processCommand_readEOI (
     final GpibAddress gpibAddress,
     final long timeout_ms,
     final boolean topLevel)
@@ -1014,7 +1014,7 @@ public final class ProLogixGpibEthernetController
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
     }
     processCommand_write (gpibAddress, bytes, timeout_ms, false);
-    return processCommand_ReadEOI (gpibAddress, deadline_millis - System.currentTimeMillis (), false);
+    return processCommand_readEOI (gpibAddress, deadline_millis - System.currentTimeMillis (), false);
   }
   
   private byte[] processCommand_writeAndReadln (
@@ -1152,6 +1152,27 @@ public final class ProLogixGpibEthernetController
     }
   }
   
+  private void processCommand_userRunnable (
+    final GpibAddress gpibAddress,
+    final Runnable runnable,
+    final long timeout_ms,
+    final boolean topLevel)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (gpibAddress == null)
+      throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
+    if (topLevel)
+    {
+      proLogixClearReadBuffer ();
+      proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      proLogixCommandSetEOT (false, LF_BYTE);
+    }
+    runnable.run ();
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractController
@@ -1177,10 +1198,10 @@ public final class ProLogixGpibEthernetController
       switch (commandString)
       {
         case ControllerCommand.CCCMD_RESET_CONTROLLER:
-          processCommand_ResetController (timeout_ms, topLevel);
+          processCommand_resetController (timeout_ms, topLevel);
           break;
         case ControllerCommand.CCCMD_NOP:
-          processCommand_Nop (timeout_ms, topLevel);
+          processCommand_nop (timeout_ms, topLevel);
           break;
         case ControllerCommand.CCCMD_GET_SETTINGS:
           throw new UnsupportedOperationException ();
@@ -1200,7 +1221,7 @@ public final class ProLogixGpibEthernetController
         case GpibControllerCommand.CCCMD_GPIB_READ_EOI:
         {
           final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
-          final byte[] bytesRead = processCommand_ReadEOI (address, timeout_ms, topLevel);
+          final byte[] bytesRead = processCommand_readEOI (address, timeout_ms, topLevel);
           controllerCommand.put (GpibControllerCommand.CCRET_VALUE_KEY, bytesRead);
           break;
         }
@@ -1284,6 +1305,13 @@ public final class ProLogixGpibEthernetController
           final Function<GpibControllerCommand, Boolean> condition =
             (Function) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ATOMIC_REPEAT_UNTIL_CONDITION);
           processCommand_atomicRepeatUntil (address, commandToRepeat, condition, timeout_ms, topLevel);
+          break;
+        }
+        case GpibControllerCommand.CCCMD_GPIB_USER_RUNNABLE:
+        {
+          final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
+          final Runnable runnable = (Runnable) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_USER_RUNNABLE);
+          processCommand_userRunnable (address, runnable, timeout_ms, topLevel);
           break;
         }
         default:

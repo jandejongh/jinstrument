@@ -707,6 +707,49 @@ public class DefaultGpibDevice
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // GpibDevice
+  // USER RUNNABLE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public GpibControllerCommand generateUserRunnableCommand (final Runnable runnable)
+  {
+    if (runnable == null)
+      throw new IllegalArgumentException ();
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CCCMD_GPIB_USER_RUNNABLE,
+      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address,
+      GpibControllerCommand.CCARG_GPIB_USER_RUNNABLE, runnable);
+    return command;
+  }
+  
+  @Override
+  public void userRunnableAsync (
+    final Runnable runnable,
+    final Long queueingTimeout_ms,
+    final Long processingTimeout_ms,
+    final Long sojournTimeout_ms)
+    throws UnsupportedOperationException
+  {
+    doControllerCommandAsync (
+      generateUserRunnableCommand (runnable),
+      queueingTimeout_ms,
+      processingTimeout_ms,
+      sojournTimeout_ms);
+  }
+
+  @Override
+  public void userRunnableSync (
+    final Runnable runnable,
+    final long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException
+  {
+    final GpibControllerCommand command = generateUserRunnableCommand (runnable);
+    doControllerCommandSync (command, timeout_ms);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // END OF FILE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

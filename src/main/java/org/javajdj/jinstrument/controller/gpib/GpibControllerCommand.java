@@ -39,6 +39,7 @@ public interface GpibControllerCommand
   public final static String CCCMD_GPIB_WRITE_AND_READLN_N = "gpibCommandWriteAndReadlnN";
   public final static String CCCMD_GPIB_ATOMIC_SEQUENCE = "gpibCommandAtomicSequence";
   public final static String CCCMD_GPIB_ATOMIC_REPEAT_UNTIL = "gpibCommandAtomicRepeatUntil";
+  public final static String CCCMD_GPIB_USER_RUNNABLE = "gpibCommandUserRunnable";
   
   public final static String CCARG_GPIB_ADDRESS = "gpibArgAddress";
   public final static String CCARG_GPIB_READLN_TERMINATION_MODE = "gpibArgReadlnTerminationMode";
@@ -47,5 +48,6 @@ public interface GpibControllerCommand
   public final static String CCARG_GPIB_ATOMIC_SEQUENCE = "gpibArgAtomicSequence";
   public final static String CCARG_GPIB_ATOMIC_REPEAT_UNTIL_COMMAND = "gpibArgAtomicRepeatUntilCommand";
   public final static String CCARG_GPIB_ATOMIC_REPEAT_UNTIL_CONDITION = "gpibArgAtomicRepeatUntilCondition";
+  public final static String CCARG_GPIB_USER_RUNNABLE = "gpibArgUserRunnable";
   
 }
