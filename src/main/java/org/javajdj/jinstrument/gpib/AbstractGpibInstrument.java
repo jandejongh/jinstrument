@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import org.javajdj.jinstrument.AbstractInstrument;
+import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.controller.gpib.ReadlineTerminationMode;
 import org.javajdj.jservice.Service;
@@ -101,7 +102,7 @@ implements GpibInstrument
   
   public final static long DEFAULT_SELECTED_DEVICE_CLEAR_TIMEOUT_MS = 1000L;
   
-  public final byte selectedDeviceCLearSync ()
+  protected final byte selectedDeviceCLearSync ()
     throws InterruptedException, IOException, TimeoutException
   {
     final byte statusByte = getDevice ().serialPollSync (getSelectedDeviceClearTimeout_ms ());
@@ -143,7 +144,7 @@ implements GpibInstrument
     }
   }
   
-  public final byte serialPollSync ()
+  protected final byte serialPollSync ()
     throws InterruptedException, IOException, TimeoutException
   {
     final byte statusByte = getDevice ().serialPollSync (getSerialPollTimeout_ms ());
@@ -163,13 +164,18 @@ implements GpibInstrument
     return DEFAULT_WRITE_TIMEOUT_MS;
   }
   
-  public void writeSync (final String string, final long timeout_ms)
+  protected final GpibControllerCommand generateWriteCommand (final String string)
+  {
+    return getDevice ().generateWriteCommand (string.getBytes (Charset.forName ("US-ASCII")));
+  }
+  
+  protected void writeSync (final String string, final long timeout_ms)
     throws InterruptedException, IOException, TimeoutException
   {
     getDevice ().writeSync (string.getBytes (Charset.forName ("US-ASCII")), timeout_ms);
   }
   
-  protected void writeSync (final String string)
+  protected final void writeSync (final String string)
     throws InterruptedException, IOException, TimeoutException
   {
     writeSync (string, getWriteTimeout_ms ());
@@ -181,11 +187,40 @@ implements GpibInstrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final static long READ_N_TIMEOUT_MS = 1000L;
+  public final static String READ_N_TIMEOUT_MS_PROPERTY_NAME = "readNTimeout_ms";
+  
+  private final static long DEFAULT_READ_N_TIMEOUT_MS = 10000L;
+  
+  // XXX Need locking or AtomicLong here...
+  private volatile long readNTimeout_ms = DEFAULT_READ_N_TIMEOUT_MS;
   
   public final long getReadNTimeout_ms ()
   {
-    return READ_N_TIMEOUT_MS;
+    return this.readNTimeout_ms;
+  }
+  
+  public final void setReadNTimeout_ms (final long readNTimeout_ms)
+  {
+    if (readNTimeout_ms <= 0)
+      throw new IllegalArgumentException ();
+    if (readNTimeout_ms != this.readNTimeout_ms)
+    {
+      final long oldReadNTimeout_ms = this.readNTimeout_ms;
+      this.readNTimeout_ms = readNTimeout_ms;
+      fireSettingsChanged (READ_N_TIMEOUT_MS_PROPERTY_NAME, oldReadNTimeout_ms, this.readNTimeout_ms);
+    }
+  }
+  
+  protected final GpibControllerCommand generateReadNCommand (final int N)
+  {
+    return getDevice ().generateReadNCommand (N);
+  }
+  
+  protected final byte[] readNSync (final int N)
+    throws InterruptedException, IOException, TimeoutException
+  {
+    final byte[] bytes = getDevice ().readNSync (N, getReadNTimeout_ms ());
+    return bytes;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,11 +229,16 @@ implements GpibInstrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final static long DEFAULT_READLINE_TIMEOUT_MS = 10000L;
+  private final static long DEFAULT_READLINE_TIMEOUT_MS = 1000L;
   
   public final long getReadlineTimeout_ms ()
   {
     return DEFAULT_READLINE_TIMEOUT_MS;
+  }
+  
+  protected final GpibControllerCommand generateReadlnCommand ()
+  {
+    return getDevice ().generateReadlnCommand (getReadlineTerminationMode ());
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,10 +247,18 @@ implements GpibInstrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public final String writeAndReadlnSync (final String string)
+  protected final GpibControllerCommand generateWriteAndReadlnCommand (final String string)
+  {
+    return getDevice ().generateWriteAndReadlnCommand (
+      string.getBytes (Charset.forName ("US-ASCII")),
+      getReadlineTerminationMode ());
+  }
+  
+  protected final String writeAndReadlnSync (final String string)
     throws InterruptedException, IOException, TimeoutException
   {
-    final byte[] bytes = getDevice ().writeAndReadlnSync (string.getBytes (Charset.forName ("US-ASCII")),
+    final byte[] bytes = getDevice ().writeAndReadlnSync (
+      string.getBytes (Charset.forName ("US-ASCII")),
       getReadlineTerminationMode (),
       getReadlineTimeout_ms ());
     return new String (bytes, Charset.forName ("US-ASCII"));
@@ -221,14 +269,64 @@ implements GpibInstrument
   // WRITE AND READN
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  protected final GpibControllerCommand generateWriteAndReadNCommand (final String string, final int N)
+  {
+    return getDevice ().generateWriteAndReadNCommand (
+      string.getBytes (Charset.forName ("US-ASCII")),
+      N);
+  }
   
-  public final byte[] writeAndReadNSync (final String string, final int N)
+  protected final byte[] writeAndReadNSync (final String string, final int N)
     throws InterruptedException, IOException, TimeoutException
   {
     final byte[] bytes = getDevice ().writeAndReadNSync (string.getBytes (Charset.forName ("US-ASCII")),
       N,
-      getReadlineTimeout_ms ());
+      getReadNTimeout_ms ());
     return bytes;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // ATOMIC SEQUENCE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static long DEFAULT_ATOMIC_SEQUENCE_TIMEOUT_MS = 10000L;
+  
+  public final long getAtomicSequenceTimeout_ms ()
+  {
+    return DEFAULT_ATOMIC_SEQUENCE_TIMEOUT_MS;
+  }
+  
+  protected final void atomicSequenceSync (final GpibControllerCommand[] sequence)
+    throws InterruptedException, IOException, TimeoutException
+  {
+    getDevice ().atomicSequenceSync (sequence, getAtomicSequenceTimeout_ms ());
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // USER RUNNABLE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static long DEFAULT_USER_RUNNABLE_TIMEOUT_MS = 10000L;
+  
+  protected final GpibControllerCommand generateUserRunnableCommand (final Runnable runnable)
+  {
+    return getDevice ().generateUserRunnableCommand (runnable);
+  }
+  
+  public final long getUserRunnableTimeout_ms ()
+  {
+    return DEFAULT_USER_RUNNABLE_TIMEOUT_MS;
+  }
+  
+  protected final void userRunnableSync (final Runnable runnable)
+    throws InterruptedException, IOException, TimeoutException
+  {
+    getDevice ().userRunnableSync (runnable, getUserRunnableTimeout_ms ());
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +361,7 @@ implements GpibInstrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public final static long DEFAULT_GET_READING_TIMEOUT_MS = 1000L;
+  public final static long DEFAULT_GET_READING_TIMEOUT_MS = 10000L;
   
   public final long getGetReadingTimeout_ms ()
   {
