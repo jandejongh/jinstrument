@@ -17,6 +17,9 @@
 package org.javajdj.jinstrument.gpib.psu.hp6033a;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -196,9 +199,101 @@ implements PowerSupplyUnit
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // FrequencyCounter
+  // PowerSupplyUnit
+  // HARD LIMITS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  public final double getHardLimitVoltage_V ()
+  {
+    return 20;
+  }
+
+  @Override
+  public final double getHardLimitCurrent_A ()
+  {
+    return 30;
+  }
+
+  @Override
+  public final double getHardLimitPower_W ()
+  {
+    return 200; // 240?? Agilent 5959-3342 is not particularly clear on this (gives two values, 200 and 240; taking lowest).
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // PowerSupplyUnit
+  // SOFT LIMITS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  public final boolean isSupportsSoftLimitVoltage ()
+  {
+    // Confirmed 20200105 - Agilent Part Number 5959-3342.
+    return true;
+  }
+
+  @Override
+  public void setSoftLimitVoltage_V (final double softLimitVoltage_V)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    // XXX TBI
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  public final boolean isSupportsSoftLimitCurrent ()
+  {
+    // Confirmed 20200105 - Agilent Part Number 5959-3342.
+    return true;
+  }
+
+  @Override
+  public void setSoftLimitCurrent_A (final double softLimitCurrent_A)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    // XXX TBI
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  public final boolean isSupportsSoftLimitPower ()
+  {
+    // Confirmed 20200105 - Agilent Part Number 5959-3342.
+    return false;
+  }
+
+  @Override
+  public void setSoftLimitPower_W (final double softLimitPower_W)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    throw new UnsupportedOperationException ();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // PowerSupplyUnit
+  // POWER SUPPLY MODES
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final static PowerSupplyMode[] SUPPORTED_POWER_SUPPLY_MODES = new PowerSupplyMode[]
+  {
+    PowerSupplyMode.CV,
+    PowerSupplyMode.CC
+  };
+  
+  private final static List<PowerSupplyMode> SUPPORTED_POWER_SUPPLY_MODES_AS_LIST =
+    Collections.unmodifiableList (Arrays.asList (HP6033A_GPIB_Instrument.SUPPORTED_POWER_SUPPLY_MODES));
+    
+  @Override
+  public final List<PowerSupplyMode> getSupportedPowerSupplyModes ()
+  {
+    return HP6033A_GPIB_Instrument.SUPPORTED_POWER_SUPPLY_MODES_AS_LIST;
+  }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
