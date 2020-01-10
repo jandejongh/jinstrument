@@ -150,6 +150,7 @@ extends JFrame
     this.instrumentRegistry.addInstrumentViewType (JDefaultSignalGeneratorView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultDigitalMultiMeterView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultFunctionGeneratorView.INSTRUMENT_VIEW_TYPE);
+    this.instrumentRegistry.addInstrumentViewType (JDefaultPowerSupplyUnitView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JHP3478A_GPIB.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JHP8116A_GPIB.INSTRUMENT_VIEW_TYPE);
     
