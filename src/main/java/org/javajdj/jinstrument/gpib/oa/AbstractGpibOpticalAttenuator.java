@@ -46,11 +46,20 @@ public abstract class AbstractGpibOpticalAttenuator
     final boolean addStatusServices,
     final boolean addSettingsServices,
     final boolean addCommandProcessorServices,
-    final boolean addAcquisitionServices)
+    final boolean addAcquisitionServices,
+    final boolean addServiceRequestPollingServices)
 
   {
-    super (name, device, runnables, targetServices,
-      addStatusServices, addSettingsServices, addCommandProcessorServices, addAcquisitionServices);
+    super (
+      name,
+      device,
+      runnables,
+      targetServices,
+      addStatusServices,
+      addSettingsServices,
+      addCommandProcessorServices,
+      addAcquisitionServices,
+      addServiceRequestPollingServices);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
