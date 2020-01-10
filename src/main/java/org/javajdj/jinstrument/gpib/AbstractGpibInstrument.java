@@ -18,8 +18,13 @@ package org.javajdj.jinstrument.gpib;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.javajdj.jinstrument.AbstractInstrument;
 import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
@@ -38,6 +43,14 @@ implements GpibInstrument
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // LOGGER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private static final Logger LOG = Logger.getLogger (AbstractGpibInstrument.class.getName ());
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // CONSTRUCTOR(S) / FACTORY / CLONING
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +63,8 @@ implements GpibInstrument
     final boolean addStatusServices,
     final boolean addSettingsServices,
     final boolean addCommandProcessorServices,
-    final boolean addAcquisitionServices)
+    final boolean addAcquisitionServices,
+    final boolean addServiceRequestPollingServices)
   {
     super (
       name,
@@ -61,6 +75,11 @@ implements GpibInstrument
       addSettingsServices,
       addCommandProcessorServices,
       addAcquisitionServices);
+    if (addServiceRequestPollingServices)
+    {
+      addRunnable (this.gpibInstrumentServiceRequestCollector);
+    }
+    addRunnable (this.gpibServiceRequestDispatcher);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,6 +131,46 @@ implements GpibInstrument
   public final long getSelectedDeviceClearTimeout_ms ()
   {
     return DEFAULT_SELECTED_DEVICE_CLEAR_TIMEOUT_MS;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // [POLL] SERVICE REQUEST
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static String POLL_SERVICE_REQUEST_TIMEOUT_MS_PROPERTY_NAME = "pollServiceRequestTimeout_ms";
+  
+  public final static long DEFAULT_POLL_SERVICE_REQUEST_TIMEOUT_MS = 100L;
+  
+  // XXX Need locking or AtomicLong here...
+  private volatile long pollServiceRequestTimeout_ms = DEFAULT_POLL_SERVICE_REQUEST_TIMEOUT_MS;
+  
+  public final long getPollServiceRequestTimeout_ms ()
+  {
+    return this.pollServiceRequestTimeout_ms;
+  }
+  
+  public final void setPollServiceRequestTimeout_ms (final long pollServiceRequestTimeout_ms)
+  {
+    if (pollServiceRequestTimeout_ms <= 0)
+      throw new IllegalArgumentException ();
+    if (pollServiceRequestTimeout_ms != this.pollServiceRequestTimeout_ms)
+    {
+      final long oldPollServiceRequestTimeout_ms = this.pollServiceRequestTimeout_ms;
+      this.pollServiceRequestTimeout_ms = pollServiceRequestTimeout_ms;
+      fireSettingsChanged (
+        POLL_SERVICE_REQUEST_TIMEOUT_MS_PROPERTY_NAME,
+        oldPollServiceRequestTimeout_ms,
+        this.pollServiceRequestTimeout_ms);
+    }
+  }
+  
+  protected final boolean pollServiceRequestSync ()
+    throws InterruptedException, IOException, TimeoutException
+  {
+    final boolean serviceRequest = getDevice ().pollServiceRequestSync (getPollServiceRequestTimeout_ms ());
+    return serviceRequest;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -367,6 +426,187 @@ implements GpibInstrument
   {
     return DEFAULT_GET_READING_TIMEOUT_MS;
   }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // ON GPIB SERVICE REQUEST FROM INSTRUMENT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected abstract void onGpibServiceRequestFromInstrument ()
+    throws IOException, InterruptedException, TimeoutException;
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GPIB INSTRUMENT SERVICE REQUEST COLLECTOR
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Runnable gpibInstrumentServiceRequestCollector = () ->
+  {
+    LOG.log (Level.INFO, "Starting GPIB Instrument Service Request Collector on {0}.", AbstractGpibInstrument.this.toString ());
+    boolean hadException = false;
+    while (! Thread.currentThread ().isInterrupted ())
+    {
+      try
+      {
+        if (hadException)
+        {
+          // Quick and dirty method to prevent continuous operation in case of (early) ignored Exceptions.
+          // We should actually compensate for the time spent already...
+          Thread.sleep ((long) (AbstractGpibInstrument.this.getGpibInstrumentServiceRequestCollectorPeriod_s () * 1000));
+          hadException = false;
+        }
+        // Mark start of sojourn.
+        final long timeBeforeProbe_ms = System.currentTimeMillis ();
+        // Obtain SRQ status from the instrument.
+        final boolean srqRead = AbstractGpibInstrument.this.pollServiceRequestSync ();
+        // Report a Service Request.
+        if (srqRead)
+          AbstractGpibInstrument.this.gpibServiceRequestFromInstrument ();
+        // Mark end of sojourn.
+        final long timeAfterProbeAndDelivery_ms = System.currentTimeMillis ();
+        // Calculate sojourn.
+        final long sojourn_ms = timeAfterProbeAndDelivery_ms - timeBeforeProbe_ms;
+        // Find out the remaining time to wait in order to respect the given period.
+        final long remainingSleep_ms =
+          ((long) AbstractGpibInstrument.this.getGpibInstrumentServiceRequestCollectorPeriod_s () * 1000) - sojourn_ms;
+        if (remainingSleep_ms < 0)
+        {
+          LOG.log (Level.WARNING, "GPIB Instrument Service Request Collector cannot meet timing reading on {0}.",
+            AbstractGpibInstrument.this.toString ());
+          hadException = true;
+        }
+        else if (remainingSleep_ms > 0)
+          Thread.sleep (remainingSleep_ms);
+      }
+      catch (InterruptedException ie)
+      {
+        LOG.log (Level.INFO, "Terminating (by request) GPIB Instrument Service Request Collector on {0}.",
+          AbstractGpibInstrument.this.toString ());
+        return;
+      }
+      catch (TimeoutException te)
+      {
+        LOG.log (Level.WARNING, "TimeoutException (ignored) in GPIB Instrument Service Request Collector on {0}: {1}.",
+          new Object[]{AbstractGpibInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
+        hadException = true;
+      }
+      catch (IOException ioe)
+      {
+        LOG.log (Level.WARNING, "Terminating (IOException) GPIB Instrument Service Request Collector on {0}: {1}.",
+          new Object[]{AbstractGpibInstrument.this.toString (), Arrays.toString (ioe.getStackTrace ())});
+        error ();
+        return;
+      }
+      catch (UnsupportedOperationException usoe)
+      {
+        LOG.log (Level.WARNING,
+          "Terminating (UnsupportedOperationException) GPIB Instrument Service Request Collector on {0}: {1}.",
+          new Object[]{AbstractGpibInstrument.this.toString (), Arrays.toString (usoe.getStackTrace ())});
+        error ();
+        return;
+      }
+      catch (Exception e)
+      {
+        LOG.log (Level.WARNING, "Terminating (Exception) GPIB Instrument Service Request Collector on {0}: {1}.",
+          new Object[]{AbstractGpibInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
+        error ();
+        return;
+      }
+    }
+    LOG.log (Level.INFO, "Terminating (by request) GPIB Instrument Service Request Collector on {0}.",
+      AbstractGpibInstrument.this.toString ());
+  };
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GPIB INSTRUMENT SERVICE REQUEST COLLECTOR PERIOD
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static String GPIB_INSTRUMENT_SERVICE_REQUEST_COLLECTOR_PERIOD_S_PROPERTY_NAME =
+    "gpibInstrumentServiceRequestCollectorPeriod_s";
+  
+  public final static double DEFAULT_GPIB_INSTRUMENT_SERVICE_REQUEST_COLLECTOR_PERIOD_S = 0.1;
+  
+  private volatile double gpibInstrumentServiceRequestCollectorPeriod_s =
+    AbstractGpibInstrument.DEFAULT_GPIB_INSTRUMENT_SERVICE_REQUEST_COLLECTOR_PERIOD_S;
+
+  private final Object gpibInstrumentServiceRequestCollectorPeriodLock = new Object ();
+  
+  public final double getGpibInstrumentServiceRequestCollectorPeriod_s ()
+  {
+    synchronized (this.gpibInstrumentServiceRequestCollectorPeriodLock)
+    {
+      return this.gpibInstrumentServiceRequestCollectorPeriod_s;
+    }
+  }
+  
+  public final void setGpibInstrumentServiceRequestCollectorPeriod_s (final double gpibInstrumentServiceRequestCollectorPeriod_s)
+  {
+    if (gpibInstrumentServiceRequestCollectorPeriod_s < 0)
+      throw new IllegalArgumentException ();
+    final double oldGpibInstrumentServiceRequestCollectorPeriod_s;
+    synchronized (this.gpibInstrumentServiceRequestCollectorPeriodLock)
+    {
+      if (this.gpibInstrumentServiceRequestCollectorPeriod_s == gpibInstrumentServiceRequestCollectorPeriod_s)
+        return;
+      oldGpibInstrumentServiceRequestCollectorPeriod_s = this.gpibInstrumentServiceRequestCollectorPeriod_s;
+      this.gpibInstrumentServiceRequestCollectorPeriod_s = gpibInstrumentServiceRequestCollectorPeriod_s;
+    }
+    fireSettingsChanged (AbstractGpibInstrument.GPIB_INSTRUMENT_SERVICE_REQUEST_COLLECTOR_PERIOD_S_PROPERTY_NAME,
+      oldGpibInstrumentServiceRequestCollectorPeriod_s,
+      gpibInstrumentServiceRequestCollectorPeriod_s);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GPIB SERVICE REQUEST QUEUE
+  // GPIB SERVICE REQUEST FROM INSTRUMENT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final BlockingQueue<Boolean> gpibServiceRequestQueue = new LinkedBlockingQueue<> ();
+  
+  protected void gpibServiceRequestFromInstrument ()
+  {
+    if (! this.gpibServiceRequestQueue.offer (true))
+      LOG.log (Level.WARNING, "Overflow on GPIB Instrument Service Request Queue on {0}.", this);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GPIB SERVICE REQUEST DISPATCHER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Runnable gpibServiceRequestDispatcher = () ->
+  {
+    LOG.log (Level.INFO, "Starting GPIB Instrument Service Request Dispatcher on {0}.", AbstractGpibInstrument.this.toString ());
+    while (! Thread.currentThread ().isInterrupted ())
+    {
+      try
+      {
+        final boolean srq = AbstractGpibInstrument.this.gpibServiceRequestQueue.take ();
+        if (srq)
+          AbstractGpibInstrument.this.onGpibServiceRequestFromInstrument ();
+      }
+      catch (InterruptedException ie)
+      {
+        LOG.log (Level.INFO, "Terminating (by request) GPIB Instrument Service Request Dispatcher on {0}.",
+          AbstractGpibInstrument.this.toString ());
+        return;
+      }
+      catch (Exception e)
+      {
+        LOG.log (Level.WARNING, "Exception (ignored) in GPIB Instrument Service Request Dispatcher on {0}: {1}.",
+          new Object[]{AbstractGpibInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
+      }
+    }
+    LOG.log (Level.INFO, "Terminating (by request) GPIB Instrument Service Request Dispatcher on {0}.",
+      AbstractGpibInstrument.this.toString ());
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
