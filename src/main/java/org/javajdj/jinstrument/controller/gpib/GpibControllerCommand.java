@@ -28,6 +28,7 @@ public interface GpibControllerCommand
 {
   
   public final static String CCCMD_GPIB_SELECTED_DEVICE_CLEAR = "gpibCommandSelectedDeviceClear";
+  public final static String CCCMD_GPIB_POLL_SERVICE_REQUEST = "gpibCommandPollServiceRequest";
   public final static String CCCMD_GPIB_SERIAL_POLL = "gpibCommandSerialPoll";
   public final static String CCCMD_GPIB_READ_EOI = "gpibCommandReadEOI";
   public final static String CCCMD_GPIB_READLN = "gpibCommandReadln";

@@ -246,6 +246,44 @@ public class DefaultGpibDevice
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // GpibDevice
+  // [POLL] SERVICE REQUEST
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public GpibControllerCommand generatePollServiceRequestCommand ()
+  {
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (GpibControllerCommand.CCCMD_GPIB_POLL_SERVICE_REQUEST,
+      GpibControllerCommand.CCARG_GPIB_ADDRESS, this.address);
+    return command;
+  }
+  
+  @Override
+  public void pollServiceRequestAsync (
+    final Long queueingTimeout_ms,
+    final Long processingTimeout_ms,
+    final Long sojournTimeout_ms)
+    throws UnsupportedOperationException
+  {
+    doControllerCommandAsync (
+      generatePollServiceRequestCommand (),
+      queueingTimeout_ms,
+      processingTimeout_ms,
+      sojournTimeout_ms);
+  }
+
+  @Override
+  public boolean pollServiceRequestSync (final long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException
+  {
+    final GpibControllerCommand command = generatePollServiceRequestCommand ();
+    doControllerCommandSync (command, timeout_ms);
+    return (boolean) command.get (GpibControllerCommand.CCRET_VALUE_KEY);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GpibDevice
   // SERIAL POLL
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
