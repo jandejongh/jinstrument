@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.controller.gpib;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -201,7 +202,11 @@ public class DefaultGpibDevice
       else if (e instanceof UnsupportedOperationException)
         throw (UnsupportedOperationException) e;
       else
-        throw new IllegalArgumentException (e);
+      {
+        LOG.log (Level.WARNING, "Unexpected Exception on {0}: {1}.",
+          new Object[]{this.toString (), e == null ? "null" : Arrays.toString (e.getStackTrace ())});
+        throw new IOException (e);
+      }
     }    
   }
 
