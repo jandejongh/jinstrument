@@ -73,10 +73,11 @@ public class HP3478A_GPIB_Instrument
   public HP3478A_GPIB_Instrument (final GpibDevice device)
   {
     super ("HP-3478A", device, null, null,
-      true,  // Status
-      false, // Setings (not needed; they come with Status!)
-      true,  // Command Processor
-      true); // Acquisition
+      true,   // Status
+      false,  // Setings (not needed; they come with Status!)
+      true,   // Command Processor
+      true,   // Acquisition
+      false); // Service Request Polling
     setReadingCollectorPeriod_s (HP3478A_GPIB_Instrument.DEFAULT_HP3478A_READING_COLLECTOR_PERIOD_S);
   }
 
@@ -468,6 +469,20 @@ public class HP3478A_GPIB_Instrument
     throw new UnsupportedOperationException ();
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AbstractGpibInstrument
+  // ON GPIB SERVICE REQUEST FROM INSTRUMENT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  protected void onGpibServiceRequestFromInstrument ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    throw new UnsupportedOperationException ();
+  }
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument

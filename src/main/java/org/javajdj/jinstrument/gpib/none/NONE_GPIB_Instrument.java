@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.javajdj.jinstrument.AbstractInstrument;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.DeviceType;
@@ -31,6 +30,7 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
+import org.javajdj.jinstrument.gpib.AbstractGpibInstrument;
 
 /** A minimum implementation of a (GPIB) {@link Instrument}, doing nothing at all, on a {@link GpibDevice}.
  *
@@ -47,7 +47,7 @@ import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
  * 
  */
 public class NONE_GPIB_Instrument
-extends AbstractInstrument
+extends AbstractGpibInstrument
 implements Instrument
 {
 
@@ -67,7 +67,7 @@ implements Instrument
   
   public NONE_GPIB_Instrument (final GpibDevice gpibDevice)
   {
-    super ("NONE [GPIB]", gpibDevice, null, null, false, false, false, false);
+    super ("NONE [GPIB]", gpibDevice, null, null, false, false, false, false, false);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,6 +202,20 @@ implements Instrument
     throw new UnsupportedOperationException ();
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AbstractGpibInstrument
+  // ON GPIB SERVICE REQUEST FROM INSTRUMENT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  protected void onGpibServiceRequestFromInstrument ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    throw new UnsupportedOperationException ();
+  }
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
