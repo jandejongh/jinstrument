@@ -16,6 +16,8 @@
  */
 package org.javajdj.jinstrument.swing;
 
+import org.javajdj.jinstrument.swing.instrument.JHP3478A_GPIB;
+import org.javajdj.jinstrument.swing.instrument.JHP8116A_GPIB;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.HeadlessException;
