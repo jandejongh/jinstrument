@@ -12,7 +12,7 @@ Apache v2.0.
 
 ## Status [20200110 - v0.6-SNAPSHOT]
 - Requires jswing v06-SNAPSHOT!
-- HP-70000 [SpectrumGenerator ONLY!] -> alpha.
+- HP-70000 [SpectrumAnalyzer ONLY!] -> alpha.
 
 ## Status [20200106 - v0.5]
 
