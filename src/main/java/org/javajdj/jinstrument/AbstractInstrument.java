@@ -560,10 +560,9 @@ implements Instrument
       }
       catch (IOException ioe)
       {
-        LOG.log (Level.WARNING, "Terminating (IOException) Instrument Settings Collector on {0}: {1}.",
+        LOG.log (Level.WARNING, "IOException (ignored) in Instrument Settings Collector on {0}: {1}.",
           new Object[]{AbstractInstrument.this.toString (), Arrays.toString (ioe.getStackTrace ())});
-        error ();
-        return;
+        hadException = true;
       }
       catch (UnsupportedOperationException usoe)
       {
