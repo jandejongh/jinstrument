@@ -658,6 +658,8 @@ public final class ProLogixGpibEthernetController
   
   private final String SELECTED_DEVICE_CLEAR_COMMAND = "++clr";
   
+  private final String SERVICE_REQUEST_COMMAND = "++srq";
+  
   private final String SERIAL_POLL_COMMAND = "++spoll";
   
   private final String READ_COMMAND = "++read";
@@ -697,8 +699,6 @@ public final class ProLogixGpibEthernetController
   {
     if (gpibAddress == null)
       throw new IllegalArgumentException ();
-    if (gpibAddress == null)
-      throw new IllegalArgumentException ();
     if (topLevel)
     {
       proLogixClearReadBuffer ();
@@ -706,6 +706,46 @@ public final class ProLogixGpibEthernetController
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     proLogixCommandWritelnControllerCommand (SELECTED_DEVICE_CLEAR_COMMAND);
+  }
+  
+  private boolean processCommand_pollServiceRequest (
+    final GpibAddress gpibAddress,
+    final long timeout_ms,
+    final boolean topLevel)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    final long now_millis = System.currentTimeMillis ();
+    final long deadline_millis = now_millis + timeout_ms;
+    if (topLevel)
+    {
+      proLogixClearReadBuffer ();
+      if (gpibAddress != null)
+        proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      proLogixCommandSetEOT (false, LF_BYTE);
+    }
+    if (gpibAddress != null)
+      // ANSI/IEEE Standard 488.1-1987: Bit 6 in Serial Poll Status Byte is SRQ.
+      return (processCommand_serialPoll (gpibAddress, deadline_millis - System.currentTimeMillis (), false) & 0x40) != 0;
+    else
+    {
+      proLogixCommandWritelnControllerCommand (SERVICE_REQUEST_COMMAND);
+      final String srqString = new String (processCommand_readln (gpibAddress,
+        ProLogixGpibEthernetController.CONTROLLER_READLINE_TERMINATION_MODE,
+        deadline_millis - System.currentTimeMillis (),
+        false,
+        false), Charset.forName ("US-ASCII"));
+      switch (srqString)
+      {
+        case "0":
+          return false;
+        case "1":
+          return true;
+        default:
+          throw new IOException ();
+      }
+    }
   }
   
   private byte processCommand_serialPoll (
@@ -816,6 +856,7 @@ public final class ProLogixGpibEthernetController
           queueLogRx (Instant.now (), baos.toByteArray ());
         throw new TimeoutException ();
       }
+      // XXX Shouldn't this better be a byte??
       final int byteRead;
       byteRead = proLogixReadByte (deadline_millis - now_millis);
       now_millis = System.currentTimeMillis ();
@@ -1209,6 +1250,13 @@ public final class ProLogixGpibEthernetController
         {
           final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
           processCommand_selectedDeviceClear (address, timeout_ms, topLevel);
+          break;
+        }
+        case GpibControllerCommand.CCCMD_GPIB_POLL_SERVICE_REQUEST:
+        {
+          final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
+          final boolean srq = processCommand_pollServiceRequest (address, timeout_ms, topLevel);
+          controllerCommand.put (GpibControllerCommand.CCRET_VALUE_KEY, srq);
           break;
         }
         case GpibControllerCommand.CCCMD_GPIB_SERIAL_POLL:
