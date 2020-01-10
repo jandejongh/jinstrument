@@ -64,7 +64,12 @@ public class HP70000_GPIB_Instrument
   
   public HP70000_GPIB_Instrument (final GpibDevice device)
   {
-    super ("HP-70000", device, null, null, true, true, true, true);
+    super ("HP-70000", device, null, null, true, true, true, false, true);
+    setStatusCollectorPeriod_s (1.0);
+    setSettingsCollectorPeriod_s (1.0);
+    setGpibInstrumentServiceRequestCollectorPeriod_s (0.75);
+    setPollServiceRequestTimeout_ms (200);
+    setSerialPollTimeout_ms (200);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,6 +147,22 @@ public class HP70000_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
+  // SET MODE ON INSTRUMENT SYNCHRONOUSLY
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  protected void setModeOnInstrumentSync (final long timeout_ms) throws IOException, InterruptedException, TimeoutException
+  {
+    super.setModeOnInstrumentSync (timeout_ms);
+    writeSync ("CONTS\r\n"); // Continuous Sweep.
+    writeSync ("RQS 4\r\n"); // Generate GPIB Service Request at End of Sweep.
+    writeSync ("TDF B\r\n"); // Trace Data Format (Binary).
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AbstractInstrument
   // INSTRUMENT STATUS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,6 +201,7 @@ public class HP70000_GPIB_Instrument
   public SpectrumAnalyzerSettings getSettingsFromInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
+    // XXX TODO: Picking up the state (< 1000 bytes) takes a lot of time with zero benefits (currently).
     final GpibControllerCommand statePreampleCommand = generateWriteAndReadNCommand ("STATE?\r\n", 14); // Fixed size!
     final GpibControllerCommand stateCommand = generateReadNCommand (1065); // N will be overwritten!
     final GpibControllerCommand[] atomicSequenceCommands = new GpibControllerCommand[]
@@ -281,13 +303,12 @@ public class HP70000_GPIB_Instrument
     final HP70000_GPIB_Settings settings = (HP70000_GPIB_Settings) getSettingsFromInstrumentSync ();
     settingsReadFromInstrument (settings);
     final int traceLength = settings.getTraceLength ();
-    // final byte[] binaryTraceBytes = writeAndReadNSync ("SNGLS;TDF B;TS;TRA?;\r\n", 2 * traceLength); // Two bytes per trace point.
-    writeSync ("SNGLS\r\n");
-    writeSync ("TDF B\r\n");
-    // XXX TS is needed!! DOES NOT WORK??
-    // DOES NOT WORK WITH SWEEP TIMES >= say 3s...
-    writeSync ("TS\r\n");
-    final byte[] binaryTraceBytes = writeAndReadNSync ("TRA?\r\n", 2 * traceLength); // Two bytes per trace point.
+    // In the approach below we initiate the trace and await its completion and transfer.
+    // This fails with high sweep-time settings, say a few seconds and higher.
+    // TDF B: Two bytes per trace point.
+    // final byte[] binaryTraceBytes = writeAndReadNSync ("SNGLS;TDF B;TS;TRA?;\r\n", 2 * traceLength);
+    // In the other approach, we directly read Trace A, assuming we are invoked from a Service Request.
+    final byte[] binaryTraceBytes = writeAndReadNSync ("TRA?\r\n", 2 * traceLength);
     final double samples[] = new double[traceLength];
     int i_buf = 0;
     for (int s = 0; s < samples.length; s++)
@@ -307,6 +328,24 @@ public class HP70000_GPIB_Instrument
     throw new UnsupportedOperationException ();
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AbstractGpibInstrument
+  // ON GPIB SERVICE REQUEST FROM INSTRUMENT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  protected void onGpibServiceRequestFromInstrument ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    final InstrumentReading reading = getReadingFromInstrumentSync ();
+    if (reading != null)
+      readingReadFromInstrument (reading);
+    else
+      LOG.log (Level.WARNING, "Null Reading on {0}!", this.toString ());
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
