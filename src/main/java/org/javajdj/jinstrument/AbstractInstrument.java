@@ -87,7 +87,8 @@ implements Instrument
     {
       addRunnable (this.instrumentReadingCollector);
     }
-    addRunnable (this.instrumentReadingDispatcher);      
+    addRunnable (this.instrumentReadingDispatcher);
+    addRunnable (this.instrumentModeSetter);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,6 +168,93 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
+  // SET MODE ON INSTRUMENT SYNCHRONOUSLY [EMPTY IMPLEMENTATION]
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected void setModeOnInstrumentSync (final long timeout_ms)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // EMPTY
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INSTRUMENT MODE SETTER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Runnable instrumentModeSetter = () ->
+  {
+    LOG.log (Level.INFO, "Starting Instrument Mode Setter on {0}.", AbstractInstrument.this.toString ());
+    try
+    {
+      AbstractInstrument.this.setModeOnInstrumentSync (AbstractInstrument.this.getInstrumentModeSetterTimeout_ms ());
+    }
+    catch (InterruptedException ie)
+    {
+      LOG.log (Level.INFO, "Terminating (by request) Instrument Mode Setter on {0}.",
+        AbstractInstrument.this.toString ());
+      return;
+    }
+    catch (Exception e)
+    {
+      LOG.log (Level.WARNING, "Exception (terminating) in Instrument Mode Setter on {0}: {1}.",
+        new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
+      error ();
+      return;
+    }
+    while (! Thread.currentThread ().isInterrupted ())
+    {
+      try
+      {
+        Thread.currentThread ().join (1000L);
+      }
+      catch (InterruptedException ie)
+      {
+        break;
+      }
+    }
+    LOG.log (Level.INFO, "Terminating (by request) Instrument Mode Setter on {0}.", AbstractInstrument.this.toString ());
+  };
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AbstractInstrument
+  // INSTRUMENT MODE SETTER TIMEOUT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static String INSTRUMENT_MODE_SETTER_TIMEOUT_MS_PROPERTY_NAME = "instrumentModeSetterTimeout_ms";
+  
+  public final static long DEFAULT_INSTRUMENT_MODE_SETTER_TIMEOUT_MS = 1000L;
+  
+  // XXX Need locking or AtomicLong here...
+  private volatile long instrumentModeSetterTimeout_ms = DEFAULT_INSTRUMENT_MODE_SETTER_TIMEOUT_MS;
+  
+  public final long getInstrumentModeSetterTimeout_ms ()
+  {
+    return this.instrumentModeSetterTimeout_ms;
+  }
+  
+  public final void setInstrumentModeSetterTimeout_ms (final long instrumentModeSetterTimeout_ms)
+  {
+    if (instrumentModeSetterTimeout_ms <= 0)
+      throw new IllegalArgumentException ();
+    if (instrumentModeSetterTimeout_ms != this.instrumentModeSetterTimeout_ms)
+    {
+      final long oldInstrumentModeSetterTimeout_ms = this.instrumentModeSetterTimeout_ms;
+      this.instrumentModeSetterTimeout_ms = instrumentModeSetterTimeout_ms;
+      fireSettingsChanged (
+        INSTRUMENT_MODE_SETTER_TIMEOUT_MS_PROPERTY_NAME,
+        oldInstrumentModeSetterTimeout_ms,
+        this.instrumentModeSetterTimeout_ms);
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // Instrument
   // CURRENT INSTRUMENT STATUS
   //
@@ -189,6 +277,7 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
   // GET STATUS FROM INSTRUMENT SYNCHRONOUSLY [ABSTRACT]
   // REQUEST STATUS FROM INSTRUMENT ASYNCHRONOUSLY [ABSTRACT]
   //
@@ -218,7 +307,7 @@ implements Instrument
         {
           // Quick and dirty method to prevent continuous operation in case of (early) ignored Exceptions.
           // We should actually compensate for the time spent already...
-          Thread.sleep ((long) AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000);
+          Thread.sleep ((long) (AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000));
           hadException = false;
         }
         // Mark start of sojourn.
@@ -232,11 +321,14 @@ implements Instrument
         // Calculate sojourn.
         final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
         // Find out the remaining time to wait in order to respect the given period.
-        final long remainingSleep_ms = ((long) AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000) - sojourn_ms;
+        final long remainingSleep_ms = ((long) (AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000)) - sojourn_ms;
         if (remainingSleep_ms < 0)
+        {
           LOG.log (Level.WARNING, "Instrument Status Collector cannot meet timing settings in on {0}.",
             AbstractInstrument.this.toString ());
-        if (remainingSleep_ms > 0)
+          hadException = true;
+        }
+        else if (remainingSleep_ms > 0)
           Thread.sleep (remainingSleep_ms);
       }
       catch (InterruptedException ie)
@@ -279,6 +371,7 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
   // STATUS COLLECTOR PERIOD
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -318,6 +411,7 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
   // STATUS READ QUEUE
   // STATUS READ FROM INSTRUMENT
   //
@@ -398,6 +492,7 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
   // GET SETTINGS FROM INSTRUMENT SYNCHRONOUSLY [ABSTRACT]
   // REQUEST SETTINGS FROM INSTRUMENT ASYNCHRONOUSLY [ABSTRACT]
   //
@@ -427,7 +522,7 @@ implements Instrument
         {
           // Quick and dirty method to prevent continuous operation in case of (early) ignored Exceptions.
           // We should actually compensate for the time spent already...
-          Thread.sleep ((long) AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000);
+          Thread.sleep ((long) (AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000));
           hadException = false;
         }
         // Mark start of sojourn.
@@ -441,11 +536,14 @@ implements Instrument
         // Calculate sojourn.
         final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
         // Find out the remaining time to wait in order to respect the given period.
-        final long remainingSleep_ms = ((long) AbstractInstrument.this.getSettingsCollectorPeriod_s () * 1000) - sojourn_ms;
+        final long remainingSleep_ms = ((long) (AbstractInstrument.this.getSettingsCollectorPeriod_s () * 1000)) - sojourn_ms;
         if (remainingSleep_ms < 0)
+        {
           LOG.log (Level.WARNING, "Instrument Settings Collector cannot meet timing settings on {0}.",
             AbstractInstrument.this.toString ());
-        if (remainingSleep_ms > 0)
+          hadException = true;
+        }
+        else if (remainingSleep_ms > 0)
           Thread.sleep (remainingSleep_ms);
       }
       catch (InterruptedException ie)
@@ -488,6 +586,7 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
   // SETTINGS COLLECTOR PERIOD
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -528,6 +627,7 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
   // SETTINGS READ QUEUE
   // SETTINGS READ FROM INSTRUMENT
   //
@@ -586,7 +686,7 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // COMMAND QUEUE
+  // COMMAND QUEUE [PRIVATE]
   // ADD COMMAND [Instrument]
   // PROCESS COMMAND [ABSTRACT]
   //
@@ -677,6 +777,7 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
   // GET READING FROM INSTRUMENT SYNCHRONOUSLY [ABSTRACT]
   // REQUEST READING FROM INSTRUMENT ASYNCHRONOUSLY [ABSTRACT]
   //
@@ -706,7 +807,7 @@ implements Instrument
         {
           // Quick and dirty method to prevent continuous operation in case of (early) ignored Exceptions.
           // We should actually compensate for the time spent already...
-          Thread.sleep ((long) AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000);
+          Thread.sleep ((long) (AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000));
           hadException = false;
         }
         // Mark start of sojourn.
@@ -720,11 +821,14 @@ implements Instrument
         // Calculate sojourn.
         final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
         // Find out the remaining time to wait in order to respect the given period.
-        final long remainingSleep_ms = ((long) AbstractInstrument.this.getReadingCollectorPeriod_s () * 1000) - sojourn_ms;
+        final long remainingSleep_ms = ((long) (AbstractInstrument.this.getReadingCollectorPeriod_s () * 1000)) - sojourn_ms;
         if (remainingSleep_ms < 0)
-          LOG.log (Level.WARNING, "Instrument Reading Collector cannot meet timing reading on {0}.",
+        {
+          LOG.log (Level.WARNING, "Instrument Reading Collector cannot meet timing settings on {0}.",
             AbstractInstrument.this.toString ());
-        if (remainingSleep_ms > 0)
+          hadException = true;
+        }
+        else if (remainingSleep_ms > 0)
           Thread.sleep (remainingSleep_ms);
       }
       catch (InterruptedException ie)
@@ -741,10 +845,9 @@ implements Instrument
       }
       catch (IOException ioe)
       {
-        LOG.log (Level.WARNING, "Terminating (IOException) Instrument Reading Collector on {0}: {1}.",
+        LOG.log (Level.WARNING, "IOException (ignored) in Instrument Reading Collector on {0}: {1}.",
           new Object[]{AbstractInstrument.this.toString (), Arrays.toString (ioe.getStackTrace ())});
-        error ();
-        return;
+        hadException = true;
       }
       catch (UnsupportedOperationException usoe)
       {
@@ -755,10 +858,9 @@ implements Instrument
       }
       catch (Exception e)
       {
-        LOG.log (Level.WARNING, "Terminating (Exception) Instrument Reading Collector on {0}: {1}.",
+        LOG.log (Level.WARNING, "Exception (ignored) in Instrument Reading Collector on {0}: {1}.",
           new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
-        error ();
-        return;
+        hadException = true;
       }
     }
     LOG.log (Level.INFO, "Terminating (by request) Instrument Reading Collector on {0}.",
@@ -767,6 +869,7 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
   // READING COLLECTOR PERIOD
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -807,6 +910,7 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // AbstractInstrument
   // READING READ QUEUE
   // READING READ FROM INSTRUMENT
   //
