@@ -21,7 +21,7 @@ import org.javajdj.jinstrument.DigitalMultiMeter;
 
 /** A Swing (base) component for interacting with a {@link DigitalMultiMeter}.
  *
- * @author {@literal Jan de Jongh <jfcmdejongh@gmail.com>}
+ * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
 public class JDigitalMultiMeterPanel
