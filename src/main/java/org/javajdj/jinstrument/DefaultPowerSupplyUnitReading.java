@@ -50,6 +50,7 @@ public class DefaultPowerSupplyUnitReading
     final double readingVoltage_V,
     final double readingCurrent_A,
     final double readingPower_W,
+    final PowerSupplyUnit.PowerSupplyMode powerSupplyMode,
     final boolean error,
     final String errorMessage,
     final boolean uncalibrated,
@@ -57,7 +58,7 @@ public class DefaultPowerSupplyUnitReading
   {
     super (
       settings,
-      new DefaultReading (readingVoltage_V, readingCurrent_A, readingPower_W),
+      new DefaultReading (readingVoltage_V, readingCurrent_A, readingPower_W, powerSupplyMode),
       null,
       error,
       errorMessage,
@@ -96,11 +97,18 @@ public class DefaultPowerSupplyUnitReading
     implements Reading
   {
 
-    public DefaultReading (final double readingVoltage_V, final double readingCurrent_A, final double readingPower_W)
+    public DefaultReading (
+      final double readingVoltage_V,
+      final double readingCurrent_A,
+      final double readingPower_W,
+      final PowerSupplyUnit.PowerSupplyMode powerSupplyMode)
     {
       this.readingVoltage_V = readingVoltage_V;
       this.readingCurrent_A = readingCurrent_A;
       this.readingPower_W = readingPower_W;
+      if (powerSupplyMode == null)
+        throw new IllegalArgumentException ();
+      this.powerSupplyMode = powerSupplyMode;
     }
     
     private final double readingVoltage_V;
@@ -125,6 +133,14 @@ public class DefaultPowerSupplyUnitReading
     public final double getReadingPower_W ()
     {
       return this.readingPower_W;
+    }
+    
+    private final PowerSupplyUnit.PowerSupplyMode powerSupplyMode;
+
+    @Override
+    public final PowerSupplyUnit.PowerSupplyMode getPowerSupplyMode ()
+    {
+      return this.powerSupplyMode;
     }
     
   }
@@ -153,6 +169,12 @@ public class DefaultPowerSupplyUnitReading
     return getReadingValue ().getReadingPower_W ();
   }
 
+  @Override
+  public final PowerSupplyUnit.PowerSupplyMode getPowerSupplyMode ()
+  {
+    return getReadingValue ().getPowerSupplyMode ();
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
