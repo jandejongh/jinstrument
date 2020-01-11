@@ -582,6 +582,138 @@ public class JInstrumentPanel
       return null;
   }
   
+  protected Double getCurrentFromDialog_A (final String title, final Double startValue_A)
+  {
+    final String inputString = JOptionPane.showInputDialog (title, startValue_A);
+    if (inputString != null)
+    {
+      final String[] splitString = inputString.split ("\\s+");
+      if (splitString == null || splitString.length == 0 || splitString.length > 2)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + inputString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      final String valueString = splitString[0];
+      final String unitString = splitString.length > 1 ? splitString[1] : null;
+      final double conversionFactor;
+      if (unitString != null)
+      {
+        if (unitString.trim ().equalsIgnoreCase ("pA"))
+        {
+          conversionFactor = 1e-12;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("nA"))
+        {
+          conversionFactor = 1e-9;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("uA"))
+        {
+          conversionFactor = 1e-6;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("mA"))
+        {
+          conversionFactor = 1e-3;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("A"))
+        {
+          conversionFactor = 1;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("kA"))
+        {
+          conversionFactor = 1e3;
+        }
+        else
+        {
+          JOptionPane.showMessageDialog (null, "Illegal unit " + unitString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+          return null;
+        }
+      }
+      else
+      {
+        conversionFactor = 1.0;
+      }
+      final double value;
+      try
+      {
+        value = Double.parseDouble (valueString);
+      }
+      catch (NumberFormatException nfe)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + valueString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      return value * conversionFactor;
+    }
+    else
+      return null;
+  }
+  
+  protected Double getPowerFromDialog_W (final String title, final Double startValue_W)
+  {
+    final String inputString = JOptionPane.showInputDialog (title, startValue_W);
+    if (inputString != null)
+    {
+      final String[] splitString = inputString.split ("\\s+");
+      if (splitString == null || splitString.length == 0 || splitString.length > 2)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + inputString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      final String valueString = splitString[0];
+      final String unitString = splitString.length > 1 ? splitString[1] : null;
+      final double conversionFactor;
+      if (unitString != null)
+      {
+        if (unitString.trim ().equalsIgnoreCase ("pW"))
+        {
+          conversionFactor = 1e-12;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("nW"))
+        {
+          conversionFactor = 1e-9;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("uW"))
+        {
+          conversionFactor = 1e-6;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("mW"))
+        {
+          conversionFactor = 1e-3;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("W"))
+        {
+          conversionFactor = 1;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("kW"))
+        {
+          conversionFactor = 1e3;
+        }
+        else
+        {
+          JOptionPane.showMessageDialog (null, "Illegal unit " + unitString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+          return null;
+        }
+      }
+      else
+      {
+        conversionFactor = 1.0;
+      }
+      final double value;
+      try
+      {
+        value = Double.parseDouble (valueString);
+      }
+      catch (NumberFormatException nfe)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + valueString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      return value * conversionFactor;
+    }
+    else
+      return null;
+  }
+  
   protected Double getDutyCycleFromDialog_percent (final String title, final Double startValue_percent)
   {
     final String inputString = JOptionPane.showInputDialog (title, startValue_percent);
