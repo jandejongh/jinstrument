@@ -183,5 +183,26 @@ public interface InstrumentCommand
   
   public final static String IC_DC_OFFSET = "commandDCOffset";
   public final static String ICARG_DC_OFFSET_V = "dcOffset_V";
+
+  public final static String IC_SOFT_LIMIT_VOLTAGE = "commandSoftLimitVoltage";  
+  public final static String ICARG_SOFT_LIMIT_VOLTAGE_V = "softLimitVoltage_V";  
+  
+  public final static String IC_SOFT_LIMIT_CURRENT = "commandSoftLimitCurrent";  
+  public final static String ICARG_SOFT_LIMIT_CURRENT_A = "softLimitCurrent_A";  
+  
+  public final static String IC_SOFT_LIMIT_POWER = "commandSoftLimitPower";  
+  public final static String ICARG_SOFT_LIMIT_POWER_W = "softLimitPower_W";  
+  
+  public final static String IC_SET_VOLTAGE = "commandSetVoltage";  
+  public final static String ICARG_SET_VOLTAGE_V = "setVoltage_V";  
+  
+  public final static String IC_SET_CURRENT = "commandSetCurrent";  
+  public final static String ICARG_SET_CURRENT_A = "setCurrent_A";  
+  
+  public final static String IC_SET_POWER = "commandSetPower";  
+  public final static String ICARG_SET_POWER_W = "setPower_W";  
+  
+  public final static String IC_OUTPUT_ENABLE = "commandOutputEnable";  
+  public final static String ICARG_OUTPUT_ENABLE = "outputEnable";  
   
 }
