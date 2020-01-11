@@ -184,6 +184,27 @@ public class JInstrumentPanel
     return JInstrumentPanel.DEFAULT_TRIGGER_COLOR;
   }
   
+  public final static Color DEFAULT_VOLTAGE_COLOR = Color.red;
+  
+  public final static Color getGuiPreferencesVoltageColor ()
+  {
+    return JInstrumentPanel.DEFAULT_VOLTAGE_COLOR;
+  }
+  
+  public final static Color DEFAULT_CURRENT_COLOR = Color.green;
+  
+  public final static Color getGuiPreferencesCurrentColor ()
+  {
+    return JInstrumentPanel.DEFAULT_CURRENT_COLOR;
+  }
+  
+  public final static Color DEFAULT_POWER_COLOR = Color.blue;
+  
+  public final static Color getGuiPreferencesPowerColor ()
+  {
+    return JInstrumentPanel.DEFAULT_POWER_COLOR;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INHIBIT INSTRUMENT CONTROL
