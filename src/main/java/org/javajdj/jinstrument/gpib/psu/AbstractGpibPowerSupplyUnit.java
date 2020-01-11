@@ -16,7 +16,10 @@
  */
 package org.javajdj.jinstrument.gpib.psu;
 
+import java.io.IOException;
 import java.util.List;
+import org.javajdj.jinstrument.DefaultInstrumentCommand;
+import org.javajdj.jinstrument.InstrumentCommand;
 import org.javajdj.jinstrument.PowerSupplyUnit;
 import org.javajdj.jinstrument.gpib.AbstractGpibInstrument;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
@@ -64,8 +67,77 @@ public abstract class AbstractGpibPowerSupplyUnit
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // PowerSupplyUnit
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public void setSoftLimitVoltage_V (final double softLimitVoltage_V)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_SOFT_LIMIT_VOLTAGE,
+      InstrumentCommand.ICARG_SOFT_LIMIT_VOLTAGE_V, softLimitVoltage_V));
+  }
+
+  @Override
+  public void setSoftLimitCurrent_A (final double softLimitCurrent_A)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_SOFT_LIMIT_CURRENT,
+      InstrumentCommand.ICARG_SOFT_LIMIT_CURRENT_A, softLimitCurrent_A));
+  }
+
+  @Override
+  public void setSoftLimitPower_W (final double softLimitPower_W)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_SOFT_LIMIT_POWER,
+      InstrumentCommand.ICARG_SOFT_LIMIT_POWER_W, softLimitPower_W));
+  }  
+  
+  @Override
+  public void setSetVoltage_V (final double setVoltage_V)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_SET_VOLTAGE,
+      InstrumentCommand.ICARG_SET_VOLTAGE_V, setVoltage_V));
+  }
+
+  @Override
+  public void setSetCurrent_A (final double setCurrent_A)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_SET_CURRENT,
+      InstrumentCommand.ICARG_SET_CURRENT_A, setCurrent_A));
+  }
+
+  @Override
+  public void setSetPower_W (final double setPower_W)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_SET_POWER,
+      InstrumentCommand.ICARG_SET_POWER_W, setPower_W));
+  }
+  
+  @Override
+  public void setOutputEnable (final boolean outputEnable)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_OUTPUT_ENABLE,
+      InstrumentCommand.ICARG_OUTPUT_ENABLE, outputEnable));
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // END OF FILE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
 }
