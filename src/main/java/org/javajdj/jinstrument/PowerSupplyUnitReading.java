@@ -30,6 +30,7 @@ public interface PowerSupplyUnitReading
     double getReadingVoltage_V ();
     double getReadingCurrent_A ();
     double getReadingPower_W ();
+    PowerSupplyUnit.PowerSupplyMode getPowerSupplyMode ();
   }
   
   @Override
@@ -41,5 +42,6 @@ public interface PowerSupplyUnitReading
   double getReadingVoltage_V ();
   double getReadingCurrent_A ();
   double getReadingPower_W ();
+  PowerSupplyUnit.PowerSupplyMode getPowerSupplyMode ();
   
 }
