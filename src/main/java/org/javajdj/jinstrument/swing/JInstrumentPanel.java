@@ -205,6 +205,13 @@ public class JInstrumentPanel
     return JInstrumentPanel.DEFAULT_POWER_COLOR;
   }
   
+  public final static Color DEFAULT_TIME_COLOR = Color.magenta;
+  
+  public final static Color getGuiPreferencesTimeColor ()
+  {
+    return JInstrumentPanel.DEFAULT_TIME_COLOR;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INHIBIT INSTRUMENT CONTROL
