@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.javajdj.jinstrument.DefaultInstrumentCommand;
 import org.javajdj.jinstrument.DefaultPowerSupplyUnitReading;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.Device;
@@ -67,8 +68,9 @@ implements PowerSupplyUnit
   public HP6033A_GPIB_Instrument (final GpibDevice device)
   {
     super ("HP-6033A", device, null, null, true, true, true, true, false);
-    setStatusCollectorPeriod_s (0.5);
-    setReadingCollectorPeriod_s (0.5);
+    setStatusCollectorPeriod_s (1.0);
+    setSettingsCollectorPeriod_s (1.0);
+    setReadingCollectorPeriod_s (1.0);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,7 +170,19 @@ implements PowerSupplyUnit
     {
       throw new IOException (e);
     }
-    return HP6033A_GPIB_Status.fromSerialPollStatusByteAndStatusRegister (serialPollStatusByte, statusRegister);
+    final String errorNumberString = writeAndReadlnSync ("ERR?\r\n").trim ();
+    if (! errorNumberString.toUpperCase ().startsWith ("ERR"))
+      throw new IOException ();
+    final int errorNumber;
+    try
+    {
+      errorNumber = Integer.parseInt (errorNumberString.substring (3).trim ());
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IOException (nfe);
+    }
+    return new HP6033A_GPIB_Status (serialPollStatusByte, statusRegister, errorNumber);
   }
 
   @Override
@@ -196,7 +210,10 @@ implements PowerSupplyUnit
       generateWriteAndReadlnCommand ("IMAX?\r\n"),
       generateWriteAndReadlnCommand ("VSET?\r\n"),
       generateWriteAndReadlnCommand ("ISET?\r\n"),
-      generateWriteAndReadlnCommand ("OUT?\r\n")
+      generateWriteAndReadlnCommand ("OUT?\r\n"),
+      generateWriteAndReadlnCommand ("OVP?\r\n"),
+      generateWriteAndReadlnCommand ("DLY?\r\n"),
+      generateWriteAndReadlnCommand ("FOLD?\r\n")
     };
     atomicSequenceSync (atomicSequenceCommands);
     int i = 0;
@@ -241,6 +258,50 @@ implements PowerSupplyUnit
       case "1": outputEnable = true; break;
       default: throw new IOException ();
     }
+    final String ovp_String =
+      new String (
+        ((byte[]) atomicSequenceCommands[i++].get (GpibControllerCommand.CCRET_VALUE_KEY)),
+        Charset.forName ("US-ASCII")).trim ();
+    if (! ovp_String.toUpperCase ().startsWith ("OVP"))
+      throw new IOException ();
+    final double ovp_s;
+    try
+    {
+      ovp_s = Double.parseDouble (ovp_String.substring (3).trim ());
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IOException (nfe);
+    }
+    final String delay_String =
+      new String (
+        ((byte[]) atomicSequenceCommands[i++].get (GpibControllerCommand.CCRET_VALUE_KEY)),
+        Charset.forName ("US-ASCII")).trim ();
+    if (! delay_String.toUpperCase ().startsWith ("DLY"))
+      throw new IOException ();
+    final double delay_s;
+    try
+    {
+      delay_s = Double.parseDouble (delay_String.substring (3).trim ());
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IOException (nfe);
+    }
+    final String foldback_String =
+      new String (
+        ((byte[]) atomicSequenceCommands[i++].get (GpibControllerCommand.CCRET_VALUE_KEY)),
+        Charset.forName ("US-ASCII")).trim ();
+    if (! foldback_String.toUpperCase ().startsWith ("FOLD"))
+      throw new IOException ();
+    final FoldbackMode foldbackMode;
+    switch (foldback_String.substring (4).trim ())
+    {
+      case "0": foldbackMode = FoldbackMode.OFF; break;
+      case "1": foldbackMode = FoldbackMode.CV; break;
+      case "2": foldbackMode = FoldbackMode.CC; break;
+      default: throw new IOException ();
+    }
     return new HP6033A_GPIB_Settings (
       null,
       softLimitVoltage_V,
@@ -249,7 +310,10 @@ implements PowerSupplyUnit
       setVoltage_V,
       setCurrent_A,
       Double.NaN,
-      outputEnable);
+      outputEnable,
+      ovp_s,
+      delay_s,
+      foldbackMode);
   }
  
   @Override
@@ -278,6 +342,9 @@ implements PowerSupplyUnit
       generateWriteAndReadlnCommand ("VSET?\r\n"),
       generateWriteAndReadlnCommand ("ISET?\r\n"),
       generateWriteAndReadlnCommand ("OUT?\r\n"),
+      generateWriteAndReadlnCommand ("OVP?\r\n"),
+      generateWriteAndReadlnCommand ("DLY?\r\n"),
+      generateWriteAndReadlnCommand ("FOLD?\r\n"),
       generateWriteAndReadlnCommand ("VOUT?\r\n"),
       generateWriteAndReadlnCommand ("IOUT?\r\n"),
       generateWriteAndReadlnCommand ("STS?\r\n")
@@ -325,6 +392,50 @@ implements PowerSupplyUnit
       case "1": outputEnable = true; break;
       default: throw new IOException ();
     }
+    final String ovp_String =
+      new String (
+        ((byte[]) atomicSequenceCommands[i++].get (GpibControllerCommand.CCRET_VALUE_KEY)),
+        Charset.forName ("US-ASCII")).trim ();
+    if (! ovp_String.toUpperCase ().startsWith ("OVP"))
+      throw new IOException ();
+    final double ovp_s;
+    try
+    {
+      ovp_s = Double.parseDouble (ovp_String.substring (3).trim ());
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IOException (nfe);
+    }
+    final String delay_String =
+      new String (
+        ((byte[]) atomicSequenceCommands[i++].get (GpibControllerCommand.CCRET_VALUE_KEY)),
+        Charset.forName ("US-ASCII")).trim ();
+    if (! delay_String.toUpperCase ().startsWith ("DLY"))
+      throw new IOException ();
+    final double delay_s;
+    try
+    {
+      delay_s = Double.parseDouble (delay_String.substring (3).trim ());
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IOException (nfe);
+    }
+    final String foldback_String =
+      new String (
+        ((byte[]) atomicSequenceCommands[i++].get (GpibControllerCommand.CCRET_VALUE_KEY)),
+        Charset.forName ("US-ASCII")).trim ();
+    if (! foldback_String.toUpperCase ().startsWith ("FOLD"))
+      throw new IOException ();
+    final FoldbackMode foldbackMode;
+    switch (foldback_String.substring (4).trim ())
+    {
+      case "0": foldbackMode = FoldbackMode.OFF; break;
+      case "1": foldbackMode = FoldbackMode.CV; break;
+      case "2": foldbackMode = FoldbackMode.CC; break;
+      default: throw new IOException ();
+    }
     final String readVoltage_V_String =
       new String (
         ((byte[]) atomicSequenceCommands[i++].get (GpibControllerCommand.CCRET_VALUE_KEY)),
@@ -364,7 +475,10 @@ implements PowerSupplyUnit
         setVoltage_V,
         setCurrent_A,
         Double.NaN,
-        outputEnable);
+        outputEnable,
+        ovp_s,
+        delay_s,
+        foldbackMode);
     settingsReadFromInstrument (settings);
     return new DefaultPowerSupplyUnitReading (
       settings,
@@ -542,7 +656,7 @@ implements PowerSupplyUnit
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Confirmed 20200105 - Agilent Part Number 5959-3342.
+  // Confirmed 20200105 - Agilent Part Number 5959-3342.
   private final static PowerSupplyMode[] SUPPORTED_POWER_SUPPLY_MODES = new PowerSupplyMode[]
   {
     PowerSupplyMode.NONE,
@@ -559,6 +673,53 @@ implements PowerSupplyUnit
     return HP6033A_GPIB_Instrument.SUPPORTED_POWER_SUPPLY_MODES_AS_LIST;
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP6033A_GPIB_Instrument
+  // DELAY
+  // RESET INSTRUMENT
+  // CLEAR INSTRUMENT
+  // FOLDBACK
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final void setDelay_s (final double delay_s)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_DELAY,
+      InstrumentCommand.ICARG_DELAY_S, delay_s));
+  }
+  
+  public final void resetInstrument ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_RESET));
+  }
+  
+  public final void clearInstrument ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_CLEAR));
+  }
+  
+  public enum FoldbackMode
+  {
+    OFF,
+    CV,
+    CC;
+  }
+  
+  public final void setFoldbackMode (final FoldbackMode foldbackMode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_FOLDBACK_MODE,
+      InstrumentCommand.ICARG_FOLDBACK_MODE, foldbackMode));
+  }
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -634,6 +795,38 @@ implements PowerSupplyUnit
         {
           final boolean outputEnable = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_OUTPUT_ENABLE);
           writeSync ("OUT " + (outputEnable ? "1": "0") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_DELAY:
+        {
+          final double delay_s = (double) instrumentCommand.get (InstrumentCommand.ICARG_DELAY_S);
+          writeSync ("DLY " + delay_s + " S\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_RESET:
+        {
+          writeSync ("RST\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_CLEAR:
+        {
+          writeSync ("CLR\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_FOLDBACK_MODE:
+        {
+          final FoldbackMode foldbackMode = (FoldbackMode) instrumentCommand.get (InstrumentCommand.ICARG_FOLDBACK_MODE);
+          switch (foldbackMode)
+          {
+            case OFF: writeSync ("FOLD 0\r\n"); break;
+            case CV:  writeSync ("FOLD 1\r\n"); break;
+            case CC:  writeSync ("FOLD 2\r\n"); break;
+            default: throw new IllegalArgumentException ();
+          }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
