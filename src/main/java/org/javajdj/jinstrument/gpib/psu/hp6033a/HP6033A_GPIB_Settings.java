@@ -53,7 +53,10 @@ public final class HP6033A_GPIB_Settings
     final double setVoltage_V,
     final double setCurrent_A,
     final double setPower_W,
-    final boolean outputEnable)
+    final boolean outputEnable,
+    final double ovp_V,
+    final double delay_s,
+    final HP6033A_GPIB_Instrument.FoldbackMode foldbackMode)
   {
     super (
       bytes,
@@ -64,8 +67,52 @@ public final class HP6033A_GPIB_Settings
       setCurrent_A,
       setPower_W,
       outputEnable);
+    this.ovp_V = ovp_V;
+    this.delay_s = delay_s;
+    if (foldbackMode == null)
+      throw new IllegalArgumentException ();
+    this.foldbackMode = foldbackMode;
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // OVERVOLTAGE PROTECTION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final double ovp_V;
+  
+  public final double getOverVoltageProtection_V ()
+  {
+    return this.ovp_V;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DELAY
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final double delay_s;
+  
+  public final double getDelay_s ()
+  {
+    return this.delay_s;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // FOLDBACK MODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final HP6033A_GPIB_Instrument.FoldbackMode foldbackMode;
+  
+  public final HP6033A_GPIB_Instrument.FoldbackMode getFoldbackMode ()
+  {
+    return this.foldbackMode;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // EQUALS / HASHCODE
@@ -73,21 +120,25 @@ public final class HP6033A_GPIB_Settings
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   @Override
-  public final boolean equals (final Object obj)
-  {
-    return super.equals (obj);
-  }
-
-  @Override
-  public final int hashCode ()
+  public int hashCode ()
   {
     return super.hashCode ();
   }
-  
+
+  @Override
+  public boolean equals (Object obj)
+  {
+    return super.equals (obj)
+      && getClass () == obj.getClass ()
+      && Double.doubleToLongBits (this.ovp_V) == Double.doubleToLongBits (((HP6033A_GPIB_Settings) obj).ovp_V)
+      && Double.doubleToLongBits (this.delay_s) == Double.doubleToLongBits (((HP6033A_GPIB_Settings) obj).delay_s)
+      && this.foldbackMode == ((HP6033A_GPIB_Settings) obj).foldbackMode;
+  }
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
 }
