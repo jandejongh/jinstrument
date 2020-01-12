@@ -10,32 +10,27 @@ Either through Maven, or by simply picking up a release's jinstrument-X.Y-jar-wi
 ## License
 Apache v2.0.
 
-## Status [20200112 - v0.6-SNAPSHOT]
-- Requires jswing v06-SNAPSHOT!
-- HP-70000 [SpectrumAnalyzer ONLY!] -> alpha.
-- HP-6033A [PowerSupplyUnit ONLY!] -> beta.
-
-## Status [20200106 - v0.5]
+## Status [20200112 - v0.6]
 
 ### Beta:
 - ProLogix GPIB Ethernet
 - HP-3478A Digital MultiMeter [complete]
 - HP-8116A 50MHz Programmable Pulse/Function Generator [complete - OPTION001 ONLY!]
+- HP-6033A Power Supply Unit / System Power Supply [almost complete]
 
 ### Alpha:
 - HP-8566B Spectrum Analyzer
 - HP-8663A Synthesized Signal Generator
+- HP70000 Spectrum Analyzer [MMS]
 
 ### Work in Progress [target for V1.0 Release]:
 - HP-3586A Selective Level Meter
 - HP-5316A Frequency Counter
 - HP-5328A [Option 011] Frequency Counter
-- HP-6033A DC Power Supply Unit [System Power Supply]
 - HP-6050A Electronic Load Mainframe [DC Load]
 - HP-8156A Optical Attenuator
 - HP-8350 Sweep Oscillator
 - HP-54502A Digitizing Oscilloscope
-- HP-70000 Spectrum Analyzer
 - Rohde&Schwarz ESH-3 (unit broken though...)
 - Tek-2440 Digital Storage Oscilloscope
 - Wiltron 560A Network Analyzer
@@ -72,5 +67,10 @@ Most important changes:
 ### Release 0.5 [20190106]
 Most important change:
 - Completed Instrument and InstrumentView implementation for HP-8116A.
+
+### Release 0.6 [20190112]
+Most important change:
+- Reinstated HP-70000 [SpectrumAnalyzer ONLY!] -> alpha.
+- Completed (almost) Instrument and InstrumentView implementation for HP-8663-A -> beta.
 
 More detailed documentation will follow once the framework has stabilized (notably, the support for channels is still lacking).
