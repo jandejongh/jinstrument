@@ -205,4 +205,14 @@ public interface InstrumentCommand
   public final static String IC_OUTPUT_ENABLE = "commandOutputEnable";  
   public final static String ICARG_OUTPUT_ENABLE = "outputEnable";  
   
+  public final static String IC_DELAY = "commandDelay";  
+  public final static String ICARG_DELAY_S = "delay_s";  
+  
+  public final static String IC_RESET = "commandReset";
+  
+  public final static String IC_CLEAR = "commandClear";  
+  
+  public final static String IC_FOLDBACK_MODE = "commandFoldbackMode";  
+  public final static String ICARG_FOLDBACK_MODE = "foldbackMode";  
+  
 }
