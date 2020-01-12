@@ -29,7 +29,7 @@ import org.javajdj.jinstrument.InstrumentStatus;
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class HP6033A_GPIB_Status
+public final class HP6033A_GPIB_Status
   implements InstrumentStatus
 {
 
@@ -41,21 +41,20 @@ public class HP6033A_GPIB_Status
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private HP6033A_GPIB_Status (final byte serialPollStatusByte, final int statusRegister)
+  public HP6033A_GPIB_Status (
+    final byte serialPollStatusByte,
+    final int statusRegister,
+    final int errorNumber)
   {
     this.serialPollStatusByte = serialPollStatusByte;
     if ((statusRegister & 0xfffffe00) != 0)
       throw new IllegalArgumentException ();
-    this.statusRegister = statusRegister;
     // XXX Sanity checks...
+    this.statusRegister = statusRegister;
+    if (errorNumber < 0 || errorNumber > 9)
+      throw new IllegalArgumentException ();
+    this.errorNumber = errorNumber;
     // XXX LOG Warning in case of error...
-  }
-  
-  public final static HP6033A_GPIB_Status fromSerialPollStatusByteAndStatusRegister (
-    final byte serialPollStatusByte,
-    final int statusRegister)
-  {
-    return new HP6033A_GPIB_Status (serialPollStatusByte, statusRegister);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,6 +85,37 @@ public class HP6033A_GPIB_Status
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // ERROR CODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final int errorNumber;
+  
+  public final int getErrorNumber ()
+  {
+    return this.errorNumber;
+  }
+  
+  public final String getErrorString ()
+  {
+    switch (this.errorNumber)
+    {
+      case 0: return "No Errors";
+      case 1: return "Unrecognized Character";
+      case 2: return "Improper Number";
+      case 3: return "Unrecognized String";
+      case 4: return "Syntax Error";
+      case 5: return "Number Out Of Range";
+      case 6: return "Attempt To Exceed Soft Limits";
+      case 7: return "Improper Soft Limit";
+      case 8: return "Data Requested Without A Query Being Sent";
+      case 9: return "Relay Error";
+      default: throw new RuntimeException ();
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // NAME / toString
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,91 +124,10 @@ public class HP6033A_GPIB_Status
   public String toString ()
   {
     return "SPoll=0x" + Integer.toHexString (Byte.toUnsignedInt (this.serialPollStatusByte))
-      + ", StReg=0x" + Integer.toUnsignedString (this.statusRegister, 16);
+      + ", StReg=0x" + Integer.toUnsignedString (this.statusRegister, 16)
+      + ", Err=" + Integer.toString (this.errorNumber);
   }
   
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // STATUS DISSECTION [SERIAL POLL STATUS BYTE]
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  public final boolean isPowerOnReset ()
-  {
-    return (this.serialPollStatusByte & 0x80) != 0;
-  }
-    
-  public final boolean isServiceRequest ()
-  {
-    return (this.serialPollStatusByte & 0x40) != 0;    
-  }
-  
-  public final boolean isCalibrationFailed ()
-  {
-    return (this.serialPollStatusByte & 0x20) != 0;
-  }
-  
-  public final boolean isFrontPanelServiceRequest ()
-  {
-    return (this.serialPollStatusByte & 0x10) != 0;        
-  }
-  
-  public final boolean isHardwareError ()
-  {
-    return (this.serialPollStatusByte & 0x08) != 0;    
-  }
-  
-  public final boolean isSyntaxError ()
-  {
-    return (this.serialPollStatusByte & 0x04) != 0;    
-  }
-  
-  public final boolean isDataReady ()
-  {
-    return (this.serialPollStatusByte & 0x01) != 0;
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // STATUS REGISTER DISSECTION
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  public final boolean hasError ()
-  {
-    return this.statusRegister != 0;
-  }
-  
-  public final boolean hasADLinkError ()
-  {
-    return ((this.statusRegister & 0x20) != 0);
-  }
-    
-  public final boolean hasADInternalSelfTestError ()
-  {
-    return ((this.statusRegister & 0x10) != 0);
-  }
-    
-  public final boolean hasADSlopeError ()
-  {
-    return ((this.statusRegister & 0x08) != 0);
-  }
-    
-  public final boolean hasROMSelfTestError ()
-  {
-    return ((this.statusRegister & 0x04) != 0);
-  }
-    
-  public final boolean hasRAMSelfTestError ()
-  {
-    return ((this.statusRegister & 0x02) != 0);
-  }
-    
-  public final boolean hasCalRAMError ()
-  {
-    return ((this.statusRegister & 0x01) != 0);
-  }
-    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // EQUALS / HASH CODE
@@ -188,9 +137,10 @@ public class HP6033A_GPIB_Status
   @Override
   public int hashCode ()
   {
-    int hash = 5;
-    hash = 37 * hash + this.serialPollStatusByte;
-    hash = 37 * hash + this.statusRegister;
+    int hash = 7;
+    hash = 79 * hash + this.serialPollStatusByte;
+    hash = 79 * hash + this.statusRegister;
+    hash = 79 * hash + this.errorNumber;
     return hash;
   }
 
@@ -218,9 +168,13 @@ public class HP6033A_GPIB_Status
     {
       return false;
     }
+    if (this.errorNumber != other.errorNumber)
+    {
+      return false;
+    }
     return true;
   }
-    
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
