@@ -25,7 +25,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.DefaultPowerSupplyUnitReading;
-import org.javajdj.jinstrument.DefaultPowerSupplyUnitSettings;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.DeviceType;
@@ -242,7 +241,7 @@ implements PowerSupplyUnit
       case "1": outputEnable = true; break;
       default: throw new IOException ();
     }
-    return new DefaultPowerSupplyUnitSettings (
+    return new HP6033A_GPIB_Settings (
       null,
       softLimitVoltage_V,
       softLimitCurrent_A,
@@ -357,7 +356,7 @@ implements PowerSupplyUnit
       default: throw new RuntimeException ();
     }
     final PowerSupplyUnitSettings settings =
-      new DefaultPowerSupplyUnitSettings (
+      new HP6033A_GPIB_Settings (
         null,
         softLimitVoltage_V,
         softLimitCurrent_A,
