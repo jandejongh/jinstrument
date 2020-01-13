@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument;
+package org.javajdj.jinstrument.util;
 
 /** Placeholder for (non-Swing) utility methods that probably should move somewhere else.
  *

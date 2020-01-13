@@ -37,7 +37,7 @@ import org.javajdj.jinstrument.BusType;
 import org.javajdj.jinstrument.Controller;
 import org.javajdj.jinstrument.ControllerCommand;
 import org.javajdj.jinstrument.ControllerListener;
-import org.javajdj.jinstrument.Util;
+import org.javajdj.jinstrument.util.Util;
 import org.javajdj.jinstrument.controller.gpib.AbstractGpibController;
 import org.javajdj.jinstrument.controller.gpib.BusType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.DefaultGpibBus;
