@@ -28,20 +28,28 @@ public class Util
   //
   // BYTES TO HEX
   //
-  // [XXX SHOULD BE TAKEN FROM UTILITY LIBRARY]
-  //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   private static final char[] HEX_ARRAY = "0123456789abcdef".toCharArray ();
 
-  public static String bytesToHex (byte[] bytes)
+  /** Returns the unsigned hexadecimal representation of an array of {@code byte}s as a {@code String}.
+   * 
+   * @param bytes The byte array, non-{@code null}.
+   * @return The string representing the values in the byte array.
+   * 
+   * @throws IllegalArgumentException If {@code bytes == null}.
+   * 
+   */ 
+  public static String bytesToHex (final byte[] bytes)
   {
-    char[] hexChars = new char[bytes.length * 2];
+    if (bytes == null)
+      throw new IllegalArgumentException ();
+    final char[] hexChars = new char[bytes.length * 2];
     for (int j = 0; j < bytes.length; j++)
     {
-      int v = bytes[j] & 0xFF;
-      hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-      hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+      final int v = bytes[j] & 0xFF;
+      hexChars[j * 2] = Util.HEX_ARRAY[v >>> 4];
+      hexChars[j * 2 + 1] = Util.HEX_ARRAY[v & 0x0F];
     }
     return new String (hexChars);
   }
