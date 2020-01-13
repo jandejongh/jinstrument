@@ -34,6 +34,11 @@ public class Util
 
   /** Returns the unsigned hexadecimal representation of an array of {@code byte}s as a {@code String}.
    * 
+   * <p>
+   * I am unsure of the original source of this piece of code; it certainly is not mine and more or less
+   * a verbatim copy from an entry in
+   * {@literal https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java}.
+   * 
    * @param bytes The byte array, non-{@code null}.
    * @return The string representing the values in the byte array.
    * 
