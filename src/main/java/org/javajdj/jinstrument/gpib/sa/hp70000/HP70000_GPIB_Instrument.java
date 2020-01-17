@@ -152,9 +152,10 @@ public class HP70000_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   @Override
-  protected void setModeOnInstrumentSync (final long timeout_ms) throws IOException, InterruptedException, TimeoutException
+  protected void setModeOnInstrumentSync ()
+    throws IOException, InterruptedException, TimeoutException
   {
-    super.setModeOnInstrumentSync (timeout_ms);
+    super.setModeOnInstrumentSync ();
     writeSync ("CONTS\r\n"); // Continuous Sweep.
     writeSync ("RQS 4\r\n"); // Generate GPIB Service Request at End of Sweep.
     writeSync ("TDF B\r\n"); // Trace Data Format (Binary).
