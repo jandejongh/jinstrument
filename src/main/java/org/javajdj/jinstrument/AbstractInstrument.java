@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.javajdj.jservice.support.RunnableInvoker;
 import org.javajdj.jservice.Service;
 import org.javajdj.jservice.support.Service_FromMix;
 
@@ -69,6 +70,7 @@ implements Instrument
     if (device == null)
       throw new IllegalArgumentException ();
     this.device = device;
+    addRunnable (this.instrumentModeSetter);
     if (addStatusServices)
     {
       addRunnable (this.instrumentStatusCollector);
@@ -88,12 +90,10 @@ implements Instrument
       addRunnable (this.instrumentReadingCollector);
     }
     addRunnable (this.instrumentReadingDispatcher);
-    addRunnable (this.instrumentModeSetter);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // Instrument
   // DEVICE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +108,6 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // Instrument
   // INSTRUMENT LISTENERS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,64 +167,27 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // AbstractInstrument
-  // SET MODE ON INSTRUMENT SYNCHRONOUSLY [EMPTY IMPLEMENTATION]
+  // INSTRUMENT MODE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected void setModeOnInstrumentSync (final long timeout_ms)
+  protected void setModeOnInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
     // EMPTY
   }
   
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT MODE SETTER
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final Runnable instrumentModeSetter = () ->
-  {
-    LOG.log (Level.INFO, "Starting Instrument Mode Setter on {0}.", AbstractInstrument.this.toString ());
-    try
-    {
-      AbstractInstrument.this.setModeOnInstrumentSync (AbstractInstrument.this.getInstrumentModeSetterTimeout_ms ());
-    }
-    catch (InterruptedException ie)
-    {
-      LOG.log (Level.INFO, "Terminating (by request) Instrument Mode Setter on {0}.",
-        AbstractInstrument.this.toString ());
-      return;
-    }
-    catch (Exception e)
-    {
-      LOG.log (Level.WARNING, "Exception (terminating) in Instrument Mode Setter on {0}: {1}.",
-        new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
-      error ();
-      return;
-    }
-    while (! Thread.currentThread ().isInterrupted ())
-    {
-      try
-      {
-        Thread.currentThread ().join (1000L);
-      }
-      catch (InterruptedException ie)
-      {
-        break;
-      }
-    }
-    LOG.log (Level.INFO, "Terminating (by request) Instrument Mode Setter on {0}.", AbstractInstrument.this.toString ());
-  };
-    
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // AbstractInstrument
-  // INSTRUMENT MODE SETTER TIMEOUT
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
+  private final Runnable instrumentModeSetter = RunnableInvoker.onceFromRunnable (
+    "Instrument Mode Setter",
+    this,
+    this::setModeOnInstrumentSync,
+    null,
+    null,
+    true,
+    b -> { if (b) error (); },
+    Level.INFO,
+    Level.WARNING);
+
   public final static String INSTRUMENT_MODE_SETTER_TIMEOUT_MS_PROPERTY_NAME = "instrumentModeSetterTimeout_ms";
   
   public final static long DEFAULT_INSTRUMENT_MODE_SETTER_TIMEOUT_MS = 1000L;
@@ -255,10 +217,31 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // Instrument
-  // CURRENT INSTRUMENT STATUS
+  // INSTRUMENT STATUS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected abstract InstrumentStatus getStatusFromInstrumentSync ()
+    throws IOException, InterruptedException, TimeoutException;
+    
+  protected abstract void requestStatusFromInstrumentASync ()
+    throws IOException;
+  
+  private final Runnable instrumentStatusCollector = RunnableInvoker.periodicallyFromSupplierConsumerChain (
+    "Instrument Status Collector",
+    this,
+    this::getStatusCollectorPeriod_s,
+    true,
+    RunnableInvoker.OverloadPolicy.IGNORE_AND_DROP,
+    this::getStatusFromInstrumentSync,
+    this::statusReadFromInstrument,
+    new LinkedHashSet<> (Arrays.<Class<? extends Exception>>asList (TimeoutException.class)),
+    null,
+    true,
+    b -> { if (b) error (); },
+    Level.INFO,
+    Level.WARNING,
+    Level.WARNING);
   
   public final static String CURRENT_INSTRUMENT_STATUS_PROPERTY_NAME = "currentInstrumentStatus";
   
@@ -274,107 +257,6 @@ implements Instrument
       return this.currentInstrumentStatus;
     }
   }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // AbstractInstrument
-  // GET STATUS FROM INSTRUMENT SYNCHRONOUSLY [ABSTRACT]
-  // REQUEST STATUS FROM INSTRUMENT ASYNCHRONOUSLY [ABSTRACT]
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  protected abstract InstrumentStatus getStatusFromInstrumentSync ()
-    throws IOException, InterruptedException, TimeoutException;
-    
-  protected abstract void requestStatusFromInstrumentASync ()
-    throws IOException;
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT STATUS COLLECTOR
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final Runnable instrumentStatusCollector = () ->
-  {
-    LOG.log (Level.INFO, "Starting Instrument Status Collector on {0}.", AbstractInstrument.this.toString ());
-    boolean hadException = false;
-    while (! Thread.currentThread ().isInterrupted ())
-    {
-      try
-      {
-        if (hadException)
-        {
-          // Quick and dirty method to prevent continuous operation in case of (early) ignored Exceptions.
-          // We should actually compensate for the time spent already...
-          Thread.sleep ((long) (AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000));
-          hadException = false;
-        }
-        // Mark start of sojourn.
-        final long timeBeforeRead_ms = System.currentTimeMillis ();
-        // Obtain current settings from the instrument.
-        final InstrumentStatus statusRead = AbstractInstrument.this.getStatusFromInstrumentSync ();
-        // Report the trace to our superclass.
-        AbstractInstrument.this.statusReadFromInstrument (statusRead);
-        // Mark end of sojourn.
-        final long timeAfterRead_ms = System.currentTimeMillis ();
-        // Calculate sojourn.
-        final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
-        // Find out the remaining time to wait in order to respect the given period.
-        final long remainingSleep_ms = ((long) (AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000)) - sojourn_ms;
-        if (remainingSleep_ms < 0)
-        {
-          LOG.log (Level.WARNING, "Instrument Status Collector cannot meet timing settings in on {0}.",
-            AbstractInstrument.this.toString ());
-          hadException = true;
-        }
-        else if (remainingSleep_ms > 0)
-          Thread.sleep (remainingSleep_ms);
-      }
-      catch (InterruptedException ie)
-      {
-        LOG.log (Level.INFO, "Terminating (by request) Instrument Status Collector on {0}.",
-          AbstractInstrument.this.toString ());
-        return;
-      }
-      catch (TimeoutException te)
-      {
-        LOG.log (Level.WARNING, "TimeoutException (ignored) in Instrument Status Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
-        hadException = true;
-      }
-      catch (IOException ioe)
-      {
-        LOG.log (Level.WARNING, "Terminating (IOException) Instrument Status Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (ioe.getStackTrace ())});
-        error ();
-        return;
-      }
-      catch (UnsupportedOperationException usoe)
-      {
-        LOG.log (Level.WARNING, "Terminating (UnsupportedOperationException) Instrument Status Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (usoe.getStackTrace ())});
-        error ();
-        return;
-      }
-      catch (Exception e)
-      {
-        LOG.log (Level.WARNING, "Terminating (Exception) Instrument Status Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
-        error ();
-        return;
-      }
-    }
-    LOG.log (Level.INFO, "Terminating (by request) Instrument Status Collector on {0}.",
-      AbstractInstrument.this.toString ());
-  };
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // AbstractInstrument
-  // STATUS COLLECTOR PERIOD
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   public final static String STATUS_COLLECTOR_PERIOD_S_PROPERTY_NAME = "statusCollectorPeriod_s";
   
@@ -409,14 +291,6 @@ implements Instrument
       statusCollectorPeriod_s);
   }
   
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // AbstractInstrument
-  // STATUS READ QUEUE
-  // STATUS READ FROM INSTRUMENT
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
   private final BlockingQueue<InstrumentStatus> statusReadQueue = new LinkedBlockingQueue<> ();
   
   protected void statusReadFromInstrument (final InstrumentStatus instrumentStatus)
@@ -427,53 +301,63 @@ implements Instrument
       LOG.log (Level.WARNING, "Overflow on Instrument Status Queue on {0}.", this);
   }
   
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT STATUS DISPATCHER
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final Runnable instrumentStatusDispatcher = () ->
+  private InstrumentStatus takeStatus ()
+    throws InterruptedException
   {
-    LOG.log (Level.INFO, "Starting Instrument Status Dispatcher on {0}.", AbstractInstrument.this.toString ());
-    while (! Thread.currentThread ().isInterrupted ())
-    {
-      try
-      {
-        final InstrumentStatus oldStatus;
-        final InstrumentStatus newStatus = AbstractInstrument.this.statusReadQueue.take ();
-        synchronized (AbstractInstrument.this.currentInstrumentStatusLock)
-        {
-          oldStatus = AbstractInstrument.this.currentInstrumentStatus;
-          if (oldStatus == null || ! newStatus.equals (oldStatus))
-          {
-            AbstractInstrument.this.currentInstrumentStatus = newStatus;
-            AbstractInstrument.this.fireInstrumentStatusChanged (newStatus);
-          }
-        }
-      }
-      catch (InterruptedException ie)
-      {
-        LOG.log (Level.INFO, "Terminating (by request) Instrument Status Dispatcher on {0}.",
-          AbstractInstrument.this.toString ());
-        return;
-      }
-      catch (Exception e)
-      {
-        LOG.log (Level.WARNING, "Exception (ignored) in Instrument Status Dispatcher on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
-      }
-    }
-    LOG.log (Level.INFO, "Terminating (by request) Instrument Status Dispatcher on {0}.",
-      AbstractInstrument.this.toString ());
-  };
+    return this.statusReadQueue.take ();
+  }
   
+  private void processStatus (final InstrumentStatus instrumentStatus)
+  {
+    synchronized (this.currentInstrumentStatusLock)
+    {
+      final InstrumentStatus oldStatus = this.currentInstrumentStatus;
+      if (oldStatus != null && instrumentStatus.equals (oldStatus))
+        return;
+      this.currentInstrumentStatus = instrumentStatus;
+    }
+    fireInstrumentStatusChanged (instrumentStatus);
+  }
+  
+  private final Runnable instrumentStatusDispatcher = RunnableInvoker.constantlyFromSupplierConsumerChain (
+    "Instrument Status Dispatcher",
+    this,
+    this::takeStatus,
+    this::processStatus,
+    null,
+    null,
+    false,
+    b -> { if (b) error (); },
+    Level.INFO,
+    Level.WARNING);
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // Instrument
-  // CURRENT INSTRUMENT SETTINGS
+  // INSTRUMENT SETTINGS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected abstract InstrumentSettings getSettingsFromInstrumentSync ()
+    throws IOException, InterruptedException, TimeoutException;
+    
+  protected abstract void requestSettingsFromInstrumentASync ()
+    throws IOException;
+  
+  private final Runnable instrumentSettingsCollector = RunnableInvoker.periodicallyFromSupplierConsumerChain (
+    "Instrument Settings Collector",
+    this,
+    this::getSettingsCollectorPeriod_s,
+    true,
+    RunnableInvoker.OverloadPolicy.IGNORE_AND_DROP,
+    this::getSettingsFromInstrumentSync,
+    this::settingsReadFromInstrument,
+    new LinkedHashSet<> (Arrays.<Class<? extends Exception>>asList (TimeoutException.class, IOException.class)),
+    null,
+    true,
+    b -> { if (b) error (); },
+    Level.INFO,
+    Level.WARNING,
+    Level.WARNING);
   
   public final static String CURRENT_INSTRUMENT_SETTINGS_PROPERTY_NAME = "currentInstrumentSettings";
   
@@ -489,106 +373,6 @@ implements Instrument
       return this.currentInstrumentSettings;
     }
   }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // AbstractInstrument
-  // GET SETTINGS FROM INSTRUMENT SYNCHRONOUSLY [ABSTRACT]
-  // REQUEST SETTINGS FROM INSTRUMENT ASYNCHRONOUSLY [ABSTRACT]
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  protected abstract InstrumentSettings getSettingsFromInstrumentSync ()
-    throws IOException, InterruptedException, TimeoutException;
-    
-  protected abstract void requestSettingsFromInstrumentASync ()
-    throws IOException;
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT SETTINGS COLLECTOR
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final Runnable instrumentSettingsCollector = () ->
-  {
-    LOG.log (Level.INFO, "Starting Instrument Settings Collector on {0}.", AbstractInstrument.this.toString ());
-    boolean hadException = false;
-    while (! Thread.currentThread ().isInterrupted ())
-    {
-      try
-      {
-        if (hadException)
-        {
-          // Quick and dirty method to prevent continuous operation in case of (early) ignored Exceptions.
-          // We should actually compensate for the time spent already...
-          Thread.sleep ((long) (AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000));
-          hadException = false;
-        }
-        // Mark start of sojourn.
-        final long timeBeforeRead_ms = System.currentTimeMillis ();
-        // Obtain current settings from the instrument.
-        final InstrumentSettings settingsRead = AbstractInstrument.this.getSettingsFromInstrumentSync ();
-        // Report the trace to our superclass.
-        AbstractInstrument.this.settingsReadFromInstrument (settingsRead);
-        // Mark end of sojourn.
-        final long timeAfterRead_ms = System.currentTimeMillis ();
-        // Calculate sojourn.
-        final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
-        // Find out the remaining time to wait in order to respect the given period.
-        final long remainingSleep_ms = ((long) (AbstractInstrument.this.getSettingsCollectorPeriod_s () * 1000)) - sojourn_ms;
-        if (remainingSleep_ms < 0)
-        {
-          LOG.log (Level.WARNING, "Instrument Settings Collector cannot meet timing settings on {0}.",
-            AbstractInstrument.this.toString ());
-          hadException = true;
-        }
-        else if (remainingSleep_ms > 0)
-          Thread.sleep (remainingSleep_ms);
-      }
-      catch (InterruptedException ie)
-      {
-        LOG.log (Level.INFO, "Terminating (by request) Instrument Settings Collector on {0}.",
-          AbstractInstrument.this.toString ());
-        return;
-      }
-      catch (TimeoutException te)
-      {
-        LOG.log (Level.WARNING, "TimeoutException (ignored) in Instrument Settings Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
-        hadException = true;
-      }
-      catch (IOException ioe)
-      {
-        LOG.log (Level.WARNING, "IOException (ignored) in Instrument Settings Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (ioe.getStackTrace ())});
-        hadException = true;
-      }
-      catch (UnsupportedOperationException usoe)
-      {
-        LOG.log (Level.WARNING, "Terminating (UnsupportedOperationException) Instrument Settings Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (usoe.getStackTrace ())});
-        error ();
-        return;
-      }
-      catch (Exception e)
-      {
-        LOG.log (Level.WARNING, "Terminating (Exception) Instrument Settings Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
-        error ();
-        return;
-      }
-    }
-    LOG.log (Level.INFO, "Terminating (by request) Instrument Settings Collector on {0}.",
-      AbstractInstrument.this.toString ());
-  };
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // AbstractInstrument
-  // SETTINGS COLLECTOR PERIOD
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   public final static String SETTINGS_COLLECTOR_PERIOD_S_PROPERTY_NAME = "settingsCollectorPeriod_s";
   
@@ -624,14 +408,6 @@ implements Instrument
       settingsCollectorPeriod_s);
   }
   
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // AbstractInstrument
-  // SETTINGS READ QUEUE
-  // SETTINGS READ FROM INSTRUMENT
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
   private final BlockingQueue<InstrumentSettings> settingsReadQueue = new LinkedBlockingQueue<> ();
   
   protected void settingsReadFromInstrument (final InstrumentSettings instrumentSettings)
@@ -642,52 +418,39 @@ implements Instrument
       LOG.log (Level.WARNING, "Overflow on Instrument Settings Queue on {0}.", this);
   }
   
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT SETTINGS DISPATCHER
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final Runnable instrumentSettingsDispatcher = () ->
+  private InstrumentSettings takeSettings ()
+    throws InterruptedException
   {
-    LOG.log (Level.INFO, "Starting Instrument Settings Dispatcher on {0}.", AbstractInstrument.this.toString ());
-    while (! Thread.currentThread ().isInterrupted ())
+    return this.settingsReadQueue.take ();
+  }
+  
+  private void processSettings (final InstrumentSettings instrumentSettings)
+  {
+    synchronized (this.currentInstrumentSettingsLock)
     {
-      try
-      {
-        final InstrumentSettings oldSettings;
-        final InstrumentSettings newSettings = AbstractInstrument.this.settingsReadQueue.take ();
-        synchronized (AbstractInstrument.this.currentInstrumentSettingsLock)
-        {
-          oldSettings = AbstractInstrument.this.currentInstrumentSettings;
-          if (oldSettings == null || ! newSettings.equals (oldSettings))
-          {
-            AbstractInstrument.this.currentInstrumentSettings = newSettings;
-            AbstractInstrument.this.fireInstrumentSettingsChanged (newSettings);
-          }
-        }
-      }
-      catch (InterruptedException ie)
-      {
-        LOG.log (Level.INFO, "Terminating (by request) Instrument Settings Dispatcher on {0}.",
-          AbstractInstrument.this.toString ());
+      final InstrumentSettings oldSettings = this.currentInstrumentSettings;
+      if (oldSettings != null && instrumentSettings.equals (oldSettings))
         return;
-      }
-      catch (Exception e)
-      {
-        LOG.log (Level.WARNING, "Exception (ignored) in Instrument Settings Dispatcher on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
-      }
+      this.currentInstrumentSettings = instrumentSettings;
     }
-    LOG.log (Level.INFO, "Terminating (by request) Instrument Settings Dispatcher on {0}.",
-      AbstractInstrument.this.toString ());
-  };
+    fireInstrumentSettingsChanged (instrumentSettings);
+  }
+  
+  private final Runnable instrumentSettingsDispatcher = RunnableInvoker.constantlyFromSupplierConsumerChain (
+    "Instrument Settings Dispatcher",
+    this,
+    this::takeSettings,
+    this::processSettings,
+    null,
+    null,
+    false,
+    b -> { if (b) error (); },
+    Level.INFO,
+    Level.WARNING);
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // COMMAND QUEUE [PRIVATE]
-  // ADD COMMAND [Instrument]
-  // PROCESS COMMAND [ABSTRACT]
+  // INSTRUMENT COMMAND PROCESSOR
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -702,62 +465,54 @@ implements Instrument
       LOG.log (Level.WARNING, "Overflow on Instrument Command Queue on {0}.", this);
   }
   
+  private InstrumentCommand takeCommand ()
+    throws InterruptedException
+  {
+    return this.commandQueue.take ();
+  }
+  
   protected abstract void processCommand (final InstrumentCommand instrumentCommand)
     throws IOException, InterruptedException, TimeoutException;
   
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT COMMAND PROCESSOR
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final Runnable instrumentCommandProcessor = () ->
-  {
-    LOG.log (Level.INFO, "Starting Instrument Command Processor on {0}.", AbstractInstrument.this.toString ());
-    while (! Thread.currentThread ().isInterrupted ())
-    {
-      try
-      {
-        final InstrumentCommand nextCommand = AbstractInstrument.this.commandQueue.take ();
-        AbstractInstrument.this.processCommand (nextCommand);
-      }
-      catch (InterruptedException ie)
-      {
-        LOG.log (Level.INFO, "Terminating (by request) Instrument Command Processor on {0}.",
-          AbstractInstrument.this.toString ());
-        return;
-      }
-      catch (TimeoutException te)
-      {
-        LOG.log (Level.WARNING, "TimeoutException (ignored) in Instrument Command Processor on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
-      }
-      catch (IOException ioe)
-      {
-        LOG.log (Level.WARNING, "IOException (ignored) in Instrument Command Processor on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (ioe.getStackTrace ())});
-      }
-      catch (UnsupportedOperationException uoe)
-      {
-        LOG.log (Level.WARNING, "UnsupportedOperationException (ignored) in Instrument Command Processor on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (uoe.getStackTrace ())});
-      }
-      catch (Exception e)
-      {
-        LOG.log (Level.WARNING, "Exception (ignored) in Instrument Command Processor on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
-      }
-    }
-    LOG.log (Level.INFO, "Terminating (by request) Instrument Command Processor on {0}.",
-      AbstractInstrument.this.toString ());
-  };
+  private final Runnable instrumentCommandProcessor = RunnableInvoker.constantlyFromSupplierConsumerChain (
+    "Instrument Command Processor",
+    this,
+    this::takeCommand,
+    this::processCommand,
+    null,
+    null,
+    false,
+    b -> { if (b) error (); },
+    Level.INFO,
+    Level.WARNING);
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // Instrument
-  // LAST INSTRUMENT READING
+  // INSTRUMENT READING
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected abstract InstrumentReading getReadingFromInstrumentSync ()
+    throws IOException, InterruptedException, TimeoutException;
+    
+  protected abstract void requestReadingFromInstrumentASync ()
+    throws IOException;
+  
+  private final Runnable instrumentReadingCollector = RunnableInvoker.periodicallyFromSupplierConsumerChain (
+    "Instrument Reading Collector",
+    this,
+    this::getReadingCollectorPeriod_s,
+    true,
+    RunnableInvoker.OverloadPolicy.IGNORE_AND_DROP,
+    this::getReadingFromInstrumentSync,
+    this::readingReadFromInstrument,
+    new LinkedHashSet<> (Arrays.<Class<? extends Exception>>asList (TimeoutException.class, IOException.class)),
+    new LinkedHashSet<> (Arrays.<Class<? extends Exception>>asList (UnsupportedOperationException.class)),
+    false,
+    b -> { if (b) error (); },
+    Level.INFO,
+    Level.WARNING,
+    Level.WARNING);
   
   public final static String LAST_INSTRUMENT_READING_PROPERTY_NAME = "lastInstrumentReading";
   
@@ -773,105 +528,6 @@ implements Instrument
       return this.lastInstrumentReading;
     }
   }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // AbstractInstrument
-  // GET READING FROM INSTRUMENT SYNCHRONOUSLY [ABSTRACT]
-  // REQUEST READING FROM INSTRUMENT ASYNCHRONOUSLY [ABSTRACT]
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  protected abstract InstrumentReading getReadingFromInstrumentSync ()
-    throws IOException, InterruptedException, TimeoutException;
-    
-  protected abstract void requestReadingFromInstrumentASync ()
-    throws IOException;
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT READING COLLECTOR
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final Runnable instrumentReadingCollector = () ->
-  {
-    LOG.log (Level.INFO, "Starting Instrument Reading Collector on {0}.", AbstractInstrument.this.toString ());
-    boolean hadException = false;
-    while (! Thread.currentThread ().isInterrupted ())
-    {
-      try
-      {
-        if (hadException)
-        {
-          // Quick and dirty method to prevent continuous operation in case of (early) ignored Exceptions.
-          // We should actually compensate for the time spent already...
-          Thread.sleep ((long) (AbstractInstrument.this.getStatusCollectorPeriod_s () * 1000));
-          hadException = false;
-        }
-        // Mark start of sojourn.
-        final long timeBeforeRead_ms = System.currentTimeMillis ();
-        // Obtain current reading from the instrument.
-        final InstrumentReading readingRead = AbstractInstrument.this.getReadingFromInstrumentSync ();
-        // Report the trace to our superclass.
-        AbstractInstrument.this.readingReadFromInstrument (readingRead);
-        // Mark end of sojourn.
-        final long timeAfterRead_ms = System.currentTimeMillis ();
-        // Calculate sojourn.
-        final long sojourn_ms = timeAfterRead_ms - timeBeforeRead_ms;
-        // Find out the remaining time to wait in order to respect the given period.
-        final long remainingSleep_ms = ((long) (AbstractInstrument.this.getReadingCollectorPeriod_s () * 1000)) - sojourn_ms;
-        if (remainingSleep_ms < 0)
-        {
-          LOG.log (Level.WARNING, "Instrument Reading Collector cannot meet timing settings on {0}.",
-            AbstractInstrument.this.toString ());
-          hadException = true;
-        }
-        else if (remainingSleep_ms > 0)
-          Thread.sleep (remainingSleep_ms);
-      }
-      catch (InterruptedException ie)
-      {
-        LOG.log (Level.INFO, "Terminating (by request) Instrument Reading Collector on {0}.",
-          AbstractInstrument.this.toString ());
-        return;
-      }
-      catch (TimeoutException te)
-      {
-        LOG.log (Level.WARNING, "TimeoutException (ignored) in Instrument Reading Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (te.getStackTrace ())});
-        hadException = true;
-      }
-      catch (IOException ioe)
-      {
-        LOG.log (Level.WARNING, "IOException (ignored) in Instrument Reading Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (ioe.getStackTrace ())});
-        hadException = true;
-      }
-      catch (UnsupportedOperationException usoe)
-      {
-        LOG.log (Level.WARNING, "Terminating (UnsupportedOperationException) Instrument Reading Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (usoe.getStackTrace ())});
-        error ();
-        return;
-      }
-      catch (Exception e)
-      {
-        LOG.log (Level.WARNING, "Exception (ignored) in Instrument Reading Collector on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
-        hadException = true;
-      }
-    }
-    LOG.log (Level.INFO, "Terminating (by request) Instrument Reading Collector on {0}.",
-      AbstractInstrument.this.toString ());
-  };
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // AbstractInstrument
-  // READING COLLECTOR PERIOD
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   public final static String READING_COLLECTOR_PERIOD_S_PROPERTY_NAME = "readingCollectorPeriod_s";
   
@@ -907,14 +563,6 @@ implements Instrument
       readingCollectorPeriod_s);
   }
   
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // AbstractInstrument
-  // READING READ QUEUE
-  // READING READ FROM INSTRUMENT
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
   private final BlockingQueue<InstrumentReading> readingReadQueue = new LinkedBlockingQueue<> ();
   
   protected void readingReadFromInstrument (final InstrumentReading instrumentReading)
@@ -925,41 +573,32 @@ implements Instrument
       LOG.log (Level.WARNING, "Overflow on Instrument Reading Queue on {0}.", this);
   }
   
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT READING DISPATCHER
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final Runnable instrumentReadingDispatcher = () ->
+  private InstrumentReading takeReading ()
+    throws InterruptedException
   {
-    LOG.log (Level.INFO, "Starting Instrument Reading Dispatcher on {0}.", AbstractInstrument.this.toString ());
-    while (! Thread.currentThread ().isInterrupted ())
+    return this.readingReadQueue.take ();
+  }
+  
+  private void processReading (final InstrumentReading instrumentReading)
+  {
+    synchronized (this.lastInstrumentReadingLock)
     {
-      try
-      {
-        final InstrumentReading newReading = AbstractInstrument.this.readingReadQueue.take ();
-        synchronized (AbstractInstrument.this.lastInstrumentReadingLock)
-        {
-          AbstractInstrument.this.lastInstrumentReading = newReading;
-          AbstractInstrument.this.fireInstrumentReading (newReading);
-        }
-      }
-      catch (InterruptedException ie)
-      {
-        LOG.log (Level.INFO, "Terminating (by request) Instrument Reading Dispatcher on {0}.",
-          AbstractInstrument.this.toString ());
-        return;
-      }
-      catch (Exception e)
-      {
-        LOG.log (Level.WARNING, "Exception (ignored) in Instrument Reading Dispatcher on {0}: {1}.",
-          new Object[]{AbstractInstrument.this.toString (), Arrays.toString (e.getStackTrace ())});
-      }
+      this.lastInstrumentReading = instrumentReading;
     }
-    LOG.log (Level.INFO, "Terminating (by request) Instrument Reading Dispatcher on {0}.",
-      AbstractInstrument.this.toString ());
-  };
+    fireInstrumentReading (instrumentReading);
+  }
+  
+  private final Runnable instrumentReadingDispatcher = RunnableInvoker.constantlyFromSupplierConsumerChain (
+    "Instrument Reading Dispatcher",
+    this,
+    this::takeReading,
+    this::processReading,
+    null,
+    null,
+    false,
+    b -> { if (b) error (); },
+    Level.INFO,
+    Level.WARNING);
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
