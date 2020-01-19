@@ -75,6 +75,28 @@ public enum Unit
   UNIT_dBmuV ("db\u03BCV"),
   UNIT_dBV ("dbV"),
   
+  //
+  // TIME [INTERVAL] / DURATION
+  //
+  UNIT_ps ("ps"),
+  UNIT_ns ("ns"),
+  UNIT_mus ("\u03BCs"),
+  UNIT_ms ("ms"),
+  UNIT_s ("ms"),
+  UNIT_ks ("ks"),
+  UNIT_Ms ("Ms"),
+  
+  //
+  // FREQUENCY
+  //
+  UNIT_muHz ("\u03BCHz"),
+  UNIT_mHz ("mHz"),
+  UNIT_Hz ("Hz"),
+  UNIT_kHz ("kHz"),
+  UNIT_MHz ("MHz"),
+  UNIT_GHz ("GHz"),
+  UNIT_THz ("THz"),
+  
   ;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
