@@ -57,20 +57,26 @@ implements Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected AbstractInstrument (final String name,
+  protected AbstractInstrument (
+    final String name,
     final Device device,
     final List<Runnable> runnables,
     final List<Service> targetServices,
+    final boolean addInitializationServices,
     final boolean addStatusServices,
     final boolean addSettingsServices,
     final boolean addCommandProcessorServices,
-    final boolean addAcquisitionServices)
+    final boolean addAcquisitionServices,
+    final boolean addHousekeepingServices)
   {
     super (name, runnables, targetServices);
     if (device == null)
       throw new IllegalArgumentException ();
     this.device = device;
-    addRunnable (this.instrumentModeSetter);
+    if (addInitializationServices)
+    {
+      addRunnable (this.instrumentInitializer);
+    }
     if (addStatusServices)
     {
       addRunnable (this.instrumentStatusCollector);
@@ -90,6 +96,10 @@ implements Instrument
       addRunnable (this.instrumentReadingCollector);
     }
     addRunnable (this.instrumentReadingDispatcher);
+    if (addHousekeepingServices)
+    {
+      addRunnable (this.instrumentHousekeeper);
+    }
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,20 +177,16 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // INSTRUMENT MODE
+  // INSTRUMENT INITIALIZATION
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected void setModeOnInstrumentSync ()
-    throws IOException, InterruptedException, TimeoutException
-  {
-    // EMPTY
-  }
+  protected abstract void initializeInstrumentSync ()
+    throws IOException, InterruptedException, TimeoutException;
   
-  private final Runnable instrumentModeSetter = RunnableInvoker.onceFromRunnable (
-    "Instrument Mode Setter",
+  private final Runnable instrumentInitializer = RunnableInvoker.onceFromRunnable ("Instrument Initializer",
     this,
-    this::setModeOnInstrumentSync,
+    this::initializeInstrumentSync,
     null,
     null,
     true,
@@ -188,30 +194,29 @@ implements Instrument
     Level.INFO,
     Level.WARNING);
 
-  public final static String INSTRUMENT_MODE_SETTER_TIMEOUT_MS_PROPERTY_NAME = "instrumentModeSetterTimeout_ms";
+  public final static String INSTRUMENT_INITIALIZER_TIMEOUT_MS_PROPERTY_NAME = "instrumentInitializerTimeout_ms";
   
-  public final static long DEFAULT_INSTRUMENT_MODE_SETTER_TIMEOUT_MS = 1000L;
+  public final static long DEFAULT_INSTRUMENT_INITIALIZER_TIMEOUT_MS = 1000L;
   
   // XXX Need locking or AtomicLong here...
-  private volatile long instrumentModeSetterTimeout_ms = DEFAULT_INSTRUMENT_MODE_SETTER_TIMEOUT_MS;
+  private volatile long instrumentInitializerTimeout_ms = DEFAULT_INSTRUMENT_INITIALIZER_TIMEOUT_MS;
   
-  public final long getInstrumentModeSetterTimeout_ms ()
+  public final long getInstrumentInitializerTimeout_ms ()
   {
-    return this.instrumentModeSetterTimeout_ms;
+    return this.instrumentInitializerTimeout_ms;
   }
   
-  public final void setInstrumentModeSetterTimeout_ms (final long instrumentModeSetterTimeout_ms)
+  public final void setInstrumentInitializerTimeout_ms (final long instrumentInitializerTimeout_ms)
   {
-    if (instrumentModeSetterTimeout_ms <= 0)
+    if (instrumentInitializerTimeout_ms <= 0)
       throw new IllegalArgumentException ();
-    if (instrumentModeSetterTimeout_ms != this.instrumentModeSetterTimeout_ms)
+    if (instrumentInitializerTimeout_ms != this.instrumentInitializerTimeout_ms)
     {
-      final long oldInstrumentModeSetterTimeout_ms = this.instrumentModeSetterTimeout_ms;
-      this.instrumentModeSetterTimeout_ms = instrumentModeSetterTimeout_ms;
-      fireSettingsChanged (
-        INSTRUMENT_MODE_SETTER_TIMEOUT_MS_PROPERTY_NAME,
+      final long oldInstrumentModeSetterTimeout_ms = this.instrumentInitializerTimeout_ms;
+      this.instrumentInitializerTimeout_ms = instrumentInitializerTimeout_ms;
+      fireSettingsChanged (INSTRUMENT_INITIALIZER_TIMEOUT_MS_PROPERTY_NAME,
         oldInstrumentModeSetterTimeout_ms,
-        this.instrumentModeSetterTimeout_ms);
+        this.instrumentInitializerTimeout_ms);
     }
   }
   
@@ -599,6 +604,64 @@ implements Instrument
     b -> { if (b) error (); },
     Level.INFO,
     Level.WARNING);
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INSTRUMENT HOUSEKEEPING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected abstract void instrumentHousekeeping ()
+    throws IOException, InterruptedException, TimeoutException;
+    
+  private final Runnable instrumentHousekeeper = RunnableInvoker.periodicallyFromRunnable (
+    "Instrument Housekeeper",
+    this,
+    this::getHousekeeperPeriod_s,
+    true,
+    RunnableInvoker.OverloadPolicy.IGNORE_AND_DROP,
+    this::instrumentHousekeeping,
+    new LinkedHashSet<> (Arrays.<Class<? extends Exception>>asList (TimeoutException.class, IOException.class)),
+    new LinkedHashSet<> (Arrays.<Class<? extends Exception>>asList (UnsupportedOperationException.class)),
+    false,
+    b -> { if (b) error (); },
+    Level.INFO,
+    Level.WARNING,
+    Level.WARNING);
+  
+  public final static String HOUSEKEEPER_PERIOD_S_PROPERTY_NAME = "housekeeperPeriod_s";
+  
+  public final static double DEFAULT_HOUSEKEEPER_PERIOD_S = 1;
+  
+  private volatile double housekeeperPeriod_s = AbstractInstrument.DEFAULT_HOUSEKEEPER_PERIOD_S;
+
+  private final Object housekeeperPeriodLock = new Object ();
+  
+  public final double getHousekeeperPeriod_s ()
+  {
+    synchronized (this.housekeeperPeriodLock)
+    {
+      return this.housekeeperPeriod_s;
+    }
+  }
+  
+  public final void setHousekeeperPeriod_s (final double housekeeperPeriod_s)
+  {
+    if (housekeeperPeriod_s < 0)
+      throw new IllegalArgumentException ();
+    final double oldHousekeeperPeriod_s;
+    synchronized (this.housekeeperPeriodLock)
+    {
+      if (this.housekeeperPeriod_s == housekeeperPeriod_s)
+        return;
+      oldHousekeeperPeriod_s = this.housekeeperPeriod_s;
+      this.housekeeperPeriod_s = housekeeperPeriod_s;
+    }
+    fireSettingsChanged (
+      AbstractInstrument.HOUSEKEEPER_PERIOD_S_PROPERTY_NAME,
+      oldHousekeeperPeriod_s,
+      housekeeperPeriod_s);
+  }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
