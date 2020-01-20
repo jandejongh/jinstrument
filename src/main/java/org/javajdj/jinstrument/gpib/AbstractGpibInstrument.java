@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,10 +60,12 @@ implements GpibInstrument
     final GpibDevice device,
     final List<Runnable> runnables,
     final List<Service> targetServices,
+    final boolean addInitializationServices,
     final boolean addStatusServices,
     final boolean addSettingsServices,
     final boolean addCommandProcessorServices,
     final boolean addAcquisitionServices,
+    final boolean addHousekeepingServices,
     final boolean addServiceRequestPollingServices)
   {
     super (
@@ -71,10 +73,12 @@ implements GpibInstrument
       device,
       runnables,
       targetServices,
+      addInitializationServices,
       addStatusServices,
       addSettingsServices,
       addCommandProcessorServices,
-      addAcquisitionServices);
+      addAcquisitionServices,
+      addHousekeepingServices);
     if (addServiceRequestPollingServices)
     {
       addRunnable (this.gpibInstrumentServiceRequestCollector);
@@ -590,7 +594,10 @@ implements GpibInstrument
       {
         final boolean srq = AbstractGpibInstrument.this.gpibServiceRequestQueue.take ();
         if (srq)
+        {
           AbstractGpibInstrument.this.onGpibServiceRequestFromInstrument ();
+          // XXX It seems like a good idea to clear the SR Queue here...
+        }
       }
       catch (InterruptedException ie)
       {
