@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public class HP70000_GPIB_Instrument
   
   public HP70000_GPIB_Instrument (final GpibDevice device)
   {
-    super ("HP-70000", device, null, null, true, true, true, false, true);
+    super ("HP-70000", device, null, null, false, true, true, true, false, false, true);
     setStatusCollectorPeriod_s (1.0);
     setSettingsCollectorPeriod_s (1.0);
     setGpibInstrumentServiceRequestCollectorPeriod_s (0.75);
@@ -147,15 +147,14 @@ public class HP70000_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
-  // SET MODE ON INSTRUMENT SYNCHRONOUSLY
+  // INSTRUMENT INITIALIZATION
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  
   @Override
-  protected void setModeOnInstrumentSync ()
+  protected void initializeInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
-    super.setModeOnInstrumentSync ();
     writeSync ("CONTS\r\n"); // Continuous Sweep.
     writeSync ("RQS 4\r\n"); // Generate GPIB Service Request at End of Sweep.
     writeSync ("TDF B\r\n"); // Trace Data Format (Binary).
@@ -329,6 +328,20 @@ public class HP70000_GPIB_Instrument
     throw new UnsupportedOperationException ();
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AbstractInstrument
+  // INSTRUMENT HOUSEKEEPING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  protected final void instrumentHousekeeping ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    throw new UnsupportedOperationException ();
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractGpibInstrument
