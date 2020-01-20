@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,10 +73,12 @@ public class HP3478A_GPIB_Instrument
   public HP3478A_GPIB_Instrument (final GpibDevice device)
   {
     super ("HP-3478A", device, null, null,
+      false,  // Initialization
       true,   // Status
       false,  // Setings (not needed; they come with Status!)
       true,   // Command Processor
       true,   // Acquisition
+      false,  // Housekeeping
       false); // Service Request Polling
     setReadingCollectorPeriod_s (HP3478A_GPIB_Instrument.DEFAULT_HP3478A_READING_COLLECTOR_PERIOD_S);
   }
@@ -361,6 +363,20 @@ public class HP3478A_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
+  // INSTRUMENT INITIALIZATION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  protected final void initializeInstrumentSync ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    throw new UnsupportedOperationException ();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AbstractInstrument
   // INSTRUMENT STATUS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -469,6 +485,20 @@ public class HP3478A_GPIB_Instrument
     throw new UnsupportedOperationException ();
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AbstractInstrument
+  // INSTRUMENT HOUSEKEEPING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  protected final void instrumentHousekeeping ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    throw new UnsupportedOperationException ();
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractGpibInstrument
