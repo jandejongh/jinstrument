@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ package org.javajdj.jinstrument;
  * 
  */
 public class DefaultSpectrumAnalyzerTrace
-implements SpectrumAnalyzerTrace
+  extends AbstractInstrumentReading
+  implements SpectrumAnalyzerTrace
 {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,19 +35,13 @@ implements SpectrumAnalyzerTrace
   public DefaultSpectrumAnalyzerTrace (
     final SpectrumAnalyzerSettings settings,
     final double[] samples,
+    final Unit unit,
     final boolean error,
     final String errorMessage,
     final boolean uncalibrated,
     final boolean uncorrected)
   {
-    if (settings == null || samples == null)
-      throw new IllegalArgumentException ();
-    this.settings = settings;
-    this.samples = samples;
-    this.error = error;
-    this.errorMessage = errorMessage;
-    this.uncalibrated = uncalibrated;
-    this.uncorrected = uncorrected;
+    super (settings, settings, unit, error, errorMessage, uncalibrated, uncorrected);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,12 +52,10 @@ implements SpectrumAnalyzerTrace
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final SpectrumAnalyzerSettings settings;
-  
   @Override
   public final SpectrumAnalyzerSettings getInstrumentSettings ()
   {
-    return this.settings;
+    return (SpectrumAnalyzerSettings) super.getInstrumentSettings ();
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,66 +70,15 @@ implements SpectrumAnalyzerTrace
   @Override
   public final int getTraceLength ()
   {
-    return this.samples.length;
+    return getReadingValue ().length;
   }
 
-  
-  private final double [] samples;
-  
   @Override
   public final double[] getReadingValue ()
   {
-    return this.samples;
+    return (double[]) super.getReadingValue ();
   }
 
-  @Override
-  public Unit getUnit ()
-  {
-    return Unit.UNIT_dBm;
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // InstrumentReading
-  // ERROR
-  // ERROR MESSAGE
-  // UNCALIBRATED
-  // UNCORRECTED
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final boolean error;
-  
-  @Override
-  public final boolean isError ()
-  {
-    return this.error;
-  }
-  
-  private final String errorMessage;
-
-  @Override
-  public final String getErrorMessage ()
-  {
-    return this.errorMessage != null ? this.errorMessage : "";
-  }
-  
-  private final boolean uncalibrated;
-  
-  @Override
-  public final boolean isUncalibrated ()
-  {
-    return this.uncalibrated;
-  }
-  
-  private final boolean uncorrected;
-  
-  @Override
-  public final boolean isUncorrected ()
-  {
-    return this.uncorrected;
-  }
-  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SpectrumAnalyzerTrace
@@ -154,16 +96,16 @@ implements SpectrumAnalyzerTrace
     // The two statements above are true, irrespective of whether the trace length is odd or even.
     // Note that this implies that we never "reach" the upper frequency, viz., the center frequency plus half the span.
     // I'm not sure if this is true "in general" for spectrum analyzers, but I highly doubt it.
-    final double fStart_MHz = this.settings.getCenterFrequency_MHz () - 0.5 * this.settings.getSpan_MHz ();
-    final double fStep_MHz = this.settings.getSpan_MHz () / getTraceLength ();
+    final double fStart_MHz = getInstrumentSettings ().getCenterFrequency_MHz () - 0.5 * getInstrumentSettings ().getSpan_MHz ();
+    final double fStep_MHz = getInstrumentSettings ().getSpan_MHz () / getTraceLength ();
     return fStart_MHz + sampleIndex * fStep_MHz;
   }
 
   @Override
   public double frequency_MHzToSampleIndex (final double frequency_MHz)
   {
-    final double fStart_MHz = this.settings.getCenterFrequency_MHz () - 0.5 * this.settings.getSpan_MHz ();
-    final double fStep_MHz = this.settings.getSpan_MHz () / getTraceLength ();
+    final double fStart_MHz = getInstrumentSettings ().getCenterFrequency_MHz () - 0.5 * getInstrumentSettings ().getSpan_MHz ();
+    final double fStep_MHz = getInstrumentSettings ().getSpan_MHz () / getTraceLength ();
     return (frequency_MHz - fStart_MHz) / fStep_MHz;
   }
 
