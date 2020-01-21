@@ -316,6 +316,7 @@ public class HP70000_GPIB_Instrument
     return new DefaultSpectrumAnalyzerTrace (
       settings,
       samples,
+      Unit.UNIT_dBm, // XXX Always correct?
       false, // XXX
       null,
       false,
