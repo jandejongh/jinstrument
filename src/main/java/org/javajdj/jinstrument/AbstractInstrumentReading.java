@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package org.javajdj.jinstrument;
 
+import java.time.Instant;
 import java.util.logging.Logger;
 
 /** Abstract base implementation of {@link InstrumentReading}.
@@ -43,6 +44,7 @@ public abstract class AbstractInstrumentReading
   
   protected AbstractInstrumentReading (
     final InstrumentSettings instrumentSettings,
+    final Instant readingTime,
     final Object readingValue,
     final Unit unit,
     final boolean error,
@@ -53,12 +55,25 @@ public abstract class AbstractInstrumentReading
     if (instrumentSettings == null || readingValue == null)
       throw new IllegalArgumentException ();
     this.instrumentSettings = instrumentSettings;
+    this.readingTime = readingTime != null ? readingTime : Instant.now ();
     this.readingValue = readingValue;
     this.unit = unit;
     this.error = error;
     this.errorMessage = errorMessage;
     this.uncalibrated = uncalibrated;
     this.uncorrected = uncorrected;    
+  }
+  
+  protected AbstractInstrumentReading (
+    final InstrumentSettings instrumentSettings,
+    final Object readingValue,
+    final Unit unit,
+    final boolean error,
+    final String errorMessage,
+    final boolean uncalibrated,
+    final boolean uncorrected)
+  {
+    this (instrumentSettings, null, readingValue, unit, error, errorMessage, uncalibrated, uncorrected);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,6 +89,21 @@ public abstract class AbstractInstrumentReading
   public InstrumentSettings getInstrumentSettings ()
   {
     return this.instrumentSettings;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // InstrumentReading
+  // READING TIME
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Instant readingTime;
+  
+  @Override
+  public final Instant getReadingTime ()
+  {
+    return this.readingTime;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
