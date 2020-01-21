@@ -215,4 +215,7 @@ public interface InstrumentCommand
   public final static String IC_FOLDBACK_MODE = "commandFoldbackMode";  
   public final static String ICARG_FOLDBACK_MODE = "foldbackMode";  
   
+  public final static String IC_GATE_TIME = "commandGateTime";  
+  public final static String ICARG_GATE_TIME_S = "gateTime_s";  
+  
 }
