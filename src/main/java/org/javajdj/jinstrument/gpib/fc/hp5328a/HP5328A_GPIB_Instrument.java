@@ -242,6 +242,38 @@ implements FrequencyCounter
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  @Override
+  public final boolean supportsGetGateTime ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  public final boolean supportsSetGateTime ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  public final double getMinGateTime_s ()
+  {
+    // Confirmed from 05328-90002 d.d. 20200121.
+    return 1e-6;
+  }
+
+  @Override
+  public final double getMaxGateTime_s ()
+  {
+    // Confirmed from 05328-90002 d.d. 20200121.
+    return 10;
+  }
+
+  @Override
+  public double getGateTimeResolution_s ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
