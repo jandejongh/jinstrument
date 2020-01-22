@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  */
 package org.javajdj.jinstrument;
 
+import java.io.IOException;
+
 /** Extension of {@link Instrument} for (single-channel) frequency counters.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
@@ -25,4 +27,29 @@ public interface FrequencyCounter
 extends Instrument
 {
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GATE TIME
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  boolean supportsGetGateTime ();
+  
+  boolean supportsSetGateTime ();
+  
+  double getMinGateTime_s ();
+  
+  double getMaxGateTime_s ();
+  
+  double getGateTimeResolution_s ();
+  
+  void setGateTime_s (double gateTime_s)
+    throws IOException, InterruptedException, UnsupportedOperationException;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // END OF FILE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
 }
