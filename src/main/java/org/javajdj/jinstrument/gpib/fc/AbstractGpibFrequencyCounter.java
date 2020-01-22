@@ -16,9 +16,12 @@
  */
 package org.javajdj.jinstrument.gpib.fc;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
+import org.javajdj.jinstrument.DefaultInstrumentCommand;
 import org.javajdj.jinstrument.FrequencyCounter;
+import org.javajdj.jinstrument.InstrumentCommand;
 import org.javajdj.jinstrument.gpib.AbstractGpibInstrument;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jservice.Service;
@@ -78,6 +81,15 @@ public abstract class AbstractGpibFrequencyCounter
   // FrequencyCounter
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public void setGateTime_s (final double gateTime_s)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_GATE_TIME,
+      InstrumentCommand.ICARG_GATE_TIME_S, gateTime_s));
+  }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
