@@ -45,6 +45,8 @@ public interface InstrumentCommand
   public final static String IC_PROPE_KEY = "commandProbe";
   
   public final static String IC_GET_SETTINGS_KEY = "commandGetSettings";
+  public final static String IC_SET_SETTINGS_KEY = "commandSetSettings";
+  public final static String ICARG_SET_SETTINGS = "setSettings"; 
   
   public final static String IC_RF_OUTPUT_ENABLE = "commandRfOutputEnable";
   public final static String ICARG_RF_OUTPUT_ENABLE = "rfOutputEnable"; 
