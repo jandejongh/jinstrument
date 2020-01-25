@@ -17,6 +17,7 @@
 package org.javajdj.jinstrument.gpib.fc.hp5328a;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -241,16 +242,46 @@ implements FrequencyCounter
   // FrequencyCounter
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
+
+  @Override
+  public final List getSupportedModes ()
+  {
+    // XXX TBI XXX
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  public final double getMinFrequency_Hz ()
+  {
+    // XXX TBI XXX
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  public final double getMaxFrequency_Hz ()
+  {
+    // XXX TBI XXX
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override  
+  public final double getFrequencyResolution_Hz ()
+  {
+    // XXX TBI XXX
+    throw new UnsupportedOperationException ();
+  }
+
   @Override
   public final boolean supportsGetGateTime ()
   {
+    // XXX TBI XXX
     throw new UnsupportedOperationException ();
   }
 
   @Override
   public final boolean supportsSetGateTime ()
   {
+    // XXX TBI XXX
     throw new UnsupportedOperationException ();
   }
 
@@ -271,6 +302,35 @@ implements FrequencyCounter
   @Override
   public double getGateTimeResolution_s ()
   {
+    // XXX TBI XXX
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  public final List getSupportedTriggerModes ()
+  {
+    // XXX TBI XXX
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  public final double getMinTriggerLevel_V ()
+  {
+    // XXX TBI XXX
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  public final double getMaxTriggerLevel_V ()
+  {
+    // XXX TBI XXX
+    throw new UnsupportedOperationException ();
+  }
+
+  @Override
+  public final double getTriggerLevelResolution_V ()
+  {
+    // XXX TBI XXX
     throw new UnsupportedOperationException ();
   }
 
