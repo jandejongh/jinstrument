@@ -37,8 +37,8 @@ import org.javajdj.jservice.Service;
  *
  */
 public abstract class AbstractGpibInstrument
-extends AbstractInstrument
-implements GpibInstrument
+  extends AbstractInstrument
+  implements GpibInstrument
 {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -302,6 +302,13 @@ implements GpibInstrument
   protected final GpibControllerCommand generateReadlnCommand ()
   {
     return getDevice ().generateReadlnCommand (getReadlineTerminationMode ());
+  }
+  
+  protected final String readlnSync ()
+    throws InterruptedException, IOException, TimeoutException
+  {
+    final byte[] bytes = getDevice ().readlnSync (getReadlineTerminationMode (), getReadlineTimeout_ms ());
+    return new String (bytes, Charset.forName ("US-ASCII"));
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
