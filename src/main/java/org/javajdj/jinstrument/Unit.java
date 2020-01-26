@@ -31,6 +31,12 @@ public enum Unit
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   //
+  // DIMENSIONLESS
+  //
+  
+  UNIT_NONE (""),
+  
+  //
   // VOLTAGE
   //
   UNIT_pV  ("pV"),
@@ -82,7 +88,7 @@ public enum Unit
   UNIT_ns ("ns"),
   UNIT_mus ("\u03BCs"),
   UNIT_ms ("ms"),
-  UNIT_s ("ms"),
+  UNIT_s ("s"),
   UNIT_ks ("ks"),
   UNIT_Ms ("Ms"),
   
