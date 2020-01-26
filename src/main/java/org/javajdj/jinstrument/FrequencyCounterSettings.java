@@ -18,10 +18,12 @@ package org.javajdj.jinstrument;
 
 /** Extension of {@link InstrumentSettings} for (typically LF) single-channel frequency counters.
  *
+ * @param <M> The type of modes (functions, measurement functions, etc.) on the instrument.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public interface FrequencyCounterSettings
+public interface FrequencyCounterSettings<M>
   extends InstrumentSettings
 {
   
@@ -29,6 +31,8 @@ public interface FrequencyCounterSettings
   FrequencyCounterSettings clone() throws CloneNotSupportedException;
   
   byte[] getBytes ();
+  
+  M getInstrumentMode ();
   
   double getGateTime_s ();
   

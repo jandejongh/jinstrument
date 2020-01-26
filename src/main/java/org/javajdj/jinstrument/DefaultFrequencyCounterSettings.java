@@ -19,16 +19,18 @@ package org.javajdj.jinstrument;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-/** Default implementation of {@link FrequencyCounterSettings}.
+/** *  Default implementation of {@link FrequencyCounterSettings}.
  * 
  * <p>
  * The object is immutable.
  * 
+ * @param <M> The type of modes (functions, measurement functions, etc.) on the instrument.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  *
  */
-public class DefaultFrequencyCounterSettings
-  implements FrequencyCounterSettings
+public class DefaultFrequencyCounterSettings<M>
+  implements FrequencyCounterSettings<M>
 {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,10 +49,12 @@ public class DefaultFrequencyCounterSettings
   
   public DefaultFrequencyCounterSettings (
     final byte[] bytes,
+    final M instrumentMode,
     final double gateTime_s,
     final Unit readingUnit)
   {
     this.bytes = bytes;
+    this.instrumentMode = instrumentMode;
     this.gateTime_s = gateTime_s;
     this.readingUnit = readingUnit;
   }
@@ -94,6 +98,21 @@ public class DefaultFrequencyCounterSettings
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // FrequencyCounterSettings
+  // INSTRUMENT MODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final M instrumentMode;
+
+  @Override
+  public final M getInstrumentMode ()
+  {
+    return this.instrumentMode;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // FrequencyCounterSettings
   // GATE TIME
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -130,23 +149,13 @@ public class DefaultFrequencyCounterSettings
     if (this.bytes == null)
       throw new UnsupportedOperationException ();
     if (this == obj)
-    {
       return true;
-    }
     if (obj == null)
-    {
       return false;
-    }
     if (getClass () != obj.getClass ())
-    {
       return false;
-    }
     final DefaultFrequencyCounterSettings other = (DefaultFrequencyCounterSettings) obj;
-    if (!Arrays.equals (this.bytes, other.bytes))
-    {
-      return false;
-    }
-    return true;
+    return Arrays.equals (this.bytes, other.bytes);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
