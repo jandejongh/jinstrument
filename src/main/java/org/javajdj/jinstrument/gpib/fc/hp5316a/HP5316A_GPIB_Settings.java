@@ -30,8 +30,8 @@ import org.javajdj.jinstrument.FrequencyCounterSettings;
  * 
  */
 public final class HP5316A_GPIB_Settings
-  extends DefaultFrequencyCounterSettings
-  implements FrequencyCounterSettings
+  extends DefaultFrequencyCounterSettings<HP5316A_GPIB_Settings.MeasurementFunction>
+  implements FrequencyCounterSettings<HP5316A_GPIB_Settings.MeasurementFunction>
 {
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,6 +219,7 @@ public final class HP5316A_GPIB_Settings
         triggerLevelControl,
         aChannelTriggerLevel_V,
         bChannelTriggerLevel_V),
+      measurementFunction,
       gateTime_s,
       getReadingUnit (measurementFunction));
     this.measurementFunction = measurementFunction;
@@ -278,7 +279,7 @@ public final class HP5316A_GPIB_Settings
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // MEASUREMENT FUNCTION
+  // MEASUREMENT FUNCTION / MODE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
