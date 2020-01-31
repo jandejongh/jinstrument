@@ -21,6 +21,9 @@ import java.util.List;
 
 /** Extension of {@link Instrument} for (single-channel) frequency counters.
  *
+ * @param <M> The type of modes (functions, measurement functions, etc.) on the instrument.
+ * @param <T> The type of trigger modes.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
@@ -35,6 +38,9 @@ extends Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   List<M> getSupportedModes ();
+  
+  void setInstrumentMode (M instrumentMode)
+    throws IOException, InterruptedException, UnsupportedOperationException;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
