@@ -19,17 +19,18 @@ package org.javajdj.jinstrument;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-/** *  Default implementation of {@link FrequencyCounterSettings}.
+/** Default implementation of {@link FrequencyCounterSettings}.
  * 
  * <p>
  * The object is immutable.
  * 
  * @param <M> The type of modes (functions, measurement functions, etc.) on the instrument.
+ * @param <T> The type of trigger modes.
  * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  *
  */
-public class DefaultFrequencyCounterSettings<M>
+public class DefaultFrequencyCounterSettings<M, T>
   implements FrequencyCounterSettings<M>
 {
 
