@@ -28,12 +28,15 @@ import org.javajdj.jservice.Service;
 
 /** Abstract base implementation of a {@link FrequencyCounter} for GPIB instruments.
  *
+ * @param <M> The type of modes (functions, measurement functions, etc.) on the instrument.
+ * @param <T> The type of trigger modes.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public abstract class AbstractGpibFrequencyCounter
+public abstract class AbstractGpibFrequencyCounter<M, T>
   extends AbstractGpibInstrument
-  implements FrequencyCounter
+  implements FrequencyCounter<M, T>
 {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,8 +86,17 @@ public abstract class AbstractGpibFrequencyCounter
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
+  public void setInstrumentMode (final M instrumentMode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_INSTRUMENT_MODE,
+      InstrumentCommand.ICARG_INSTRUMENT_MODE, instrumentMode));
+  }
+  
+  @Override
   public void setGateTime_s (final double gateTime_s)
-    throws IOException, InterruptedException
+    throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
       InstrumentCommand.IC_GATE_TIME,
