@@ -16,6 +16,10 @@
  */
 package org.javajdj.jinstrument;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 /** A physical (scalar) unit.
@@ -250,6 +254,187 @@ public enum Unit
     return to;
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // AUTO RANGE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private enum AutoRangeBin
+  {
+    
+    INTERVAL_1000_POS_INFTY (1000, Double.POSITIVE_INFINITY),
+    INTERVAL_100_1000       (100, 1000),
+    INTERVAL_10_100         (10, 100),
+    INTERVAL_1_10           (1, 10),
+    INTERVAL_0p1_1          (0.1, 1),
+    INTERVAL_0p01_0p1       (0.01, 0.1),
+    INTERVAL_0p001_0p01     (0.001, 0.01),
+    INTERVAL_ZERO_p001      (0, 0.001);
+
+    private AutoRangeBin (final double rangeMin, final double rangeMax)
+    {
+      this.rangeMin = rangeMin;
+      this.rangeMax = rangeMax;
+    }
+    
+    private final double rangeMin;
+
+    public final double getRangeMin ()
+    {
+      return this.rangeMin;
+    }
+
+    private final double rangeMax;
+    
+    public final double getRangeMax ()
+    {
+      return this.rangeMax;
+    }
+   
+    public final static AutoRangeBin fromDouble (final double d)
+    {
+      if (d < 0)
+        return fromDouble (-d);
+      for (final AutoRangeBin bin : AutoRangeBin.values ())
+        if (d >= bin.getRangeMin () && d < bin.getRangeMax ())
+          return bin;
+      throw new RuntimeException ();
+    }
+    
+  }
+  
+  public enum AutoRangePolicy
+  {
+    PREFER_1_1000,
+    PREFER_1_100,
+    PREFER_1_10,
+    PREFER_0p1_1;
+  }
+  
+  private static double scoreMagnitude (final AutoRangePolicy autoRangePolicy, final double magnitude)
+  {
+    if (autoRangePolicy == null)
+      throw new IllegalArgumentException ();
+    if (magnitude < 0)
+      return scoreMagnitude (autoRangePolicy, -magnitude);
+    final AutoRangeBin autoRangeBin = AutoRangeBin.fromDouble (magnitude);
+    switch (autoRangeBin)
+    {
+      case INTERVAL_1000_POS_INFTY:
+        switch (autoRangePolicy)
+        {
+          case PREFER_1_1000:
+            return -magnitude/1000;
+          case PREFER_1_100:
+            return -magnitude/100;
+          case PREFER_1_10:
+            return -magnitude/10;
+          case PREFER_0p1_1:
+            return -magnitude;
+          default:
+            throw new RuntimeException ();
+        }
+      case INTERVAL_100_1000:
+        switch (autoRangePolicy)
+        {
+          case PREFER_1_1000:
+            return magnitude;
+          case PREFER_1_100:
+            return -magnitude/100;
+          case PREFER_1_10:
+            return -magnitude/10;
+          case PREFER_0p1_1:
+            return -magnitude;
+          default:
+            throw new RuntimeException ();
+        }
+      case INTERVAL_10_100:
+        switch (autoRangePolicy)
+        {
+          case PREFER_1_1000:
+            return magnitude / 10;
+          case PREFER_1_100:
+            return magnitude;
+          case PREFER_1_10:
+            return -magnitude/10;
+          case PREFER_0p1_1:
+            return -magnitude;
+          default:
+            throw new RuntimeException ();
+        }
+      case INTERVAL_1_10:
+        switch (autoRangePolicy)
+        {
+          case PREFER_1_1000:
+            return magnitude / 100;
+          case PREFER_1_100:
+            return magnitude / 10;
+          case PREFER_1_10:
+            return magnitude;
+          case PREFER_0p1_1:
+            return -magnitude;
+          default:
+            throw new RuntimeException ();
+        }
+      case INTERVAL_0p1_1:
+        switch (autoRangePolicy)
+        {
+          case PREFER_1_1000:
+            return -magnitude;
+          case PREFER_1_100:
+            return -magnitude;
+          case PREFER_1_10:
+            return -magnitude;
+          case PREFER_0p1_1:
+            return magnitude;
+          default:
+            throw new RuntimeException ();
+        }
+      case INTERVAL_0p01_0p1:
+      case INTERVAL_0p001_0p01:
+      case INTERVAL_ZERO_p001:
+        return -magnitude;
+      default:
+        throw new RuntimeException ();
+    }
+  }
+  
+  public static final Unit autoRange (
+    final AutoRangePolicy autoRangePolicy,
+    final double magnitude,
+    final Unit fromUnit,
+    final Resolution fromResolution,
+    final Unit[] toUnits,
+    final Resolution toResolution,
+    final boolean strictQuantity,
+    final boolean round)
+  {
+    if (autoRangePolicy == null)
+      throw new IllegalArgumentException ();
+    if (fromUnit == null)
+      throw new IllegalArgumentException ();
+    if (toUnits == null || toUnits.length == 0)
+      return fromUnit;
+    final SortedMap<Double, Set<Unit>> unitScores = new TreeMap<> ();
+    final double defaultScore = scoreMagnitude (autoRangePolicy, magnitude);
+    unitScores.put (defaultScore, new LinkedHashSet<> ());
+    unitScores.get (defaultScore).add (fromUnit);
+    for (final Unit toUnit : toUnits)
+      if (toUnit != fromUnit)
+      {
+        if (strictQuantity && fromUnit.getQuantity () != toUnit.getQuantity ())
+          continue;
+        final double unitScore = scoreMagnitude (autoRangePolicy, Unit.convertToUnit (magnitude, fromUnit, toUnit));
+        if (unitScore < unitScores.lastKey ())
+          continue;
+        if (! unitScores.containsKey (unitScore))
+          unitScores.put (unitScore, new LinkedHashSet<> ());
+        unitScores.get (unitScore).add (toUnit);
+      }
+    return unitScores.get (unitScores.lastKey ()).iterator ().next ();
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
