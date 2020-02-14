@@ -30,6 +30,7 @@ import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
+import org.javajdj.jinstrument.Resolution;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.gpib.sa.AbstractGpibSpectrumAnalyzer;
@@ -317,8 +318,10 @@ public class HP70000_GPIB_Instrument
       settings,
       samples,
       Unit.UNIT_dBm, // XXX Always correct?
+      Resolution.DIGITS_5, // XXX Educated guess: dynamic range > 100 dB, 0.01 dB resolution...
       false, // XXX
       null,
+      false,
       false,
       false);
   }
