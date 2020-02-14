@@ -21,11 +21,13 @@ import java.util.logging.Logger;
 
 /** Abstract base implementation of {@link InstrumentReading}.
  * 
+ * @param <R> The type of the actual reading.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public abstract class AbstractInstrumentReading
-  implements InstrumentReading
+public abstract class AbstractInstrumentReading<R>
+  implements InstrumentReading<R>
 {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,10 +47,12 @@ public abstract class AbstractInstrumentReading
   protected AbstractInstrumentReading (
     final InstrumentSettings instrumentSettings,
     final Instant readingTime,
-    final Object readingValue,
+    final R readingValue,
     final Unit unit,
+    final Resolution resolution,
     final boolean error,
     final String errorMessage,
+    final boolean overflow,
     final boolean uncalibrated,
     final boolean uncorrected)
   {
@@ -58,22 +62,35 @@ public abstract class AbstractInstrumentReading
     this.readingTime = readingTime != null ? readingTime : Instant.now ();
     this.readingValue = readingValue;
     this.unit = unit;
+    this.resolution = resolution;
     this.error = error;
     this.errorMessage = errorMessage;
+    this.overflow = overflow;
     this.uncalibrated = uncalibrated;
     this.uncorrected = uncorrected;    
   }
   
   protected AbstractInstrumentReading (
     final InstrumentSettings instrumentSettings,
-    final Object readingValue,
+    final R readingValue,
     final Unit unit,
+    final Resolution resolution,
     final boolean error,
     final String errorMessage,
+    final boolean overflow,
     final boolean uncalibrated,
     final boolean uncorrected)
   {
-    this (instrumentSettings, null, readingValue, unit, error, errorMessage, uncalibrated, uncorrected);
+    this (instrumentSettings, null, readingValue, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
+  }
+  
+  protected AbstractInstrumentReading (
+    final InstrumentSettings instrumentSettings,
+    final R readingValue,
+    final Unit unit,
+    final Resolution resolution)
+  {
+    this (instrumentSettings, null, readingValue, unit, resolution, false, null, false, false, false);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,10 +131,10 @@ public abstract class AbstractInstrumentReading
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final Object readingValue;
+  private final R readingValue;
   
   @Override
-  public Object getReadingValue ()
+  public R getReadingValue ()
   {
     return this.readingValue;
   }
@@ -133,8 +150,24 @@ public abstract class AbstractInstrumentReading
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // InstrumentReading
+  // RESOLUTION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Resolution resolution;
+  
+  @Override
+  public final Resolution getResolution ()
+  {
+    return this.resolution;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // InstrumentReading
   // ERROR
   // ERROR MESSAGE
+  // OVERFLOW
   // UNCALIBRATED
   // UNCORRECTED
   //
@@ -154,6 +187,14 @@ public abstract class AbstractInstrumentReading
   public final String getErrorMessage ()
   {
     return this.errorMessage;
+  }
+  
+  public final boolean overflow;
+  
+  @Override
+  public final boolean isOverflow ()
+  {
+    return this.overflow;
   }
   
   private final boolean uncalibrated;

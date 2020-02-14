@@ -24,23 +24,29 @@ import java.time.Instant;
  * This class applies mostly to <i>measurement</i> {@link Instrument}s.
  * Reading may be as simple as a single value or as complex as multiple related traces.
  *
+ * @param <R> The type of the actual reading.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public interface InstrumentReading
+public interface InstrumentReading<R>
 {
   
   InstrumentSettings getInstrumentSettings ();
   
   Instant getReadingTime ();
 
-  Object getReadingValue ();
+  R getReadingValue ();
   
   Unit getUnit ();
+  
+  Resolution getResolution ();
   
   boolean isError ();
   
   String getErrorMessage ();
+  
+  boolean isOverflow ();
   
   boolean isUncalibrated ();
   
