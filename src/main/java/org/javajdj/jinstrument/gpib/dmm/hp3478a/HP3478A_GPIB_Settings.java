@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.javajdj.jinstrument.Unit;
 import org.javajdj.jinstrument.DefaultDigitalMultiMeterSettings;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.DigitalMultiMeterSettings;
+import org.javajdj.jinstrument.Resolution;
 
 /** Implementation of {@link InstrumentSettings} and {@link DigitalMultiMeterSettings} for the HP-3478A.
  *
@@ -73,7 +74,7 @@ public final class HP3478A_GPIB_Settings
   
   private HP3478A_GPIB_Settings (
     final byte[] bytes,
-    final DigitalMultiMeter.NumberOfDigits resolution,
+    final Resolution resolution,
     final DigitalMultiMeter.MeasurementMode measurementMode,
     final boolean autoRange,
     final DigitalMultiMeter.Range range,
@@ -112,19 +113,19 @@ public final class HP3478A_GPIB_Settings
     // BYTE 0: RESOLUTION, MEASUREMENT MODE, RANGE
     //
     final int resolutionInt = (b[0] & 0x03);
-    final DigitalMultiMeter.NumberOfDigits resolution;
+    final Resolution resolution;
     switch (resolutionInt)
     {
       case 0:
         throw new IllegalArgumentException ();
       case 1:
-        resolution = DigitalMultiMeter.NumberOfDigits.DIGITS_5_5;
+        resolution = Resolution.DIGITS_5_5;
         break;
       case 2:
-        resolution = DigitalMultiMeter.NumberOfDigits.DIGITS_4_5;
+        resolution = Resolution.DIGITS_4_5;
         break;
       case 3:
-        resolution = DigitalMultiMeter.NumberOfDigits.DIGITS_3_5;
+        resolution = Resolution.DIGITS_3_5;
         break;
       default:
         throw new RuntimeException ();
