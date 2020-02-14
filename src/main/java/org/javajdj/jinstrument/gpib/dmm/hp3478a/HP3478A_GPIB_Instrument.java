@@ -42,6 +42,7 @@ import org.javajdj.jinstrument.gpib.dmm.AbstractGpibDigitalMultiMeter;
 import org.javajdj.jinstrument.DefaultDigitalMultiMeterReading;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.DigitalMultiMeterSettings;
+import org.javajdj.jinstrument.Resolution;
 import org.javajdj.jinstrument.controller.gpib.ReadlineTerminationMode;
 
 /** Implementation of {@link Instrument} and {@link DigitalMultiMeter} for the HP-3478A.
@@ -143,18 +144,18 @@ public class HP3478A_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  private final static NumberOfDigits[] SUPPORTED_RESOLUTIONS = new NumberOfDigits[]
+  private final static Resolution[] SUPPORTED_RESOLUTIONS = new Resolution[]
   {
-    NumberOfDigits.DIGITS_3_5,
-    NumberOfDigits.DIGITS_4_5,
-    NumberOfDigits.DIGITS_5_5
+    Resolution.DIGITS_3_5,
+    Resolution.DIGITS_4_5,
+    Resolution.DIGITS_5_5
   };
   
-  private final static List<NumberOfDigits> SUPPORTED_RESOLUTIONS_AS_LIST
+  private final static List<Resolution> SUPPORTED_RESOLUTIONS_AS_LIST
     = Collections.unmodifiableList (Arrays.asList (HP3478A_GPIB_Instrument.SUPPORTED_RESOLUTIONS));
   
   @Override
-  public final List<NumberOfDigits> getSupportedResolutions ()
+  public final List<Resolution> getSupportedResolutions ()
   {
     return HP3478A_GPIB_Instrument.SUPPORTED_RESOLUTIONS_AS_LIST;
   }
@@ -472,11 +473,12 @@ public class HP3478A_GPIB_Instrument
       settings,
       readingValue,
       settings.getReadingUnit (),
+      settings.getResolution (),
       false,
       null,
+      false, // XXX DON'T WE HAVE AN OVERFLOW INDICATION??
       false,
-      false,
-      settings.getResolution ());
+      false);
   }
 
   @Override
@@ -550,8 +552,8 @@ public class HP3478A_GPIB_Instrument
         }
         case InstrumentCommand.IC_RESOLUTION:
         {
-          final NumberOfDigits resolution = (NumberOfDigits) instrumentCommand.get (InstrumentCommand.ICARG_RESOLUTION);
-          final List<NumberOfDigits> supportedResolutions = HP3478A_GPIB_Instrument.SUPPORTED_RESOLUTIONS_AS_LIST;
+          final Resolution resolution = (Resolution) instrumentCommand.get (InstrumentCommand.ICARG_RESOLUTION);
+          final List<Resolution> supportedResolutions = HP3478A_GPIB_Instrument.SUPPORTED_RESOLUTIONS_AS_LIST;
           if (! supportedResolutions.contains (resolution))
           {
             LOG.log (Level.WARNING, "Resolution {0} is not supported on HP3478A.",
