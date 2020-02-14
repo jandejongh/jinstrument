@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,9 @@ package org.javajdj.jinstrument;
  * 
  */
 public interface InstrumentTrace
-  extends InstrumentReading
+  extends InstrumentReading<double[]>
 {
   
   int getTraceLength ();
-  
-  @Override
-  double[] getReadingValue ();
   
 }

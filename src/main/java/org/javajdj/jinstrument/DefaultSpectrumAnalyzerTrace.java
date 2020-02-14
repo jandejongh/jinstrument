@@ -22,7 +22,7 @@ package org.javajdj.jinstrument;
  * 
  */
 public class DefaultSpectrumAnalyzerTrace
-  extends AbstractInstrumentReading
+  extends AbstractInstrumentReading<double[]>
   implements SpectrumAnalyzerTrace
 {
 
@@ -36,12 +36,14 @@ public class DefaultSpectrumAnalyzerTrace
     final SpectrumAnalyzerSettings settings,
     final double[] samples,
     final Unit unit,
+    final Resolution resolution,
     final boolean error,
     final String errorMessage,
+    final boolean overflow,
     final boolean uncalibrated,
     final boolean uncorrected)
   {
-    super (settings, settings, unit, error, errorMessage, uncalibrated, uncorrected);
+    super (settings, samples, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
