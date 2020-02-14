@@ -36,6 +36,7 @@ import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
 import org.javajdj.jinstrument.gpib.sa.AbstractGpibSpectrumAnalyzer;
 import org.javajdj.jinstrument.DefaultSpectrumAnalyzerSettings;
 import org.javajdj.jinstrument.DefaultSpectrumAnalyzerTrace;
+import org.javajdj.jinstrument.Resolution;
 import org.javajdj.jinstrument.SpectrumAnalyzer;
 import org.javajdj.jinstrument.SpectrumAnalyzerSettings;
 import org.javajdj.jinstrument.controller.gpib.ReadlineTerminationMode;
@@ -420,10 +421,12 @@ public class HP8566B_GPIB_Instrument
       settings,
       samples,
       Unit.UNIT_dBm, // XXX Always correct?
+      Resolution.DIGITS_5, // XXX Educated guess: dynamic range > 100 dB, 0.01 dB resolution...
       true,
       null,
-      true,
-      true);
+      false,
+      true,  // XXX ???
+      true); // XXX ???
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
