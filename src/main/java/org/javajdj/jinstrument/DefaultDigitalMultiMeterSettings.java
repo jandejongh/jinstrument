@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class DefaultDigitalMultiMeterSettings
   
   public DefaultDigitalMultiMeterSettings (
     final byte[] bytes,
-    final DigitalMultiMeter.NumberOfDigits resolution,
+    final Resolution resolution,
     final DigitalMultiMeter.MeasurementMode measurementMode,
     final boolean autoRange,
     final DigitalMultiMeter.Range range,
@@ -104,10 +104,10 @@ public class DefaultDigitalMultiMeterSettings
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final DigitalMultiMeter.NumberOfDigits resolution;
+  private final Resolution resolution;
   
   @Override
-  public final DigitalMultiMeter.NumberOfDigits getResolution ()
+  public final Resolution getResolution ()
   {
     return this.resolution;
   }
