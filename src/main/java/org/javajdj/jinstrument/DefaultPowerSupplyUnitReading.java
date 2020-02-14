@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  *
  */
 public class DefaultPowerSupplyUnitReading
-  extends AbstractInstrumentReading
+  extends AbstractInstrumentReading<PowerSupplyUnitReading.Reading>
   implements PowerSupplyUnitReading
 {
 
@@ -51,8 +51,10 @@ public class DefaultPowerSupplyUnitReading
     final double readingCurrent_A,
     final double readingPower_W,
     final PowerSupplyUnit.PowerSupplyMode powerSupplyMode,
+    final Resolution resolution,
     final boolean error,
     final String errorMessage,
+    final boolean overflow,
     final boolean uncalibrated,
     final boolean uncorrected)
   {
@@ -60,8 +62,10 @@ public class DefaultPowerSupplyUnitReading
       settings,
       new DefaultReading (readingVoltage_V, readingCurrent_A, readingPower_W, powerSupplyMode),
       null,
+      resolution,
       error,
       errorMessage,
+      overflow,
       uncalibrated,
       uncorrected);
   }
@@ -145,12 +149,6 @@ public class DefaultPowerSupplyUnitReading
     
   }
   
-  @Override
-  public Reading getReadingValue ()
-  {
-    return (Reading) super.getReadingValue ();
-  }
-
   @Override
   public final double getReadingVoltage_V ()
   {

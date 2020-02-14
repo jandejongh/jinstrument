@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package org.javajdj.jinstrument;
  * 
  */
 public interface PowerSupplyUnitReading
-  extends InstrumentReading
+  extends InstrumentReading<PowerSupplyUnitReading.Reading>
 {
 
   interface Reading
@@ -35,9 +35,6 @@ public interface PowerSupplyUnitReading
   
   @Override
   PowerSupplyUnitSettings getInstrumentSettings ();
-
-  @Override
-  Reading getReadingValue ();
 
   double getReadingVoltage_V ();
   double getReadingCurrent_A ();
