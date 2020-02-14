@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  *
  */
 public class DefaultFrequencyCounterReading
-  extends AbstractInstrumentReading
+  extends AbstractInstrumentReading<Double>
   implements FrequencyCounterReading
 {
 
@@ -49,16 +49,16 @@ public class DefaultFrequencyCounterReading
     final FrequencyCounterSettings settings,
     final double readingValue,
     final Unit unit,
+    final Resolution resolution,
     final boolean error,
     final String errorMessage,
+    final boolean overflow,
     final boolean uncalibrated,
-    final boolean uncorrected,
-    final DigitalMultiMeter.NumberOfDigits resolution)
+    final boolean uncorrected)
   {
-    super (settings, readingValue, unit, error, errorMessage, uncalibrated, uncorrected);
+    super (settings, readingValue, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
     if (unit == null)
       throw new IllegalArgumentException ();
-    this.resolution = resolution;
   }
 
   @Override
@@ -89,30 +89,9 @@ public class DefaultFrequencyCounterReading
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
-  public Double getReadingValue ()
-  {
-    return (Double) super.getReadingValue ();
-  }
-
-  @Override
   public double getFrequencyCounterReading ()
   {
     return getReadingValue ();
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // FrequencyCounterReading
-  // RESOLUTION
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final DigitalMultiMeter.NumberOfDigits resolution;
-
-  @Override
-  public final DigitalMultiMeter.NumberOfDigits getResolution ()
-  {
-    return this.resolution;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

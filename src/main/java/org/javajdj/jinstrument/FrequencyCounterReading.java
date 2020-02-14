@@ -22,17 +22,12 @@ package org.javajdj.jinstrument;
  * 
  */
 public interface FrequencyCounterReading
-  extends InstrumentReading
+  extends InstrumentReading<Double>
 {
 
   @Override
   public FrequencyCounterSettings getInstrumentSettings ();
 
-  @Override
-  Double getReadingValue ();
-
   double getFrequencyCounterReading ();
-  
-  DigitalMultiMeter.NumberOfDigits getResolution ();
   
 }
