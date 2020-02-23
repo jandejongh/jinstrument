@@ -41,6 +41,9 @@ public enum Quantity
   QUANTITY_FREQUENCY   (Unit.UNIT_Hz),
   QUANTITY_CAPACITANCE (Unit.UNIT_F),
   QUANTITY_INDUCTANCE  (Unit.UNIT_H),
+  QUANTITY_TEMPERATURE (Unit.UNIT_K),
+  QUANTITY_ENERGY      (Unit.UNIT_J),
+  QUANTITY_DISTANCE    (Unit.UNIT_m),
   
   ;
   
@@ -112,6 +115,12 @@ public enum Quantity
         return false;
       case QUANTITY_INDUCTANCE:
         return false;
+      case QUANTITY_TEMPERATURE:
+        return false;
+      case QUANTITY_ENERGY:
+        return false;
+      case QUANTITY_DISTANCE:
+        return false;
       default:
         throw new RuntimeException ();
     }
@@ -141,6 +150,9 @@ public enum Quantity
         return 1 / magnitude;
       case QUANTITY_CAPACITANCE:
       case QUANTITY_INDUCTANCE:
+      case QUANTITY_TEMPERATURE:
+      case QUANTITY_ENERGY:
+      case QUANTITY_DISTANCE:
         throw new IllegalArgumentException ();
       default:
         throw new RuntimeException ();

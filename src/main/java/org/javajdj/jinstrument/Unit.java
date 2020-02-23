@@ -132,7 +132,60 @@ public enum Unit
   UNIT_kH  (Quantity.QUANTITY_INDUCTANCE, 1E3 , "kH"),
   UNIT_MH  (Quantity.QUANTITY_INDUCTANCE, 1E6 , "MH"),
   
+  //
+  // TEMPERATURE
+  //
+  UNIT_K (Quantity.QUANTITY_TEMPERATURE, 1, "K"),
+  UNIT_C (Quantity.QUANTITY_TEMPERATURE, (c) -> c + Unit.ZERO_CELSIUS_K, (k) -> k - Unit.ZERO_CELSIUS_K, "C"),
+  // XXX NEED Fahrenheit!
+  
+  //
+  // ENERGY
+  //
+  UNIT_aJ  (Quantity.QUANTITY_ENERGY, 1E-18, "aJ"),
+  UNIT_fJ  (Quantity.QUANTITY_ENERGY, 1E-15, "fJ"),
+  UNIT_pJ  (Quantity.QUANTITY_ENERGY, 1E-12, "pJ"),
+  UNIT_nJ  (Quantity.QUANTITY_ENERGY, 1E-9,  "nJ"),
+  UNIT_muJ (Quantity.QUANTITY_ENERGY, 1E-6,  "\u03BCJ"),
+  UNIT_mJ  (Quantity.QUANTITY_ENERGY, 1E-3,  "mJ"),
+  UNIT_J   (Quantity.QUANTITY_ENERGY, 1,     "J"),
+  UNIT_kJ  (Quantity.QUANTITY_ENERGY, 1E3,   "kJ"),
+  UNIT_MJ  (Quantity.QUANTITY_ENERGY, 1E6,   "MJ"),
+  UNIT_GJ  (Quantity.QUANTITY_ENERGY, 1E9,   "GJ"),
+  UNIT_TJ  (Quantity.QUANTITY_ENERGY, 1E12,  "TJ"),
+  UNIT_PJ  (Quantity.QUANTITY_ENERGY, 1E15,  "PJ"),
+  UNIT_EJ  (Quantity.QUANTITY_ENERGY, 1E18,  "EJ"),
+  
+  //
+  // DISTANCE
+  //
+  UNIT_am  (Quantity.QUANTITY_DISTANCE, 1E-18, "am"),
+  UNIT_fm  (Quantity.QUANTITY_DISTANCE, 1E-15, "fm"),
+  UNIT_pm  (Quantity.QUANTITY_DISTANCE, 1E-12, "pm"),
+  UNIT_nm  (Quantity.QUANTITY_DISTANCE, 1E-9,  "nm"),
+  UNIT_mum (Quantity.QUANTITY_DISTANCE, 1E-6,  "\u03BCm"),
+  UNIT_mm  (Quantity.QUANTITY_DISTANCE, 1E-3,  "mm"),
+  UNIT_cm  (Quantity.QUANTITY_DISTANCE, 1E-2,  "cm"),
+  UNIT_dm  (Quantity.QUANTITY_DISTANCE, 1E-1,  "dm"),
+  UNIT_m   (Quantity.QUANTITY_DISTANCE, 1,     "m"),
+  UNIT_dam (Quantity.QUANTITY_DISTANCE, 1E1,   "dam"),
+  UNIT_hm  (Quantity.QUANTITY_DISTANCE, 1E2,   "hm"),
+  UNIT_km  (Quantity.QUANTITY_DISTANCE, 1E3,   "km"),
+  UNIT_Mm  (Quantity.QUANTITY_DISTANCE, 1E6,   "Mm"),
+  UNIT_Gm  (Quantity.QUANTITY_DISTANCE, 1E9,   "Gm"),
+  UNIT_Tm  (Quantity.QUANTITY_DISTANCE, 1E12,  "Tm"),
+  UNIT_Pm  (Quantity.QUANTITY_DISTANCE, 1E15,  "Pm"),
+  UNIT_Em  (Quantity.QUANTITY_DISTANCE, 1E18,  "Em"),
+  
   ;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // PUBLIC STATIC CONSTANTS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static double ZERO_CELSIUS_K = 273.15;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
