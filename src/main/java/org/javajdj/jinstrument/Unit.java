@@ -304,12 +304,26 @@ public enum Unit
     
   }
   
-  public enum AutoRangePolicy
+  public static enum AutoRangePolicy
   {
-    PREFER_1_1000,
-    PREFER_1_100,
-    PREFER_1_10,
-    PREFER_0p1_1;
+    
+    PREFER_1_1000 (2),
+    PREFER_1_100  (1),
+    PREFER_1_10   (0),
+    PREFER_0p1_1  (0);
+    
+    private AutoRangePolicy (final int preferredDecimalPointIndex)
+    {
+      this.preferredDecimalPointIndex = preferredDecimalPointIndex;
+    }
+    
+    private final int preferredDecimalPointIndex;
+    
+    public final int getPreferredDecimalPointIndex ()
+    {
+      return this.preferredDecimalPointIndex;
+    }
+    
   }
   
   private static double scoreMagnitude (final AutoRangePolicy autoRangePolicy, final double magnitude)
