@@ -36,4 +36,6 @@ public interface FrequencyCounterSettings<M>
   
   double getGateTime_s ();
   
+  double getTriggerLevel_V ();
+  
 }
