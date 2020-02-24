@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ import org.javajdj.jinstrument.DefaultDigitalMultiMeterReading;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.DigitalMultiMeterReading;
 import org.javajdj.jinstrument.DigitalMultiMeterSettings;
+import org.javajdj.jinstrument.Resolution;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
@@ -253,10 +254,10 @@ public class JDefaultDigitalMultiMeterView
     
     public JResolutionPanel ()
     {
-      final List<DigitalMultiMeter.NumberOfDigits> resolutions = getDigitalMultiMeter ().getSupportedResolutions ();
+      final List<Resolution> resolutions = getDigitalMultiMeter ().getSupportedResolutions ();
       setLayout (new GridLayout (resolutions.size (), 2));
       this.resolutionsMap = new LinkedHashMap<> ();
-      for (final DigitalMultiMeter.NumberOfDigits resolution : resolutions)
+      for (final Resolution resolution : resolutions)
       {
         final JColorCheckBox<Boolean> jccb = new JColorCheckBox<> ((t) -> (t != null && t) ? Color.red : null);
         this.resolutionsMap.put (resolution, jccb);
@@ -278,11 +279,11 @@ public class JDefaultDigitalMultiMeterView
       }
     }
     
-    private final Map<DigitalMultiMeter.NumberOfDigits, JColorCheckBox> resolutionsMap;
+    private final Map<Resolution, JColorCheckBox> resolutionsMap;
     
-    public void setResolution (DigitalMultiMeter.NumberOfDigits newResolution)
+    public void setResolution (Resolution newResolution)
     {
-      for (final DigitalMultiMeter.NumberOfDigits resolution : this.resolutionsMap.keySet ())
+      for (final Resolution resolution : this.resolutionsMap.keySet ())
       {
         this.resolutionsMap.get (resolution).setDisplayedValue (resolution == newResolution);
         this.resolutionsMap.get (resolution).repaint ();
