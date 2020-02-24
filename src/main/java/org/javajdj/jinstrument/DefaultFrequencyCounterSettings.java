@@ -52,11 +52,13 @@ public class DefaultFrequencyCounterSettings<M, T>
     final byte[] bytes,
     final M instrumentMode,
     final double gateTime_s,
+    final double triggerLevel_V,
     final Unit readingUnit)
   {
     this.bytes = bytes;
     this.instrumentMode = instrumentMode;
     this.gateTime_s = gateTime_s;
+    this.triggerLevel_V = triggerLevel_V;
     this.readingUnit = readingUnit;
   }
 
@@ -124,6 +126,21 @@ public class DefaultFrequencyCounterSettings<M, T>
   public final double getGateTime_s ()
   {
     return this.gateTime_s;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // FrequencyCounterSettings
+  // TRIGGER LEVEL
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final double triggerLevel_V;
+
+  @Override
+  public final double getTriggerLevel_V ()
+  {
+    return this.triggerLevel_V;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
