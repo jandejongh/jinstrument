@@ -24,6 +24,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -35,7 +37,9 @@ import org.javajdj.jinstrument.InstrumentListener;
 import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
+import org.javajdj.jinstrument.Resolution;
 import org.javajdj.jinstrument.Unit;
+import org.javajdj.jswing.jbyte.JBooleans;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
 /** A Swing (base) component for showing a {@code double} {@link InstrumentReading}.
@@ -65,7 +69,8 @@ public class JDefaultInstrumentReadingPanel_Double
     final double resolution,
     final boolean printUnit,
     final List<Unit> units,
-    final boolean allowConversions)
+    final boolean allowConversions,
+    final boolean showReadingStatus)
   {
     super (instrument, title, level, panelBorderColor);
     this.jDisplay = new JSevenSegmentNumber (displayColor, minValue, maxValue, resolution);
@@ -74,7 +79,8 @@ public class JDefaultInstrumentReadingPanel_Double
       displayColor,
       printUnit,
       units,
-      allowConversions);
+      allowConversions,
+      showReadingStatus);
     if (orientationHorizontal)
     {
       setLayout (new GridBagLayout ());
@@ -129,6 +135,13 @@ public class JDefaultInstrumentReadingPanel_Double
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  private static enum UnitMode
+  {
+    INSTRUMENT,
+    AUTO,
+    MANUAL;
+  }
+    
   private class JUnitAndReadingStatus
     extends JPanel
   {
@@ -138,19 +151,17 @@ public class JDefaultInstrumentReadingPanel_Double
       final Color displayColor,
       final boolean printUnit,
       final List<Unit> units,
-      final boolean allowConversions)
+      final boolean allowConversions,
+      final boolean showReadingStatus)
     {
       this.printUnit = printUnit;
       this.units = units;
       this.allowConversions = allowConversions;
+      this.showReadingStatus= showReadingStatus;
       if (orientationHorizontal)
-      {
-        setLayout (new GridLayout (1, (this.printUnit ? 1 : 0) + (this.units != null ? 1: 0)));
-      }
+        setLayout (new GridLayout (1, (this.printUnit ? 1 : 0) + (this.units != null ? 1: 0) + (this.showReadingStatus ? 1 : 0)));
       else
-      {
-        setLayout (new GridLayout ((this.printUnit ? 1 : 0) + (this.units != null ? 1: 0), 1));        
-      }
+        setLayout (new GridLayout ((this.printUnit ? 1 : 0) + (this.units != null ? 1: 0) + (this.showReadingStatus ? 1 : 0), 1));
       if (this.printUnit)
       {
         this.jUnit = new JLabel ();
@@ -164,28 +175,65 @@ public class JDefaultInstrumentReadingPanel_Double
       else
         this.jUnit = null;
       if (this.units != null)
-      {
+      {      
+        final JPanel jUnitControlPanel = new JPanel ();
+        jUnitControlPanel.setLayout (new GridLayout (1, 2));
+        final JPanel jUnitsModePanel = new JPanel ();
+        setPanelBorder (jUnitsModePanel, getLevel () + 2, displayColor, "Mode");
+        jUnitsModePanel.setLayout (new GridBagLayout ());
+        this.jUnitMode = new JComboBox (UnitMode.values ());
+        this.jUnitMode.setEditable (false);
+        this.jUnitMode.setAlignmentY (Component.CENTER_ALIGNMENT);
+        if (allowConversions)
+        {
+          this.jUnitMode.setSelectedItem (UnitMode.AUTO);
+          this.jUnitMode.addActionListener (this.jUnitModeListener);
+        }
+        else
+        {
+          this.jUnitMode.setSelectedItem (UnitMode.INSTRUMENT);
+          this.jUnitMode.setEnabled (false);
+        }
+        jUnitsModePanel.add (this.jUnitMode, new GridBagConstraints ());
+        jUnitControlPanel.add (jUnitsModePanel);
         final JPanel jUnitsPanel = new JPanel ();
         setPanelBorder (jUnitsPanel, getLevel () + 2, displayColor, "Unit");
-        jUnitsPanel.setOpaque (true);
-        jUnitsPanel.setBackground (Color.black);
         jUnitsPanel.setLayout (new GridBagLayout ());
         this.jUnits = new JComboBox (this.units.toArray ());
+        this.jUnits.setEditable (false);
         this.jUnits.setAlignmentY (Component.CENTER_ALIGNMENT);
         if (this.allowConversions)
           this.jUnits.addActionListener (this.jUnitsListener);
         else
           this.jUnits.setEnabled (false);
         jUnitsPanel.add (this.jUnits, new GridBagConstraints ());
-        add (jUnitsPanel);
+        jUnitControlPanel.add (jUnitsPanel);
+        add (jUnitControlPanel);
       }
       else
+      {
+        this.jUnitMode = null;
         this.jUnits = null;
+      }
+      if (this.showReadingStatus)
+      {
+        this.jStatus = new JBooleans ((b) -> b != null && b ? displayColor : null,
+          new LinkedHashSet (Arrays.asList (new String[]{"ERR", "OVFL", "UNCOR", "UNCAL"})),
+          ! orientationHorizontal);
+        setPanelBorder (this.jStatus, getLevel () + 2, displayColor, "Status");
+        add (this.jStatus);
+      }
+      else
+      {
+        this.jStatus = null;
+      }
     }
     
     private final boolean printUnit;
     
     private final JLabel jUnit;
+
+    private final JComboBox jUnitMode;
     
     private final List<Unit> units;
     
@@ -193,7 +241,14 @@ public class JDefaultInstrumentReadingPanel_Double
     
     private final boolean allowConversions;
     
+    private final boolean showReadingStatus;
+    
     private volatile InstrumentReading instrumentReading;
+    
+    private final JBooleans jStatus;
+    
+     // XXX Could be user-settable...
+    private final Unit.AutoRangePolicy autoRangePolicy = Unit.AutoRangePolicy.PREFER_1_1000;
     
     public final void newInstrumentReading (final InstrumentReading instrumentReading)
     {
@@ -201,21 +256,67 @@ public class JDefaultInstrumentReadingPanel_Double
       // XXX At this stage, the cast should not be necessary!
       double value = (double) instrumentReading.getReadingValue ();
       Unit unit = instrumentReading.getUnit ();
-      if (this.allowConversions && unit != this.jUnits.getSelectedItem ())
+      int decimalPointIndex = JDefaultInstrumentReadingPanel_Double.this.jDisplay.getDefaultDecimalPointIndex ();
+      boolean allowSetUnit = false;
+      switch ((UnitMode) this.jUnitMode.getSelectedItem ())
       {
-        value = Unit.convertToUnit (value, unit, (Unit) this.jUnits.getSelectedItem ());
-        unit = (Unit) this.jUnits.getSelectedItem ();
-        // XXX What if the conversion fails??
-        // XXX What if we do not want conversion at this point?
+        case INSTRUMENT:
+          // EMPTY
+          break;
+        case AUTO:
+        {
+          final Unit newUnit = Unit.autoRange (this.autoRangePolicy,
+            value,
+            unit,
+            instrumentReading.getResolution (),
+            this.units.toArray (new Unit[]{}),
+            Resolution.fromNumberOfDigits (JDefaultInstrumentReadingPanel_Double.this.jDisplay.getNumberOfDigits ()),
+            true,
+            false);
+          if (unit != newUnit)
+          {
+            value = Unit.convertToUnit (value, unit, newUnit);
+            unit = newUnit;
+            decimalPointIndex = this.autoRangePolicy.getPreferredDecimalPointIndex ();
+          }
+          break;
+        }
+        case MANUAL:
+          if (this.allowConversions && unit != this.jUnits.getSelectedItem ())
+          {
+            value = Unit.convertToUnit (value, unit, (Unit) this.jUnits.getSelectedItem ());
+            unit = (Unit) this.jUnits.getSelectedItem ();
+            // XXX What if the conversion fails??
+          }
+          allowSetUnit = this.allowConversions;
+          break;
+        default:
+          throw new RuntimeException ();
       }
-      // XXX There's a lot more to it; the displayed valeu can no longer be separated from the unit stuff...
+      JDefaultInstrumentReadingPanel_Double.this.jDisplay.setDecimalPointIndex (decimalPointIndex);
       JDefaultInstrumentReadingPanel_Double.this.jDisplay.setNumber (value);
       if (this.jUnit != null)
         this.jUnit.setText (unit != null ? unit.toString () : "NULL");
       if (this.jUnits != null)
+      {
         this.jUnits.setSelectedItem (this.units.contains (unit) ? unit : null);
+        this.jUnits.setEnabled (allowSetUnit);
+      }
+      if (this.showReadingStatus)
+      {
+        this.jStatus.setDisplayedValue ("ERR", this.instrumentReading.isError ());
+        this.jStatus.setDisplayedValue ("OVFL", this.instrumentReading.isOverflow ());
+        this.jStatus.setDisplayedValue ("UNCOR", this.instrumentReading.isUncorrected ());
+        this.jStatus.setDisplayedValue ("UNCAL", this.instrumentReading.isUncalibrated ());
+      }
     }
     
+    private final ActionListener jUnitModeListener = (final ActionEvent ae) ->
+    {
+      if (this.instrumentReading != null)
+        newInstrumentReading (this.instrumentReading);
+    };
+      
     private final ActionListener jUnitsListener = (final ActionEvent ae) ->
     {
       if (this.instrumentReading != null)
