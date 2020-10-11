@@ -17,7 +17,6 @@
 package org.javajdj.jinstrument.gpib.fc.hp5316a;
 
 import java.nio.charset.Charset;
-import java.text.DecimalFormat;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.Unit;
@@ -30,7 +29,7 @@ import org.javajdj.jinstrument.FrequencyCounterSettings;
  * 
  */
 public final class HP5316A_GPIB_Settings
-  extends DefaultFrequencyCounterSettings<HP5316A_GPIB_Settings.MeasurementFunction>
+  extends DefaultFrequencyCounterSettings<HP5316A_GPIB_Settings.MeasurementFunction, HP5316A_GPIB_Settings.TriggerLevelControl>
   implements FrequencyCounterSettings<HP5316A_GPIB_Settings.MeasurementFunction>
 {
   
@@ -63,45 +62,45 @@ public final class HP5316A_GPIB_Settings
     if (measurementFunction == null)
       throw new IllegalArgumentException ();
     sb.append (measurementFunction.toCanonicalString ());
-    if (channelATriggerSlope == null)
-      throw new IllegalArgumentException ();
-    switch (channelATriggerSlope)
-    {
-      case POSITIVE:
-        sb.append ("AS0");
-        break;
-      case NEGATIVE:
-        sb.append ("AS1");
-        break;
-      default:
-        throw new RuntimeException ();
-    }
-    if (channelBTriggerSlope == null)
-      throw new IllegalArgumentException ();
-    switch (channelBTriggerSlope)
-    {
-      case POSITIVE:
-        sb.append ("BS0");
-        break;
-      case NEGATIVE:
-        sb.append ("BS1");
-        break;
-      default:
-        throw new RuntimeException ();
-    }
+//    if (channelATriggerSlope == null)
+//      throw new IllegalArgumentException ();
+//    switch (channelATriggerSlope)
+//    {
+//      case POSITIVE:
+//        sb.append ("AS0");
+//        break;
+//      case NEGATIVE:
+//        sb.append ("AS1");
+//        break;
+//      default:
+//        throw new RuntimeException ();
+//    }
+//    if (channelBTriggerSlope == null)
+//      throw new IllegalArgumentException ();
+//    switch (channelBTriggerSlope)
+//    {
+//      case POSITIVE:
+//        sb.append ("BS0");
+//        break;
+//      case NEGATIVE:
+//        sb.append ("BS1");
+//        break;
+//      default:
+//        throw new RuntimeException ();
+//    }
     if (gatingMode == null)
       throw new IllegalArgumentException ();
     sb.append (gatingMode.toString ());
     sb.append (endOfMeasurementSrq ? "SR1" : "SR0");
-    if (gateTimeControl == null)
-      throw new IllegalArgumentException ();
-    sb.append (gateTimeControl.toString ());
-    if (triggerLevelControl == null)
-      throw new IllegalArgumentException ();
-    sb.append (triggerLevelControl.toString ());
-    final DecimalFormat df = new DecimalFormat ("#.##");
-    sb.append ("AT").append (df.format (aChannelTriggerLevel_V));
-    sb.append ("BT").append (df.format (bChannelTriggerLevel_V));
+//    if (gateTimeControl == null)
+//      throw new IllegalArgumentException ();
+//    sb.append (gateTimeControl.toString ());
+//    if (triggerLevelControl == null)
+//      throw new IllegalArgumentException ();
+//    sb.append (triggerLevelControl.toString ());
+//    final DecimalFormat df = new DecimalFormat ("#.##");
+//    sb.append ("AT").append (df.format (aChannelTriggerLevel_V));
+//    sb.append ("BT").append (df.format (bChannelTriggerLevel_V));
     return sb.toString ();
   }
   
@@ -157,44 +156,6 @@ public final class HP5316A_GPIB_Settings
       bChannelTriggerLevel_V).getBytes (Charset.forName ("US-ASCII"));
   }
   
-  private static Unit getReadingUnit (final MeasurementFunction measurementFunction)
-  {
-    if (measurementFunction == null)
-      throw new IllegalArgumentException ();
-    switch (measurementFunction)
-    {
-      case FN00_ROLLING_DISPLAY_TEST:
-        return null;
-      case FN01_FREQUENCY_A:
-        return Unit.UNIT_Hz;
-      case FN02_TIME_INTERVAL_A_TO_B:
-      case FN03_TIME_INTERVAL_DELAY:
-        return Unit.UNIT_s;
-      case FN04_RATIO_A_OVER_B:
-        return null;
-      case FN05_FREQUENCY_C:
-        return Unit.UNIT_Hz;
-      case FN06_TOTALIZE_STOP:
-        return null;
-      case FN07_PERIOD_A:
-        return Unit.UNIT_s;
-      case FN08_TIME_INTERVAL_AVERAGE_A_TO_B:
-        return Unit.UNIT_s;
-      case FN09_CHECK_10MHZ:
-        return Unit.UNIT_Hz;
-      case FN10_A_GATED_BY_B:
-        return null;
-      case FN11_GATE_TIME:
-        return Unit.UNIT_s;
-      case FN12_TOTALIZE_START:
-        return null;
-      case FN13_FREQUENCY_A_AVG_ARMED_BY_B_POS_SLOPE:
-        return Unit.UNIT_Hz;
-      default:
-        throw new IllegalArgumentException ();
-    }
-  }
-
   public HP5316A_GPIB_Settings (
     final double gateTime_s,
     final MeasurementFunction measurementFunction,
@@ -221,7 +182,8 @@ public final class HP5316A_GPIB_Settings
         bChannelTriggerLevel_V),
       measurementFunction,
       gateTime_s,
-      getReadingUnit (measurementFunction));
+      aChannelTriggerLevel_V,
+      measurementFunction.getUnit ());
     this.measurementFunction = measurementFunction;
     this.channelATriggerSlope = channelATriggerSlope;
     this.channelBTriggerSlope = channelBTriggerSlope;
@@ -253,9 +215,41 @@ public final class HP5316A_GPIB_Settings
     GatingMode.ONCE,
     true,
     GateTimeControl.GA0_LONG_FRONT,
-    TriggerLevelControl.REMOTE_HP_IB,
+    TriggerLevelControl.FRONT_PANEL,
     0,
     0);
+  
+  public final HP5316A_GPIB_Settings withInstrumentMode (final MeasurementFunction mode)
+  {
+    if (mode == null)
+      throw new IllegalArgumentException ();
+    return new HP5316A_GPIB_Settings (
+      getGateTime_s (),
+      mode,
+      this.channelATriggerSlope,
+      this.channelBTriggerSlope,
+      this.gatingMode,
+      this.endOfMeasurementSrq,
+      this.gateTimeControl,
+      this.triggerLevelControl,
+      this.aChannelTriggerLevel_V,
+      this.bChannelTriggerLevel_V);
+  }
+  
+  public final HP5316A_GPIB_Settings withGateTime_s (final double gateTime_s)
+  {
+    return new HP5316A_GPIB_Settings (
+      gateTime_s,
+      getInstrumentMode (),
+      this.channelATriggerSlope,
+      this.channelBTriggerSlope,
+      this.gatingMode,
+      this.endOfMeasurementSrq,
+      this.gateTimeControl,
+      this.triggerLevelControl,
+      this.aChannelTriggerLevel_V,
+      this.bChannelTriggerLevel_V);
+  }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -286,28 +280,29 @@ public final class HP5316A_GPIB_Settings
   public enum MeasurementFunction
   {
     
-    FN00_ROLLING_DISPLAY_TEST ("FN0"),
-    FN01_FREQUENCY_A ("FN1"),
-    FN02_TIME_INTERVAL_A_TO_B ("FN2"),
-    FN03_TIME_INTERVAL_DELAY ("FN3"),
-    FN04_RATIO_A_OVER_B ("FN4"),
-    FN05_FREQUENCY_C ("FN5"),
-    FN06_TOTALIZE_STOP ("FN6"),
-    FN07_PERIOD_A ("FN7"),
-    FN08_TIME_INTERVAL_AVERAGE_A_TO_B ("FN8"),
-    FN09_CHECK_10MHZ ("FN9"),
-    FN10_A_GATED_BY_B ("FN10"),
-    FN11_GATE_TIME ("FN11"),
-    FN12_TOTALIZE_START ("FN12"),
-    FN13_FREQUENCY_A_AVG_ARMED_BY_B_POS_SLOPE ("FN13"),
-    FN14_FREQUENCY_A_AVG_ARMED_BY_B_NEG_SLOPE ("FN14"),
-    FN16_HPIB_INTERFACE_TEST ("FN16");
+    FN00_ROLLING_DISPLAY_TEST                 ("FN0", Unit.UNIT_NONE),
+    FN01_FREQUENCY_A                          ("FN1", Unit.UNIT_Hz),
+    FN02_TIME_INTERVAL_A_TO_B                 ("FN2", Unit.UNIT_s),
+    FN03_TIME_INTERVAL_DELAY                  ("FN3", Unit.UNIT_s),
+    FN04_RATIO_A_OVER_B                       ("FN4", Unit.UNIT_NONE),
+    FN05_FREQUENCY_C                          ("FN5", Unit.UNIT_Hz),
+    FN06_TOTALIZE_STOP                        ("FN6", Unit.UNIT_NONE),
+    FN07_PERIOD_A                             ("FN7",  Unit.UNIT_s),
+    FN08_TIME_INTERVAL_AVERAGE_A_TO_B         ("FN8",  Unit.UNIT_s),
+    FN09_CHECK_10MHZ                          ("FN9", Unit.UNIT_Hz),
+    FN10_A_GATED_BY_B                         ("FN10", Unit.UNIT_NONE),
+    FN11_GATE_TIME                            ("FN11", Unit.UNIT_s),
+    FN12_TOTALIZE_START                       ("FN12", Unit.UNIT_NONE),
+    FN13_FREQUENCY_A_AVG_ARMED_BY_B_POS_SLOPE ("FN13", Unit.UNIT_Hz),
+    FN14_FREQUENCY_A_AVG_ARMED_BY_B_NEG_SLOPE ("FN14", Unit.UNIT_Hz),
+    FN16_HPIB_INTERFACE_TEST                  ("FN16", Unit.UNIT_NONE);
 
     final String canonicalString;
     
-    private MeasurementFunction (final String canonicalString)
+    private MeasurementFunction (final String canonicalString, final Unit unit)
     {
       this.canonicalString = canonicalString;
+      this.unit = unit;
     }
     
     public final String toCanonicalString ()
@@ -319,6 +314,13 @@ public final class HP5316A_GPIB_Settings
     public final String toString ()
     {
       return super.toString ();
+    }
+    
+    private final Unit unit;
+    
+    public final Unit getUnit ()
+    {
+      return this.unit;
     }
     
   }
@@ -412,10 +414,10 @@ public final class HP5316A_GPIB_Settings
   public enum GateTimeControl
   {
     
-    GA0_LONG_FRONT ("GA0"),
+    GA0_LONG_FRONT  ("GA0"),
     GA1_SHORT_FRONT ("GA1"),
-    GA2_LONG_REAR ("GA2"),
-    GA3_SHORT_REAR ("GA3");
+    GA2_LONG_REAR   ("GA2"),
+    GA3_SHORT_REAR  ("GA3");
     
     final String string;
 
