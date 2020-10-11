@@ -216,37 +216,49 @@ public abstract class AbstractGpibInstrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // WRITE
+  // READ EOI
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public final static long DEFAULT_WRITE_TIMEOUT_MS = 2000L;
+  public final static String READ_EOI_TIMEOUT_MS_PROPERTY_NAME = "readEOITimeout_ms";
   
-  public final long getWriteTimeout_ms ()
+  private final static long DEFAULT_READ_EOI_TIMEOUT_MS = 10000L;
+  
+  // XXX Need locking or AtomicLong here...
+  private volatile long readEOITimeout_ms = DEFAULT_READ_EOI_TIMEOUT_MS;
+  
+  public final long getReadEOITimeout_ms ()
   {
-    return DEFAULT_WRITE_TIMEOUT_MS;
+    return this.readEOITimeout_ms;
   }
   
-  protected final GpibControllerCommand generateWriteCommand (final String string)
+  public final void setReadEOITimeout_ms (final long readEOITimeout_ms)
   {
-    return getDevice ().generateWriteCommand (string.getBytes (Charset.forName ("US-ASCII")));
+    if (readEOITimeout_ms <= 0)
+      throw new IllegalArgumentException ();
+    if (readEOITimeout_ms != this.readEOITimeout_ms)
+    {
+      final long oldReadEOITimeout_ms = this.readEOITimeout_ms;
+      this.readEOITimeout_ms = readEOITimeout_ms;
+      fireSettingsChanged (READ_EOI_TIMEOUT_MS_PROPERTY_NAME, oldReadEOITimeout_ms, this.readEOITimeout_ms);
+    }
   }
   
-  protected void writeSync (final String string, final long timeout_ms)
+  protected final GpibControllerCommand generateReadEOICommand ()
+  {
+    return getDevice ().generateReadEOICommand ();
+  }
+  
+  protected final byte[] readEOISync ()
     throws InterruptedException, IOException, TimeoutException
   {
-    getDevice ().writeSync (string.getBytes (Charset.forName ("US-ASCII")), timeout_ms);
-  }
-  
-  protected final void writeSync (final String string)
-    throws InterruptedException, IOException, TimeoutException
-  {
-    writeSync (string, getWriteTimeout_ms ());
+    final byte[] bytes = getDevice ().readEOISync (getReadEOITimeout_ms ());
+    return bytes;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // READN
+  // READ N
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -288,7 +300,7 @@ public abstract class AbstractGpibInstrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // READLINE
+  // READ LINE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -313,7 +325,79 @@ public abstract class AbstractGpibInstrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // WRITE AND READLN
+  // WRITE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static long DEFAULT_WRITE_TIMEOUT_MS = 2000L;
+  
+  public final long getWriteTimeout_ms ()
+  {
+    return DEFAULT_WRITE_TIMEOUT_MS;
+  }
+  
+  protected final GpibControllerCommand generateWriteCommand (final String string)
+  {
+    return getDevice ().generateWriteCommand (string.getBytes (Charset.forName ("US-ASCII")));
+  }
+  
+  protected void writeSync (final String string, final long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException
+  {
+    getDevice ().writeSync (string.getBytes (Charset.forName ("US-ASCII")), timeout_ms);
+  }
+  
+  protected final void writeSync (final String string)
+    throws InterruptedException, IOException, TimeoutException
+  {
+    writeSync (string, getWriteTimeout_ms ());
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // WRITE AND READ EOI
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  protected final GpibControllerCommand generateWriteAndReadEOICommand (final String string)
+  {
+    return getDevice ().generateWriteAndReadEOICommand (
+      string.getBytes (Charset.forName ("US-ASCII")));
+  }
+  
+  protected final byte[] writeAndReadEOISync (final String string)
+    throws InterruptedException, IOException, TimeoutException
+  {
+    final byte[] bytes = getDevice ().writeAndReadEOISync (string.getBytes (Charset.forName ("US-ASCII")),
+      getReadEOITimeout_ms ());
+    return bytes;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // WRITE AND READ N
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  protected final GpibControllerCommand generateWriteAndReadNCommand (final String string, final int N)
+  {
+    return getDevice ().generateWriteAndReadNCommand (
+      string.getBytes (Charset.forName ("US-ASCII")),
+      N);
+  }
+  
+  protected final byte[] writeAndReadNSync (final String string, final int N)
+    throws InterruptedException, IOException, TimeoutException
+  {
+    final byte[] bytes = getDevice ().writeAndReadNSync (string.getBytes (Charset.forName ("US-ASCII")),
+      N,
+      getReadNTimeout_ms ());
+    return bytes;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // WRITE AND READ LINE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -332,28 +416,6 @@ public abstract class AbstractGpibInstrument
       getReadlineTerminationMode (),
       getReadlineTimeout_ms ());
     return new String (bytes, Charset.forName ("US-ASCII"));
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // WRITE AND READN
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  protected final GpibControllerCommand generateWriteAndReadNCommand (final String string, final int N)
-  {
-    return getDevice ().generateWriteAndReadNCommand (
-      string.getBytes (Charset.forName ("US-ASCII")),
-      N);
-  }
-  
-  protected final byte[] writeAndReadNSync (final String string, final int N)
-    throws InterruptedException, IOException, TimeoutException
-  {
-    final byte[] bytes = getDevice ().writeAndReadNSync (string.getBytes (Charset.forName ("US-ASCII")),
-      N,
-      getReadNTimeout_ms ());
-    return bytes;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
