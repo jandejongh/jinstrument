@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ public interface GpibDevice
     Long sojournTimeout_ms)
     throws UnsupportedOperationException;
   
-  void doControllerCommandSync (GpibControllerCommand command, final long timeout_ms)
+  void doControllerCommandSync (GpibControllerCommand command, long timeout_ms)
     throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,25 +129,6 @@ public interface GpibDevice
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // READ LINE
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  GpibControllerCommand generateReadlnCommand (ReadlineTerminationMode readlineTerminationMode)
-    throws UnsupportedOperationException;
-  
-  void readlnAsync (
-    ReadlineTerminationMode readlineTerminationMode,
-    Long queueingTimeout_ms,
-    Long processingTimeout_ms,
-    Long sojournTimeout_ms)
-    throws UnsupportedOperationException;
-  
-  byte[] readlnSync (ReadlineTerminationMode readlineTerminationMode, long timeout_ms)
-    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException;
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
   // READ N
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,6 +144,25 @@ public interface GpibDevice
     throws UnsupportedOperationException;
   
   byte[] readNSync (int N, long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException;
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // READ LINE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  GpibControllerCommand generateReadlnCommand (ReadlineTerminationMode readlineTerminationMode)
+    throws UnsupportedOperationException;
+  
+  void readlnAsync (
+    ReadlineTerminationMode readlineTerminationMode,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
+    throws UnsupportedOperationException;
+  
+  byte[] readlnSync (ReadlineTerminationMode readlineTerminationMode, long timeout_ms)
     throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException;
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -205,26 +205,6 @@ public interface GpibDevice
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // WRITE AND READ LINE
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  GpibControllerCommand generateWriteAndReadlnCommand (byte[] bytes, ReadlineTerminationMode readlineTerminationMode)
-    throws UnsupportedOperationException;
-  
-  void writeAndReadlnAsync (
-    byte[] bytes,
-    ReadlineTerminationMode readlineTerminationMode,
-    Long queueingTimeout_ms,
-    Long processingTimeout_ms,
-    Long sojournTimeout_ms)
-    throws UnsupportedOperationException;
-  
-  byte[] writeAndReadlnSync (byte[] bytes, ReadlineTerminationMode readlineTerminationMode, long timeout_ms)
-    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException;
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
   // WRITE AND READ N
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -241,6 +221,26 @@ public interface GpibDevice
     throws UnsupportedOperationException;
   
   byte[] writeAndReadNSync (byte[] bytes, int N, long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // WRITE AND READ LINE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  GpibControllerCommand generateWriteAndReadlnCommand (byte[] bytes, ReadlineTerminationMode readlineTerminationMode)
+    throws UnsupportedOperationException;
+  
+  void writeAndReadlnAsync (
+    byte[] bytes,
+    ReadlineTerminationMode readlineTerminationMode,
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
+    throws UnsupportedOperationException;
+  
+  byte[] writeAndReadlnSync (byte[] bytes, ReadlineTerminationMode readlineTerminationMode, long timeout_ms)
     throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
