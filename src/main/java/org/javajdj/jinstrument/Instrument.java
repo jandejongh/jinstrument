@@ -35,6 +35,8 @@ public interface Instrument
   
   void removeInstrumentListener (InstrumentListener l);
   
+  String getInstrumentId ();
+  
   InstrumentStatus getCurrentInstrumentStatus ();
   
   InstrumentSettings getCurrentInstrumentSettings ();
