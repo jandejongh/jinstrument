@@ -177,6 +177,41 @@ implements Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // INSTRUMENT ID
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static String INSTRUMENT_ID_PROPERTY_NAME = "instrumentId";
+  
+  private volatile String instrumentId = "unknown";
+
+  private final Object instrumentIdLock = new Object ();
+  
+  @Override
+  public final String getInstrumentId ()
+  {
+    return this.instrumentId;
+  }
+  
+  protected final void setInstrumentId (final String instrumentId)
+  {
+    if (instrumentId == null)
+      throw new IllegalArgumentException ();
+    synchronized (this.instrumentIdLock)
+    {
+     if (! instrumentId.equals (this.instrumentId))
+     {
+        final String oldInstrumentId = this.instrumentId;
+        this.instrumentId = instrumentId;
+        fireSettingsChanged (INSTRUMENT_ID_PROPERTY_NAME,
+          oldInstrumentId,
+          this.instrumentId);
+      }
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // INSTRUMENT INITIALIZATION
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
