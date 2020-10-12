@@ -781,6 +781,8 @@ public final class ProLogixGpibEthernetController
     }
   }
   
+  private final static long EOI_LINGER_MS = 50L;
+  
   private byte[] processCommand_readEOI (
     final GpibAddress gpibAddress,
     final long timeout_ms,
@@ -789,9 +791,9 @@ public final class ProLogixGpibEthernetController
   {
     if (gpibAddress == null)
       throw new IllegalArgumentException ();
-    if (timeout_ms <= 0)
+    if (timeout_ms <= EOI_LINGER_MS)
       throw new TimeoutException ();
-    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms - EOI_LINGER_MS;
     if (topLevel)
     {
       proLogixClearReadBuffer ();
@@ -802,11 +804,37 @@ public final class ProLogixGpibEthernetController
     final ByteArrayOutputStream baos = new ByteArrayOutputStream ();
     for (;;)
     {
-      // First, we hunt for an EOT...
-      final byte byteRead = proLogixReadByte (deadline_millis - System.currentTimeMillis ());
-      // XXX
-      // For now, throw the uoe, as we do not have any use for this yet.
-      throw new UnsupportedOperationException ();
+      long now_millis = System.currentTimeMillis ();
+      if (now_millis >= deadline_millis)
+      {
+        if (baos.size () > 0)
+          queueLogRx (Instant.now (), baos.toByteArray ());
+        throw new TimeoutException ();
+      }
+      byte byteRead = proLogixReadByte (deadline_millis - now_millis);
+      while (byteRead == DEFAULT_EOT)
+      {
+        if (System.currentTimeMillis () >= deadline_millis)
+        {
+          baos.write (byteRead);
+          queueLogRx (Instant.now (), baos.toByteArray ());      
+          throw new TimeoutException ();
+        }
+        try
+        {
+          final byte nextByteRead = proLogixReadByte (EOI_LINGER_MS);
+          baos.write (byteRead);
+          byteRead = nextByteRead;
+        }
+        catch (TimeoutException te)
+        {
+          final byte[] bytesRead = baos.toByteArray ();
+          baos.write (byteRead); // DEFALT_EOT; for proper Rx Logging...
+          queueLogRx (Instant.now (), baos.toByteArray ());
+          return bytesRead;
+        }
+      }
+      baos.write (byteRead);
     }
   }
   
@@ -818,7 +846,7 @@ public final class ProLogixGpibEthernetController
     final boolean ask)
     throws IOException, InterruptedException, TimeoutException
   {
-    if (gpibAddress == null || readlineTerminationMode ==null)
+    if (gpibAddress == null || readlineTerminationMode == null)
       throw new IllegalArgumentException ();
     if (timeout_ms <= 0)
       throw new TimeoutException ();
@@ -1053,6 +1081,7 @@ public final class ProLogixGpibEthernetController
     {
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      proLogixCommandSetEOT (true, DEFAULT_EOT);
     }
     processCommand_write (gpibAddress, bytes, timeout_ms, false);
     return processCommand_readEOI (gpibAddress, deadline_millis - System.currentTimeMillis (), false);
