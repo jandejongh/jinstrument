@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ import org.javajdj.jswing.jbyte.JByte;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
-/** A Swing panel for (complete) control and status of a {@link JHP6033A_GPIB} Power Supply Unit.
+/** A Swing panel for (complete) control and status of a {@link HP6033A_GPIB_Instrument} Power Supply Unit.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
