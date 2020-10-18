@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing;
+package org.javajdj.jinstrument.swing.base;
 
 import java.awt.Color;
 import org.javajdj.jinstrument.DigitalMultiMeter;

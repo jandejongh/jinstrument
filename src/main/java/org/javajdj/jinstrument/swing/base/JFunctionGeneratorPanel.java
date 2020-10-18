@@ -14,17 +14,17 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing;
+package org.javajdj.jinstrument.swing.base;
 
 import java.awt.Color;
-import org.javajdj.jinstrument.SignalGenerator;
+import org.javajdj.jinstrument.FunctionGenerator;
 
-/** A Swing (base) component for interacting with a {@link SignalGenerator}.
+/** A Swing (base) component for interacting with a {@link FunctionGenerator}.
  *
  * @author {@literal Jan de Jongh <jfcmdejongh@gmail.com>}
  * 
  */
-public class JSignalGeneratorPanel
+public class JFunctionGeneratorPanel
   extends JInstrumentPanel
 {
 
@@ -34,32 +34,32 @@ public class JSignalGeneratorPanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected JSignalGeneratorPanel (
-    final SignalGenerator signalGenerator,
+  protected JFunctionGeneratorPanel (
+    final FunctionGenerator functionGenerator,
     final String title,
     final int level,
     final Color panelColor)
   {
-    super (signalGenerator, title, level, panelColor);
+    super (functionGenerator, title, level, panelColor);
     // Super-class accepts null Instrument; we do not.
-    if (signalGenerator == null)
+    if (functionGenerator == null)
       throw new IllegalArgumentException ();    
   }
 
-  protected JSignalGeneratorPanel (final SignalGenerator signalGenerator, final int level)
+  protected JFunctionGeneratorPanel (final FunctionGenerator functionGenerator, final int level)
   {
-    this (signalGenerator, null, level, null);
+    this (functionGenerator, null, level, null);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // SIGNAL GENERATOR
+  // FUNCTION GENERATOR
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public final SignalGenerator getSignalGenerator ()
+  public final FunctionGenerator getFunctionGenerator ()
   {
-    return (SignalGenerator) getInstrument ();
+    return (FunctionGenerator) getInstrument ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

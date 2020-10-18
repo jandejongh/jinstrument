@@ -14,17 +14,18 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing;
+package org.javajdj.jinstrument.swing.base;
 
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import java.awt.Color;
-import org.javajdj.jinstrument.DigitalStorageOscilloscope;
+import org.javajdj.jinstrument.PowerSupplyUnit;
 
-/** A Swing (base) component for interacting with a {@link DigitalStorageOscilloscope}.
+/** A Swing (base) component for interacting with a {@link PowerSupplyUnit}.
  *
- * @author {@literal Jan de Jongh <jfcmdejongh@gmail.com>}
+ * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class JDigitalStorageOscilloscopePanel
+public class JPowerSupplyUnitPanel
   extends JInstrumentPanel
 {
 
@@ -34,32 +35,31 @@ public class JDigitalStorageOscilloscopePanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected JDigitalStorageOscilloscopePanel (
-    final DigitalStorageOscilloscope digitalStorageOscilloscope,
+  protected JPowerSupplyUnitPanel (
+    final PowerSupplyUnit powerSupplyUnit,
     final String title,
     final int level,
     final Color panelColor)
   {
-    super (digitalStorageOscilloscope, title, level, panelColor);
-    // Super-class accepts null Instrument; we do not.
-    if (digitalStorageOscilloscope == null)
-      throw new IllegalArgumentException ();    
+    super (powerSupplyUnit, title, level, panelColor);
+    if (powerSupplyUnit == null)
+      throw new IllegalArgumentException ();
   }
 
-  protected JDigitalStorageOscilloscopePanel (final DigitalStorageOscilloscope digitalStorageOscilloscope, final int level)
+  protected JPowerSupplyUnitPanel (final PowerSupplyUnit powerSupplyUnit, final int level)
   {
-    this (digitalStorageOscilloscope, null, level, null);
+    this (powerSupplyUnit, null, level, null);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // DIGITAL STORAGE OSCILLOSCOPE
+  // POWER SUPPLY UNIT
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public final DigitalStorageOscilloscope getDigitalStorageOscilloscope ()
+  public final PowerSupplyUnit getPowerSupplyUnit ()
   {
-    return (DigitalStorageOscilloscope) getInstrument ();
+    return (PowerSupplyUnit) getInstrument ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

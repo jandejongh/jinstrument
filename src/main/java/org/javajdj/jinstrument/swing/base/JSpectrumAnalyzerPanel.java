@@ -14,17 +14,18 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing;
+package org.javajdj.jinstrument.swing.base;
 
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import java.awt.Color;
-import org.javajdj.jinstrument.FunctionGenerator;
+import org.javajdj.jinstrument.SpectrumAnalyzer;
 
-/** A Swing (base) component for interacting with a {@link FunctionGenerator}.
+/** A Swing (base) component for interacting with a {@link SpectrumAnalyzer}.
  *
  * @author {@literal Jan de Jongh <jfcmdejongh@gmail.com>}
  * 
  */
-public class JFunctionGeneratorPanel
+public class JSpectrumAnalyzerPanel
   extends JInstrumentPanel
 {
 
@@ -34,32 +35,31 @@ public class JFunctionGeneratorPanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected JFunctionGeneratorPanel (
-    final FunctionGenerator functionGenerator,
+  protected JSpectrumAnalyzerPanel (
+    final SpectrumAnalyzer spectrumAnalyzer,
     final String title,
     final int level,
     final Color panelColor)
   {
-    super (functionGenerator, title, level, panelColor);
-    // Super-class accepts null Instrument; we do not.
-    if (functionGenerator == null)
-      throw new IllegalArgumentException ();    
+    super (spectrumAnalyzer, title, level, panelColor);
+    if (spectrumAnalyzer == null)
+      throw new IllegalArgumentException ();
   }
 
-  protected JFunctionGeneratorPanel (final FunctionGenerator functionGenerator, final int level)
+  protected JSpectrumAnalyzerPanel (final SpectrumAnalyzer spectrumAnalyzer, final int level)
   {
-    this (functionGenerator, null, level, null);
+    this (spectrumAnalyzer, null, level, null);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // FUNCTION GENERATOR
+  // SPECTRUM ANALYZER
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public final FunctionGenerator getFunctionGenerator ()
+  public final SpectrumAnalyzer getSpectrumAnalyzer ()
   {
-    return (FunctionGenerator) getInstrument ();
+    return (SpectrumAnalyzer) getInstrument ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

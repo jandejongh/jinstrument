@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing;
+package org.javajdj.jinstrument.swing.base;
 
 import java.awt.Color;
 import javax.swing.BorderFactory;
@@ -42,7 +42,7 @@ public class JInstrumentPanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected JInstrumentPanel (
+  public JInstrumentPanel (
     final Instrument instrument,
     final String title,
     final int level,
@@ -55,7 +55,7 @@ public class JInstrumentPanel
       setPanelBorder (panelColor, title);
   }
 
-  protected JInstrumentPanel (
+  public JInstrumentPanel (
     final String title,
     final int level,
     final Color panelColor)
@@ -63,7 +63,7 @@ public class JInstrumentPanel
     this (null, title, level, panelColor);
   }
   
-  protected JInstrumentPanel (final Instrument instrument, final int level)
+  public JInstrumentPanel (final Instrument instrument, final int level)
   {
     this (instrument, null, level, null);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing;
+package org.javajdj.jinstrument.swing.base;
 
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import java.awt.Color;
-import org.javajdj.jinstrument.FrequencyCounter;
+import org.javajdj.jinstrument.SignalGenerator;
 
-/** A Swing (base) component for interacting with a {@link FrequencyCounter}.
+/** A Swing (base) component for interacting with a {@link SignalGenerator}.
  *
  * @author {@literal Jan de Jongh <jfcmdejongh@gmail.com>}
  * 
  */
-public class JFrequencyCounterPanel
+public class JSignalGeneratorPanel
   extends JInstrumentPanel
 {
 
@@ -34,32 +35,32 @@ public class JFrequencyCounterPanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected JFrequencyCounterPanel (
-    final FrequencyCounter frequencyCounter,
+  protected JSignalGeneratorPanel (
+    final SignalGenerator signalGenerator,
     final String title,
     final int level,
     final Color panelColor)
   {
-    super (frequencyCounter, title, level, panelColor);
+    super (signalGenerator, title, level, panelColor);
     // Super-class accepts null Instrument; we do not.
-    if (frequencyCounter == null)
+    if (signalGenerator == null)
       throw new IllegalArgumentException ();    
   }
 
-  protected JFrequencyCounterPanel (final FrequencyCounter frequencyCounter, final int level)
+  protected JSignalGeneratorPanel (final SignalGenerator signalGenerator, final int level)
   {
-    this (frequencyCounter, null, level, null);
+    this (signalGenerator, null, level, null);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // FUNCTION GENERATOR
+  // SIGNAL GENERATOR
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public final FrequencyCounter getFrequencyCounter ()
+  public final SignalGenerator getSignalGenerator ()
   {
-    return (FrequencyCounter) getInstrument ();
+    return (SignalGenerator) getInstrument ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

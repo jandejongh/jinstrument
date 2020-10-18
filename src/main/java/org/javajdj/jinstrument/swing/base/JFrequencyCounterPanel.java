@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,17 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing;
+package org.javajdj.jinstrument.swing.base;
 
 import java.awt.Color;
-import org.javajdj.jinstrument.SpectrumAnalyzer;
+import org.javajdj.jinstrument.FrequencyCounter;
 
-/** A Swing (base) component for interacting with a {@link SpectrumAnalyzer}.
+/** A Swing (base) component for interacting with a {@link FrequencyCounter}.
  *
  * @author {@literal Jan de Jongh <jfcmdejongh@gmail.com>}
  * 
  */
-public class JSpectrumAnalyzerPanel
+public class JFrequencyCounterPanel
   extends JInstrumentPanel
 {
 
@@ -34,31 +34,32 @@ public class JSpectrumAnalyzerPanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected JSpectrumAnalyzerPanel (
-    final SpectrumAnalyzer spectrumAnalyzer,
+  protected JFrequencyCounterPanel (
+    final FrequencyCounter frequencyCounter,
     final String title,
     final int level,
     final Color panelColor)
   {
-    super (spectrumAnalyzer, title, level, panelColor);
-    if (spectrumAnalyzer == null)
-      throw new IllegalArgumentException ();
+    super (frequencyCounter, title, level, panelColor);
+    // Super-class accepts null Instrument; we do not.
+    if (frequencyCounter == null)
+      throw new IllegalArgumentException ();    
   }
 
-  protected JSpectrumAnalyzerPanel (final SpectrumAnalyzer spectrumAnalyzer, final int level)
+  protected JFrequencyCounterPanel (final FrequencyCounter frequencyCounter, final int level)
   {
-    this (spectrumAnalyzer, null, level, null);
+    this (frequencyCounter, null, level, null);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // SPECTRUM ANALYZER
+  // FUNCTION GENERATOR
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public final SpectrumAnalyzer getSpectrumAnalyzer ()
+  public final FrequencyCounter getFrequencyCounter ()
   {
-    return (SpectrumAnalyzer) getInstrument ();
+    return (FrequencyCounter) getInstrument ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
