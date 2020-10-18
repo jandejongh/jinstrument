@@ -53,7 +53,7 @@ import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.util.Util;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
-import org.javajdj.jinstrument.swing.JTinyCDIStatusAndControl;
+import org.javajdj.jinstrument.swing.cdi.JTinyCDIStatusAndControl;
 import org.javajdj.jservice.Service;
 import org.javajdj.jservice.swing.JServiceControl;
 

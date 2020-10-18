@@ -44,7 +44,7 @@ import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.controller.gpib.ReadlineTerminationMode;
-import org.javajdj.jinstrument.swing.JTinyCDIStatusAndControl;
+import org.javajdj.jinstrument.swing.cdi.JTinyCDIStatusAndControl;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
 /** A console for text-oriented communication with a {@link GpibDevice}.
