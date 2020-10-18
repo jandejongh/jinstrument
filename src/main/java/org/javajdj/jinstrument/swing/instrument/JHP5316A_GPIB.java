@@ -27,7 +27,7 @@ import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.fc.hp5316a.HP5316A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.fc.hp5316a.HP5316A_GPIB_Settings;
-import org.javajdj.jinstrument.swing.JDefaultFrequencyCounterView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultFrequencyCounterView;
 
 /** A Swing panel for (complete) control and status of a {@link JHP5316A_GPIB} Frequency Counter.
  *

@@ -43,7 +43,7 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.psu.hp6033a.HP6033A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.psu.hp6033a.HP6033A_GPIB_Settings;
 import org.javajdj.jinstrument.gpib.psu.hp6033a.HP6033A_GPIB_Status;
-import org.javajdj.jinstrument.swing.JDefaultPowerSupplyUnitView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultPowerSupplyUnitView;
 import org.javajdj.jswing.jbyte.JBitsLong;
 import org.javajdj.jswing.jbyte.JByte;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;

@@ -21,7 +21,7 @@ import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
-import org.javajdj.jinstrument.swing.JDefaultDigitalStorageOscilloscopeView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalStorageOscilloscopeView;
 
 /** A Swing panel for (complete) control and status of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *

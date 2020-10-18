@@ -36,7 +36,7 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dmm.hp3478a.HP3478A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dmm.hp3478a.HP3478A_GPIB_Settings;
 import org.javajdj.jinstrument.gpib.dmm.hp3478a.HP3478A_GPIB_Status;
-import org.javajdj.jinstrument.swing.JDefaultDigitalMultiMeterView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalMultiMeterView;
 import org.javajdj.jswing.jbyte.JByte;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
