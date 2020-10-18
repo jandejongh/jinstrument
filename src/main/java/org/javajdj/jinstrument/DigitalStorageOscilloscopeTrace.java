@@ -30,7 +30,7 @@ extends InstrumentTrace
   
   double sampleIndexToTime_s (double sampleIndex);
 
-  double Time_sToSampleIndex (double time_s);
+  double time_sToSampleIndex (double time_s);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
