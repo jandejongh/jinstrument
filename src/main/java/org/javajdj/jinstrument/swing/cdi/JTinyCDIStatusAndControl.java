@@ -14,8 +14,9 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing;
+package org.javajdj.jinstrument.swing.cdi;
 
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
