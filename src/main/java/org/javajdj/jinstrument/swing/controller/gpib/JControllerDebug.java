@@ -14,8 +14,10 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing;
+package org.javajdj.jinstrument.swing.controller.gpib;
 
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
+import org.javajdj.jinstrument.swing.default_view.JDefaultInstrumentManagementUrlsView;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -51,6 +53,7 @@ import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.util.Util;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
+import org.javajdj.jinstrument.swing.JTinyCDIStatusAndControl;
 import org.javajdj.jservice.Service;
 import org.javajdj.jservice.swing.JServiceControl;
 
