@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,34 +16,39 @@
  */
 package org.javajdj.jinstrument.swing.default_view;
 
+import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
-import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
+import org.javajdj.jinstrument.DigitalStorageOscilloscopeTrace;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentListener;
+import org.javajdj.jinstrument.InstrumentReading;
+import org.javajdj.jinstrument.InstrumentSettings;
+import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
-import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
-import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
+import org.javajdj.jinstrument.swing.jtrace.JTrace;
 
-/** A one-size-fits-all Swing panel for control and status of a generic {@link DigitalStorageOscilloscope}.
+/** Panel showing the (latest) {@link DigitalStorageOscilloscopeTrace}(s) from a {@link DigitalStorageOscilloscopeTrace}.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class JDefaultDigitalStorageOscilloscopeView
+public class JDefaultDigitalStorageOscilloscopeTraceDisplay
   extends JDigitalStorageOscilloscopePanel
   implements InstrumentView
 {
-  
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // LOGGER
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private static final Logger LOG = Logger.getLogger (JDefaultDigitalStorageOscilloscopeView.class.getName ());
+  private static final Logger LOG = Logger.getLogger (JDefaultDigitalStorageOscilloscopeTraceDisplay.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -51,33 +56,17 @@ public class JDefaultDigitalStorageOscilloscopeView
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JDefaultDigitalStorageOscilloscopeView (final DigitalStorageOscilloscope digitalStorageOscilloscope, final int level)
+  public JDefaultDigitalStorageOscilloscopeTraceDisplay (final DigitalStorageOscilloscope digitalStorageOscilloscope, final int level)
   {
     super (digitalStorageOscilloscope, level);
+    setLayout (new GridLayout (1, 1));
     setOpaque (true);
-    // setBackground (Color.white);
-    setLayout (new GridLayout (2, 2));
-    final JDefaultInstrumentManagementView instrumentManagementPanel= new JDefaultInstrumentManagementView (
-      JDefaultDigitalStorageOscilloscopeView.this.getInstrument (),
-      JDefaultDigitalStorageOscilloscopeView.this.getLevel () + 1);
-    instrumentManagementPanel.setPanelBorder (JInstrumentPanel.getGuiPreferencesManagementColor (), "Management");
-    add (instrumentManagementPanel);
-    this.display = new JDefaultDigitalStorageOscilloscopeTraceDisplay (digitalStorageOscilloscope, level + 1);
-    JInstrumentPanel.setPanelBorder (this.display,
-      level + 1,
-      Color.pink,
-      "Trace");
-    add (this.display);
-    final JDigitalStorageOscilloscopePanel digitalStorageOscilloscopePanel = new JDigitalStorageOscilloscopePanel (
-        JDefaultDigitalStorageOscilloscopeView.this.getDigitalStorageOscilloscope (),
-        "Settings",
-        JDefaultDigitalStorageOscilloscopeView.this.getLevel () + 1,
-        Color.black);
-    add (digitalStorageOscilloscopePanel);
-    add (new JPanel ());
+    setBackground (Color.black);
+    add (new JTrace<> ());
+    getInstrument ().addInstrumentListener (this.instrumentListener);
   }
-  
-  public JDefaultDigitalStorageOscilloscopeView (final DigitalStorageOscilloscope digitalStorageOscilloscope)
+
+  public JDefaultDigitalStorageOscilloscopeTraceDisplay (final DigitalStorageOscilloscope digitalStorageOscilloscope)
   {
     this (digitalStorageOscilloscope, 0);
   }
@@ -94,14 +83,14 @@ public class JDefaultDigitalStorageOscilloscopeView
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Default Digital Storage Oscilloscope View";
+      return "Default Digital Storage Oscilloscope Trace [Only] View";
     }
 
     @Override
     public final InstrumentView openInstrumentView (final Instrument instrument)
     {
       if (instrument != null && (instrument instanceof DigitalStorageOscilloscope))
-        return new JDefaultDigitalStorageOscilloscopeView ((DigitalStorageOscilloscope) instrument);
+        return new JDefaultDigitalStorageOscilloscopeTraceDisplay ((DigitalStorageOscilloscope) instrument);
       else
         return null;
     }
@@ -118,7 +107,7 @@ public class JDefaultDigitalStorageOscilloscopeView
   @Override
   public String getInstrumentViewUrl ()
   {
-    return JDefaultDigitalStorageOscilloscopeView.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
+    return JDefaultDigitalStorageOscilloscopeTraceDisplay.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
       + "<>"
       + getInstrument ().getInstrumentUrl ();
   }
@@ -131,11 +120,49 @@ public class JDefaultDigitalStorageOscilloscopeView
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // DISPLAY
+  // PROPERTY trace
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final JDefaultDigitalStorageOscilloscopeTraceDisplay display;
+  private volatile DigitalStorageOscilloscopeTrace trace = null;
+  
+  public final void setTrace (final DigitalStorageOscilloscopeTrace trace)
+  {
+    this.trace = trace;
+    SwingUtilities.invokeLater (() ->
+    {
+      repaint ();
+    });
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INSTRUMENT LISTENER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final InstrumentListener instrumentListener = new InstrumentListener ()
+  {
+    
+    @Override
+    public void newInstrumentStatus (final Instrument instrument, final InstrumentStatus instrumentStatus)
+    {
+    }
+    
+    @Override
+    public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+    {
+    }
+
+    @Override
+    public void newInstrumentReading (final Instrument instrument, final InstrumentReading instrumentReading)
+    {
+      if (instrument != JDefaultDigitalStorageOscilloscopeTraceDisplay.this.getDigitalStorageOscilloscope ())
+        return;
+      JDefaultDigitalStorageOscilloscopeTraceDisplay.this.setTrace ((DigitalStorageOscilloscopeTrace) instrumentReading);
+    }
+    
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
