@@ -16,17 +16,6 @@
  */
 package org.javajdj.jinstrument.swing.main;
 
-import org.javajdj.jinstrument.swing.default_view.JDefaultSpectrumAnalyzerView;
-import org.javajdj.jinstrument.swing.default_view.JDefaultFunctionGeneratorView;
-import org.javajdj.jinstrument.swing.default_view.JDefaultSignalGeneratorView;
-import org.javajdj.jinstrument.swing.default_view.JDefaultInstrumentManagementUrlsView;
-import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalMultiMeterView;
-import org.javajdj.jinstrument.swing.default_view.JDefaultPowerSupplyUnitView;
-import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalStorageOscilloscopeView;
-import org.javajdj.jinstrument.swing.default_view.JDefaultInstrumentManagementView;
-import org.javajdj.jinstrument.swing.default_view.JDefaultFrequencyCounterView;
-import org.javajdj.jinstrument.swing.instrument.JHP3478A_GPIB;
-import org.javajdj.jinstrument.swing.instrument.JHP8116A_GPIB;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.HeadlessException;
@@ -91,14 +80,26 @@ import org.javajdj.jinstrument.gpib.sg.hp8663a.HP8663A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.slm.hp3586.HP3586_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.sna.wiltron560a.Wiltron560A_GPIB_Instrument;
+import org.javajdj.jinstrument.swing.cdi.JTinyCDIStatusAndControl;
 import org.javajdj.jinstrument.swing.controller.gpib.JControllerDebug;
 import org.javajdj.jinstrument.swing.controller.gpib.JGpibDeviceConsole;
-import org.javajdj.jinstrument.swing.JSpectrumAnalyzerSettingsPanel;
-import org.javajdj.jinstrument.swing.JSpectrumAnalyzerTraceDisplay;
-import org.javajdj.jinstrument.swing.cdi.JTinyCDIStatusAndControl;
+import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalMultiMeterView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalStorageOscilloscopeView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultFrequencyCounterView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultFunctionGeneratorView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultInstrumentManagementUrlsView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultInstrumentManagementView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultPowerSupplyUnitView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultSignalGeneratorView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultSpectrumAnalyzerSettingsPanel;
+import org.javajdj.jinstrument.swing.default_view.JDefaultSpectrumAnalyzerTraceDisplay;
+import org.javajdj.jinstrument.swing.default_view.JDefaultSpectrumAnalyzerView;
+import org.javajdj.jinstrument.swing.instrument.JHP3478A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JHP5316A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JHP6033A_GPIB;
+import org.javajdj.jinstrument.swing.instrument.JHP8116A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JTek2440_GPIB;
+
 
 /** Swing {@code JFrame} for opening and interacting with instruments like RF signal generators, spectrum analyzers, etc.
  * 
@@ -163,8 +164,8 @@ extends JFrame
     this.instrumentRegistry.addInstrumentViewType (JTinyCDIStatusAndControl.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultDigitalStorageOscilloscopeView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerView.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JSpectrumAnalyzerSettingsPanel.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JSpectrumAnalyzerTraceDisplay.INSTRUMENT_VIEW_TYPE);
+    this.instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerSettingsPanel.INSTRUMENT_VIEW_TYPE);
+    this.instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerTraceDisplay.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultSignalGeneratorView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultDigitalMultiMeterView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultFunctionGeneratorView.INSTRUMENT_VIEW_TYPE);
