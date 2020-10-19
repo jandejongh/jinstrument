@@ -26,8 +26,6 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.SpectrumAnalyzer;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jinstrument.swing.base.JSpectrumAnalyzerPanel;
-import org.javajdj.jinstrument.swing.JSpectrumAnalyzerSettingsPanel;
-import org.javajdj.jinstrument.swing.JSpectrumAnalyzerTraceDisplay;
 
 /** A one-size-fits-all Swing panel for control and status of a generic {@link SpectrumAnalyzer}.
  *
@@ -64,13 +62,13 @@ public class JDefaultSpectrumAnalyzerView
       JDefaultSpectrumAnalyzerView.this.getLevel () + 1);
     instrumentManagementPanel.setPanelBorder (JInstrumentPanel.getGuiPreferencesManagementColor (), "Management");
     add (instrumentManagementPanel);
-    this.display = new JSpectrumAnalyzerTraceDisplay (spectrumAnalyzer, level + 1);
+    this.display = new JDefaultSpectrumAnalyzerTraceDisplay (spectrumAnalyzer, level + 1);
     JInstrumentPanel.setPanelBorder (this.display,
       level + 1,
       Color.pink,
       "Trace");
     add (this.display);
-    final JSpectrumAnalyzerSettingsPanel spectrumAnalyzerSettingsPanel = new JSpectrumAnalyzerSettingsPanel (
+    final JDefaultSpectrumAnalyzerSettingsPanel spectrumAnalyzerSettingsPanel = new JDefaultSpectrumAnalyzerSettingsPanel (
         JDefaultSpectrumAnalyzerView.this.getSpectrumAnalyzer (),
         "Settings",
         JDefaultSpectrumAnalyzerView.this.getLevel () + 1,
@@ -137,7 +135,7 @@ public class JDefaultSpectrumAnalyzerView
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final JSpectrumAnalyzerTraceDisplay display;
+  private final JDefaultSpectrumAnalyzerTraceDisplay display;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
