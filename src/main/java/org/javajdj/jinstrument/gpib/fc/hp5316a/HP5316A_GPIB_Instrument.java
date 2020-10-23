@@ -512,6 +512,7 @@ public class HP5316A_GPIB_Instrument
   // PROCESS COMMAND
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   @Override
   protected void processCommand (final InstrumentCommand instrumentCommand)
     throws IOException, InterruptedException, TimeoutException
