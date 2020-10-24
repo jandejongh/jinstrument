@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.swing.cdi;
 
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -69,6 +70,7 @@ public class JTinyCDIStatusAndControl
       throw new IllegalArgumentException ();
     setOpaque (true);
     setLayout (new GridLayout (3, 2));
+    setPreferredSize (new Dimension (40, 80));
     final JServiceControl controllerServiceCheckBox =
       new JServiceControl (controller, (Service.Status t) ->
       {
