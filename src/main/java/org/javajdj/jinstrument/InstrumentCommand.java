@@ -223,4 +223,14 @@ public interface InstrumentCommand
   public final static String IC_INSTRUMENT_MODE = "commandInstrumentMode";  
   public final static String ICARG_INSTRUMENT_MODE = "instrumentMode";  
   
+  public final static String ICARG_CHANNEL = "channel";
+  
+  public final static String IC_TIMEBASE = "commandTimebase";
+  public final static String ICARG_TIMEBASE_CHANNEL = ICARG_CHANNEL;
+  public final static String ICARG_TIMEBASE = "timebase";
+  
+  public final static String IC_VOLTS_PER_DIV = "commandVoltsPerDiv";
+  public final static String ICARG_VOLTS_PER_DIV_CHANNEL = ICARG_CHANNEL;
+  public final static String ICARG_VOLTS_PER_DIV = "voltsPerDiv";
+  
 }
