@@ -35,6 +35,10 @@ public class DefaultDigitalStorageOscilloscopeTrace
   public DefaultDigitalStorageOscilloscopeTrace (
     final DigitalStorageOscilloscopeSettings settings,
     final double[] samples,
+    final double minXHint,
+    final double maxXHint,
+    final double minYHint,
+    final double maxYHint,
     final Unit unit,
     final Resolution resolution,
     final boolean error,
@@ -44,6 +48,10 @@ public class DefaultDigitalStorageOscilloscopeTrace
     final boolean uncorrected)
   {
     super (settings, samples, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
+    this.minXHint = minXHint;
+    this.maxXHint = maxXHint;
+    this.minYHint = minYHint;
+    this.maxYHint = maxYHint;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +88,45 @@ public class DefaultDigitalStorageOscilloscopeTrace
     return (double[]) super.getReadingValue ();
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DigitalStorageOscilloscopeTrace
+  // BOUNDARIES HINTS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final double minXHint;
+  
+  @Override
+  public final double getMinXHint ()
+  {
+    return this.minXHint;
+  }
+
+  private final double maxXHint;
+  
+  @Override
+  public final double getMaxXHint ()
+  {
+    return this.maxXHint;
+  }
+
+  private final double minYHint;
+  
+  @Override
+  public final double getMinYHint ()
+  {
+    return this.minYHint;
+  }
+
+  private final double maxYHint;
+
+  @Override
+  public final double getMaxYHint ()
+  {
+    return this.maxYHint;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DigitalStorageOscilloscopeTrace
