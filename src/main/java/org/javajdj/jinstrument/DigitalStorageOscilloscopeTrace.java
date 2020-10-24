@@ -28,6 +28,14 @@ extends InstrumentTrace
   @Override
   DigitalStorageOscilloscopeSettings getInstrumentSettings ();
   
+  double getMinXHint ();
+  
+  double getMaxXHint ();
+  
+  double getMinYHint ();
+  
+  double getMaxYHint ();
+  
   double sampleIndexToTime_s (double sampleIndex);
 
   double time_sToSampleIndex (double time_s);
