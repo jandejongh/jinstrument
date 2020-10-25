@@ -34,6 +34,7 @@ public class DefaultDigitalStorageOscilloscopeTrace
   
   public DefaultDigitalStorageOscilloscopeTrace (
     final DigitalStorageOscilloscopeSettings settings,
+    final Channel channel,
     final double[] samples,
     final double minXHint,
     final double maxXHint,
@@ -48,6 +49,9 @@ public class DefaultDigitalStorageOscilloscopeTrace
     final boolean uncorrected)
   {
     super (settings, samples, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
+    if (channel == null)
+      throw new IllegalArgumentException ();
+    this.channel = channel;
     this.minXHint = minXHint;
     this.maxXHint = maxXHint;
     this.minYHint = minYHint;
@@ -66,6 +70,21 @@ public class DefaultDigitalStorageOscilloscopeTrace
   public final DigitalStorageOscilloscopeSettings getInstrumentSettings ()
   {
     return (DigitalStorageOscilloscopeSettings) super.getInstrumentSettings ();
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DigitalStorageOscilloscopeTrace
+  // CHANNEL
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Channel channel;
+  
+  @Override
+  public final Channel getChannel ()
+  {
+    return this.channel;
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
