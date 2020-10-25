@@ -30,10 +30,17 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
-import org.javajdj.jinstrument.swing.jtrace.JTrace;
+import org.javajdj.jswing.jtrace.JTrace;
 
 /** Panel showing the (latest) {@link DigitalStorageOscilloscopeTrace}(s) from a {@link DigitalStorageOscilloscopeTrace}.
  *
+ * <p>
+ * This class is (merely) a wrapper around a {@link JTrace} instance,
+ * acting as a bridge between {@link DigitalStorageOscilloscopeTrace}
+ * and {@link JTrace}. It listens for instrument reading from the
+ * instrument passed at construction time, and translates them
+ * into {@link JTrace} traces.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
@@ -62,7 +69,8 @@ public class JDefaultDigitalStorageOscilloscopeTraceDisplay
     setLayout (new GridLayout (1, 1));
     setOpaque (true);
     setBackground (Color.black);
-    add (new JTrace<> ());
+    this.jTrace = new JTrace<> ();
+    add (this.jTrace);
     getInstrument ().addInstrumentListener (this.instrumentListener);
   }
 
@@ -129,10 +137,26 @@ public class JDefaultDigitalStorageOscilloscopeTraceDisplay
   public final void setTrace (final DigitalStorageOscilloscopeTrace trace)
   {
     this.trace = trace;
-    SwingUtilities.invokeLater (() ->
-    {
-      repaint ();
-    });
+    this.jTrace.setMinX (trace.getChannel (), trace.getMinXHint ());
+    this.jTrace.setMaxX (trace.getChannel (), trace.getMaxXHint ());
+    this.jTrace.setMinY (trace.getChannel (), trace.getMinYHint ());
+    this.jTrace.setMaxY (trace.getChannel (), trace.getMaxYHint ());
+    this.jTrace.setTrace (trace.getChannel (), trace.getReadingValue ());
+    // XXX Is this still needed??
+    SwingUtilities.invokeLater (() -> repaint ());
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING COMPONENTS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JTrace jTrace;
+  
+  public final JTrace getJTrace ()
+  {
+    return this.jTrace;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
