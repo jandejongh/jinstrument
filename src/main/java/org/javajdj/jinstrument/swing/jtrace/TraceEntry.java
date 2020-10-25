@@ -58,7 +58,7 @@ public class TraceEntry
     this.maxX = maxX;
     this.minY = minY;
     this.maxY = maxY;
-    this.color = null;
+    this.color = color;
   }
 
   public static TraceEntry EMPTY = new TraceEntry (
