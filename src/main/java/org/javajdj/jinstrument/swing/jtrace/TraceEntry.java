@@ -25,10 +25,17 @@ import java.util.logging.Logger;
  * This class is designed for internal use in {@link JTrace}, but is exposed
  * as it may be useful in other use cases as well.
  * 
+ * <p>
+ * The class is final because it is used internally in {@link JTrace};
+ * often by recreating {@link TraceEntry} objects with (slightly) different properties.
+ * 
+ * <p>
+ * Objects of this class are immutable.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class TraceEntry
+public final class TraceEntry
 {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
