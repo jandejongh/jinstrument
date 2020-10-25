@@ -26,6 +26,7 @@ import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
+import org.javajdj.jinstrument.swing.cdi.JTinyCDIStatusAndControl;
 
 /** A one-size-fits-all Swing panel for control and status of a generic {@link DigitalStorageOscilloscope}.
  *
@@ -57,23 +58,21 @@ public class JDefaultDigitalStorageOscilloscopeView
     setOpaque (true);
     // setBackground (Color.white);
     setLayout (new GridLayout (2, 2));
-    final JDefaultInstrumentManagementView instrumentManagementPanel= new JDefaultInstrumentManagementView (
+    this.largeInstrumentManagementPanel = new JDefaultInstrumentManagementView (
       JDefaultDigitalStorageOscilloscopeView.this.getInstrument (),
       JDefaultDigitalStorageOscilloscopeView.this.getLevel () + 1);
-    instrumentManagementPanel.setPanelBorder (JInstrumentPanel.getGuiPreferencesManagementColor (), "Management");
-    add (instrumentManagementPanel);
-    this.display = new JDefaultDigitalStorageOscilloscopeTraceDisplay (digitalStorageOscilloscope, level + 1);
-    JInstrumentPanel.setPanelBorder (this.display,
+    this.largeInstrumentManagementPanel.setPanelBorder (JInstrumentPanel.getGuiPreferencesManagementColor (), "Management");
+    add (this.largeInstrumentManagementPanel);
+    this.smallInstrumentManagementPanel = new JTinyCDIStatusAndControl (
+      JDefaultDigitalStorageOscilloscopeView.this.getInstrument (),
+      JDefaultDigitalStorageOscilloscopeView.this.getLevel () + 1);
+    this.tracePanel = new JDefaultDigitalStorageOscilloscopeTraceDisplay (digitalStorageOscilloscope, level + 1);
+    JInstrumentPanel.setPanelBorder (this.tracePanel,
       level + 1,
       Color.pink,
       "Trace");
-    add (this.display);
-    final JDigitalStorageOscilloscopePanel digitalStorageOscilloscopePanel = new JDigitalStorageOscilloscopePanel (
-        JDefaultDigitalStorageOscilloscopeView.this.getDigitalStorageOscilloscope (),
-        "Settings",
-        JDefaultDigitalStorageOscilloscopeView.this.getLevel () + 1,
-        Color.black);
-    add (digitalStorageOscilloscopePanel);
+    add (this.tracePanel);
+    add (new JPanel ());
     add (new JPanel ());
   }
   
@@ -131,11 +130,36 @@ public class JDefaultDigitalStorageOscilloscopeView
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // DISPLAY
+  // MANAGEMENT PANELS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final JDefaultDigitalStorageOscilloscopeTraceDisplay display;
+  private final JDefaultInstrumentManagementView largeInstrumentManagementPanel;
+
+  protected final JDefaultInstrumentManagementView getLargeInstrumentManagementPanel ()
+  {
+    return this.largeInstrumentManagementPanel;
+  }
+  
+  private final JTinyCDIStatusAndControl smallInstrumentManagementPanel;
+
+  protected final JTinyCDIStatusAndControl getSmallInstrumentManagementPanel ()
+  {
+    return this.smallInstrumentManagementPanel;
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // TRACE PANEL
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JDefaultDigitalStorageOscilloscopeTraceDisplay tracePanel;
+  
+  protected final JDefaultDigitalStorageOscilloscopeTraceDisplay getTracePanel ()
+  {
+    return this.tracePanel;
+  }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
