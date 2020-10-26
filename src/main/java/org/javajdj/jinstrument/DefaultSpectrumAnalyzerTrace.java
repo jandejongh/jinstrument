@@ -34,6 +34,7 @@ public class DefaultSpectrumAnalyzerTrace
   
   public DefaultSpectrumAnalyzerTrace (
     final SpectrumAnalyzerSettings settings,
+    final InstrumentChannel channel,
     final double[] samples,
     final Unit unit,
     final Resolution resolution,
@@ -43,7 +44,7 @@ public class DefaultSpectrumAnalyzerTrace
     final boolean uncalibrated,
     final boolean uncorrected)
   {
-    super (settings, samples, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
+    super (settings, channel, samples, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

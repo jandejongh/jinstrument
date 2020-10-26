@@ -47,6 +47,7 @@ public class DefaultFrequencyCounterReading
   
   public DefaultFrequencyCounterReading (
     final FrequencyCounterSettings settings,
+    final InstrumentChannel instrumentChannel,
     final double readingValue,
     final Unit unit,
     final Resolution resolution,
@@ -56,7 +57,7 @@ public class DefaultFrequencyCounterReading
     final boolean uncalibrated,
     final boolean uncorrected)
   {
-    super (settings, readingValue, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
+    super (settings, instrumentChannel, readingValue, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
     if (unit == null)
       throw new IllegalArgumentException ();
   }

@@ -47,6 +47,7 @@ public class DefaultDigitalMultiMeterReading
   
   public DefaultDigitalMultiMeterReading (
     final DigitalMultiMeterSettings settings,
+    final InstrumentChannel channel,
     final double readingValue,
     final Unit unit,
     final Resolution resolution,
@@ -56,7 +57,7 @@ public class DefaultDigitalMultiMeterReading
     final boolean uncalibrated,
     final boolean uncorrected)
   {
-    super (settings, readingValue, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
+    super (settings, channel, readingValue, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
     if (unit == null)
       throw new IllegalArgumentException ();
   }

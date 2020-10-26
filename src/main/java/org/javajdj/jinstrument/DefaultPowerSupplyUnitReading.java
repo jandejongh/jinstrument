@@ -47,6 +47,7 @@ public class DefaultPowerSupplyUnitReading
   
   public DefaultPowerSupplyUnitReading (
     final PowerSupplyUnitSettings settings,
+    final InstrumentChannel channel,
     final double readingVoltage_V,
     final double readingCurrent_A,
     final double readingPower_W,
@@ -60,6 +61,7 @@ public class DefaultPowerSupplyUnitReading
   {
     super (
       settings,
+      channel,
       new DefaultReading (readingVoltage_V, readingCurrent_A, readingPower_W, powerSupplyMode),
       null,
       resolution,
