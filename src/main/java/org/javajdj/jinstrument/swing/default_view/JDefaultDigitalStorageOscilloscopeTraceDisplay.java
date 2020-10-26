@@ -20,7 +20,6 @@ import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
 import org.javajdj.jinstrument.DigitalStorageOscilloscopeTrace;
 import org.javajdj.jinstrument.Instrument;
@@ -128,22 +127,19 @@ public class JDefaultDigitalStorageOscilloscopeTraceDisplay
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // PROPERTY trace
+  // SET TRACE [ON JTrace]
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private volatile DigitalStorageOscilloscopeTrace trace = null;
-  
   public final void setTrace (final DigitalStorageOscilloscopeTrace trace)
   {
-    this.trace = trace;
-    this.jTrace.setMinX (trace.getChannel (), trace.getMinXHint ());
-    this.jTrace.setMaxX (trace.getChannel (), trace.getMaxXHint ());
-    this.jTrace.setMinY (trace.getChannel (), trace.getMinYHint ());
-    this.jTrace.setMaxY (trace.getChannel (), trace.getMaxYHint ());
-    this.jTrace.setTrace (trace.getChannel (), trace.getReadingValue ());
-    // XXX Is this still needed??
-    SwingUtilities.invokeLater (() -> repaint ());
+    this.jTrace.setMinX (trace.getInstrumentChannel (), trace.getMinXHint ());
+    this.jTrace.setMaxX (trace.getInstrumentChannel (), trace.getMaxXHint ());
+    this.jTrace.setMinY (trace.getInstrumentChannel (), trace.getMinYHint ());
+    this.jTrace.setMaxY (trace.getInstrumentChannel (), trace.getMaxYHint ());
+    this.jTrace.setTrace (trace.getInstrumentChannel (), trace.getReadingValue ());
+    // For future use...
+    // SwingUtilities.invokeLater (() -> repaint ());
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
