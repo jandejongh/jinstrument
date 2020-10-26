@@ -316,6 +316,7 @@ public class HP70000_GPIB_Instrument
       samples[s] = binaryTracePairToDouble (binaryTraceBytes[i_buf++], binaryTraceBytes[i_buf++]);
     return new DefaultSpectrumAnalyzerTrace (
       settings,
+      null,
       samples,
       Unit.UNIT_dBm, // XXX Always correct?
       Resolution.DIGITS_5, // XXX Educated guess: dynamic range > 100 dB, 0.01 dB resolution...
