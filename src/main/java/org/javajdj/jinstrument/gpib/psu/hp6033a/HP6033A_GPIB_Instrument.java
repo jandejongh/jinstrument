@@ -497,6 +497,7 @@ implements PowerSupplyUnit
     settingsReadFromInstrument (settings);
     return new DefaultPowerSupplyUnitReading (
       settings,
+      null,
       readVoltage_V,
       readCurrent_A,
       Double.NaN,
