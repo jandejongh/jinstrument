@@ -372,6 +372,7 @@ public class HP5316A_GPIB_Instrument
       }
       final InstrumentReading reading = new DefaultFrequencyCounterReading (
         settings,
+        null,
         readingValue,
         settings.getMeasurementFunction ().getUnit (),
         Resolution.DIGITS_8, // 8 digit display; more complicated tham that though (overflow behavior)... XXX ...
