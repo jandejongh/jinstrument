@@ -34,6 +34,8 @@ public interface InstrumentReading<R>
   
   InstrumentSettings getInstrumentSettings ();
   
+  InstrumentChannel getInstrumentChannel ();
+  
   Instant getReadingTime ();
 
   R getReadingValue ();

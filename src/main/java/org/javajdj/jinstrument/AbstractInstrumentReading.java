@@ -46,6 +46,7 @@ public abstract class AbstractInstrumentReading<R>
   
   protected AbstractInstrumentReading (
     final InstrumentSettings instrumentSettings,
+    final InstrumentChannel instrumentChannel,
     final Instant readingTime,
     final R readingValue,
     final Unit unit,
@@ -59,6 +60,7 @@ public abstract class AbstractInstrumentReading<R>
     if (instrumentSettings == null || readingValue == null)
       throw new IllegalArgumentException ();
     this.instrumentSettings = instrumentSettings;
+    this.instrumentChannel = instrumentChannel;
     this.readingTime = readingTime != null ? readingTime : Instant.now ();
     this.readingValue = readingValue;
     this.unit = unit;
@@ -72,6 +74,7 @@ public abstract class AbstractInstrumentReading<R>
   
   protected AbstractInstrumentReading (
     final InstrumentSettings instrumentSettings,
+    final InstrumentChannel instrumentChannel,
     final R readingValue,
     final Unit unit,
     final Resolution resolution,
@@ -81,16 +84,17 @@ public abstract class AbstractInstrumentReading<R>
     final boolean uncalibrated,
     final boolean uncorrected)
   {
-    this (instrumentSettings, null, readingValue, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
+    this (instrumentSettings, instrumentChannel, null, readingValue, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
   }
   
   protected AbstractInstrumentReading (
     final InstrumentSettings instrumentSettings,
+    final InstrumentChannel instrumentChannel,
     final R readingValue,
     final Unit unit,
     final Resolution resolution)
   {
-    this (instrumentSettings, null, readingValue, unit, resolution, false, null, false, false, false);
+    this (instrumentSettings, instrumentChannel, null, readingValue, unit, resolution, false, null, false, false, false);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,6 +110,21 @@ public abstract class AbstractInstrumentReading<R>
   public InstrumentSettings getInstrumentSettings ()
   {
     return this.instrumentSettings;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // InstrumentReading
+  // INSTRUMENT CHANNEL
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final InstrumentChannel instrumentChannel;
+  
+  @Override
+  public InstrumentChannel getInstrumentChannel ()
+  {
+    return this.instrumentChannel;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
