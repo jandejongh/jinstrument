@@ -229,12 +229,28 @@ public interface InstrumentCommand
   public final static String ICARG_TIMEBASE_CHANNEL = ICARG_CHANNEL;
   public final static String ICARG_TIMEBASE = "timebase";
   
+  public final static String IC_CHANNEL_ENABLE = "commandChannelEnable";
+  public final static String ICARG_CHANNEL_ENABLE_CHANNEL = ICARG_CHANNEL;
+  public final static String ICARG_CHANNEL_ENABLE = "channelEnable";
+  
   public final static String IC_VOLTS_PER_DIV = "commandVoltsPerDiv";
   public final static String ICARG_VOLTS_PER_DIV_CHANNEL = ICARG_CHANNEL;
   public final static String ICARG_VOLTS_PER_DIV = "voltsPerDiv";
   
-  public final static String IC_CHANNEL_ENABLE = "commandChannelEnable";
-  public final static String ICARG_CHANNEL_ENABLE_CHANNEL = ICARG_CHANNEL;
-  public final static String ICARG_CHANNEL_ENABLE = "channelEnable";
+  public final static String IC_CHANNEL_COUPLING = "commandChannelCoupling";
+  public final static String ICARG_CHANNEL_COUPLING_CHANNEL = ICARG_CHANNEL;
+  public final static String ICARG_CHANNEL_COUPLING = "channelCoupling";
+  
+  public final static String IC_CHANNEL_50_OHMS = "commandChannel50Ohms";
+  public final static String ICARG_CHANNEL_50_OHMS_CHANNEL = ICARG_CHANNEL;
+  public final static String ICARG_CHANNEL_50_OHMS = "channel50Ohms";
+  
+  public final static String IC_CHANNEL_INVERT = "commandChannelInvert";
+  public final static String ICARG_CHANNEL_INVERT_CHANNEL = ICARG_CHANNEL;
+  public final static String ICARG_CHANNEL_INVERT = "channelInvert";
+  
+  public final static String IC_CHANNEL_POSITION = "commandChannelPosition";
+  public final static String ICARG_CHANNEL_POSITION_CHANNEL = ICARG_CHANNEL;
+  public final static String ICARG_CHANNEL_POSITION = "channelPosition";
   
 }
