@@ -419,6 +419,7 @@ public class HP8566B_GPIB_Instrument
       samples[s] = Double.parseDouble (strings[s]);
     return new DefaultSpectrumAnalyzerTrace (
       settings,
+      null,
       samples,
       Unit.UNIT_dBm, // XXX Always correct?
       Resolution.DIGITS_5, // XXX Educated guess: dynamic range > 100 dB, 0.01 dB resolution...
