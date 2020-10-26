@@ -17,9 +17,11 @@
 package org.javajdj.jinstrument.gpib.dso.tek2440;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.javajdj.jinstrument.DefaultInstrumentCommand;
 import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.DeviceType;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
@@ -31,8 +33,8 @@ import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
-import org.javajdj.jinstrument.SpectrumAnalyzerSettings;
 import org.javajdj.jinstrument.gpib.dso.AbstractGpibDigitalStorageOscilloscope;
+import org.javajdj.jinstrument.InstrumentChannel;
 
 /** Implementation of {@link Instrument} and {@link DigitalStorageOscilloscope} for the Tektronix-2440.
  *
@@ -60,7 +62,20 @@ public class Tek2440_GPIB_Instrument
   
   public Tek2440_GPIB_Instrument (final GpibDevice device)
   {
-    super ("Tek-2440", device, null, null, false, /* XXX */ false, true, true, true, false, false);
+    super ("Tek-2440", device, null, null,
+      true,   // Initialization
+      true,   // Status
+      true,   // Setings
+      true,   // Command Processor
+      true,   // Acquisition
+      false,  // Housekeeping
+      false); // Service Request Polling
+    setStatusCollectorPeriod_s (5);
+    setSettingsCollectorPeriod_s (3);
+    setHousekeeperPeriod_s (5);
+    setGpibInstrumentServiceRequestCollectorPeriod_s (4.0);
+    setPollServiceRequestTimeout_ms (3000);
+    setSerialPollTimeout_ms (3000);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -137,6 +152,47 @@ public class Tek2440_GPIB_Instrument
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // DigitalStorageOscilloscope
+  // NUMBER OF CHANNELS
+  // CHANNELS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public static enum Tek2440Channel
+    implements InstrumentChannel
+  {
+    
+    Channel1,
+    Channel2;
+
+    @Override
+    public final String toString ()
+    {
+      switch (this)
+      {
+        case Channel1: return "1";
+        case Channel2: return "2";
+        default: throw new RuntimeException ();
+      }
+    }
+        
+  }
+  
+  public final static int NUMBER_OF_CHANNELS = 2;
+  
+  @Override
+  public final int getNumberOfChannels ()
+  {
+    return NUMBER_OF_CHANNELS;
+  }
+  
+  public final InstrumentChannel[] getChannels ()
+  {
+    return Tek2440Channel.values ();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // AbstractInstrument
   // INSTRUMENT INITIALIZATION
   //
@@ -146,7 +202,19 @@ public class Tek2440_GPIB_Instrument
   protected final void initializeInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
-    throw new UnsupportedOperationException ();
+    final byte[] idBytes = writeAndReadEOISync ("ID?\n");
+    final String idString = new String (idBytes, Charset.forName ("US-ASCII"));
+    setInstrumentId (idString);
+    if (getCurrentInstrumentSettings () == null)
+    {
+      final Tek2440_GPIB_Settings settings = getSettingsFromInstrumentSync ();
+      settingsReadFromInstrument (settings);
+      // There is actually a critical race here because new settings are
+      // processed in another thread...
+      // At least wait for a non-null settings object for other methods.
+      while (getCurrentInstrumentSettings () == null)
+        Thread.sleep (100L);
+    }
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,7 +228,11 @@ public class Tek2440_GPIB_Instrument
   protected InstrumentStatus getStatusFromInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
-    throw new UnsupportedOperationException ();
+    final byte statusByte = serialPollSync ();
+    final String errString = new String (writeAndReadEOISync ("ERR?\n"), Charset.forName ("US-ASCII"));
+    // System.err.println ("Error String: " + errString);
+    final InstrumentStatus instrumentStatus = new Tek2440_GPIB_Status (statusByte, errString);
+    return instrumentStatus;
   }
 
   @Override
@@ -183,11 +255,25 @@ public class Tek2440_GPIB_Instrument
     throw new UnsupportedOperationException ();
   }
   
+  protected final static boolean SETTINGS_USE_LOW_LEVEL = false;
+  
   @Override
-  public SpectrumAnalyzerSettings getSettingsFromInstrumentSync ()
+  public Tek2440_GPIB_Settings getSettingsFromInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
-    throw new UnsupportedOperationException ();
+    final byte[] settingsBytes;
+    final Tek2440_GPIB_Settings settings;
+    if (SETTINGS_USE_LOW_LEVEL)
+    {
+      settingsBytes = writeAndReadEOISync ("LLSET?\n");
+      settings = Tek2440_GPIB_Settings.fromLlSetData (settingsBytes);
+    }
+    else
+    {
+      settingsBytes = writeAndReadEOISync ("SET?\n");
+      settings = Tek2440_GPIB_Settings.fromSetData (settingsBytes);
+    }
+    return settings;
   }
  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -201,7 +287,28 @@ public class Tek2440_GPIB_Instrument
   protected final InstrumentReading getReadingFromInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
-    throw new UnsupportedOperationException ();
+    if (getCurrentInstrumentSettings () == null)
+      initializeInstrumentSync ();
+    final Tek2440_GPIB_Settings settings = (Tek2440_GPIB_Settings) getCurrentInstrumentSettings ();
+    if (settings.isVModeChannel1 ())
+    {
+      final byte[] data;
+      // XXX This changes the settings??
+      data = writeAndReadEOISync ("DAT SOU:CH1;CURVE?\n");
+      final Tek2440_GPIB_Trace reading = new Tek2440_GPIB_Trace (settings, Tek2440Channel.Channel1, data);
+      if (! settings.isVModeChannel2 ())
+        return reading;
+      else
+        readingReadFromInstrument (reading);
+    }
+    if (settings.isVModeChannel2 ())
+    {
+      final byte[] data;
+      data = writeAndReadEOISync ("DAT SOU:CH2;CURVE?\n");
+      final Tek2440_GPIB_Trace reading = new Tek2440_GPIB_Trace (settings, Tek2440Channel.Channel2, data);
+      return reading;
+    }
+    return null;
   }
 
   @Override
@@ -237,7 +344,100 @@ public class Tek2440_GPIB_Instrument
   {
     throw new UnsupportedOperationException ();
   }
-    
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DigitalStorageOscilloscope
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // Tek2440_GPIB_Instrument
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static int TEK2440_X_DIVISIONS = 10;
+  
+  public final static int TEK2440_Y_DIVISIONS = 8;
+  
+  public void setChannelTimebase (
+    final Tek2440Channel channel,
+    final Tek2440_GPIB_Settings.SecondsPerDivision secondsPerDivision)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TIMEBASE,
+      InstrumentCommand.ICARG_TIMEBASE_CHANNEL, channel,
+      InstrumentCommand.ICARG_TIMEBASE, secondsPerDivision));
+  }
+  
+  public void setChannelEnable (
+    final Tek2440Channel channel,
+    final boolean channelEnable)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_CHANNEL_ENABLE,
+      InstrumentCommand.ICARG_CHANNEL_ENABLE_CHANNEL, channel,
+      InstrumentCommand.ICARG_CHANNEL_ENABLE, channelEnable));
+  }
+  
+  public void setVoltsPerDiv (
+    final Tek2440Channel channel,
+    final Tek2440_GPIB_Settings.VoltsPerDivision voltsPerDivision)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_VOLTS_PER_DIV,
+      InstrumentCommand.ICARG_VOLTS_PER_DIV_CHANNEL, channel,
+      InstrumentCommand.ICARG_VOLTS_PER_DIV, voltsPerDivision));
+  }
+  
+  public void setChannelCoupling (
+    final Tek2440Channel channel,
+    final Tek2440_GPIB_Settings.ChannelCoupling channelCoupling)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_CHANNEL_COUPLING,
+      InstrumentCommand.ICARG_CHANNEL_COUPLING_CHANNEL, channel,
+      InstrumentCommand.ICARG_CHANNEL_COUPLING, channelCoupling));
+  }
+  
+  public void setChannelFiftyOhms (
+    final Tek2440Channel channel,
+    final boolean fiftyOhms)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_CHANNEL_50_OHMS,
+      InstrumentCommand.ICARG_CHANNEL_50_OHMS_CHANNEL, channel,
+      InstrumentCommand.ICARG_CHANNEL_50_OHMS, fiftyOhms));
+  }
+  
+  public void setChannelInvert (
+    final Tek2440Channel channel,
+    final boolean invert)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_CHANNEL_INVERT,
+      InstrumentCommand.ICARG_CHANNEL_INVERT_CHANNEL, channel,
+      InstrumentCommand.ICARG_CHANNEL_INVERT, invert));
+  }
+  
+  public void setChannelPosition (
+    final Tek2440Channel channel,
+    final double position)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_CHANNEL_POSITION,
+      InstrumentCommand.ICARG_CHANNEL_POSITION_CHANNEL, channel,
+      InstrumentCommand.ICARG_CHANNEL_POSITION, position));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -270,6 +470,153 @@ public class Tek2440_GPIB_Instrument
           break;
         case InstrumentCommand.IC_GET_SETTINGS_KEY:
         {
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TIMEBASE:
+        {
+          final Tek2440Channel channel = (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_TIMEBASE_CHANNEL);
+          final Tek2440_GPIB_Settings.SecondsPerDivision secondsPerDivision =
+            (Tek2440_GPIB_Settings.SecondsPerDivision) instrumentCommand.get (InstrumentCommand.ICARG_TIMEBASE);
+          switch (channel)
+          {
+            case Channel1:
+              writeSync ("HOR ASE:" + secondsPerDivision.getSecondsPerDivision_s ()  + "\r\n");
+              break;
+            case Channel2:
+              writeSync ("HOR BSE:" + secondsPerDivision.getSecondsPerDivision_s ()  + "\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_VOLTS_PER_DIV:
+        {
+          final Tek2440Channel channel = (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_VOLTS_PER_DIV_CHANNEL);
+          final Tek2440_GPIB_Settings.VoltsPerDivision voltsPerDivision =
+            (Tek2440_GPIB_Settings.VoltsPerDivision) instrumentCommand.get (InstrumentCommand.ICARG_VOLTS_PER_DIV);
+          switch (channel)
+          {
+            case Channel1:
+              writeSync ("CH1 VOL:" + voltsPerDivision.getVoltsPerDivision_V () + "\r\n");
+              break;
+            case Channel2:
+              writeSync ("CH2 VOL:" + voltsPerDivision.getVoltsPerDivision_V () + "\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_CHANNEL_ENABLE:
+        {
+          final Tek2440Channel channel = (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_ENABLE_CHANNEL);
+          final boolean channelEnable =
+            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_ENABLE);
+          switch (channel)
+          {
+            case Channel1:
+              writeSync ("VMO CH1:" + (channelEnable ? "ON" : "OFF") + "\r\n");
+              break;
+            case Channel2:
+              writeSync ("VMO CH2:" + (channelEnable ? "ON" : "OFF") + "\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_CHANNEL_COUPLING:
+        {
+          final Tek2440Channel channel = (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_COUPLING_CHANNEL);
+          final Tek2440_GPIB_Settings.ChannelCoupling channelCoupling =
+            (Tek2440_GPIB_Settings.ChannelCoupling) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_COUPLING);
+          switch (channel)
+          {
+            case Channel1:
+              switch (channelCoupling)
+              {
+                case AC:  writeSync ("CH1 COU:AC\r\n");  break;
+                case DC:  writeSync ("CH1 COU:DC\r\n");  break;
+                case GND: writeSync ("CH1 COU:GND\r\n"); break;
+                default:
+                  throw new IllegalArgumentException ();
+              }
+              break;
+            case Channel2:
+              switch (channelCoupling)
+              {
+                case AC:  writeSync ("CH2 COU:AC\r\n");  break;
+                case DC:  writeSync ("CH2 COU:DC\r\n");  break;
+                case GND: writeSync ("CH2 COU:GND\r\n"); break;
+                default:
+                  throw new IllegalArgumentException ();
+              }
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_CHANNEL_50_OHMS:
+        {
+          final Tek2440Channel channel = (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_50_OHMS_CHANNEL);
+          final boolean channelFiftyOhms =
+            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_50_OHMS);
+          switch (channel)
+          {
+            case Channel1:
+              writeSync ("CH1 FIF:" + (channelFiftyOhms ? "ON" : "OFF") + "\r\n");
+              break;
+            case Channel2:
+              writeSync ("CH2 FIF:" + (channelFiftyOhms ? "ON" : "OFF") + "\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_CHANNEL_INVERT:
+        {
+          final Tek2440Channel channel = (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_INVERT_CHANNEL);
+          final boolean channelInvert =
+            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_INVERT);
+          switch (channel)
+          {
+            case Channel1:
+              writeSync ("CH1 INV:" + (channelInvert ? "ON" : "OFF") + "\r\n");
+              break;
+            case Channel2:
+              writeSync ("CH2 INV:" + (channelInvert ? "ON" : "OFF") + "\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_CHANNEL_POSITION:
+        {
+          final Tek2440Channel channel = (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_POSITION_CHANNEL);
+          final double channelPosition =
+            (double) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_POSITION);
+          switch (channel)
+          {
+            case Channel1:
+              writeSync ("CH1 POS:" + channelPosition + "\r\n");
+              break;
+            case Channel2:
+              writeSync ("CH2 POS:" + channelPosition + "\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
