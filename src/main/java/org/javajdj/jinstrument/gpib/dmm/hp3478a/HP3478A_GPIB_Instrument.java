@@ -471,6 +471,7 @@ public class HP3478A_GPIB_Instrument
     }
     return new DefaultDigitalMultiMeterReading (
       settings,
+      null,
       readingValue,
       settings.getReadingUnit (),
       settings.getResolution (),
