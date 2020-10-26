@@ -41,8 +41,6 @@ public interface Instrument
   
   InstrumentSettings getCurrentInstrumentSettings ();
   
-  InstrumentReading getLastInstrumentReading ();
-    
   boolean isPoweredOn ();
   
   void setPoweredOn (boolean poweredOn);

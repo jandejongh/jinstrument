@@ -554,21 +554,6 @@ implements Instrument
     Level.WARNING,
     Level.WARNING);
   
-  public final static String LAST_INSTRUMENT_READING_PROPERTY_NAME = "lastInstrumentReading";
-  
-  private volatile InstrumentReading lastInstrumentReading = null;
-  
-  private final Object lastInstrumentReadingLock = new Object ();
-  
-  @Override
-  public final InstrumentReading getLastInstrumentReading ()
-  {
-    synchronized (this.lastInstrumentReadingLock)
-    {
-      return this.lastInstrumentReading;
-    }
-  }
-  
   public final static String READING_COLLECTOR_PERIOD_S_PROPERTY_NAME = "readingCollectorPeriod_s";
   
   public final static double DEFAULT_READING_COLLECTOR_PERIOD_S = 10;
@@ -608,7 +593,7 @@ implements Instrument
   protected void readingReadFromInstrument (final InstrumentReading instrumentReading)
   {
     if (instrumentReading == null)
-      throw new IllegalArgumentException ();
+      return;
     if (! this.readingReadQueue.offer (instrumentReading))
       LOG.log (Level.WARNING, "Overflow on Instrument Reading Queue on {0}.", this);
   }
@@ -621,10 +606,6 @@ implements Instrument
   
   private void processReading (final InstrumentReading instrumentReading)
   {
-    synchronized (this.lastInstrumentReadingLock)
-    {
-      this.lastInstrumentReading = instrumentReading;
-    }
     fireInstrumentReading (instrumentReading);
   }
   
