@@ -233,4 +233,8 @@ public interface InstrumentCommand
   public final static String ICARG_VOLTS_PER_DIV_CHANNEL = ICARG_CHANNEL;
   public final static String ICARG_VOLTS_PER_DIV = "voltsPerDiv";
   
+  public final static String IC_CHANNEL_ENABLE = "commandChannelEnable";
+  public final static String ICARG_CHANNEL_ENABLE_CHANNEL = ICARG_CHANNEL;
+  public final static String ICARG_CHANNEL_ENABLE = "channelEnable";
+  
 }
