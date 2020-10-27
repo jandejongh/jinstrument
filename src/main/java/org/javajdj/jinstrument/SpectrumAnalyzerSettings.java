@@ -28,8 +28,6 @@ public interface SpectrumAnalyzerSettings
   @Override
   SpectrumAnalyzerSettings clone() throws CloneNotSupportedException;
   
-  byte[] getBytes ();
-  
   double getCenterFrequency_MHz ();
   
   double getSpan_MHz ();

@@ -28,8 +28,6 @@ public interface DigitalMultiMeterSettings
   @Override
   DigitalMultiMeterSettings clone() throws CloneNotSupportedException;
   
-  byte[] getBytes ();
-  
   Resolution getResolution ();
   
   DigitalMultiMeter.MeasurementMode getMeasurementMode ();

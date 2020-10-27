@@ -28,8 +28,6 @@ public interface PowerSupplyUnitSettings
   @Override
   PowerSupplyUnitSettings clone() throws CloneNotSupportedException;
   
-  byte[] getBytes ();
-  
   double getSoftLimitVoltage_V ();
   
   double getSoftLimitCurrent_A ();

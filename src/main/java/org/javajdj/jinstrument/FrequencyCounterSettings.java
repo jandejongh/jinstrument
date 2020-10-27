@@ -30,8 +30,6 @@ public interface FrequencyCounterSettings<M>
   @Override
   FrequencyCounterSettings clone() throws CloneNotSupportedException;
   
-  byte[] getBytes ();
-  
   M getInstrumentMode ();
   
   double getGateTime_s ();

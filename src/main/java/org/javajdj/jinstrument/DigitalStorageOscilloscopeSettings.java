@@ -28,6 +28,4 @@ public interface DigitalStorageOscilloscopeSettings
   @Override
   DigitalStorageOscilloscopeSettings clone() throws CloneNotSupportedException;
   
-  byte[] getBytes ();
-  
 }

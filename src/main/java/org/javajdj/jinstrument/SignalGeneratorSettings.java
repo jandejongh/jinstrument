@@ -28,8 +28,6 @@ public interface SignalGeneratorSettings
   @Override
   SignalGeneratorSettings clone() throws CloneNotSupportedException;
   
-  byte[] getBytes ();
-  
   double getCenterFrequency_MHz ();
   
   double getSpan_MHz ();

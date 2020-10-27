@@ -28,8 +28,6 @@ public interface FunctionGeneratorSettings
   @Override
   FunctionGeneratorSettings clone() throws CloneNotSupportedException;
   
-  byte[] getBytes ();
-  
   boolean isOuputEnable ();
   
   FunctionGenerator.Waveform getWaveform ();
