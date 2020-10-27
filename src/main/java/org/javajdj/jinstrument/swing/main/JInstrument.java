@@ -83,6 +83,7 @@ import org.javajdj.jinstrument.gpib.sna.wiltron560a.Wiltron560A_GPIB_Instrument;
 import org.javajdj.jinstrument.swing.cdi.JTinyCDIStatusAndControl;
 import org.javajdj.jinstrument.swing.controller.gpib.JControllerDebug;
 import org.javajdj.jinstrument.swing.controller.gpib.JGpibDeviceConsole;
+import org.javajdj.jinstrument.swing.debug.JSettingsMonitor;
 import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalMultiMeterView;
 import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalStorageOscilloscopeView;
 import org.javajdj.jinstrument.swing.default_view.JDefaultFrequencyCounterView;
@@ -162,6 +163,7 @@ extends JFrame
     this.instrumentRegistry.addInstrumentViewType (JDefaultInstrumentManagementUrlsView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultInstrumentManagementView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JTinyCDIStatusAndControl.INSTRUMENT_VIEW_TYPE);
+    this.instrumentRegistry.addInstrumentViewType (JSettingsMonitor.INSTRUMENT_VIEW_TYPE);    
     this.instrumentRegistry.addInstrumentViewType (JDefaultDigitalStorageOscilloscopeView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerSettingsPanel.INSTRUMENT_VIEW_TYPE);
