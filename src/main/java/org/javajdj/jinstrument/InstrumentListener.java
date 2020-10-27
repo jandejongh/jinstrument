@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020. Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,8 +65,8 @@ public interface InstrumentListener
    * @param instrumentSettings  An optional instrument settings object.
    * @param instrumentReading   An optional instrument reading object.
    * @param debugObject1        An optional debug object.
-   * @param debuObject2         An optional debug object.
-   * @param debuObject3         An optional debug object.
+   * @param debugObject2        An optional debug object.
+   * @param debugObject3        An optional debug object.
    * 
    */
   default void newInstrumentDebug (
@@ -76,8 +76,8 @@ public interface InstrumentListener
     InstrumentSettings instrumentSettings,
     InstrumentReading instrumentReading,
     Object debugObject1,
-    Object debuObject2,
-    Object debuObject3)
+    Object debugObject2,
+    Object debugObject3)
   {
   }
   
