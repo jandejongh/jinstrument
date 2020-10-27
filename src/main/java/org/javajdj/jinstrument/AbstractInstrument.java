@@ -175,6 +175,30 @@ implements Instrument
       l.newInstrumentReading (this, instrumentReading);
   }
   
+  protected final void fireInstrumentDebug (
+    final Instrument instrument,
+    final int debugId,
+    final InstrumentStatus instrumentStatus,
+    final InstrumentSettings instrumentSettings,
+    final InstrumentReading instrumentReading,
+    final Object debugObject1,
+    final Object debugObject2,
+    final Object debugObject3)
+  {
+    // References are atomic.
+    final Set<InstrumentListener> listeners = this.instrumentListenersCopy;
+    for (final InstrumentListener l : listeners)
+      l.newInstrumentDebug (
+        instrument,
+        debugId,
+        instrumentStatus,
+        instrumentSettings,
+        instrumentReading,
+        debugObject1,
+        debugObject2,
+        debugObject3);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENT ID
