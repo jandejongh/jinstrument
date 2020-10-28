@@ -48,13 +48,13 @@ public interface InstrumentListener
    * An optional method on an {@link InstrumentListener} for the purpose of debugging.
    * The {@code debugId} is meant to distinguish between different debugging methods
    * in place, so listeners can skip notifications from non-related debug exercises.
-   * The special value of zero for {@link debugId} means the issuer has not set it.
+   * The special value of zero for {@code debugId} means the issuer has not set it.
    * 
    * <P>
    * Other than that, the are not really any further restriction on the use of this method.
    * 
    * <p>
-   * Unused arguments should be set to {@code null} or zero (for {@link @debugId}).
+   * Unused arguments should be set to {@code null} or zero (for {@code @debugId}).
    * 
    * <p>
    * The default implementation is empty.
