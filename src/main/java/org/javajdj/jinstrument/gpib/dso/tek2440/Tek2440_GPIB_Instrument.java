@@ -35,6 +35,7 @@ import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.gpib.dso.AbstractGpibDigitalStorageOscilloscope;
 import org.javajdj.jinstrument.InstrumentChannel;
+import org.javajdj.jinstrument.InstrumentListener;
 
 /** Implementation of {@link Instrument} and {@link DigitalStorageOscilloscope} for the Tektronix-2440.
  *
@@ -267,11 +268,32 @@ public class Tek2440_GPIB_Instrument
     {
       settingsBytes = writeAndReadEOISync ("LLSET?\n");
       settings = Tek2440_GPIB_Settings.fromLlSetData (settingsBytes);
+      // XXX DEBUG
+      fireInstrumentDebug (
+        this,
+        InstrumentListener.INSTRUMENT_DEBUG_ID_SETTINGS_BYTES_1,
+        null,
+        null,
+        null,
+        settings.getBytes (),
+        null,
+        null);
     }
     else
     {
       settingsBytes = writeAndReadEOISync ("SET?\n");
       settings = Tek2440_GPIB_Settings.fromSetData (settingsBytes);
+      // XXX DEBUG
+      final byte[] debugSettingsBytes = writeAndReadEOISync ("LLSET?\n");
+      fireInstrumentDebug (
+        this,
+        InstrumentListener.INSTRUMENT_DEBUG_ID_SETTINGS_BYTES_1,
+        null,
+        null,
+        null,
+        debugSettingsBytes,
+        null,
+        null);
     }
     return settings;
   }
