@@ -350,13 +350,20 @@ public class Tek2440_GPIB_Settings
   public static enum HorizontalExternalExpansionFactor
   {
     
-    HorExtExp_1,
-    HorExtExp_2,
-    HorExtExp_5,
-    HorExtExp_10,
-    HorExtExp_20,
-    HorExtExp_50,
-    HorExtExp_100;
+    HorExtExp_1     (1),
+    HorExtExp_2     (2),
+    HorExtExp_5     (5),
+    HorExtExp_10   (10),
+    HorExtExp_20   (20),
+    HorExtExp_50   (50),
+    HorExtExp_100 (100);
+
+    private final int heef;
+    
+    private HorizontalExternalExpansionFactor (final int heef)
+    {
+      this.heef = heef;
+    }
     
     public static HorizontalExternalExpansionFactor fromInteger (final int heefInt)
     {
@@ -371,6 +378,12 @@ public class Tek2440_GPIB_Settings
         case 100: return HorExtExp_100;
         default: throw new IllegalArgumentException ();
       }
+    }
+
+    @Override
+    public final String toString ()
+    {
+      return Integer.toString (this.heef);
     }
     
   }
