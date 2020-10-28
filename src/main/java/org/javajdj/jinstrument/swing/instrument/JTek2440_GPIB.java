@@ -47,9 +47,11 @@ import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
+import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Status;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalStorageOscilloscopeView;
+import org.javajdj.jswing.jbyte.JByte;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jtrace.JTrace;
 
@@ -101,8 +103,20 @@ public class JTek2440_GPIB
     this.northPanel = new JPanel ();
     this.northPanel.setLayout (new FlowLayout (FlowLayout.LEFT));
     final JPanel jSimp = getSmallInstrumentManagementPanel ();
-    jSimp.setBorder (BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR));
+    jSimp.setPreferredSize (new Dimension (60, 80));
+    jSimp.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Inst"));
     this.northPanel.add (jSimp);
+    this.jSerialPollStatus = new JByte (Color.red,
+      Arrays.asList (new String[]{"  ?", "RQS", "  ?", "  ?", "  ?", "  ?", "  ?", "  ?"}));
+    this.jSerialPollStatus.setPreferredSize (new Dimension (240, 80));
+    this.jSerialPollStatus.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Serial Poll"));
+    this.northPanel.add (this.jSerialPollStatus);
     add (northPanel, BorderLayout.NORTH);
     //
     this.eastPanel = new JPanel ();
@@ -191,6 +205,15 @@ public class JTek2440_GPIB
   private final JPanel southPanel;
   
   private final JPanel westPanel;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  // NORTH PANEL
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JByte jSerialPollStatus;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -535,7 +558,15 @@ public class JTek2440_GPIB
     @Override
     public void newInstrumentStatus (final Instrument instrument, final InstrumentStatus instrumentStatus)
     {
-      // EMPTY
+      if (instrument != JTek2440_GPIB.this.getDigitalStorageOscilloscope () || instrumentStatus == null)
+        throw new IllegalArgumentException ();
+      if (! (instrumentStatus instanceof Tek2440_GPIB_Status))
+        throw new IllegalArgumentException ();
+      SwingUtilities.invokeLater (() ->
+      {
+        JTek2440_GPIB.this.jSerialPollStatus.setDisplayedValue (
+          ((Tek2440_GPIB_Status) instrumentStatus).getSerialPollStatusByte ());
+      });
     }
     
     @Override
