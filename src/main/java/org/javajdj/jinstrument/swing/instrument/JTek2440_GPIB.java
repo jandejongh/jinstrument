@@ -120,9 +120,12 @@ public class JTek2440_GPIB
     add (northPanel, BorderLayout.NORTH);
     //
     this.eastPanel = new JPanel ();
-    this.eastPanel.setLayout (new GridLayout (1, 2));
-    this.eastPanel.add (this.jCh1Panel);
-    this.eastPanel.add (this.jCh2Panel);
+    this.eastPanel.setLayout (new GridLayout (2, 1));
+    final JPanel eastNorthPanel = new JPanel ();
+    eastNorthPanel.setLayout (new GridLayout (1, 2));
+    eastNorthPanel.add (this.jCh1Panel);
+    eastNorthPanel.add (this.jCh2Panel);
+    this.eastPanel.add (eastNorthPanel);
     add (this.eastPanel, BorderLayout.EAST);
     //
     this.southPanel = new JPanel ();
@@ -258,7 +261,7 @@ public class JTek2440_GPIB
     public JTek2440XPanel (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
     {
       super (digitalStorageOscilloscope, "X", 1, JInstrumentPanel.getGuiPreferencesTimeColor ());
-      setLayout (new GridLayout (2, 2));
+      setLayout (new GridLayout (5, 2, 0, 10));
       add (new JLabel ("A Timebase"));
       this.jChATimebase = new JComboBox<> (Tek2440_GPIB_Settings.SecondsPerDivision.values ());
       this.jChATimebase.addItemListener (JTek2440_GPIB.this.jChTimebaseListener);
@@ -267,11 +270,31 @@ public class JTek2440_GPIB
       this.jChBTimebase = new JComboBox<> (Tek2440_GPIB_Settings.SecondsPerDivision.values ());
       this.jChBTimebase.addItemListener (JTek2440_GPIB.this.jChTimebaseListener);
       add (this.jChBTimebase);
+      add (new JLabel ("Hor Ext Expansion"));
+      this.jExtExp = new JComboBox (Tek2440_GPIB_Settings.HorizontalExternalExpansionFactor.values ());
+      this.jExtExp.setEditable (false);
+      this.jExtExp.setEnabled (false);
+      add (this.jExtExp);
+      add (new JLabel ("Position"));
+      this.jPosition = new JSlider (0, 1023);
+      this.jPosition.setEnabled (false);
+      add (this.jPosition);
+      add (new JLabel ("Mode"));
+      this.jMode = new JComboBox<> (Tek2440_GPIB_Settings.HorizontalMode.values ());
+      this.jMode.setEditable (false);
+      this.jMode.setEnabled (false);
+      add (this.jMode);
     }
     
     private final JComboBox<Tek2440_GPIB_Settings.SecondsPerDivision> jChATimebase;
     
     private final JComboBox<Tek2440_GPIB_Settings.SecondsPerDivision> jChBTimebase;  
+    
+    private final JComboBox<Tek2440_GPIB_Settings.HorizontalExternalExpansionFactor> jExtExp;
+    
+    private final JSlider jPosition;
+    
+    private final JComboBox<Tek2440_GPIB_Settings.HorizontalMode> jMode;
     
   }
   
@@ -345,7 +368,7 @@ public class JTek2440_GPIB
       if (channel == null)
         throw new IllegalArgumentException ();
       this.channel = channel;
-      setLayout (new GridLayout (20,2));
+      setLayout (new GridLayout (10,2));
       add (new JLabel("Enable"));
       switch (channel)
       {
@@ -394,26 +417,6 @@ public class JTek2440_GPIB
       this.jPosition.setToolTipText ("-");
       this.jPosition.addChangeListener (this.jPositionChangeListener);
       add (this.jPosition);
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
-      add (new JLabel());
       add (new JLabel());
       add (new JLabel());
     }
@@ -584,6 +587,11 @@ public class JTek2440_GPIB
         {
           JTek2440_GPIB.this.xPanel.jChATimebase.setSelectedItem (settings.getASecondsPerDivision ());
           JTek2440_GPIB.this.xPanel.jChBTimebase.setSelectedItem (settings.getBSecondsPerDivision ());
+          JTek2440_GPIB.this.xPanel.jExtExp.setSelectedItem (settings.getHorizontalExternalExpansionFactor ());
+          final int roundedXPosition = (int) Math.round (settings.getHorizontalPosition ());
+          JTek2440_GPIB.this.xPanel.jPosition.setValue (roundedXPosition);
+          JTek2440_GPIB.this.xPanel.jPosition.setToolTipText (Integer.toString (roundedXPosition));
+          JTek2440_GPIB.this.xPanel.jMode.setSelectedItem (settings.getHorizontalMode ());
           JTek2440_GPIB.this.jCh1Panel.jEnabled.setDisplayedValue (settings.isVModeChannel1 ());
           JTek2440_GPIB.this.jCh2Panel.jEnabled.setDisplayedValue (settings.isVModeChannel2 ());
           if (! settings.isVModeChannel1 ())
