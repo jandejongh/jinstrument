@@ -131,13 +131,32 @@ public class JTek2440_GPIB
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
         "Generic"));
-    eastSouthPanel.setLayout (new GridLayout (10, 4));
+    eastSouthPanel.setLayout (new GridLayout (10, 4, 10, 2));
     eastSouthPanel.add (new JLabel ("Bandwidth"));
     this.jBandwithLimit = new JComboBox<> (Tek2440_GPIB_Settings.BandwidthLimit.values ());
     this.jBandwithLimit.setEditable (false);
     this.jBandwithLimit.setEnabled (false);
     eastSouthPanel.add (this.jBandwithLimit);
-    for (int i = 1; i <= 38; i++)
+    eastSouthPanel.add (new JLabel ("Display Mode"));
+    this.jVModeDisplay = new JComboBox<> (Tek2440_GPIB_Settings.VModeDisplay.values ());
+    this.jVModeDisplay.setEditable (false);
+    this.jVModeDisplay.setEnabled (false);
+    eastSouthPanel.add (this.jVModeDisplay);
+    eastSouthPanel.add (new JLabel ());
+    eastSouthPanel.add (new JLabel ());
+    eastSouthPanel.add (new JLabel ());
+    eastSouthPanel.add (new JLabel ());
+    eastSouthPanel.add (new JLabel ("Add"));
+    this.jAdd = new JColorCheckBox.JBoolean (Color.red);
+    this.jAdd.setEnabled (false);
+    // this.jAdd.setHorizontalAlignment (SwingConstants.CENTER);
+    eastSouthPanel.add (this.jAdd);
+    eastSouthPanel.add (new JLabel ("Mul"));
+    this.jMul = new JColorCheckBox.JBoolean (Color.red);
+    this.jMul.setEnabled (false);
+    // this.jMul.setHorizontalAlignment (SwingConstants.CENTER);
+    eastSouthPanel.add (this.jMul);
+    for (int i = 1; i <= 28; i++)
       eastSouthPanel.add (new JLabel ());
     this.eastPanel.add (eastSouthPanel);
     add (this.eastPanel, BorderLayout.EAST);
@@ -566,6 +585,19 @@ public class JTek2440_GPIB
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SWING
+  // VERTICAL MODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JColorCheckBox.JBoolean jAdd;
+    
+  private final JColorCheckBox.JBoolean jMul;
+  
+  private final JComboBox<Tek2440_GPIB_Settings.VModeDisplay> jVModeDisplay;
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
   // BANDWIDTH LIMIT
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -642,6 +674,9 @@ public class JTek2440_GPIB
           JTek2440_GPIB.this.jCh2Panel.jPosition.setValue (ch2PositionDiv);
           JTek2440_GPIB.this.jCh2Panel.jPosition.setToolTipText (Integer.toString (ch2PositionDiv));
           JTek2440_GPIB.this.jBandwithLimit.setSelectedItem (settings.getBandwidthLimit ());
+          JTek2440_GPIB.this.jAdd.setDisplayedValue (settings.isVModeAdd ());
+          JTek2440_GPIB.this.jMul.setDisplayedValue (settings.isVModeMult ());
+          JTek2440_GPIB.this.jVModeDisplay.setSelectedItem (settings.getVModeDisplay ());          
         }
         finally
         {
