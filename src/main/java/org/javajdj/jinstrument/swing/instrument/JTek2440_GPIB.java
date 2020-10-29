@@ -126,6 +126,20 @@ public class JTek2440_GPIB
     eastNorthPanel.add (this.jCh1Panel);
     eastNorthPanel.add (this.jCh2Panel);
     this.eastPanel.add (eastNorthPanel);
+    final JPanel eastSouthPanel = new JPanel ();
+    eastSouthPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Generic"));
+    eastSouthPanel.setLayout (new GridLayout (10, 4));
+    eastSouthPanel.add (new JLabel ("Bandwidth"));
+    this.jBandwithLimit = new JComboBox<> (Tek2440_GPIB_Settings.BandwidthLimit.values ());
+    this.jBandwithLimit.setEditable (false);
+    this.jBandwithLimit.setEnabled (false);
+    eastSouthPanel.add (this.jBandwithLimit);
+    for (int i = 1; i <= 38; i++)
+      eastSouthPanel.add (new JLabel ());
+    this.eastPanel.add (eastSouthPanel);
     add (this.eastPanel, BorderLayout.EAST);
     //
     this.southPanel = new JPanel ();
@@ -551,6 +565,15 @@ public class JTek2440_GPIB
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // SWING
+  // BANDWIDTH LIMIT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JComboBox<Tek2440_GPIB_Settings.BandwidthLimit> jBandwithLimit;
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // INSTRUMENT LISTENER
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -618,6 +641,7 @@ public class JTek2440_GPIB
           JTek2440_GPIB.this.jCh1Panel.jPosition.setToolTipText (Integer.toString (ch1PositionDiv));
           JTek2440_GPIB.this.jCh2Panel.jPosition.setValue (ch2PositionDiv);
           JTek2440_GPIB.this.jCh2Panel.jPosition.setToolTipText (Integer.toString (ch2PositionDiv));
+          JTek2440_GPIB.this.jBandwithLimit.setSelectedItem (settings.getBandwidthLimit ());
         }
         finally
         {
