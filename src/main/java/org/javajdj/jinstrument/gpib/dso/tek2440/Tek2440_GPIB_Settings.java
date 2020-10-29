@@ -61,7 +61,8 @@ public class Tek2440_GPIB_Settings
     final ChannelSettings ch1Settings,
     final ChannelSettings ch2Settings,
     final DataSettings dataSettings,
-    final VModeSettings vModeSettings)
+    final VModeSettings vModeSettings,
+    final BandwidthLimitSettings bandwidthLimitSettings)
   {
     super (
       bytes,
@@ -84,6 +85,9 @@ public class Tek2440_GPIB_Settings
     if (vModeSettings == null)
       throw new IllegalArgumentException ();
     this.vModeSettings = vModeSettings;
+    if (bandwidthLimitSettings == null)
+      throw new IllegalArgumentException ();
+    this.bandwidthLimitSettings = bandwidthLimitSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -113,6 +117,7 @@ public class Tek2440_GPIB_Settings
     ChannelSettings ch2Settings = null;
     DataSettings dataSettings = null;
     VModeSettings vModeSettings = null;
+    BandwidthLimitSettings bandwidthLimitSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -120,9 +125,11 @@ public class Tek2440_GPIB_Settings
       final String argString = partParts[1].trim ().toLowerCase ();
       switch (keyString)
       {
+        case "autos":
         case "autosetup":
           autoSetupSettings = parseAutoSetupSettings (argString);
           break;
+        case "hor":
         case "horizontal":
           horizontalSettings = parseHorizontalSettings (argString);
           break;
@@ -132,12 +139,17 @@ public class Tek2440_GPIB_Settings
         case "ch2":
           ch2Settings = parseChannelSettings (argString, Tek2440_GPIB_Instrument.Tek2440Channel.Channel2);
           break;
+        case "dat":
         case "data":
           dataSettings = parseDataSettings (argString);
           break;
         case "vmo":
         case "vmode":
           vModeSettings = parseVModeSettings (argString);
+          break;
+        case "bwl":
+        case "bwlimit":
+          bandwidthLimitSettings = parseBandwidthLimitSettings (argString);
           break;
         // XXX ParseException of IllegalArgumentException later...
         default:
@@ -152,7 +164,8 @@ public class Tek2440_GPIB_Settings
       ch1Settings,
       ch2Settings,
       dataSettings,
-      vModeSettings);    
+      vModeSettings,
+      bandwidthLimitSettings);    
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,33 +244,49 @@ public class Tek2440_GPIB_Settings
     {
       final String[] argArgParts = argPart.trim ().split (":");
       if (argArgParts == null || argArgParts.length != 2)
-        throw new IllegalArgumentException ("autosetup");
+        throw new IllegalArgumentException ();
       final String argKey = argArgParts[0].trim ();
       switch (argKey)
       {
+        case "mod":
         case "mode":
         {
           switch (argArgParts[1].trim ())
           {
-            case "fall":   mode = AutoSetupMode.FALL; break;
-            case "period": mode = AutoSetupMode.PERIOD; break;
-            case "pulse":  mode = AutoSetupMode.PULSE; break;
-            case "rise":   mode = AutoSetupMode.RISE; break;
-            case "view": mode = AutoSetupMode.VIEW; break;
-            default: throw new IllegalArgumentException ("autosetup - mode");
+            case "fal":
+            case "fall":
+              mode = AutoSetupMode.FALL;
+              break;
+            case "peri":
+            case "period":
+              mode = AutoSetupMode.PERIOD;
+              break;
+            case "pul":
+            case "pulse":
+              mode = AutoSetupMode.PULSE;
+              break;
+            case "ris":
+            case "rise":
+              mode = AutoSetupMode.RISE;
+              break;
+            case "vie":
+            case "view":
+              mode = AutoSetupMode.VIEW;
+              break;
+            default:
+              throw new IllegalArgumentException ();
           }
-          // System.err.println ("  Found autosetup/mode definition: " + argPart + ".");
           break;
         }
+        case "res":
         case "resolution":
         {
           switch (argArgParts[1].trim ())
           {
             case "hi": resolution = AutoSetupResolution.HIGH; break;
-            case "lo": resolution = AutoSetupResolution.LOW; break;
-            default: throw new IllegalArgumentException ("autosetup - resolution");
+            case "lo": resolution = AutoSetupResolution.LOW;  break;
+            default: throw new IllegalArgumentException ();
           }
-          // System.err.println ("  Found autosetup/resolution definition: " + argPart + ".");
           break;
         }
         default:
@@ -480,9 +509,11 @@ public class Tek2440_GPIB_Settings
       boolean isASecDiv = false;
       switch (argKey)
       {
+        case "ase":
         case "asecdiv":
           isASecDiv = true;
           // Intended fallthrough.
+        case "bse":
         case "bsecdiv":
         {
           try
@@ -497,9 +528,9 @@ public class Tek2440_GPIB_Settings
           {
             throw new IllegalArgumentException ();                          
           }
-          // System.err.println ("  Found horizontal/" + argKey + " definition: " + argPart + ".");
           break;
         }
+        case "exte":
         case "extexp":
         {
           try
@@ -510,21 +541,31 @@ public class Tek2440_GPIB_Settings
           {
             throw new IllegalArgumentException ();
           }
-          // System.err.println ("  Found horizontal/extexp definition: " + argPart + ".");
           break;
         }
+        case "mod":
         case "mode":
         {
           switch (argArgParts[1].trim ())
           {
-            case "aintb":  mode = HorizontalMode.AInTb;  break;
-            case "asweep": mode = HorizontalMode.ASweep; break;
-            case "bsweep": mode = HorizontalMode.BSweep; break;
-            default: throw new IllegalArgumentException ();
+            case "ain":
+            case "aintb":
+              mode = HorizontalMode.AInTb;
+              break;
+            case "asw":
+            case "asweep":
+              mode = HorizontalMode.ASweep;
+              break;
+            case "bsw":
+            case "bsweep":
+              mode = HorizontalMode.BSweep;
+              break;
+            default:
+              throw new IllegalArgumentException ();
           }
-          // System.err.println ("  Found horizontal/mode definition: " + argPart + ".");
           break;
         }
+        case "pos":
         case "position":
         {
           try
@@ -537,7 +578,6 @@ public class Tek2440_GPIB_Settings
           }
           if (position < 0 || position > 1023)
             throw new IllegalArgumentException ();
-          // System.err.println ("  Found horizontal/position definition: " + argPart + ".");
           break;
         }
         default:
@@ -788,10 +828,11 @@ public class Tek2440_GPIB_Settings
     {
       final String[] argArgParts = argPart.trim ().split (":");
       if (argArgParts == null || argArgParts.length != 2)
-        throw new IllegalArgumentException ("ch");
+        throw new IllegalArgumentException ();
       final String argKey = argArgParts[0].trim ();
       switch (argKey)
       {
+        case "cou":
         case "coupling":
         {
           switch (argArgParts[1].trim ())
@@ -799,33 +840,33 @@ public class Tek2440_GPIB_Settings
             case "ac":  channelCoupling = ChannelCoupling.AC;  break;
             case "dc":  channelCoupling = ChannelCoupling.DC;  break;
             case "gnd": channelCoupling = ChannelCoupling.GND; break;
-            default: throw new IllegalArgumentException ("ch - " + channel + " - coupling");
+            default: throw new IllegalArgumentException ();
           }
-          // System.err.println ("  Found coupling definition: " + argPart + ", channel=" + channel + ".");
           break;
         }
+        case "fif":
         case "fifty":
         {
           switch (argArgParts[1].trim ())
           {
             case "on":  fifty = true;  break;
             case "off": fifty = false; break;
-            default: throw new IllegalArgumentException ("ch - " + channel + " - fifty");
+            default: throw new IllegalArgumentException ();
           }
-          // System.err.println ("  Found fifty definition: " + argPart + ", channel=" + channel + ".");
           break;
         }
+        case "inv":
         case "invert":
         {
           switch (argArgParts[1].trim ())
           {
             case "on":  invert = true;  break;
             case "off": invert = false; break;
-            default: throw new IllegalArgumentException ("ch - " + channel + " - invert");
+            default: throw new IllegalArgumentException ();
           }
-          // System.err.println ("  Found invert definition: " + argPart + ", channel=" + channel + ".");
           break;
         }
+        case "pos":
         case "position":
         {
           try
@@ -834,11 +875,11 @@ public class Tek2440_GPIB_Settings
           }
           catch (NumberFormatException nfe)
           {
-            throw new IllegalArgumentException ("ch - " + channel + " - position");              
+            throw new IllegalArgumentException ();
           }
-          // System.err.println ("  Found position definition: " + argPart + ", channel=" + channel + ".");
           break;
         }
+        case "var":
         case "variable":
         {
           try
@@ -847,11 +888,11 @@ public class Tek2440_GPIB_Settings
           }
           catch (NumberFormatException nfe)
           {
-            throw new IllegalArgumentException ("ch - " + channel + " - variable");              
+            throw new IllegalArgumentException ();              
           }
-          // System.err.println ("  Found variable definition: " + argPart + ", channel=" + channel + ".");
           break;
         }
+        case "vol":
         case "volts":
         {
           try
@@ -860,9 +901,8 @@ public class Tek2440_GPIB_Settings
           }
           catch (NumberFormatException nfe)
           {
-            throw new IllegalArgumentException ("ch - " + channel + " - volts");              
+            throw new IllegalArgumentException ();              
           }
-          // System.err.println ("  Found volts definition: " + argPart + ", channel=" + channel + ".");
           break;
         }
         default:
@@ -978,14 +1018,16 @@ public class Tek2440_GPIB_Settings
     {
       final String[] argArgParts = argPart.trim ().split (":");
       if (argArgParts == null || argArgParts.length != 2)
-        throw new IllegalArgumentException ("data");
+        throw new IllegalArgumentException ();
       final String argKey = argArgParts[0].trim ();
       boolean isDSource = false;
       switch (argKey)
       {
+        case "dsou":
         case "dsource":
           isDSource = true;
           // Intended fallthrough.
+        case "sou":
         case "source":
         {
           final DataSource thisSource;
@@ -994,14 +1036,19 @@ public class Tek2440_GPIB_Settings
             case "ch1":     thisSource = DataSource.Ch1;     break;
             case "ch2":     thisSource = DataSource.Ch2;     break;
             case "add":     thisSource = DataSource.Add;     break;
+            case "mul":
             case "mult":    thisSource = DataSource.Mult;    break;
             case "ref1":    thisSource = DataSource.Ref1;    break;
             case "ref2":    thisSource = DataSource.Ref2;    break;
             case "ref3":    thisSource = DataSource.Ref3;    break;
             case "ref4":    thisSource = DataSource.Ref4;    break;
+            case "ch1d":
             case "ch1del":  thisSource = DataSource.Ch1Del;  break;
+            case "ch2d":
             case "ch2del":  thisSource = DataSource.Ch2Del;  break;
+            case "addd":
             case "adddel":  thisSource = DataSource.AddDel;  break;
+            case "multd":
             case "multdel": thisSource = DataSource.MultDel; break;
             default: throw new IllegalArgumentException ();
           }
@@ -1012,20 +1059,37 @@ public class Tek2440_GPIB_Settings
           // System.err.println ("  Found data/" + argKey + " definition: " + argPart + ".");
           break;
         }
+        case "enc":
         case "encdg":
         {
           switch (argArgParts[1].trim ())
           {
-            case "ascii":     encoding = DataEncoding.ASCII;     break;
-            case "rpbinary":  encoding = DataEncoding.RPBinary;  break;
-            case "ribinary":  encoding = DataEncoding.RIBinary;  break;
-            case "rppartial": encoding = DataEncoding.RPPartial; break;
-            case "ripartial": encoding = DataEncoding.RIPartial; break;
-            default: throw new IllegalArgumentException ();
+            case "asc":
+            case "ascii":
+              encoding = DataEncoding.ASCII;
+              break;
+            case "rpb":
+            case "rpbinary":
+              encoding = DataEncoding.RPBinary;
+              break;
+            case "rib":
+            case "ribinary":
+              encoding = DataEncoding.RIBinary;
+              break;
+            case "rpp":
+            case "rppartial":
+              encoding = DataEncoding.RPPartial;
+              break;
+            case "rip":
+            case "ripartial":
+              encoding = DataEncoding.RIPartial;
+              break;
+            default:
+              throw new IllegalArgumentException ();
           }
-          // System.err.println ("  Found data/" + argKey + " definition: " + argPart + ".");
           break;
         }
+        case "tar":
         case "target":
         {
           switch (argArgParts[1].trim ())
@@ -1196,6 +1260,88 @@ public class Tek2440_GPIB_Settings
       }
     }
     return new VModeSettings (channel1, channel2, add, mult, display);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // BANDWIDTH LIMIT SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum BandwidthLimit
+  {
+    
+    BWL_20_MHz  ("20 MHz"),
+    BWL_100_MHz ("100 MHz"),
+    BWL_FULL    ("Full");
+    
+    public final String bwlString;
+
+    private BandwidthLimit (final String bwlString)
+    {
+      this.bwlString = bwlString;
+    }
+
+    @Override
+    public final String toString ()
+    {
+      return this.bwlString;
+    }
+    
+  }
+  
+  public static class BandwidthLimitSettings
+  {
+    
+    private final BandwidthLimit bandwidthLimit;
+    
+    public BandwidthLimitSettings (final BandwidthLimit bandwidthLimit)
+    {
+      if (bandwidthLimit == null)
+        throw new IllegalArgumentException ();
+      this.bandwidthLimit = bandwidthLimit;
+    }
+    
+  }
+  
+  private final BandwidthLimitSettings bandwidthLimitSettings;
+  
+  public final BandwidthLimitSettings getBandwidthLimitSettings ()
+  {
+    return this.bandwidthLimitSettings;
+  }
+
+  public final BandwidthLimit getBandwidthLimit ()
+  {
+    return this.bandwidthLimitSettings.bandwidthLimit;
+  }
+  
+  private static BandwidthLimitSettings parseBandwidthLimitSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final BandwidthLimit bandwidthLimit;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    if (argParts == null || argParts.length != 1 || argParts[0] == null)
+      throw new IllegalArgumentException ();
+    switch (argParts[0].trim ())
+    {
+      case "twe":
+      case "twenty":
+        bandwidthLimit = BandwidthLimit.BWL_20_MHz;
+        break;
+      case "hun":
+      case "hundred":
+        bandwidthLimit = BandwidthLimit.BWL_100_MHz;
+        break;
+      case "ful":
+      case "full":
+        bandwidthLimit = BandwidthLimit.BWL_FULL;
+        break;
+      default:
+        throw new IllegalArgumentException ();
+    }
+    return new BandwidthLimitSettings (bandwidthLimit);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
