@@ -62,7 +62,8 @@ public class Tek2440_GPIB_Settings
     final ChannelSettings ch2Settings,
     final DataSettings dataSettings,
     final VModeSettings vModeSettings,
-    final BandwidthLimitSettings bandwidthLimitSettings)
+    final BandwidthLimitSettings bandwidthLimitSettings,
+    final AcquisitionSettings acquisitionSettings)
   {
     super (
       bytes,
@@ -88,6 +89,9 @@ public class Tek2440_GPIB_Settings
     if (bandwidthLimitSettings == null)
       throw new IllegalArgumentException ();
     this.bandwidthLimitSettings = bandwidthLimitSettings;
+    if (acquisitionSettings == null)
+      throw new IllegalArgumentException ();
+    this.acquisitionSettings = acquisitionSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -118,6 +122,7 @@ public class Tek2440_GPIB_Settings
     DataSettings dataSettings = null;
     VModeSettings vModeSettings = null;
     BandwidthLimitSettings bandwidthLimitSettings = null;
+    AcquisitionSettings acquisitionSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -151,6 +156,10 @@ public class Tek2440_GPIB_Settings
         case "bwlimit":
           bandwidthLimitSettings = parseBandwidthLimitSettings (argString);
           break;
+        case "acq":
+        case "acquire":
+          acquisitionSettings = parseAcquisitionSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -165,7 +174,8 @@ public class Tek2440_GPIB_Settings
       ch2Settings,
       dataSettings,
       vModeSettings,
-      bandwidthLimitSettings);    
+      bandwidthLimitSettings,
+      acquisitionSettings);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1365,6 +1375,193 @@ public class Tek2440_GPIB_Settings
         throw new IllegalArgumentException ();
     }
     return new BandwidthLimitSettings (bandwidthLimit);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // ACQUISITION SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public enum AcquisitionMode
+  {
+    AVERAGE,
+    ENVELOPE,
+    NORMAL;
+  }
+  
+  public enum NumberOfAcquisitionsAveraged
+  {
+    
+    ACQ_AVG_2,
+    ACQ_AVG_4,
+    ACQ_AVG_8,
+    ACQ_AVG_16,
+    ACQ_AVG_32,
+    ACQ_AVG_64,
+    ACQ_AVG_128,
+    ACQ_AVG_256;
+    
+  }
+  
+  public enum NumberOfEnvelopeSweeps
+  {
+    
+    ENV_SWEEPS_1, // XXX Should not get this value; is this the encoding for ENV_SWEEPS_CONTROL??
+    ENV_SWEEPS_2,
+    ENV_SWEEPS_4,
+    ENV_SWEEPS_8,
+    ENV_SWEEPS_16,
+    ENV_SWEEPS_32,
+    ENV_SWEEPS_64,
+    ENV_SWEEPS_128,
+    ENV_SWEEPS_256,
+    ENV_SWEEPS_CONTROL;
+    
+  }
+  
+  public static class AcquisitionSettings
+  {
+    
+    private final AcquisitionMode mode;
+    
+    private final boolean repetitive;
+    
+    private final NumberOfAcquisitionsAveraged acquisitionsAveraged;
+    
+    private final NumberOfEnvelopeSweeps envelopeSweeps;
+    
+    private final boolean saveOnDelta;
+
+    public AcquisitionSettings (
+      final AcquisitionMode mode,
+      final Boolean repetitive,
+      final NumberOfAcquisitionsAveraged acquisitionsAveraged,
+      final NumberOfEnvelopeSweeps envelopeSweeps,
+      final Boolean saveOnDelta)
+    {
+      if (mode == null || repetitive == null || acquisitionsAveraged == null || envelopeSweeps == null || saveOnDelta == null)
+        throw new IllegalArgumentException ();
+      this.mode = mode;
+      this.repetitive = repetitive;
+      this.acquisitionsAveraged = acquisitionsAveraged;
+      this.envelopeSweeps = envelopeSweeps;
+      this.saveOnDelta = saveOnDelta;
+    }
+    
+  }
+  
+  private final AcquisitionSettings acquisitionSettings;
+  
+  private final AcquisitionSettings getAcquisitionSettings ()
+  {
+    return this.acquisitionSettings;
+  }
+  
+  private static AcquisitionSettings parseAcquisitionSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    AcquisitionMode acquisitionMode = null;
+    Boolean repetitive = null;
+    NumberOfAcquisitionsAveraged acquisitionsAveraged = null;
+    NumberOfEnvelopeSweeps envelopeSweeps = null;
+    Boolean saveOnDelta = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      boolean isASecDiv = false;
+      switch (argKey)
+      {
+        case "mod":
+        case "mode":
+        {
+          switch (argArgParts[1].trim ())
+          {
+            case "avg":
+              acquisitionMode = AcquisitionMode.AVERAGE;
+              break;
+            case "env":
+              acquisitionMode = AcquisitionMode.ENVELOPE;
+              break;
+            case "nor":
+            case "normal":
+              acquisitionMode = AcquisitionMode.NORMAL;
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          break;
+        }
+        case "rep":
+        case "repet":
+        {
+          switch (argArgParts[1].trim ())
+          {
+            case "on":  repetitive = true;  break;
+            case "off": repetitive = false; break;
+            default: throw new IllegalArgumentException ();
+          }
+          break;
+        }
+        case "numav":
+        case "numavg":
+        {
+          switch (argArgParts[1].trim ())
+          {
+            case   "2": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_2;   break;
+            case   "4": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_4;   break;
+            case   "8": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_8;   break;
+            case  "16": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_16;  break;
+            case  "32": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_32;  break;
+            case  "64": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_64;  break;
+            case "128": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_128; break;
+            case "256": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_256; break;
+            default: throw new IllegalArgumentException ();
+          }
+          break;
+        }
+        case "nume":
+        case "numenv":
+        {
+          switch (argArgParts[1].trim ())
+          {
+            // Value "1" should not happen; but it does... Encoding for ENV_SWEEPS_CONTROL??
+            case   "1":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_1;   break;
+            case   "2":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_2;   break;
+            case   "4":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_4;   break;
+            case   "8":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_8;   break;
+            case  "16":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_16;  break;
+            case  "32":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_32;  break;
+            case  "64":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_64;  break;
+            case "128":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_128; break;
+            case "256":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_256; break;
+            case "con":
+            case "cont": envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_CONTROL; break;
+            default: throw new IllegalArgumentException ();
+          }
+          break;
+        }
+        case "savd":
+        case "savdel":
+        {
+          switch (argArgParts[1].trim ())
+          {
+            case "on":  saveOnDelta = true;  break;
+            case "off": saveOnDelta = false; break;
+            default: throw new IllegalArgumentException ();
+          }
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new AcquisitionSettings (acquisitionMode, repetitive, acquisitionsAveraged, envelopeSweeps, saveOnDelta);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
