@@ -401,7 +401,7 @@ public class JTek2440_GPIB
       if (channel == null)
         throw new IllegalArgumentException ();
       this.channel = channel;
-      setLayout (new GridLayout (10,2));
+      setLayout (new GridLayout (6,2));
       add (new JLabel("Enable"));
       switch (channel)
       {
@@ -417,30 +417,35 @@ public class JTek2440_GPIB
       this.jEnabled.setHorizontalAlignment (SwingConstants.CENTER);
       this.jEnabled.addActionListener (this.jEnabledListener);
       add (this.jEnabled);
-      add (new JLabel());
-      add (new JLabel());
       add (new JLabel ("V/Div"));
       this.jVoltsPerDiv = new JComboBox<> (Tek2440_GPIB_Settings.VoltsPerDivision.values ());
       this.jVoltsPerDiv.addItemListener (this.jVoltsPerDivListener);
       add (this.jVoltsPerDiv);
-      add (new JLabel());
-      add (new JLabel());
+      add (new JLabel("Var"));
+      this.jVar = new JSlider (0, 100);
+      this.jVar.setPreferredSize (new Dimension (100, 40));
+      this.jVar.addChangeListener (this.jVarChangeListener);
+      add (this.jVar);
       add (new JLabel("Coupling"));
       this.jCoupling = new JComboBox<> (Tek2440_GPIB_Settings.ChannelCoupling.values ());
       this.jCoupling.addItemListener (this.jCouplingListener);
       add (this.jCoupling);
-      add (new JLabel("50 \u03A9"));
+      final JPanel j50Combi = new JPanel ();
+      j50Combi.setLayout (new GridLayout (1, 2));
+      j50Combi.add (new JLabel("50 \u03A9"));
       this.jFifty = new JColorCheckBox.JBoolean (Color.red);
       this.jFifty.setHorizontalAlignment (SwingConstants.CENTER);
       this.jFifty.addActionListener (this.jFiftyListener);
-      add (this.jFifty);
-      add (new JLabel("Invert"));
+      j50Combi.add (this.jFifty);
+      add (j50Combi);
+      final JPanel jInvertCombi = new JPanel ();
+      jInvertCombi.setLayout (new GridLayout (1, 2));
+      jInvertCombi.add (new JLabel("Invert"));
       this.jInvert = new JColorCheckBox.JBoolean (Color.red);
       this.jInvert.setHorizontalAlignment (SwingConstants.CENTER);
       this.jInvert.addActionListener (this.jInvertListener);
-      add (this.jInvert);
-      add (new JLabel());
-      add (new JLabel());
+      jInvertCombi.add (this.jInvert);
+      add (jInvertCombi);
       add (new JLabel("Pos [DIV]"));
       this.jPosition = new JSlider (-10, 10);
       this.jPosition.setPreferredSize (new Dimension (100, 40));
@@ -450,8 +455,6 @@ public class JTek2440_GPIB
       this.jPosition.setToolTipText ("-");
       this.jPosition.addChangeListener (this.jPositionChangeListener);
       add (this.jPosition);
-      add (new JLabel());
-      add (new JLabel());
     }
     
     private final JColorCheckBox.JBoolean jEnabled;
@@ -497,6 +500,29 @@ public class JTek2440_GPIB
       }
     };
     
+    private final JSlider jVar;
+    
+    private final ChangeListener jVarChangeListener = (final ChangeEvent ce) ->
+    {
+      final JSlider source = (JSlider) ce.getSource ();
+      source.setToolTipText (Integer.toString (source.getValue ()));
+      if (! source.getValueIsAdjusting ())
+      {
+        if (! JTek2440_GPIB.this.inhibitInstrumentControl)
+          try
+          {
+            final double newValue = source.getValue ();
+            final Tek2440_GPIB_Instrument tek = (Tek2440_GPIB_Instrument) getDigitalStorageOscilloscope ();
+            tek.setChannelVariableY (JTek2440ChannelPanel.this.channel, newValue);
+          }
+          catch (IOException | InterruptedException e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting channel variable-Y from slider to {0}: {1}.",
+              new Object[]{source.getValue (), e});          
+          }
+      }
+    };
+  
     private final JComboBox<Tek2440_GPIB_Settings.ChannelCoupling> jCoupling;
   
     private final ItemListener jCouplingListener = (ItemEvent ie) ->
@@ -655,6 +681,12 @@ public class JTek2440_GPIB
             getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2, null);
           JTek2440_GPIB.this.jCh1Panel.jVoltsPerDiv.setSelectedItem (settings.getAVoltsPerDivision ());
           JTek2440_GPIB.this.jCh2Panel.jVoltsPerDiv.setSelectedItem (settings.getBVoltsPerDivision ());
+          JTek2440_GPIB.this.jCh1Panel.jVar.setValue ((int) Math.round (settings.getCh1VariableVoltsPerDivision ()));
+          JTek2440_GPIB.this.jCh1Panel.jVar.setToolTipText
+            (Integer.toString ((int) Math.round (settings.getCh1VariableVoltsPerDivision ())));
+          JTek2440_GPIB.this.jCh2Panel.jVar.setValue ((int) Math.round (settings.getCh2VariableVoltsPerDivision ()));
+          JTek2440_GPIB.this.jCh2Panel.jVar.setToolTipText
+            (Integer.toString ((int) Math.round (settings.getCh2VariableVoltsPerDivision ())));
           JTek2440_GPIB.this.jCh1Panel.jCoupling.setSelectedItem
             (settings.getChannelCoupling (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1));
           JTek2440_GPIB.this.jCh2Panel.jCoupling.setSelectedItem

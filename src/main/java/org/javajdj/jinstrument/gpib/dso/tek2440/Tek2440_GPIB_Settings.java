@@ -772,6 +772,29 @@ public class Tek2440_GPIB_Settings
     return getChannelSettings (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2).voltsPerDivision;
   }
   
+  public final double getVariableVoltsPerDivision (final Tek2440_GPIB_Instrument.Tek2440Channel channel)
+  {
+    if (channel == null)
+      throw new IllegalArgumentException ();
+    switch (channel)
+    {
+      case Channel1: return getCh1VariableVoltsPerDivision ();
+      case Channel2: return getCh2VariableVoltsPerDivision ();
+      default:
+        throw new IllegalArgumentException ();
+    }
+  }
+  
+  public final double getCh1VariableVoltsPerDivision ()
+  {
+    return getChannelSettings (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1).variable;
+  }
+  
+  public final double getCh2VariableVoltsPerDivision ()
+  {
+    return getChannelSettings (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2).variable;
+  }
+  
   public final boolean isFiftyOhms (final Tek2440_GPIB_Instrument.Tek2440Channel channel)
   {
     if (channel == null)

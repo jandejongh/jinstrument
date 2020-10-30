@@ -416,6 +416,17 @@ public class Tek2440_GPIB_Instrument
       InstrumentCommand.ICARG_VOLTS_PER_DIV, voltsPerDivision));
   }
   
+  public void   setChannelVariableY (
+    final Tek2440Channel channel,
+    final double variableY)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_CHANNEL_VARIABLE_Y,
+      InstrumentCommand.ICARG_CHANNEL_VARIABLE_Y_CHANNEL, channel,
+      InstrumentCommand.ICARG_CHANNEL_VARIABLE_Y, variableY));
+  }
+
   public void setChannelCoupling (
     final Tek2440Channel channel,
     final Tek2440_GPIB_Settings.ChannelCoupling channelCoupling)
@@ -526,6 +537,25 @@ public class Tek2440_GPIB_Instrument
               break;
             case Channel2:
               writeSync ("CH2 VOL:" + voltsPerDivision.getVoltsPerDivision_V () + "\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_CHANNEL_VARIABLE_Y:
+        {
+          final Tek2440Channel channel = (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_VARIABLE_Y_CHANNEL);
+          final double variableY =
+            (double) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_VARIABLE_Y);
+          switch (channel)
+          {
+            case Channel1:
+              writeSync ("CH1 VAR:" + Double.toString (variableY) + "\r\n");
+              break;
+            case Channel2:
+              writeSync ("CH2 VAR:" + Double.toString (variableY) + "\r\n");
               break;
             default:
               throw new IllegalArgumentException ();
