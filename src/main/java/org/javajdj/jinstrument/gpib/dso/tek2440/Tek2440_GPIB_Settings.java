@@ -70,7 +70,10 @@ public class Tek2440_GPIB_Settings
     final RunSettings runSettings,
     final DelayTimeSettings delayTimeSettings,
     final DelayEventsSettings delayEventsSettings,
-    final SmoothSettings smoothSettings)
+    final SmoothSettings smoothSettings,
+    final ExecutionErrorSRQSettings executionErrorSRQSettings,
+    final ExecutionWarningSRQSettings executionWarningSRQSettings,
+    final InternalErrorSRQSettings internalErrorSRQSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -115,6 +118,15 @@ public class Tek2440_GPIB_Settings
     if (smoothSettings == null)
       throw new IllegalArgumentException ();
     this.smoothSettings = smoothSettings;
+    if (executionErrorSRQSettings == null)
+      throw new IllegalArgumentException ();
+    this.executionErrorSRQSettings = executionErrorSRQSettings;
+    if (executionWarningSRQSettings == null)
+      throw new IllegalArgumentException ();
+    this.executionWarningSRQSettings = executionWarningSRQSettings;
+    if (internalErrorSRQSettings == null)
+      throw new IllegalArgumentException ();
+    this.internalErrorSRQSettings = internalErrorSRQSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -152,6 +164,9 @@ public class Tek2440_GPIB_Settings
     DelayTimeSettings delayTimeSettings = null;
     DelayEventsSettings delayEventsSettings = null;
     SmoothSettings smoothSettings = null;
+    ExecutionErrorSRQSettings executionErrorSRQSettings = null;
+    ExecutionWarningSRQSettings executionWarningSRQSettings = null;
+    InternalErrorSRQSettings internalErrorSRQSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -212,6 +227,15 @@ public class Tek2440_GPIB_Settings
         case "smooth":
           smoothSettings = parseSmoothSettings (argString);
           break;
+        case ("exr"):
+          executionErrorSRQSettings = parseExecutionErrorSRQSettings (argString);
+          break;
+        case ("exw"):
+          executionWarningSRQSettings = parseExecutionWarningSRQSettings (argString);
+          break;
+        case ("inr"):
+          internalErrorSRQSettings = parseInternalErrorSRQSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -233,7 +257,10 @@ public class Tek2440_GPIB_Settings
       runSettings,
       delayTimeSettings,
       delayEventsSettings,
-      smoothSettings);
+      smoothSettings,
+      executionErrorSRQSettings,
+      executionWarningSRQSettings,
+      internalErrorSRQSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -2468,6 +2495,111 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final Boolean smooth = parseOnOff (argString.trim ().toLowerCase ());
     return new SmoothSettings (smooth);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // EXECUTION ERROR SRQ SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class ExecutionErrorSRQSettings
+  {
+    
+    private final boolean srq;
+
+    public ExecutionErrorSRQSettings (final Boolean srq)
+    {
+      if (srq == null)
+        throw new IllegalArgumentException ();
+      this.srq = srq;
+    }
+    
+  }
+  
+  private final ExecutionErrorSRQSettings executionErrorSRQSettings;
+  
+  public final ExecutionErrorSRQSettings getExecutionErrorSRQSettings ()
+  {
+    return this.executionErrorSRQSettings;
+  }
+  
+  private static ExecutionErrorSRQSettings parseExecutionErrorSRQSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
+    return new ExecutionErrorSRQSettings (srq);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // EXECUTION WARNING SRQ SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class ExecutionWarningSRQSettings
+  {
+    
+    private final boolean srq;
+
+    public ExecutionWarningSRQSettings (final Boolean srq)
+    {
+      if (srq == null)
+        throw new IllegalArgumentException ();
+      this.srq = srq;
+    }
+    
+  }
+  
+  private final ExecutionWarningSRQSettings executionWarningSRQSettings;
+  
+  public final ExecutionWarningSRQSettings getExecutionWarningSRQSettings ()
+  {
+    return this.executionWarningSRQSettings;
+  }
+  
+  private static ExecutionWarningSRQSettings parseExecutionWarningSRQSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
+    return new ExecutionWarningSRQSettings (srq);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INTERNAL ERROR SRQ SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class InternalErrorSRQSettings
+  {
+    
+    private final boolean srq;
+
+    public InternalErrorSRQSettings (final Boolean srq)
+    {
+      if (srq == null)
+        throw new IllegalArgumentException ();
+      this.srq = srq;
+    }
+    
+  }
+  
+  private final InternalErrorSRQSettings internalErrorSRQSettings;
+  
+  public final InternalErrorSRQSettings getInternalErrorSRQSettings ()
+  {
+    return this.internalErrorSRQSettings;
+  }
+  
+  private static InternalErrorSRQSettings parseInternalErrorSRQSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
+    return new InternalErrorSRQSettings (srq);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
