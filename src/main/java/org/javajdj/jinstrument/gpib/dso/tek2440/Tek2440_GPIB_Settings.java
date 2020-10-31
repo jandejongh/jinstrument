@@ -80,7 +80,8 @@ public class Tek2440_GPIB_Settings
     final ServiceRequestSettings serviceRequestSettings,
     final SetWordSettings setWordSettings,
     final ExtGainSettings extGainSettings,
-    final RefFromSettings refFromSettings)
+    final RefFromSettings refFromSettings,
+    final RefDisplaySettings refDisplaySettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -155,6 +156,9 @@ public class Tek2440_GPIB_Settings
     if (refFromSettings == null)
       throw new IllegalArgumentException ();
     this.refFromSettings = refFromSettings;
+    if (refDisplaySettings == null)
+      throw new IllegalArgumentException ();
+    this.refDisplaySettings = refDisplaySettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -202,6 +206,7 @@ public class Tek2440_GPIB_Settings
     SetWordSettings setWordSettings = null;
     ExtGainSettings extGainSettings = null;
     RefFromSettings refFromSettings = null;
+    RefDisplaySettings refDisplaySettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -297,6 +302,10 @@ public class Tek2440_GPIB_Settings
         case "reffrom":
           refFromSettings = parseRefFromSettings (argString);
           break;
+        case "refd":
+        case "refdisp":
+          refDisplaySettings = parseRefDisplaySettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -328,7 +337,8 @@ public class Tek2440_GPIB_Settings
       serviceRequestSettings,
       setWordSettings,
       extGainSettings,
-      refFromSettings);
+      refFromSettings,
+      refDisplaySettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -3122,6 +3132,125 @@ public class Tek2440_GPIB_Settings
         put ("ref4",    RefFrom.Ref4);
       }});
     return new RefFromSettings (refFrom);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // REF DISPLAY SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum RefDisplay
+  {
+    Empty,
+    Off,
+    On;
+  }
+  
+  public final static class RefDisplaySettings
+  {
+    
+    private final RefDisplay refDisplay1;
+    
+    private final RefDisplay refDisplay2;
+    
+    private final RefDisplay refDisplay3;
+    
+    private final RefDisplay refDisplay4;
+    
+    public RefDisplaySettings (
+      final RefDisplay refDisplay1,
+      final RefDisplay refDisplay2,
+      final RefDisplay refDisplay3,
+      final RefDisplay refDisplay4)
+    {
+      if (refDisplay1 == null || refDisplay2 == null || refDisplay3 == null || refDisplay4 == null)
+        throw new IllegalArgumentException ();
+      this.refDisplay1 = refDisplay1;
+      this.refDisplay2 = refDisplay2;
+      this.refDisplay3 = refDisplay3;
+      this.refDisplay4 = refDisplay4;
+    }
+    
+  }
+  
+  private final RefDisplaySettings refDisplaySettings;
+  
+  public final RefDisplaySettings getRefDisplaySettings ()
+  {
+    return this.refDisplaySettings;
+  }
+  
+  private static RefDisplaySettings parseRefDisplaySettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    RefDisplay refDisplay1 = null;
+    RefDisplay refDisplay2 = null;
+    RefDisplay refDisplay3 = null;
+    RefDisplay refDisplay4 = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "ref1":
+        {
+          refDisplay1 = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, RefDisplay> ()
+            {{
+              put ("emp",   RefDisplay.Empty);
+              put ("empty", RefDisplay.Empty);
+              put ("off",   RefDisplay.Off);
+              put ("on",    RefDisplay.On);
+            }});
+          break;
+        }
+        case "ref2":
+        {
+          refDisplay2 = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, RefDisplay> ()
+            {{
+              put ("emp",   RefDisplay.Empty);
+              put ("empty", RefDisplay.Empty);
+              put ("off",   RefDisplay.Off);
+              put ("on",    RefDisplay.On);
+            }});
+          break;
+        }
+        case "ref3":
+        {
+          refDisplay3 = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, RefDisplay> ()
+            {{
+              put ("emp",   RefDisplay.Empty);
+              put ("empty", RefDisplay.Empty);
+              put ("off",   RefDisplay.Off);
+              put ("on",    RefDisplay.On);
+            }});
+          break;
+        }
+        case "ref4":
+        {
+          refDisplay4 = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, RefDisplay> ()
+            {{
+              put ("emp",   RefDisplay.Empty);
+              put ("empty", RefDisplay.Empty);
+              put ("off",   RefDisplay.Off);
+              put ("on",    RefDisplay.On);
+            }});
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new RefDisplaySettings (refDisplay1, refDisplay2, refDisplay3, refDisplay4);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
