@@ -68,7 +68,8 @@ public class Tek2440_GPIB_Settings
     final ATriggerSettings aTriggerSettings,
     final BTriggerSettings bTriggerSettings,
     final RunSettings runSettings,
-    final DelayTimeSettings delayTimeSettings)
+    final DelayTimeSettings delayTimeSettings,
+    final DelayEventsSettings delayEventsSettings)
   {
     super (
       bytes,
@@ -109,6 +110,9 @@ public class Tek2440_GPIB_Settings
     if (delayTimeSettings == null)
       throw new IllegalArgumentException ();
     this.delayTimeSettings = delayTimeSettings;
+    if (delayEventsSettings == null)
+      throw new IllegalArgumentException ();
+    this.delayEventsSettings = delayEventsSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -144,6 +148,7 @@ public class Tek2440_GPIB_Settings
     BTriggerSettings bTriggerSettings = null;
     RunSettings runSettings = null;
     DelayTimeSettings delayTimeSettings = null;
+    DelayEventsSettings delayEventsSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -192,9 +197,13 @@ public class Tek2440_GPIB_Settings
         case "run":
           runSettings = parseRunSettings (argString);
           break;
-        case "dlytime":
         case "dlyt":
+        case "dlytime":
           delayTimeSettings = parseDelayTimeSettings (argString);
+          break;
+        case "dlye":
+        case "dlyevts":
+          delayEventsSettings = parseDelayEventsSettings (argString);
           break;
         // XXX ParseException of IllegalArgumentException later...
         default:
@@ -215,7 +224,8 @@ public class Tek2440_GPIB_Settings
       aTriggerSettings,
       bTriggerSettings,
       runSettings,
-      delayTimeSettings);
+      delayTimeSettings,
+      delayEventsSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -2347,6 +2357,74 @@ public class Tek2440_GPIB_Settings
       }
     }
     return new DelayTimeSettings (delta, delay1, delay2);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DELAY EVENTS SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public static class DelayEventsSettings
+  {
+    
+    private final boolean mode;
+    
+    private final int value;
+    
+    public DelayEventsSettings (
+      final Boolean mode,
+      final Integer value)
+    {
+      if (mode == null)
+        throw new IllegalArgumentException ();
+      this.mode = mode;
+      if (value == null)
+        throw new IllegalArgumentException ();
+      this.value = value;
+    }
+    
+  }
+    
+  private final DelayEventsSettings delayEventsSettings;
+  
+  public final DelayEventsSettings getDelayEventsSettings ()
+  {
+    return this.delayEventsSettings;
+  }
+  
+  private static DelayEventsSettings parseDelayEventsSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    Boolean mode = null;
+    Integer value = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "mod":
+        case "mode":
+        {
+          mode = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        case "val":
+        case "value":
+        {
+          value = parseNr1 (argArgParts[1].trim (), 1, 65536);
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new DelayEventsSettings (mode, value);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
