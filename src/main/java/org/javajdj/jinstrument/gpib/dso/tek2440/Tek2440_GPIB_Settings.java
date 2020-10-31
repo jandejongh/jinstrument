@@ -69,11 +69,10 @@ public class Tek2440_GPIB_Settings
     final BTriggerSettings bTriggerSettings,
     final RunSettings runSettings,
     final DelayTimeSettings delayTimeSettings,
-    final DelayEventsSettings delayEventsSettings)
+    final DelayEventsSettings delayEventsSettings,
+    final SmoothSettings smoothSettings)
   {
-    super (
-      bytes,
-      unit);
+    super (bytes, unit);
     if (autoSetup == null)
       throw new IllegalArgumentException ();
     this.autoSetupSettings = autoSetup;
@@ -113,6 +112,9 @@ public class Tek2440_GPIB_Settings
     if (delayEventsSettings == null)
       throw new IllegalArgumentException ();
     this.delayEventsSettings = delayEventsSettings;
+    if (smoothSettings == null)
+      throw new IllegalArgumentException ();
+    this.smoothSettings = smoothSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -149,6 +151,7 @@ public class Tek2440_GPIB_Settings
     RunSettings runSettings = null;
     DelayTimeSettings delayTimeSettings = null;
     DelayEventsSettings delayEventsSettings = null;
+    SmoothSettings smoothSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -205,6 +208,10 @@ public class Tek2440_GPIB_Settings
         case "dlyevts":
           delayEventsSettings = parseDelayEventsSettings (argString);
           break;
+        case "smo":
+        case "smooth":
+          smoothSettings = parseSmoothSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -225,7 +232,8 @@ public class Tek2440_GPIB_Settings
       bTriggerSettings,
       runSettings,
       delayTimeSettings,
-      delayEventsSettings);
+      delayEventsSettings,
+      smoothSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -2425,6 +2433,41 @@ public class Tek2440_GPIB_Settings
       }
     }
     return new DelayEventsSettings (mode, value);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SMOOTH SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class SmoothSettings
+  {
+    
+    private final boolean smooth;
+
+    public SmoothSettings (final Boolean smooth)
+    {
+      if (smooth == null)
+        throw new IllegalArgumentException ();
+      this.smooth = smooth;
+    }
+    
+  }
+  
+  private final SmoothSettings smoothSettings;
+  
+  public final SmoothSettings getSmoothSettings ()
+  {
+    return this.smoothSettings;
+  }
+  
+  private static SmoothSettings parseSmoothSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean smooth = parseOnOff (argString.trim ().toLowerCase ());
+    return new SmoothSettings (smooth);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
