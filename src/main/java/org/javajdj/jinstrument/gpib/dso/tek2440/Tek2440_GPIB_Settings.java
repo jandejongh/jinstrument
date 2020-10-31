@@ -73,7 +73,10 @@ public class Tek2440_GPIB_Settings
     final SmoothSettings smoothSettings,
     final ExecutionErrorSRQSettings executionErrorSRQSettings,
     final ExecutionWarningSRQSettings executionWarningSRQSettings,
-    final InternalErrorSRQSettings internalErrorSRQSettings)
+    final InternalErrorSRQSettings internalErrorSRQSettings,
+    final LongSettings longSettings,
+    final PathSettings pathSettings,
+    final ServiceRequestSettings serviceRequestSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -127,6 +130,15 @@ public class Tek2440_GPIB_Settings
     if (internalErrorSRQSettings == null)
       throw new IllegalArgumentException ();
     this.internalErrorSRQSettings = internalErrorSRQSettings;
+    if (longSettings == null)
+      throw new IllegalArgumentException ();
+    this.longSettings = longSettings;
+    if (pathSettings == null)
+      throw new IllegalArgumentException ();
+    this.pathSettings = pathSettings;
+    if (serviceRequestSettings == null)
+      throw new IllegalArgumentException ();
+    this.serviceRequestSettings = serviceRequestSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -167,6 +179,9 @@ public class Tek2440_GPIB_Settings
     ExecutionErrorSRQSettings executionErrorSRQSettings = null;
     ExecutionWarningSRQSettings executionWarningSRQSettings = null;
     InternalErrorSRQSettings internalErrorSRQSettings = null;
+    LongSettings longSettings = null;
+    PathSettings pathSettings = null;
+    ServiceRequestSettings serviceRequestSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -236,6 +251,17 @@ public class Tek2440_GPIB_Settings
         case ("inr"):
           internalErrorSRQSettings = parseInternalErrorSRQSettings (argString);
           break;
+        case "lon":
+        case "long":
+          longSettings = parseLongSettings (argString);
+          break;
+        case "pat":
+        case "path":
+          pathSettings = parsePathSettings (argString);
+          break;
+        case "rqs":
+          serviceRequestSettings = parseServiceRequestSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -260,7 +286,10 @@ public class Tek2440_GPIB_Settings
       smoothSettings,
       executionErrorSRQSettings,
       executionWarningSRQSettings,
-      internalErrorSRQSettings);
+      internalErrorSRQSettings,
+      longSettings,
+      pathSettings,
+      serviceRequestSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -2600,6 +2629,111 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
     return new InternalErrorSRQSettings (srq);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // LONG [RESPONSE] SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class LongSettings
+  {
+    
+    private final boolean longResponse;
+
+    public LongSettings (final Boolean longResponse)
+    {
+      if (longResponse == null)
+        throw new IllegalArgumentException ();
+      this.longResponse = longResponse;
+    }
+    
+  }
+  
+  private final LongSettings longSettings;
+  
+  public final LongSettings getLongSettings ()
+  {
+    return this.longSettings;
+  }
+  
+  private static LongSettings parseLongSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean longResponse = parseOnOff (argString.trim ().toLowerCase ());
+    return new LongSettings (longResponse);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // PATH SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class PathSettings
+  {
+    
+    private final boolean path;
+
+    public PathSettings (final Boolean path)
+    {
+      if (path == null)
+        throw new IllegalArgumentException ();
+      this.path = path;
+    }
+    
+  }
+  
+  private final PathSettings pathSettings;
+  
+  public final PathSettings getPathSettings ()
+  {
+    return this.pathSettings;
+  }
+  
+  private static PathSettings parsePathSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean path = parseOnOff (argString.trim ().toLowerCase ());
+    return new PathSettings (path);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SERVICE REQUEST [ENABLED] SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class ServiceRequestSettings
+  {
+    
+    private final boolean serviceRequestEnabled;
+
+    public ServiceRequestSettings (final Boolean serviceRequestEnabled)
+    {
+      if (serviceRequestEnabled == null)
+        throw new IllegalArgumentException ();
+      this.serviceRequestEnabled = serviceRequestEnabled;
+    }
+    
+  }
+  
+  private final ServiceRequestSettings serviceRequestSettings;
+  
+  public final ServiceRequestSettings getServiceRequestSettings ()
+  {
+    return this.serviceRequestSettings;
+  }
+  
+  private static ServiceRequestSettings parseServiceRequestSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean serviceRequestEnabled = parseOnOff (argString.trim ().toLowerCase ());
+    return new ServiceRequestSettings (serviceRequestEnabled);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
