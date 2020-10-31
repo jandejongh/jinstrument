@@ -81,7 +81,8 @@ public class Tek2440_GPIB_Settings
     final SetWordSettings setWordSettings,
     final ExtGainSettings extGainSettings,
     final RefFromSettings refFromSettings,
-    final RefDisplaySettings refDisplaySettings)
+    final RefDisplaySettings refDisplaySettings,
+    final RefPositionSettings refPositionSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -159,6 +160,9 @@ public class Tek2440_GPIB_Settings
     if (refDisplaySettings == null)
       throw new IllegalArgumentException ();
     this.refDisplaySettings = refDisplaySettings;
+    if (refPositionSettings == null)
+      throw new IllegalArgumentException ();
+    this.refPositionSettings = refPositionSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -207,6 +211,7 @@ public class Tek2440_GPIB_Settings
     ExtGainSettings extGainSettings = null;
     RefFromSettings refFromSettings = null;
     RefDisplaySettings refDisplaySettings = null;
+    RefPositionSettings refPositionSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -306,6 +311,10 @@ public class Tek2440_GPIB_Settings
         case "refdisp":
           refDisplaySettings = parseRefDisplaySettings (argString);
           break;
+        case "refp":
+        case "refpos":
+          refPositionSettings = parseRefPositionSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -338,7 +347,8 @@ public class Tek2440_GPIB_Settings
       setWordSettings,
       extGainSettings,
       refFromSettings,
-      refDisplaySettings);
+      refDisplaySettings,
+      refPositionSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -3251,6 +3261,114 @@ public class Tek2440_GPIB_Settings
       }
     }
     return new RefDisplaySettings (refDisplay1, refDisplay2, refDisplay3, refDisplay4);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // REF POSITION SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum RefPositionMode
+  {
+    Independent,
+    Lock;
+  }
+  
+  public final static class RefPositionSettings
+  {
+    
+    private final RefPositionMode mode;
+    
+    private final Double refPosition1;
+    
+    private final Double refPosition2;
+    
+    private final Double refPosition3;
+    
+    private final Double refPosition4;
+    
+    public RefPositionSettings (
+      final RefPositionMode mode,
+      final Double refPosition1,
+      final Double refPosition2,
+      final Double refPosition3,
+      final Double refPosition4)
+    {
+      if (mode == null || refPosition1 == null || refPosition2 == null || refPosition3 == null || refPosition4 == null)
+        throw new IllegalArgumentException ();
+      this.mode = mode;
+      this.refPosition1 = refPosition1;
+      this.refPosition2 = refPosition2;
+      this.refPosition3 = refPosition3;
+      this.refPosition4 = refPosition4;
+    }
+    
+  }
+  
+  private final RefPositionSettings refPositionSettings;
+  
+  public final RefPositionSettings getRefPositionSettings ()
+  {
+    return this.refPositionSettings;
+  }
+  
+  private static RefPositionSettings parseRefPositionSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    RefPositionMode mode = null;
+    Double refPosition1 = null;
+    Double refPosition2 = null;
+    Double refPosition3 = null;
+    Double refPosition4 = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "mod":
+        case "mode":
+        {
+          mode = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, RefPositionMode> ()
+            {{
+              put ("independent", RefPositionMode.Independent);
+              put ("ind",         RefPositionMode.Independent);
+              put ("loc",         RefPositionMode.Lock);
+              put ("lock",        RefPositionMode.Lock);
+            }});
+          break;
+        }
+        case "ref1":
+        {
+          refPosition1 = parseNr3 (argArgParts[1].trim (), 0, 1023);
+          break;
+        }
+        case "ref2":
+        {
+          refPosition2 = parseNr3 (argArgParts[1].trim (), 0, 1023);
+          break;
+        }
+        case "ref3":
+        {
+          refPosition3 = parseNr3 (argArgParts[1].trim (), 0, 1023);
+          break;
+        }
+        case "ref4":
+        {
+          refPosition4 = parseNr3 (argArgParts[1].trim (), 0, 1023);
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new RefPositionSettings (mode, refPosition1, refPosition2, refPosition3, refPosition4);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
