@@ -82,7 +82,8 @@ public class Tek2440_GPIB_Settings
     final ExtGainSettings extGainSettings,
     final RefFromSettings refFromSettings,
     final RefDisplaySettings refDisplaySettings,
-    final RefPositionSettings refPositionSettings)
+    final RefPositionSettings refPositionSettings,
+    final ReadoutSettings readoutSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -163,6 +164,9 @@ public class Tek2440_GPIB_Settings
     if (refPositionSettings == null)
       throw new IllegalArgumentException ();
     this.refPositionSettings = refPositionSettings;
+    if (readoutSettings == null)
+      throw new IllegalArgumentException ();
+    this.readoutSettings = readoutSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -212,6 +216,7 @@ public class Tek2440_GPIB_Settings
     RefFromSettings refFromSettings = null;
     RefDisplaySettings refDisplaySettings = null;
     RefPositionSettings refPositionSettings = null;
+    ReadoutSettings readoutSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -315,6 +320,10 @@ public class Tek2440_GPIB_Settings
         case "refpos":
           refPositionSettings = parseRefPositionSettings (argString);
           break;
+        case "rea":
+        case "readout":
+          readoutSettings = parseReadoutSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -348,7 +357,8 @@ public class Tek2440_GPIB_Settings
       extGainSettings,
       refFromSettings,
       refDisplaySettings,
-      refPositionSettings);
+      refPositionSettings,
+      readoutSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -3369,6 +3379,41 @@ public class Tek2440_GPIB_Settings
       }
     }
     return new RefPositionSettings (mode, refPosition1, refPosition2, refPosition3, refPosition4);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // READOUT SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class ReadoutSettings
+  {
+    
+    private final boolean readout;
+
+    public ReadoutSettings (final Boolean readout)
+    {
+      if (readout == null)
+        throw new IllegalArgumentException ();
+      this.readout = readout;
+    }
+    
+  }
+  
+  private final ReadoutSettings readoutSettings;
+  
+  public final ReadoutSettings getReadoutSettings ()
+  {
+    return this.readoutSettings;
+  }
+  
+  private static ReadoutSettings parseReadoutSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean readout = parseOnOff (argString.trim ().toLowerCase ());
+    return new ReadoutSettings (readout);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
