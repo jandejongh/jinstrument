@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.gpib.dso.tek2440;
 
 import java.nio.charset.Charset;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.DefaultDigitalStorageOscilloscopeSettings;
@@ -63,7 +64,8 @@ public class Tek2440_GPIB_Settings
     final DataSettings dataSettings,
     final VModeSettings vModeSettings,
     final BandwidthLimitSettings bandwidthLimitSettings,
-    final AcquisitionSettings acquisitionSettings)
+    final AcquisitionSettings acquisitionSettings,
+    final ATriggerSettings aTriggerSettings)
   {
     super (
       bytes,
@@ -92,6 +94,9 @@ public class Tek2440_GPIB_Settings
     if (acquisitionSettings == null)
       throw new IllegalArgumentException ();
     this.acquisitionSettings = acquisitionSettings;
+    if (aTriggerSettings == null)
+      throw new IllegalArgumentException ();
+    this.aTriggerSettings = aTriggerSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -123,6 +128,7 @@ public class Tek2440_GPIB_Settings
     VModeSettings vModeSettings = null;
     BandwidthLimitSettings bandwidthLimitSettings = null;
     AcquisitionSettings acquisitionSettings = null;
+    ATriggerSettings aTriggerSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -160,6 +166,10 @@ public class Tek2440_GPIB_Settings
         case "acquire":
           acquisitionSettings = parseAcquisitionSettings (argString);
           break;
+        case "atr":
+        case "atrigger":
+          aTriggerSettings = parseATriggerSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -175,7 +185,101 @@ public class Tek2440_GPIB_Settings
       dataSettings,
       vModeSettings,
       bandwidthLimitSettings,
-      acquisitionSettings);
+      acquisitionSettings,
+      aTriggerSettings);
+  }
+  
+  private static boolean parseOnOff (final String argString)
+  {
+    switch (argString)
+    {
+      case "on" : return true;
+      case "off": return false;
+      default: throw new IllegalArgumentException ();
+    }
+  }
+  
+  private static <E extends Enum<E>> E parseEnum (
+    final String argString,
+    final Map<String, E> argMap)
+  {
+    for (final String s : argMap.keySet ())
+      if (argString.equals (s))
+        return argMap.get (s);
+    return null;
+  }
+  
+  private static <E extends Enum<E>> E parseEnumFromOrdinal (
+    final String argString,
+    final Class<E> enumClass,
+    final int firstIndex)
+  {
+    try
+    {
+      return enumClass.getEnumConstants ()[Integer.parseInt (argString) - firstIndex];
+    }
+    catch (NumberFormatException | ArrayIndexOutOfBoundsException | NullPointerException e)
+    {
+      throw new IllegalArgumentException ();
+    }
+  }
+  
+  private static int parseNr1 (final String argString)
+  {
+    try
+    {
+      return Integer.parseInt (argString);
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IllegalArgumentException ();
+    }
+  }
+  
+  private static int parseNr1 (final String argString, final int min, final int max)
+  {
+    try
+    {
+      final int iRead = Integer.parseInt (argString);
+      if (iRead < min)
+        throw new IllegalArgumentException ();
+      if (iRead > max)
+        throw new IllegalArgumentException ();
+      return iRead;
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IllegalArgumentException ();
+    }
+  }
+  
+  private static double parseNr3 (final String argString)
+  {
+    try
+    {
+      return Double.parseDouble (argString);
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IllegalArgumentException ();
+    }
+  }
+  
+  private static double parseNr3 (final String argString, final double min, final double max)
+  {
+    try
+    {
+      final double dRead = Double.parseDouble (argString);
+      if (dRead < min)
+        throw new IllegalArgumentException ();
+      if (dRead > max)
+        throw new IllegalArgumentException ();
+      return dRead;
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IllegalArgumentException ();
+    }
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -880,23 +984,13 @@ public class Tek2440_GPIB_Settings
         case "fif":
         case "fifty":
         {
-          switch (argArgParts[1].trim ())
-          {
-            case "on":  fifty = true;  break;
-            case "off": fifty = false; break;
-            default: throw new IllegalArgumentException ();
-          }
+          fifty = parseOnOff (argArgParts[1].trim ());
           break;
         }
         case "inv":
         case "invert":
         {
-          switch (argArgParts[1].trim ())
-          {
-            case "on":  invert = true;  break;
-            case "off": invert = false; break;
-            default: throw new IllegalArgumentException ();
-          }
+          invert = parseOnOff (argArgParts[1].trim ());
           break;
         }
         case "pos":
@@ -1453,7 +1547,7 @@ public class Tek2440_GPIB_Settings
   
   private final AcquisitionSettings acquisitionSettings;
   
-  private final AcquisitionSettings getAcquisitionSettings ()
+  public final AcquisitionSettings getAcquisitionSettings ()
   {
     return this.acquisitionSettings;
   }
@@ -1563,6 +1657,316 @@ public class Tek2440_GPIB_Settings
     return new AcquisitionSettings (acquisitionMode, repetitive, acquisitionsAveraged, envelopeSweeps, saveOnDelta);
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // A-TRIGGER SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public enum ATriggerMode
+  {
+    Auto,
+    AutoLevel,
+    Normal,
+    SingleSequence;
+  }
+  
+  public enum ATriggerSource
+  {
+    Ch1,
+    Ch2,
+    Ext1,
+    Ext2,
+    Line,
+    Vertical;
+  }
+  
+  public enum ATriggerCoupling
+  {
+    AC,
+    DC,
+    LFReject,
+    HFReject,
+    NoiseReject,
+    TV;
+  }
+  
+  public enum ATriggerLogSource
+  {
+    Off,
+    A_and_B,
+    Word;
+  }
+  
+  public enum Slope
+  {
+    Plus,
+    Minus; 
+  }
+  
+  public enum ATriggerPosition
+  {
+    ATriggerPosition_01,
+    ATriggerPosition_02,
+    ATriggerPosition_03,
+    ATriggerPosition_04,
+    ATriggerPosition_05,
+    ATriggerPosition_06,
+    ATriggerPosition_07,
+    ATriggerPosition_08,
+    ATriggerPosition_09,
+    ATriggerPosition_10,
+    ATriggerPosition_11,
+    ATriggerPosition_12,
+    ATriggerPosition_13,
+    ATriggerPosition_14,
+    ATriggerPosition_15,
+    ATriggerPosition_16,
+    ATriggerPosition_17,
+    ATriggerPosition_18,
+    ATriggerPosition_19,
+    ATriggerPosition_20,
+    ATriggerPosition_21,
+    ATriggerPosition_22,
+    ATriggerPosition_23,
+    ATriggerPosition_24,
+    ATriggerPosition_25,
+    ATriggerPosition_26,
+    ATriggerPosition_27,
+    ATriggerPosition_28,
+    ATriggerPosition_29,
+    ATriggerPosition_30;
+  }
+  
+  public enum ABSelect
+  {
+    A,
+    B;
+  }
+  
+  public static class ATriggerSettings
+  {
+    
+    private final ATriggerMode mode;
+    
+    private final ATriggerSource source;
+    
+    private final ATriggerCoupling coupling;
+    
+    private final ATriggerLogSource logSource;
+    
+    private final double level;
+    
+    private final Slope slope;
+    
+    private final ATriggerPosition position;
+    
+    private final double holdoff;
+    
+    private final ABSelect abSelect;
+
+    public ATriggerSettings (
+      final ATriggerMode mode,
+      final ATriggerSource source,
+      final ATriggerCoupling coupling,
+      final ATriggerLogSource logSource,
+      final Double level,
+      final Slope slope,
+      final ATriggerPosition position,
+      final Double holdoff,
+      final ABSelect abSelect)
+    {
+      if (mode == null || source == null || coupling == null || logSource == null)
+        throw new IllegalArgumentException ();
+      if (level == null || slope == null || position == null || holdoff == null || abSelect == null)
+        throw new IllegalArgumentException ();
+      if (holdoff < 0 || holdoff > 100)
+        throw new IllegalArgumentException ();
+      this.mode = mode;
+      this.source = source;
+      this.coupling = coupling;
+      this.logSource = logSource;
+      this.level = level;
+      this.slope = slope;
+      this.position = position;
+      this.holdoff = holdoff;
+      this.abSelect = abSelect;
+    }
+  }
+    
+  private final ATriggerSettings aTriggerSettings;
+  
+  public final ATriggerSettings getATriggerSettings ()
+  {
+    return this.aTriggerSettings;
+  }
+  
+  private static ATriggerSettings parseATriggerSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    ATriggerMode mode = null;
+    ATriggerSource source = null;
+    ATriggerCoupling coupling = null;
+    ATriggerLogSource logSource = null;
+    Double level = null;
+    Slope slope = null;
+    ATriggerPosition position = null;
+    Double holdoff = null;
+    ABSelect abSelect = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "mod":
+        case "mode":
+        {
+          switch (argArgParts[1].trim ())
+          {
+            case   "auto":
+              mode = ATriggerMode.Auto;
+              break;
+            case   "autol":
+            case   "autolevel":
+              mode = ATriggerMode.AutoLevel;
+              break;
+            case   "nor":
+            case   "normal":
+              mode = ATriggerMode.Normal;
+              break;
+            case   "sgl":
+            case   "sglseq":
+              mode = ATriggerMode.SingleSequence;
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          break;
+        }
+        case "sou":
+        case "source":
+        {
+          switch (argArgParts[1].trim ())
+          {
+            case   "ch1":
+              source = ATriggerSource.Ch1;
+              break;
+            case   "ch2":
+              source = ATriggerSource.Ch2;
+              break;
+            case   "ext1":
+              source = ATriggerSource.Ext1;
+              break;
+            case   "ext2":
+              source = ATriggerSource.Ext2;
+              break;
+            case   "lin":
+            case   "line":
+              source = ATriggerSource.Line;
+              break;
+            case   "ver":
+            case   "vertical":
+              source = ATriggerSource.Vertical;
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          break;
+        }
+        case "cou":
+        case "coupling":
+        {
+          coupling = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, ATriggerCoupling> ()
+            {{
+              put ("ac",       ATriggerCoupling.AC);
+              put ("dc",       ATriggerCoupling.DC);
+              put ("lfr",      ATriggerCoupling.LFReject);
+              put ("lfrej",    ATriggerCoupling.LFReject);
+              put ("hfr",      ATriggerCoupling.HFReject);
+              put ("hfrej",    ATriggerCoupling.HFReject);
+              put ("noi",      ATriggerCoupling.NoiseReject);
+              put ("noiserej", ATriggerCoupling.NoiseReject);
+              put ("tv",       ATriggerCoupling.TV);
+            }});
+          break;
+        }
+        case "log":
+        case "logsrc":
+        {
+          logSource = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, ATriggerLogSource> ()
+            {{
+              put ("off",  ATriggerLogSource.Off);
+              put ("a.b",  ATriggerLogSource.A_and_B);
+              put ("wor",  ATriggerLogSource.Word);
+              put ("word", ATriggerLogSource.Word);
+            }});
+          break;
+        }
+        case "lev":
+        case "level":
+        {
+          level = parseNr3 (argArgParts[1].trim ());
+          break;
+        }
+        case "slo":
+        case "slope":
+        {
+          slope = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, Slope> ()
+            {{
+              put ("plu",   Slope.Plus);
+              put ("plus",  Slope.Plus);
+              put ("minu",  Slope.Minus);
+              put ("minus", Slope.Minus);
+            }});
+          break;
+        }
+        case "pos":
+        case "position":
+        {
+          position = parseEnumFromOrdinal (argArgParts[1].trim (), ATriggerPosition.class, 1);
+          break;
+        }
+        case "hol":
+        case "holdoff":
+        {
+          holdoff = parseNr3 (argArgParts[1].trim (), 0, 100);
+          break;
+        }
+        case "abse":
+        case "abselect":
+        {
+          abSelect = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, ABSelect> ()
+            {{
+              put ("a", ABSelect.A);
+              put ("b", ABSelect.B);
+            }});
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new ATriggerSettings (
+      mode,
+      source,
+      coupling,
+      logSource,
+      level,
+      slope,
+      position,
+      holdoff,
+      abSelect);
+  }
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
