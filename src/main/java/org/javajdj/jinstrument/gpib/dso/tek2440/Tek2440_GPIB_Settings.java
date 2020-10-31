@@ -71,6 +71,7 @@ public class Tek2440_GPIB_Settings
     final DelayTimeSettings delayTimeSettings,
     final DelayEventsSettings delayEventsSettings,
     final SmoothSettings smoothSettings,
+    final CommandErrorSRQSettings commandErrorSRQSettings,
     final ExecutionErrorSRQSettings executionErrorSRQSettings,
     final ExecutionWarningSRQSettings executionWarningSRQSettings,
     final InternalErrorSRQSettings internalErrorSRQSettings,
@@ -121,6 +122,9 @@ public class Tek2440_GPIB_Settings
     if (smoothSettings == null)
       throw new IllegalArgumentException ();
     this.smoothSettings = smoothSettings;
+    if (commandErrorSRQSettings == null)
+      throw new IllegalArgumentException ();
+    this.commandErrorSRQSettings = commandErrorSRQSettings;
     if (executionErrorSRQSettings == null)
       throw new IllegalArgumentException ();
     this.executionErrorSRQSettings = executionErrorSRQSettings;
@@ -176,6 +180,7 @@ public class Tek2440_GPIB_Settings
     DelayTimeSettings delayTimeSettings = null;
     DelayEventsSettings delayEventsSettings = null;
     SmoothSettings smoothSettings = null;
+    CommandErrorSRQSettings commandErrorSRQSettings = null;
     ExecutionErrorSRQSettings executionErrorSRQSettings = null;
     ExecutionWarningSRQSettings executionWarningSRQSettings = null;
     InternalErrorSRQSettings internalErrorSRQSettings = null;
@@ -242,6 +247,9 @@ public class Tek2440_GPIB_Settings
         case "smooth":
           smoothSettings = parseSmoothSettings (argString);
           break;
+        case ("cer"):
+          commandErrorSRQSettings = parseCommandErrorSRQSettings (argString);
+          break;
         case ("exr"):
           executionErrorSRQSettings = parseExecutionErrorSRQSettings (argString);
           break;
@@ -284,6 +292,7 @@ public class Tek2440_GPIB_Settings
       delayTimeSettings,
       delayEventsSettings,
       smoothSettings,
+      commandErrorSRQSettings,
       executionErrorSRQSettings,
       executionWarningSRQSettings,
       internalErrorSRQSettings,
@@ -2524,6 +2533,41 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final Boolean smooth = parseOnOff (argString.trim ().toLowerCase ());
     return new SmoothSettings (smooth);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // COMMAND ERROR SRQ SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class CommandErrorSRQSettings
+  {
+    
+    private final boolean srq;
+
+    public CommandErrorSRQSettings (final Boolean srq)
+    {
+      if (srq == null)
+        throw new IllegalArgumentException ();
+      this.srq = srq;
+    }
+    
+  }
+  
+  private final CommandErrorSRQSettings commandErrorSRQSettings;
+  
+  public final CommandErrorSRQSettings getCommandErrorSRQSettings ()
+  {
+    return this.commandErrorSRQSettings;
+  }
+  
+  private static CommandErrorSRQSettings parseCommandErrorSRQSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
+    return new CommandErrorSRQSettings (srq);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
