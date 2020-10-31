@@ -67,7 +67,8 @@ public class Tek2440_GPIB_Settings
     final AcquisitionSettings acquisitionSettings,
     final ATriggerSettings aTriggerSettings,
     final BTriggerSettings bTriggerSettings,
-    final RunSettings runSettings)
+    final RunSettings runSettings,
+    final DelayTimeSettings delayTimeSettings)
   {
     super (
       bytes,
@@ -105,6 +106,9 @@ public class Tek2440_GPIB_Settings
     if (runSettings == null)
       throw new IllegalArgumentException ();
     this.runSettings = runSettings;
+    if (delayTimeSettings == null)
+      throw new IllegalArgumentException ();
+    this.delayTimeSettings = delayTimeSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -139,6 +143,7 @@ public class Tek2440_GPIB_Settings
     ATriggerSettings aTriggerSettings = null;
     BTriggerSettings bTriggerSettings = null;
     RunSettings runSettings = null;
+    DelayTimeSettings delayTimeSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -187,6 +192,10 @@ public class Tek2440_GPIB_Settings
         case "run":
           runSettings = parseRunSettings (argString);
           break;
+        case "dlytime":
+        case "dlyt":
+          delayTimeSettings = parseDelayTimeSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -205,7 +214,8 @@ public class Tek2440_GPIB_Settings
       acquisitionSettings,
       aTriggerSettings,
       bTriggerSettings,
-      runSettings);
+      runSettings,
+      delayTimeSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -2258,6 +2268,85 @@ public class Tek2440_GPIB_Settings
         put ("save",    RunMode.Save);
       }});
     return new RunSettings (mode);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DELAY TIME SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public static class DelayTimeSettings
+  {
+    
+    private final boolean delta;
+    
+    private final double delay1;
+    
+    private final double delay2;
+    
+    public DelayTimeSettings (
+      final Boolean delta,
+      final Double delay1,
+      final Double delay2)
+    {
+      if (delta == null)
+        throw new IllegalArgumentException ();
+      this.delta = delta;
+      if (delay1 == null)
+        throw new IllegalArgumentException ();
+      this.delay1 = delay1;
+      if (delay2 == null)
+        throw new IllegalArgumentException ();
+      this.delay2 = delay2;
+    }
+    
+  }
+    
+  private final DelayTimeSettings delayTimeSettings;
+  
+  public final DelayTimeSettings getDelayTimeSettings ()
+  {
+    return this.delayTimeSettings;
+  }
+  
+  private static DelayTimeSettings parseDelayTimeSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    Boolean delta = null;
+    Double delay1 = null;
+    Double delay2 = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "delt":
+        case "delta":
+        {
+          delta = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        case "dly1":
+        {
+          delay1 = parseNr3 (argArgParts[1].trim ());
+          break;
+        }
+        case "dly2":
+        {
+          delay2 = parseNr3 (argArgParts[1].trim ());
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new DelayTimeSettings (delta, delay1, delay2);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
