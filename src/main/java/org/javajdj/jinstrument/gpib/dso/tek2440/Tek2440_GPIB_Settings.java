@@ -85,7 +85,8 @@ public class Tek2440_GPIB_Settings
     final RefPositionSettings refPositionSettings,
     final ReadoutSettings readoutSettings,
     final DebugSettings debugSettings,
-    final DeviceDependentSRQSettings deviceDependentSRQSettings)
+    final DeviceDependentSRQSettings deviceDependentSRQSettings,
+    final DirectionSettings directionSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -175,6 +176,9 @@ public class Tek2440_GPIB_Settings
     if (deviceDependentSRQSettings == null)
       throw new IllegalArgumentException ();
     this.deviceDependentSRQSettings = deviceDependentSRQSettings;
+    if (directionSettings == null)
+      throw new IllegalArgumentException ();
+    this.directionSettings = directionSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -227,6 +231,7 @@ public class Tek2440_GPIB_Settings
     ReadoutSettings readoutSettings = null;
     DebugSettings debugSettings = null;
     DeviceDependentSRQSettings deviceDependentSRQSettings = null;
+    DirectionSettings directionSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -342,6 +347,10 @@ public class Tek2440_GPIB_Settings
         case "devdep":
           deviceDependentSRQSettings = parseDeviceDependentSRQSettings (argString);
           break;
+        case "dir":
+        case "direction":
+          directionSettings = parseDirectionSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -378,7 +387,8 @@ public class Tek2440_GPIB_Settings
       refPositionSettings,
       readoutSettings,
       debugSettings,
-      deviceDependentSRQSettings);
+      deviceDependentSRQSettings,
+      directionSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -3504,6 +3514,54 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
     return new DeviceDependentSRQSettings (srq);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DIRECTION SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public static enum Direction
+  {
+    Plus,
+    Minus;
+  }
+  
+  public final static class DirectionSettings
+  {
+    
+    private final Direction direction;
+    
+    public DirectionSettings (final Direction direction)
+    {
+      if (direction == null)
+        throw new IllegalArgumentException ();
+      this.direction = direction;
+    }
+    
+  }
+  
+  private final DirectionSettings directionSettings;
+  
+  public final DirectionSettings getDirectionSettings ()
+  {
+    return this.directionSettings;
+  }
+  
+  private static DirectionSettings parseDirectionSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Direction direction = parseEnum (argString.trim ().toLowerCase (),
+      new HashMap<String, Direction> ()
+      {{
+        put ("plu",   Direction.Plus);
+        put ("plus",  Direction.Plus);
+        put ("minu",  Direction.Minus);
+        put ("minus", Direction.Minus);
+      }});
+    return new DirectionSettings (direction);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
