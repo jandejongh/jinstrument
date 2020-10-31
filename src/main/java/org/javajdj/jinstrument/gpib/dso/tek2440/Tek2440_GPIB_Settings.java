@@ -77,7 +77,8 @@ public class Tek2440_GPIB_Settings
     final InternalErrorSRQSettings internalErrorSRQSettings,
     final LongSettings longSettings,
     final PathSettings pathSettings,
-    final ServiceRequestSettings serviceRequestSettings)
+    final ServiceRequestSettings serviceRequestSettings,
+    final SetWordSettings setWordSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -143,6 +144,9 @@ public class Tek2440_GPIB_Settings
     if (serviceRequestSettings == null)
       throw new IllegalArgumentException ();
     this.serviceRequestSettings = serviceRequestSettings;
+    if (setWordSettings == null)
+      throw new IllegalArgumentException ();
+    this.setWordSettings = setWordSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -187,6 +191,7 @@ public class Tek2440_GPIB_Settings
     LongSettings longSettings = null;
     PathSettings pathSettings = null;
     ServiceRequestSettings serviceRequestSettings = null;
+    SetWordSettings setWordSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -270,6 +275,10 @@ public class Tek2440_GPIB_Settings
         case "rqs":
           serviceRequestSettings = parseServiceRequestSettings (argString);
           break;
+        case "setw":
+        case "setword":
+          setWordSettings = parseSetWordSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -298,7 +307,8 @@ public class Tek2440_GPIB_Settings
       internalErrorSRQSettings,
       longSettings,
       pathSettings,
-      serviceRequestSettings);
+      serviceRequestSettings,
+      setWordSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -2778,6 +2788,116 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final Boolean serviceRequestEnabled = parseOnOff (argString.trim ().toLowerCase ());
     return new ServiceRequestSettings (serviceRequestEnabled);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SET WORD SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // XXX Erroneous in Programming Manual??
+  public enum SetWordClock
+  {
+    Rise,
+    Fall,
+    ASync;
+  }
+  
+  // XXX Erroneous in Programming Manual??
+  public enum SetWordRadix
+  {
+    Octal,
+    Hexagonal;
+  }
+  
+  public final static class SetWordSettings
+  {
+    
+    private final String word;
+    
+    private final SetWordClock clock;
+    
+    private final SetWordRadix radix;
+
+    public SetWordSettings (
+      final String word,
+      final SetWordClock clock,
+      final SetWordRadix radix)
+    {
+      if (word == null || word.length () != 19)
+        throw new IllegalArgumentException ();
+      this.word = word;
+      if (clock == null)
+        throw new IllegalArgumentException ();
+      this.clock = clock;
+      if (radix == null)
+        throw new IllegalArgumentException ();
+      this.radix = radix;
+    }
+    
+  }
+  
+  private final SetWordSettings setWordSettings;
+  
+  public final SetWordSettings getSetWordSettings ()
+  {
+    return this.setWordSettings;
+  }
+  
+  private static SetWordSettings parseSetWordSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    String word = null;
+    SetWordClock clock = null;
+    SetWordRadix radix = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "wor":
+        case "word":
+        {
+          word = argArgParts[1].trim ();
+          break;
+        }
+        case "clo":
+        case "clock":
+        {
+          clock = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, SetWordClock> ()
+            {{
+              put ("ris",   SetWordClock.Rise);
+              put ("rise",  SetWordClock.Rise);
+              put ("fal",   SetWordClock.Fall);
+              put ("fall",  SetWordClock.Fall);
+              put ("asy",   SetWordClock.ASync);
+              put ("async", SetWordClock.ASync);
+            }});
+          break;
+        }
+        case "rad":
+        case "radix":
+        {
+          radix = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, SetWordRadix> ()
+            {{
+              put ("hex",  SetWordRadix.Hexagonal);
+              put ("oct",  SetWordRadix.Octal);
+            }});
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new SetWordSettings (word, clock, radix);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
