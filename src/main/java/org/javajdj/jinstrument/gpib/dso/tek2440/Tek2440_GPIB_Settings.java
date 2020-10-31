@@ -78,7 +78,8 @@ public class Tek2440_GPIB_Settings
     final LongSettings longSettings,
     final PathSettings pathSettings,
     final ServiceRequestSettings serviceRequestSettings,
-    final SetWordSettings setWordSettings)
+    final SetWordSettings setWordSettings,
+    final ExtGainSettings extGainSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -147,6 +148,9 @@ public class Tek2440_GPIB_Settings
     if (setWordSettings == null)
       throw new IllegalArgumentException ();
     this.setWordSettings = setWordSettings;
+    if (extGainSettings == null)
+      throw new IllegalArgumentException ();
+    this.extGainSettings = extGainSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -192,6 +196,7 @@ public class Tek2440_GPIB_Settings
     PathSettings pathSettings = null;
     ServiceRequestSettings serviceRequestSettings = null;
     SetWordSettings setWordSettings = null;
+    ExtGainSettings extGainSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -279,6 +284,10 @@ public class Tek2440_GPIB_Settings
         case "setword":
           setWordSettings = parseSetWordSettings (argString);
           break;
+        case "extg":
+        case "extgain":
+          extGainSettings = parseExtGainSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -308,7 +317,8 @@ public class Tek2440_GPIB_Settings
       longSettings,
       pathSettings,
       serviceRequestSettings,
-      setWordSettings);
+      setWordSettings,
+      extGainSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -2898,6 +2908,138 @@ public class Tek2440_GPIB_Settings
       }
     }
     return new SetWordSettings (word, clock, radix);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // EXT GAIN SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum ExtGain
+  {
+    Div1,
+    Div5;
+  }
+  
+  // Undocumented; assumed to be identical in semantics to A Trigger Position.
+  // XXX Keep in place until we are sure.
+  // But wait: Isn't the 'position' argument wrongly put under ExtGain
+  // instead of under B Trigger?
+  public enum ExtInputPosition
+  {
+    ExtInputPosition_01,
+    ExtInputPosition_02,
+    ExtInputPosition_03,
+    ExtInputPosition_04,
+    ExtInputPosition_05,
+    ExtInputPosition_06,
+    ExtInputPosition_07,
+    ExtInputPosition_08,
+    ExtInputPosition_09,
+    ExtInputPosition_10,
+    ExtInputPosition_11,
+    ExtInputPosition_12,
+    ExtInputPosition_13,
+    ExtInputPosition_14,
+    ExtInputPosition_15,
+    ExtInputPosition_16,
+    ExtInputPosition_17,
+    ExtInputPosition_18,
+    ExtInputPosition_19,
+    ExtInputPosition_20,
+    ExtInputPosition_21,
+    ExtInputPosition_22,
+    ExtInputPosition_23,
+    ExtInputPosition_24,
+    ExtInputPosition_25,
+    ExtInputPosition_26,
+    ExtInputPosition_27,
+    ExtInputPosition_28,
+    ExtInputPosition_29,
+    ExtInputPosition_30;
+  }
+  
+  public final static class ExtGainSettings
+  {
+    
+    private final ExtGain extGain1;
+    
+    private final ExtGain extGain2;
+    
+    private final ExtInputPosition position;
+
+    public ExtGainSettings (
+      final ExtGain extGain1,
+      final ExtGain extGain2,
+      final ExtInputPosition position)
+    {
+      // XXX Well, at least tonight, there is not position argument
+      // in the SET? output...
+      if (extGain1 == null || extGain2 == null /* || position == null */)
+        throw new IllegalArgumentException ();
+      this.extGain1 = extGain1;
+      this.extGain2 = extGain2;
+      this.position = position;
+    }
+    
+  }
+  
+  private final ExtGainSettings extGainSettings;
+  
+  public final ExtGainSettings getExtGainSettings ()
+  {
+    return this.extGainSettings;
+  }
+  
+  private static ExtGainSettings parseExtGainSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    ExtGain extGain1 = null;
+    ExtGain extGain2 = null;
+    ExtInputPosition position = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "ext1":
+        {
+          extGain1 = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, ExtGain> ()
+            {{
+              put ("div1", ExtGain.Div1);
+              put ("div5", ExtGain.Div5);
+            }});
+          break;
+        }
+        case "ext2":
+        {
+          extGain2 = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, ExtGain> ()
+            {{
+              put ("div1", ExtGain.Div1);
+              put ("div5", ExtGain.Div5);
+            }});
+          break;
+        }
+        // XXX Is this really an argument??
+        case "pos":
+        case "position":
+        {
+          position = parseEnumFromOrdinal (argArgParts[1].trim (), ExtInputPosition.class, 1);
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new ExtGainSettings (extGain1, extGain2, position);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
