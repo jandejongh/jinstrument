@@ -66,7 +66,8 @@ public class Tek2440_GPIB_Settings
     final BandwidthLimitSettings bandwidthLimitSettings,
     final AcquisitionSettings acquisitionSettings,
     final ATriggerSettings aTriggerSettings,
-    final BTriggerSettings bTriggerSettings)
+    final BTriggerSettings bTriggerSettings,
+    final RunSettings runSettings)
   {
     super (
       bytes,
@@ -101,6 +102,9 @@ public class Tek2440_GPIB_Settings
     if (bTriggerSettings == null)
       throw new IllegalArgumentException ();
     this.bTriggerSettings = bTriggerSettings;
+    if (runSettings == null)
+      throw new IllegalArgumentException ();
+    this.runSettings = runSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -134,6 +138,7 @@ public class Tek2440_GPIB_Settings
     AcquisitionSettings acquisitionSettings = null;
     ATriggerSettings aTriggerSettings = null;
     BTriggerSettings bTriggerSettings = null;
+    RunSettings runSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -179,6 +184,9 @@ public class Tek2440_GPIB_Settings
         case "btrigger":
           bTriggerSettings = parseBTriggerSettings (argString);
           break;
+        case "run":
+          runSettings = parseRunSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -196,7 +204,8 @@ public class Tek2440_GPIB_Settings
       bandwidthLimitSettings,
       acquisitionSettings,
       aTriggerSettings,
-      bTriggerSettings);
+      bTriggerSettings,
+      runSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -2201,6 +2210,54 @@ public class Tek2440_GPIB_Settings
       level,
       slope,
       position);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // RUN SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum RunMode
+  {
+    Acquire,
+    Save;
+  }
+  
+  public final static class RunSettings
+  {
+    
+    private final RunMode mode;
+
+    public RunSettings (final RunMode mode)
+    {
+      if (mode == null)
+        throw new IllegalArgumentException ();
+      this.mode = mode;
+    }
+    
+  }
+  
+  private final RunSettings runSettings;
+  
+  public final RunSettings getRunSettings ()
+  {
+    return this.runSettings;
+  }
+  
+  private static RunSettings parseRunSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final RunMode mode = parseEnum (argString.trim ().toLowerCase (),
+      new HashMap<String, RunMode> ()
+      {{
+        put ("acq",     RunMode.Acquire);
+        put ("acquire", RunMode.Acquire);
+        put ("sav",     RunMode.Save);
+        put ("save",    RunMode.Save);
+      }});
+    return new RunSettings (mode);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
