@@ -65,7 +65,8 @@ public class Tek2440_GPIB_Settings
     final VModeSettings vModeSettings,
     final BandwidthLimitSettings bandwidthLimitSettings,
     final AcquisitionSettings acquisitionSettings,
-    final ATriggerSettings aTriggerSettings)
+    final ATriggerSettings aTriggerSettings,
+    final BTriggerSettings bTriggerSettings)
   {
     super (
       bytes,
@@ -97,6 +98,9 @@ public class Tek2440_GPIB_Settings
     if (aTriggerSettings == null)
       throw new IllegalArgumentException ();
     this.aTriggerSettings = aTriggerSettings;
+    if (bTriggerSettings == null)
+      throw new IllegalArgumentException ();
+    this.bTriggerSettings = bTriggerSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -129,6 +133,7 @@ public class Tek2440_GPIB_Settings
     BandwidthLimitSettings bandwidthLimitSettings = null;
     AcquisitionSettings acquisitionSettings = null;
     ATriggerSettings aTriggerSettings = null;
+    BTriggerSettings bTriggerSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -170,6 +175,10 @@ public class Tek2440_GPIB_Settings
         case "atrigger":
           aTriggerSettings = parseATriggerSettings (argString);
           break;
+        case "btr":
+        case "btrigger":
+          bTriggerSettings = parseBTriggerSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -186,7 +195,8 @@ public class Tek2440_GPIB_Settings
       vModeSettings,
       bandwidthLimitSettings,
       acquisitionSettings,
-      aTriggerSettings);
+      aTriggerSettings,
+      bTriggerSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -1965,6 +1975,232 @@ public class Tek2440_GPIB_Settings
       position,
       holdoff,
       abSelect);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // B-TRIGGER SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public enum BTriggerMode
+  {
+    RunsAft,
+    TrigAft;
+  }
+  
+  public enum BTriggerSource
+  {
+    Ch1,
+    Ch2,
+    Ext1,
+    Ext2,
+    Word,
+    Vertical;
+  }
+  
+  public enum BTriggerCoupling
+  {
+    AC,
+    DC,
+    LFReject,
+    HFReject,
+    NoiseReject;
+  }
+  
+  // Undocumented; assumed to be identical in semantics to A Trigger Position.
+  // XXX Keep in place until we are sure.
+  public enum BTriggerPosition
+  {
+    BTriggerPosition_01,
+    BTriggerPosition_02,
+    BTriggerPosition_03,
+    BTriggerPosition_04,
+    BTriggerPosition_05,
+    BTriggerPosition_06,
+    BTriggerPosition_07,
+    BTriggerPosition_08,
+    BTriggerPosition_09,
+    BTriggerPosition_10,
+    BTriggerPosition_11,
+    BTriggerPosition_12,
+    BTriggerPosition_13,
+    BTriggerPosition_14,
+    BTriggerPosition_15,
+    BTriggerPosition_16,
+    BTriggerPosition_17,
+    BTriggerPosition_18,
+    BTriggerPosition_19,
+    BTriggerPosition_20,
+    BTriggerPosition_21,
+    BTriggerPosition_22,
+    BTriggerPosition_23,
+    BTriggerPosition_24,
+    BTriggerPosition_25,
+    BTriggerPosition_26,
+    BTriggerPosition_27,
+    BTriggerPosition_28,
+    BTriggerPosition_29,
+    BTriggerPosition_30;
+  }
+  
+  public static class BTriggerSettings
+  {
+    
+    private final BTriggerMode mode;
+    
+    private final boolean extClk;
+    
+    private final BTriggerSource source;
+    
+    private final BTriggerCoupling coupling;
+    
+    private final double level;
+    
+    private final Slope slope;
+    
+    private final BTriggerPosition position;
+
+    public BTriggerSettings (
+      final BTriggerMode mode,
+      final Boolean extClk,
+      final BTriggerSource source,
+      final BTriggerCoupling coupling,
+      final Double level,
+      final Slope slope,
+      final BTriggerPosition position)
+    {
+      if (mode == null || extClk == null || source == null || coupling == null)
+        throw new IllegalArgumentException ();
+      if (level == null || slope == null || position == null)
+        throw new IllegalArgumentException ();
+      this.mode = mode;
+      this.extClk = extClk;
+      this.source = source;
+      this.coupling = coupling;
+      this.level = level;
+      this.slope = slope;
+      this.position = position;
+    }
+  }
+    
+  private final BTriggerSettings bTriggerSettings;
+  
+  public final BTriggerSettings getBTriggerSettings ()
+  {
+    return this.bTriggerSettings;
+  }
+  
+  private static BTriggerSettings parseBTriggerSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    BTriggerMode mode = null;
+    Boolean extClk = null;
+    BTriggerSource source = null;
+    BTriggerCoupling coupling = null;
+    Double level = null;
+    Slope slope = null;
+    BTriggerPosition position = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "mod":
+        case "mode":
+        {
+          mode = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, BTriggerMode> ()
+            {{
+              put ("runs",    BTriggerMode.RunsAft);
+              put ("runsaft", BTriggerMode.RunsAft);
+              put ("tri",     BTriggerMode.TrigAft);
+              put ("trigaft", BTriggerMode.TrigAft);
+            }});
+          break;
+        }
+        case "extcl":
+        case "extclk":
+        {
+          extClk = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        case "sou":
+        case "source":
+        {
+          source = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, BTriggerSource> ()
+            {{
+              put ("ch1",      BTriggerSource.Ch1);
+              put ("ch2",      BTriggerSource.Ch2);
+              put ("ext1",     BTriggerSource.Ext1);
+              put ("ext2",     BTriggerSource.Ext2);
+              put ("wor",      BTriggerSource.Word);
+              put ("word",     BTriggerSource.Word);
+              put ("vert",     BTriggerSource.Vertical);
+              put ("vertical", BTriggerSource.Vertical);
+            }});
+          break;
+        }
+        case "cou":
+        case "coupling":
+        {
+          coupling = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, BTriggerCoupling> ()
+            {{
+              put ("ac",       BTriggerCoupling.AC);
+              put ("dc",       BTriggerCoupling.DC);
+              put ("lfr",      BTriggerCoupling.LFReject);
+              put ("lfrej",    BTriggerCoupling.LFReject);
+              put ("hfr",      BTriggerCoupling.HFReject);
+              put ("hfrej",    BTriggerCoupling.HFReject);
+              put ("noi",      BTriggerCoupling.NoiseReject);
+              put ("noiserej", BTriggerCoupling.NoiseReject);
+            }});
+          break;
+        }
+        case "lev":
+        case "level":
+        {
+          level = parseNr3 (argArgParts[1].trim ());
+          break;
+        }
+        case "slo":
+        case "slope":
+        {
+          slope = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, Slope> ()
+            {{
+              put ("plu",   Slope.Plus);
+              put ("plus",  Slope.Plus);
+              put ("minu",  Slope.Minus);
+              put ("minus", Slope.Minus);
+            }});
+          break;
+        }
+        case "pos":
+        case "position":
+        {
+          position = parseEnumFromOrdinal (argArgParts[1].trim (), BTriggerPosition.class, 1);
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new BTriggerSettings (
+      mode,
+      extClk,
+      source,
+      coupling,
+      level,
+      slope,
+      position);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
