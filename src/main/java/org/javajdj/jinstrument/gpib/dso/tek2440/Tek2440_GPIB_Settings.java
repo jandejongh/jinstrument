@@ -83,7 +83,8 @@ public class Tek2440_GPIB_Settings
     final RefFromSettings refFromSettings,
     final RefDisplaySettings refDisplaySettings,
     final RefPositionSettings refPositionSettings,
-    final ReadoutSettings readoutSettings)
+    final ReadoutSettings readoutSettings,
+    final DebugSettings debugSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -167,6 +168,9 @@ public class Tek2440_GPIB_Settings
     if (readoutSettings == null)
       throw new IllegalArgumentException ();
     this.readoutSettings = readoutSettings;
+    if (debugSettings == null)
+      throw new IllegalArgumentException ();
+    this.debugSettings = debugSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -217,6 +221,7 @@ public class Tek2440_GPIB_Settings
     RefDisplaySettings refDisplaySettings = null;
     RefPositionSettings refPositionSettings = null;
     ReadoutSettings readoutSettings = null;
+    DebugSettings debugSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -324,6 +329,10 @@ public class Tek2440_GPIB_Settings
         case "readout":
           readoutSettings = parseReadoutSettings (argString);
           break;
+        case "deb":
+        case "debug":
+          debugSettings = parseDebugSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -358,7 +367,8 @@ public class Tek2440_GPIB_Settings
       refFromSettings,
       refDisplaySettings,
       refPositionSettings,
-      readoutSettings);
+      readoutSettings,
+      debugSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -3414,6 +3424,41 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final Boolean readout = parseOnOff (argString.trim ().toLowerCase ());
     return new ReadoutSettings (readout);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DEBUG SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class DebugSettings
+  {
+    
+    private final boolean debug;
+
+    public DebugSettings (final Boolean debug)
+    {
+      if (debug == null)
+        throw new IllegalArgumentException ();
+      this.debug = debug;
+    }
+    
+  }
+  
+  private final DebugSettings debugSettings;
+  
+  public final DebugSettings getDebugSettings ()
+  {
+    return this.debugSettings;
+  }
+  
+  private static DebugSettings parseDebugSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean debug = parseOnOff (argString.trim ().toLowerCase ());
+    return new DebugSettings (debug);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
