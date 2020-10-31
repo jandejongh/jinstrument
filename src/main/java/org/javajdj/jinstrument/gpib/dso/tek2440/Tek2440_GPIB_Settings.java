@@ -84,7 +84,8 @@ public class Tek2440_GPIB_Settings
     final RefDisplaySettings refDisplaySettings,
     final RefPositionSettings refPositionSettings,
     final ReadoutSettings readoutSettings,
-    final DebugSettings debugSettings)
+    final DebugSettings debugSettings,
+    final DeviceDependentSRQSettings deviceDependentSRQSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -171,6 +172,9 @@ public class Tek2440_GPIB_Settings
     if (debugSettings == null)
       throw new IllegalArgumentException ();
     this.debugSettings = debugSettings;
+    if (deviceDependentSRQSettings == null)
+      throw new IllegalArgumentException ();
+    this.deviceDependentSRQSettings = deviceDependentSRQSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -222,6 +226,7 @@ public class Tek2440_GPIB_Settings
     RefPositionSettings refPositionSettings = null;
     ReadoutSettings readoutSettings = null;
     DebugSettings debugSettings = null;
+    DeviceDependentSRQSettings deviceDependentSRQSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -333,6 +338,10 @@ public class Tek2440_GPIB_Settings
         case "debug":
           debugSettings = parseDebugSettings (argString);
           break;
+        case "devd":
+        case "devdep":
+          deviceDependentSRQSettings = parseDeviceDependentSRQSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -368,7 +377,8 @@ public class Tek2440_GPIB_Settings
       refDisplaySettings,
       refPositionSettings,
       readoutSettings,
-      debugSettings);
+      debugSettings,
+      deviceDependentSRQSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -2709,7 +2719,7 @@ public class Tek2440_GPIB_Settings
     final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
     return new ExecutionWarningSRQSettings (srq);
   }
-    
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INTERNAL ERROR SRQ SETTINGS
@@ -3459,6 +3469,41 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final Boolean debug = parseOnOff (argString.trim ().toLowerCase ());
     return new DebugSettings (debug);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // DEVICE DEPENDENT SRQ SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class DeviceDependentSRQSettings
+  {
+    
+    private final boolean srq;
+
+    public DeviceDependentSRQSettings (final Boolean srq)
+    {
+      if (srq == null)
+        throw new IllegalArgumentException ();
+      this.srq = srq;
+    }
+    
+  }
+  
+  private final DeviceDependentSRQSettings deviceDependentSRQSettings;
+  
+  public final DeviceDependentSRQSettings getDeviceDependentSRQSettings ()
+  {
+    return this.deviceDependentSRQSettings;
+  }
+  
+  private static DeviceDependentSRQSettings parseDeviceDependentSRQSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
+    return new DeviceDependentSRQSettings (srq);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
