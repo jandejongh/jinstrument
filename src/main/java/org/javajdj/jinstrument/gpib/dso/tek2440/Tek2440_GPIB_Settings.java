@@ -79,7 +79,8 @@ public class Tek2440_GPIB_Settings
     final PathSettings pathSettings,
     final ServiceRequestSettings serviceRequestSettings,
     final SetWordSettings setWordSettings,
-    final ExtGainSettings extGainSettings)
+    final ExtGainSettings extGainSettings,
+    final RefFromSettings refFromSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -151,6 +152,9 @@ public class Tek2440_GPIB_Settings
     if (extGainSettings == null)
       throw new IllegalArgumentException ();
     this.extGainSettings = extGainSettings;
+    if (refFromSettings == null)
+      throw new IllegalArgumentException ();
+    this.refFromSettings = refFromSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -197,6 +201,7 @@ public class Tek2440_GPIB_Settings
     ServiceRequestSettings serviceRequestSettings = null;
     SetWordSettings setWordSettings = null;
     ExtGainSettings extGainSettings = null;
+    RefFromSettings refFromSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -288,6 +293,10 @@ public class Tek2440_GPIB_Settings
         case "extgain":
           extGainSettings = parseExtGainSettings (argString);
           break;
+        case "reff":
+        case "reffrom":
+          refFromSettings = parseRefFromSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -318,7 +327,8 @@ public class Tek2440_GPIB_Settings
       pathSettings,
       serviceRequestSettings,
       setWordSettings,
-      extGainSettings);
+      extGainSettings,
+      refFromSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -3040,6 +3050,78 @@ public class Tek2440_GPIB_Settings
       }
     }
     return new ExtGainSettings (extGain1, extGain2, position);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // REF FROM SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // XXX Identical to DataSource.
+  public static enum RefFrom
+  {
+    Ch1,
+    Ch2,
+    Add,
+    Mult,
+    Ref1,
+    Ref2,
+    Ref3,
+    Ref4,
+    Ch1Del,
+    Ch2Del,
+    AddDel,
+    MultDel;
+  }
+  
+  public final static class RefFromSettings
+  {
+    
+    private final RefFrom refFrom;
+    
+    public RefFromSettings (final RefFrom refFrom)
+    {
+      if (refFrom == null)
+        throw new IllegalArgumentException ();
+      this.refFrom = refFrom;
+    }
+    
+  }
+  
+  private final RefFromSettings refFromSettings;
+  
+  public final RefFromSettings getRefFromSettings ()
+  {
+    return this.refFromSettings;
+  }
+  
+  private static RefFromSettings parseRefFromSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final RefFrom refFrom = parseEnum (argString.trim ().toLowerCase (),
+      new HashMap<String, RefFrom> ()
+      {{
+        put ("ch1",     RefFrom.Ch1);
+        put ("ch2",     RefFrom.Ch2);
+        put ("add",     RefFrom.Add);
+        put ("mul",     RefFrom.Mult);
+        put ("mult",    RefFrom.Mult);
+        put ("ch1d",    RefFrom.Ch1Del);
+        put ("ch1del",  RefFrom.Ch1Del);
+        put ("ch2d",    RefFrom.Ch2Del);
+        put ("ch2del",  RefFrom.Ch2Del);
+        put ("addd",    RefFrom.AddDel);
+        put ("adddel",  RefFrom.AddDel);
+        put ("multd",   RefFrom.MultDel);
+        put ("multdel", RefFrom.MultDel);
+        put ("ref1",    RefFrom.Ref1);
+        put ("ref2",    RefFrom.Ref2);
+        put ("ref3",    RefFrom.Ref3);
+        put ("ref4",    RefFrom.Ref4);
+      }});
+    return new RefFromSettings (refFrom);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
