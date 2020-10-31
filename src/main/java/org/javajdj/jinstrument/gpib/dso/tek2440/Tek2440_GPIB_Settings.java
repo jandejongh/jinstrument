@@ -1474,7 +1474,6 @@ public class Tek2440_GPIB_Settings
       if (argArgParts == null || argArgParts.length != 2)
         throw new IllegalArgumentException ();
       final String argKey = argArgParts[0].trim ();
-      boolean isASecDiv = false;
       switch (argKey)
       {
         case "mod":
