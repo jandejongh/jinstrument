@@ -98,7 +98,8 @@ public class Tek2440_GPIB_Settings
     final SetupSettings setupSettings,
     final StartSettings startSettings,
     final StopSettings stopSettings,
-    final UserButtonSRQSettings userButtonSRQSettings)
+    final UserButtonSRQSettings userButtonSRQSettings,
+    final IntensitySettings intensitySettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -224,6 +225,9 @@ public class Tek2440_GPIB_Settings
     if (userButtonSRQSettings == null)
       throw new IllegalArgumentException ();
     this.userButtonSRQSettings = userButtonSRQSettings;
+    if (intensitySettings == null)
+      throw new IllegalArgumentException ();
+    this.intensitySettings = intensitySettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -288,6 +292,7 @@ public class Tek2440_GPIB_Settings
     StartSettings startSettings = null;
     StopSettings stopSettings = null;
     UserButtonSRQSettings userButtonSRQSettings = null;
+    IntensitySettings intensitySettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -448,6 +453,10 @@ public class Tek2440_GPIB_Settings
         case "user":
           userButtonSRQSettings = parseUserButtonSRQSettings (argString);
           break;
+        case "intensi":
+        case "intensity":
+          intensitySettings = parseIntensitySettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -496,7 +505,8 @@ public class Tek2440_GPIB_Settings
       setupSettings,
       startSettings,
       stopSettings,
-      userButtonSRQSettings);
+      userButtonSRQSettings,
+      intensitySettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -4189,6 +4199,117 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
     return new UserButtonSRQSettings (srq);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INTENSITY SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public static class IntensitySettings
+  {
+    
+    private final double displayIntensity;
+    
+    private final double graticuleIntensity;
+    
+    private final double intensifiedZoneIntensity;
+    
+    private final double readoutIntensity;
+    
+    private final boolean vectors;
+    
+    public IntensitySettings (
+      final Double displayIntensity,
+      final Double graticuleIntensity,
+      final Double intensifiedZoneIntensity,
+      final Double readoutIntensity,
+      final Boolean vectors)
+    {
+      if (displayIntensity == null)
+        throw new IllegalArgumentException ();
+      this.displayIntensity = displayIntensity;
+      if (graticuleIntensity == null)
+        throw new IllegalArgumentException ();
+      this.graticuleIntensity = graticuleIntensity;
+      if (intensifiedZoneIntensity == null)
+        throw new IllegalArgumentException ();
+      this.intensifiedZoneIntensity = intensifiedZoneIntensity;
+      if (readoutIntensity == null)
+        throw new IllegalArgumentException ();
+      this.readoutIntensity = readoutIntensity;
+      if (vectors == null)
+        throw new IllegalArgumentException ();
+      this.vectors = vectors;
+    }
+        
+  }
+    
+  private final IntensitySettings intensitySettings;
+  
+  public final IntensitySettings getIntensitySettings ()
+  {
+    return this.intensitySettings;
+  }
+  
+  private static IntensitySettings parseIntensitySettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    Double displayIntensity = null;
+    Double graticuleIntensity = null;
+    Double intensifiedZoneIntensity = null;
+    Double readoutIntensity = null;
+    Boolean vectors = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "disp":
+        case "display":
+        {
+          displayIntensity = parseNr3 (argArgParts[1].trim (), 0, 100);
+          break;
+        }
+        case "gra":
+        case "grat":
+        {
+          graticuleIntensity = parseNr3 (argArgParts[1].trim (), 0, 100);
+          break;
+        }
+        case "intens":
+        {
+          intensifiedZoneIntensity = parseNr3 (argArgParts[1].trim (), 0, 100);
+          break;
+        }
+        case "rea":
+        case "readout":
+        {
+          readoutIntensity = parseNr3 (argArgParts[1].trim (), 0, 100);
+          break;
+        }
+        case "vec":
+        case "vectors":
+        {
+          vectors = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new IntensitySettings (
+      displayIntensity,
+      graticuleIntensity,
+      intensifiedZoneIntensity,
+      readoutIntensity,
+      vectors);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
