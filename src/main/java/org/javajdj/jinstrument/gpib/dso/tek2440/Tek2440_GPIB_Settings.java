@@ -99,7 +99,8 @@ public class Tek2440_GPIB_Settings
     final StartSettings startSettings,
     final StopSettings stopSettings,
     final UserButtonSRQSettings userButtonSRQSettings,
-    final IntensitySettings intensitySettings)
+    final IntensitySettings intensitySettings,
+    final PrintDeviceSettings printDeviceSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -228,6 +229,9 @@ public class Tek2440_GPIB_Settings
     if (intensitySettings == null)
       throw new IllegalArgumentException ();
     this.intensitySettings = intensitySettings;
+    if (printDeviceSettings == null)
+      throw new IllegalArgumentException ();
+    this.printDeviceSettings = printDeviceSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -293,6 +297,7 @@ public class Tek2440_GPIB_Settings
     StopSettings stopSettings = null;
     UserButtonSRQSettings userButtonSRQSettings = null;
     IntensitySettings intensitySettings = null;
+    PrintDeviceSettings printDeviceSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -457,6 +462,10 @@ public class Tek2440_GPIB_Settings
         case "intensity":
           intensitySettings = parseIntensitySettings (argString);
           break;
+        case "devi":
+        case "device":
+          printDeviceSettings = parsePrintDeviceSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -506,7 +515,8 @@ public class Tek2440_GPIB_Settings
       startSettings,
       stopSettings,
       userButtonSRQSettings,
-      intensitySettings);
+      intensitySettings,
+      printDeviceSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -4310,6 +4320,157 @@ public class Tek2440_GPIB_Settings
       intensifiedZoneIntensity,
       readoutIntensity,
       vectors);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // [PRINT] DEVICE SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public enum PrintDeviceType
+  {
+    ThinkJet,
+    HPGL;
+  }
+  
+  public enum PrintPageSize
+  {
+    A4,
+    US;
+  }
+  
+  public static class PrintDeviceSettings
+  {
+    
+    private final PrintDeviceType deviceType;
+    
+    private final PrintPageSize pageSize;
+    
+    private final boolean printGraticule;
+    
+    private final boolean printSettings;
+    
+    private final boolean printText;
+    
+    private final boolean printWaveforms;
+
+    public PrintDeviceSettings (
+      final PrintDeviceType deviceType,
+      final PrintPageSize pageSize,
+      final Boolean printGraticule,
+      final Boolean printSettings,
+      final Boolean printText,
+      final Boolean printWaveforms)
+    {
+      if (deviceType == null)
+        throw new IllegalArgumentException ();
+      this.deviceType = deviceType;
+      if (pageSize == null)
+        throw new IllegalArgumentException ();
+      this.pageSize = pageSize;
+      if (printGraticule == null)
+        throw new IllegalArgumentException ();
+      this.printGraticule = printGraticule;
+      if (printSettings == null)
+        throw new IllegalArgumentException ();
+      this.printSettings = printSettings;
+      if (printText == null)
+        throw new IllegalArgumentException ();
+      this.printText = printText;
+      if (printWaveforms == null)
+        throw new IllegalArgumentException ();
+      this.printWaveforms = printWaveforms;
+    }
+    
+    
+  }
+    
+  private final PrintDeviceSettings printDeviceSettings;
+  
+  public final PrintDeviceSettings getPrintDeviceSettings ()
+  {
+    return this.printDeviceSettings;
+  }
+  
+  private static PrintDeviceSettings parsePrintDeviceSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    PrintDeviceType deviceType = null;
+    PrintPageSize pageSize = null;
+    Boolean printGraticule = null;
+    Boolean printSettings = null;
+    Boolean printText = null;
+    Boolean printWaveforms = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "typ":
+        case "type":
+        {
+          deviceType = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, PrintDeviceType> ()
+            {{
+              put ("thi",      PrintDeviceType.ThinkJet);
+              put ("thinkjet", PrintDeviceType.ThinkJet);
+              put ("hpg",      PrintDeviceType.HPGL);
+              put ("hpgl",     PrintDeviceType.HPGL);
+            }});
+          break;
+        }
+        case "pag":
+        case "pagesize":
+        {
+          pageSize = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, PrintPageSize> ()
+            {{
+              put ("a4", PrintPageSize.A4);
+              put ("us", PrintPageSize.US);
+            }});
+          break;
+        }
+        case "gra":
+        case "grat":
+        {
+          printGraticule = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        case "setti":
+        case "settings":
+        {
+          printSettings = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        case "tex":
+        case "text":
+        {
+          printText = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        case "wav":
+        case "wavfrm":
+        {
+          printWaveforms = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new PrintDeviceSettings (
+      deviceType,
+      pageSize,
+      printGraticule,
+      printSettings,
+      printText,
+      printWaveforms);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
