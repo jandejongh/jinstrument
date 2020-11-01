@@ -87,7 +87,8 @@ public class Tek2440_GPIB_Settings
     final DebugSettings debugSettings,
     final DeviceDependentSRQSettings deviceDependentSRQSettings,
     final DirectionSettings directionSettings,
-    final GroupTriggerSRQSettings groupTriggerSRQSettings)
+    final GroupTriggerSRQSettings groupTriggerSRQSettings,
+    final FormatSettings formatSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -183,6 +184,9 @@ public class Tek2440_GPIB_Settings
     if (groupTriggerSRQSettings == null)
       throw new IllegalArgumentException ();
     this.groupTriggerSRQSettings = groupTriggerSRQSettings;
+    if (formatSettings == null)
+      throw new IllegalArgumentException ();
+    this.formatSettings = formatSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -237,6 +241,7 @@ public class Tek2440_GPIB_Settings
     DeviceDependentSRQSettings deviceDependentSRQSettings = null;
     DirectionSettings directionSettings = null;
     GroupTriggerSRQSettings groupTriggerSRQSettings = null;
+    FormatSettings formatSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -359,6 +364,10 @@ public class Tek2440_GPIB_Settings
         case "dt":
           groupTriggerSRQSettings = parseGroupTriggerSRQSettings (argString);
           break;
+        case "form":
+        case "format":
+          formatSettings = parseFormatSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -397,7 +406,8 @@ public class Tek2440_GPIB_Settings
       debugSettings,
       deviceDependentSRQSettings,
       directionSettings,
-      groupTriggerSRQSettings);
+      groupTriggerSRQSettings,
+      formatSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -3657,6 +3667,41 @@ public class Tek2440_GPIB_Settings
         sequence = argProper;
     }
     return new GroupTriggerSRQSettings (mode, sequence);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // FORMAT SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class FormatSettings
+  {
+    
+    private final boolean format;
+
+    public FormatSettings (final Boolean format)
+    {
+      if (format == null)
+        throw new IllegalArgumentException ();
+      this.format = format;
+    }
+    
+  }
+  
+  private final FormatSettings formatSettings;
+  
+  public final FormatSettings getFormatSettings ()
+  {
+    return this.formatSettings;
+  }
+  
+  private static FormatSettings parseFormatSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean format = parseOnOff (argString.trim ().toLowerCase ());
+    return new FormatSettings (format);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
