@@ -87,6 +87,7 @@ public class Tek2440_GPIB_Settings
     final DebugSettings debugSettings,
     final DeviceDependentSRQSettings deviceDependentSRQSettings,
     final CommandCompletionSRQSettings commandCompletionSRQSettings,
+    final ProbeIdentifyButtonSRQSettings probeIdentifyButtonSRQSettings,
     final DirectionSettings directionSettings,
     final GroupTriggerSRQSettings groupTriggerSRQSettings,
     final FormatSettings formatSettings,
@@ -185,6 +186,9 @@ public class Tek2440_GPIB_Settings
     if (commandCompletionSRQSettings == null)
       throw new IllegalArgumentException ();
     this.commandCompletionSRQSettings = commandCompletionSRQSettings;
+    if (probeIdentifyButtonSRQSettings == null)
+      throw new IllegalArgumentException ();
+    this.probeIdentifyButtonSRQSettings = probeIdentifyButtonSRQSettings;
     if (directionSettings == null)
       throw new IllegalArgumentException ();
     this.directionSettings = directionSettings;
@@ -256,6 +260,7 @@ public class Tek2440_GPIB_Settings
     DebugSettings debugSettings = null;
     DeviceDependentSRQSettings deviceDependentSRQSettings = null;
     CommandCompletionSRQSettings commandCompletionSRQSettings = null;
+    ProbeIdentifyButtonSRQSettings probeIdentifyButtonSRQSettings = null;
     DirectionSettings directionSettings = null;
     GroupTriggerSRQSettings groupTriggerSRQSettings = null;
     FormatSettings formatSettings = null;
@@ -380,6 +385,9 @@ public class Tek2440_GPIB_Settings
         case "opc":
           commandCompletionSRQSettings = parseCommandCompletionSRQSettings (argString);
           break;
+        case "pid":
+          probeIdentifyButtonSRQSettings = parseProbeIdentifyButtonSRQSettings (argString);
+          break;
         case "dir":
         case "direction":
           directionSettings = parseDirectionSettings (argString);
@@ -441,6 +449,7 @@ public class Tek2440_GPIB_Settings
       debugSettings,
       deviceDependentSRQSettings,
       commandCompletionSRQSettings,
+      probeIdentifyButtonSRQSettings,
       directionSettings,
       groupTriggerSRQSettings,
       formatSettings,
@@ -3607,6 +3616,41 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
     return new CommandCompletionSRQSettings (srq);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // PROBE IDENTIFY BUTTON SRQ SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class ProbeIdentifyButtonSRQSettings
+  {
+    
+    private final boolean srq;
+
+    public ProbeIdentifyButtonSRQSettings (final Boolean srq)
+    {
+      if (srq == null)
+        throw new IllegalArgumentException ();
+      this.srq = srq;
+    }
+    
+  }
+  
+  private final ProbeIdentifyButtonSRQSettings probeIdentifyButtonSRQSettings;
+  
+  public final ProbeIdentifyButtonSRQSettings getProbeIdentifyButtonSRQSettings ()
+  {
+    return this.probeIdentifyButtonSRQSettings;
+  }
+  
+  private static ProbeIdentifyButtonSRQSettings parseProbeIdentifyButtonSRQSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
+    return new ProbeIdentifyButtonSRQSettings (srq);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
