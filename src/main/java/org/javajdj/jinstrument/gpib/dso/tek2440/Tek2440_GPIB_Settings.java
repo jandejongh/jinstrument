@@ -89,7 +89,8 @@ public class Tek2440_GPIB_Settings
     final DirectionSettings directionSettings,
     final GroupTriggerSRQSettings groupTriggerSRQSettings,
     final FormatSettings formatSettings,
-    final HysteresisSettings hysteresisSettings)
+    final HysteresisSettings hysteresisSettings,
+    final LevelSettings levelSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -191,6 +192,9 @@ public class Tek2440_GPIB_Settings
     if (hysteresisSettings == null)
       throw new IllegalArgumentException ();
     this.hysteresisSettings = hysteresisSettings;
+    if (levelSettings == null)
+      throw new IllegalArgumentException ();
+    this.levelSettings = levelSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -247,6 +251,7 @@ public class Tek2440_GPIB_Settings
     GroupTriggerSRQSettings groupTriggerSRQSettings = null;
     FormatSettings formatSettings = null;
     HysteresisSettings hysteresisSettings = null;
+    LevelSettings levelSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -377,6 +382,10 @@ public class Tek2440_GPIB_Settings
         case "hysteresis":
           hysteresisSettings = parseHysteresisSettings (argString);
           break;
+        case "lev":
+        case "level":
+          levelSettings = parseLevelSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -417,7 +426,8 @@ public class Tek2440_GPIB_Settings
       directionSettings,
       groupTriggerSRQSettings,
       formatSettings,
-      hysteresisSettings);
+      hysteresisSettings,
+      levelSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -3747,6 +3757,41 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final int hysteresis = parseNr1 (argString.trim ().toLowerCase (), 0, Integer.MAX_VALUE);
     return new HysteresisSettings (hysteresis);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // LEVEL SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class LevelSettings
+  {
+    
+    private final int level;
+
+    public LevelSettings (final Integer level)
+    {
+      if (level == null)
+        throw new IllegalArgumentException ();
+      this.level = level;
+    }
+    
+  }
+  
+  private final LevelSettings levelSettings;
+  
+  public final LevelSettings getLevelSettings ()
+  {
+    return this.levelSettings;
+  }
+  
+  private static LevelSettings parseLevelSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final int level = parseNr1 (argString.trim ().toLowerCase (), Integer.MIN_VALUE, Integer.MAX_VALUE);
+    return new LevelSettings (level);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
