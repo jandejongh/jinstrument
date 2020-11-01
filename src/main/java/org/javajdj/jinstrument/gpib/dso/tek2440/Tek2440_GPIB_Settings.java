@@ -86,7 +86,8 @@ public class Tek2440_GPIB_Settings
     final ReadoutSettings readoutSettings,
     final DebugSettings debugSettings,
     final DeviceDependentSRQSettings deviceDependentSRQSettings,
-    final DirectionSettings directionSettings)
+    final DirectionSettings directionSettings,
+    final GroupTriggerSRQSettings groupTriggerSRQSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -179,6 +180,9 @@ public class Tek2440_GPIB_Settings
     if (directionSettings == null)
       throw new IllegalArgumentException ();
     this.directionSettings = directionSettings;
+    if (groupTriggerSRQSettings == null)
+      throw new IllegalArgumentException ();
+    this.groupTriggerSRQSettings = groupTriggerSRQSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -232,6 +236,7 @@ public class Tek2440_GPIB_Settings
     DebugSettings debugSettings = null;
     DeviceDependentSRQSettings deviceDependentSRQSettings = null;
     DirectionSettings directionSettings = null;
+    GroupTriggerSRQSettings groupTriggerSRQSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -351,6 +356,9 @@ public class Tek2440_GPIB_Settings
         case "direction":
           directionSettings = parseDirectionSettings (argString);
           break;
+        case "dt":
+          groupTriggerSRQSettings = parseGroupTriggerSRQSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -388,7 +396,8 @@ public class Tek2440_GPIB_Settings
       readoutSettings,
       debugSettings,
       deviceDependentSRQSettings,
-      directionSettings);
+      directionSettings,
+      groupTriggerSRQSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -3562,6 +3571,92 @@ public class Tek2440_GPIB_Settings
         put ("minus", Direction.Minus);
       }});
     return new DirectionSettings (direction);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GROUP TRIGGER SRQ [DT] SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum GroupTriggerSRQMode
+  {
+    Off,
+    Run,
+    SodRun, // XXX??
+    Step,
+    ExecuteSequence;
+  }
+  
+  public final static class GroupTriggerSRQSettings
+  {
+    
+    private final GroupTriggerSRQMode mode;
+    
+    private final String sequence;
+
+    public GroupTriggerSRQSettings (final GroupTriggerSRQMode mode, final String sequence)
+    {
+      if (mode == null)
+        throw new IllegalArgumentException ();
+      this.mode = mode;
+      switch (this.mode)
+      {
+        case Off:
+        case Run:
+        case SodRun:
+        case Step:
+          if (sequence != null)
+            throw new IllegalArgumentException ();
+          break;
+        case ExecuteSequence:
+          if (sequence == null || sequence.trim ().isEmpty ())
+            throw new IllegalArgumentException ();
+          break;
+        default:
+          throw new IllegalArgumentException ();
+      }
+      this.sequence = sequence;
+    }
+    
+  }
+  
+  private final GroupTriggerSRQSettings groupTriggerSRQSettings;
+  
+  public final GroupTriggerSRQSettings getGroupTriggerSRQSettings ()
+  {
+    return this.groupTriggerSRQSettings;
+  }
+  
+  private static GroupTriggerSRQSettings parseGroupTriggerSRQSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    GroupTriggerSRQMode mode = null;
+    String sequence = null;
+    final String argProper = argString.trim ().toLowerCase ();
+    switch (argProper)
+    {
+      case "off":
+        mode = GroupTriggerSRQMode.Off;
+        break;
+      case "run":
+        mode = GroupTriggerSRQMode.Run;
+        break;
+      case "sodrun":
+        mode = GroupTriggerSRQMode.SodRun;
+        break;
+      case "ste":
+      case "step":
+        mode = GroupTriggerSRQMode.Step;
+        break;
+      default:
+        if (argProper.trim ().isEmpty ())
+          throw new IllegalArgumentException ();
+        mode = GroupTriggerSRQMode.ExecuteSequence;
+        sequence = argProper;
+    }
+    return new GroupTriggerSRQSettings (mode, sequence);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
