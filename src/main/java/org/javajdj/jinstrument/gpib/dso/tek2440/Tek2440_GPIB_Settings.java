@@ -88,7 +88,8 @@ public class Tek2440_GPIB_Settings
     final DeviceDependentSRQSettings deviceDependentSRQSettings,
     final DirectionSettings directionSettings,
     final GroupTriggerSRQSettings groupTriggerSRQSettings,
-    final FormatSettings formatSettings)
+    final FormatSettings formatSettings,
+    final HysteresisSettings hysteresisSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -187,6 +188,9 @@ public class Tek2440_GPIB_Settings
     if (formatSettings == null)
       throw new IllegalArgumentException ();
     this.formatSettings = formatSettings;
+    if (hysteresisSettings == null)
+      throw new IllegalArgumentException ();
+    this.hysteresisSettings = hysteresisSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -242,6 +246,7 @@ public class Tek2440_GPIB_Settings
     DirectionSettings directionSettings = null;
     GroupTriggerSRQSettings groupTriggerSRQSettings = null;
     FormatSettings formatSettings = null;
+    HysteresisSettings hysteresisSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -368,6 +373,10 @@ public class Tek2440_GPIB_Settings
         case "format":
           formatSettings = parseFormatSettings (argString);
           break;
+        case "hys":
+        case "hysteresis":
+          hysteresisSettings = parseHysteresisSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -407,7 +416,8 @@ public class Tek2440_GPIB_Settings
       deviceDependentSRQSettings,
       directionSettings,
       groupTriggerSRQSettings,
-      formatSettings);
+      formatSettings,
+      hysteresisSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -3702,6 +3712,41 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final Boolean format = parseOnOff (argString.trim ().toLowerCase ());
     return new FormatSettings (format);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HYSTERESIS SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class HysteresisSettings
+  {
+    
+    private final int hysteresis;
+
+    public HysteresisSettings (final Integer hysteresis)
+    {
+      if (hysteresis == null)
+        throw new IllegalArgumentException ();
+      this.hysteresis = hysteresis;
+    }
+    
+  }
+  
+  private final HysteresisSettings hysteresisSettings;
+  
+  public final HysteresisSettings getHysteresisSettings ()
+  {
+    return this.hysteresisSettings;
+  }
+  
+  private static HysteresisSettings parseHysteresisSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final int hysteresis = parseNr1 (argString.trim ().toLowerCase (), 0, Integer.MAX_VALUE);
+    return new HysteresisSettings (hysteresis);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
