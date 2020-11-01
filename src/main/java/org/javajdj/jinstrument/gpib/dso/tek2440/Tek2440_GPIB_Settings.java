@@ -95,7 +95,10 @@ public class Tek2440_GPIB_Settings
     final HysteresisSettings hysteresisSettings,
     final LevelSettings levelSettings,
     final LockSettings lockSettings,
-    final SetupSettings setupSettings)
+    final SetupSettings setupSettings,
+    final StartSettings startSettings,
+    final StopSettings stopSettings,
+    final UserButtonSRQSettings userButtonSRQSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -212,6 +215,15 @@ public class Tek2440_GPIB_Settings
     if (setupSettings == null)
       throw new IllegalArgumentException ();
     this.setupSettings = setupSettings;
+    if (startSettings == null)
+      throw new IllegalArgumentException ();
+    this.startSettings = startSettings;
+    if (stopSettings == null)
+      throw new IllegalArgumentException ();
+    this.stopSettings = stopSettings;
+    if (userButtonSRQSettings == null)
+      throw new IllegalArgumentException ();
+    this.userButtonSRQSettings = userButtonSRQSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -273,6 +285,9 @@ public class Tek2440_GPIB_Settings
     LevelSettings levelSettings = null;
     LockSettings lockSettings = null;
     SetupSettings setupSettings = null;
+    StartSettings startSettings = null;
+    StopSettings stopSettings = null;
+    UserButtonSRQSettings userButtonSRQSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -421,6 +436,18 @@ public class Tek2440_GPIB_Settings
         case "setup":
           setupSettings = parseSetupSettings (argString);
           break;
+        case "star":
+        case "start":
+          startSettings = parseStartSettings (argString);
+          break;
+        case "sto":
+        case "stop":
+          stopSettings = parseStopSettings (argString);
+          break;
+        case "use":
+        case "user":
+          userButtonSRQSettings = parseUserButtonSRQSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -466,7 +493,10 @@ public class Tek2440_GPIB_Settings
       hysteresisSettings,
       levelSettings,
       lockSettings,
-      setupSettings);
+      setupSettings,
+      startSettings,
+      stopSettings,
+      userButtonSRQSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -4056,6 +4086,111 @@ public class Tek2440_GPIB_Settings
     return new SetupSettings (actions, force);
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // START SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class StartSettings
+  {
+    
+    private final int start;
+
+    public StartSettings (final Integer start)
+    {
+      if (start == null)
+        throw new IllegalArgumentException ();
+      this.start = start;
+    }
+    
+  }
+  
+  private final StartSettings startSettings;
+  
+  public final StartSettings getStartSettings ()
+  {
+    return this.startSettings;
+  }
+  
+  private static StartSettings parseStartSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final int start = parseNr1 (argString.trim ().toLowerCase (), 1, 1024);
+    return new StartSettings (start);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // STOP SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class StopSettings
+  {
+    
+    private final int stop;
+
+    public StopSettings (final Integer stop)
+    {
+      if (stop == null)
+        throw new IllegalArgumentException ();
+      this.stop = stop;
+    }
+    
+  }
+  
+  private final StopSettings stopSettings;
+  
+  public final StopSettings getStopSettings ()
+  {
+    return this.stopSettings;
+  }
+  
+  private static StopSettings parseStopSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final int stop = parseNr1 (argString.trim ().toLowerCase (), 1, 1024);
+    return new StopSettings (stop);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // USER BUTTON SRQ SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class UserButtonSRQSettings
+  {
+    
+    private final boolean srq;
+
+    public UserButtonSRQSettings (final Boolean srq)
+    {
+      if (srq == null)
+        throw new IllegalArgumentException ();
+      this.srq = srq;
+    }
+    
+  }
+  
+  private final UserButtonSRQSettings userButtonSRQSettings;
+  
+  public final UserButtonSRQSettings getUserButtonSRQSettings ()
+  {
+    return this.userButtonSRQSettings;
+  }
+  
+  private static UserButtonSRQSettings parseUserButtonSRQSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
+    return new UserButtonSRQSettings (srq);
+  }
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
