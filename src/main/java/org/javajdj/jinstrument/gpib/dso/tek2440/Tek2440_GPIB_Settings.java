@@ -86,6 +86,7 @@ public class Tek2440_GPIB_Settings
     final ReadoutSettings readoutSettings,
     final DebugSettings debugSettings,
     final DeviceDependentSRQSettings deviceDependentSRQSettings,
+    final CommandCompletionSRQSettings commandCompletionSRQSettings,
     final DirectionSettings directionSettings,
     final GroupTriggerSRQSettings groupTriggerSRQSettings,
     final FormatSettings formatSettings,
@@ -181,6 +182,9 @@ public class Tek2440_GPIB_Settings
     if (deviceDependentSRQSettings == null)
       throw new IllegalArgumentException ();
     this.deviceDependentSRQSettings = deviceDependentSRQSettings;
+    if (commandCompletionSRQSettings == null)
+      throw new IllegalArgumentException ();
+    this.commandCompletionSRQSettings = commandCompletionSRQSettings;
     if (directionSettings == null)
       throw new IllegalArgumentException ();
     this.directionSettings = directionSettings;
@@ -251,6 +255,7 @@ public class Tek2440_GPIB_Settings
     ReadoutSettings readoutSettings = null;
     DebugSettings debugSettings = null;
     DeviceDependentSRQSettings deviceDependentSRQSettings = null;
+    CommandCompletionSRQSettings commandCompletionSRQSettings = null;
     DirectionSettings directionSettings = null;
     GroupTriggerSRQSettings groupTriggerSRQSettings = null;
     FormatSettings formatSettings = null;
@@ -372,6 +377,9 @@ public class Tek2440_GPIB_Settings
         case "devdep":
           deviceDependentSRQSettings = parseDeviceDependentSRQSettings (argString);
           break;
+        case "opc":
+          commandCompletionSRQSettings = parseCommandCompletionSRQSettings (argString);
+          break;
         case "dir":
         case "direction":
           directionSettings = parseDirectionSettings (argString);
@@ -432,6 +440,7 @@ public class Tek2440_GPIB_Settings
       readoutSettings,
       debugSettings,
       deviceDependentSRQSettings,
+      commandCompletionSRQSettings,
       directionSettings,
       groupTriggerSRQSettings,
       formatSettings,
@@ -3563,6 +3572,41 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
     return new DeviceDependentSRQSettings (srq);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // COMMAND COMPLETION SRQ SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class CommandCompletionSRQSettings
+  {
+    
+    private final boolean srq;
+
+    public CommandCompletionSRQSettings (final Boolean srq)
+    {
+      if (srq == null)
+        throw new IllegalArgumentException ();
+      this.srq = srq;
+    }
+    
+  }
+  
+  private final CommandCompletionSRQSettings commandCompletionSRQSettings;
+  
+  public final CommandCompletionSRQSettings getCommandCompletionSRQSettings ()
+  {
+    return this.commandCompletionSRQSettings;
+  }
+  
+  private static CommandCompletionSRQSettings parseCommandCompletionSRQSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Boolean srq = parseOnOff (argString.trim ().toLowerCase ());
+    return new CommandCompletionSRQSettings (srq);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
