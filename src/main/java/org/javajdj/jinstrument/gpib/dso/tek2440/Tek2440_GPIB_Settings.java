@@ -4060,9 +4060,9 @@ public class Tek2440_GPIB_Settings
       switch (argKey)
       {
         case "act":
-        case "actions":
+        case "action":
         {
-          final int mask = parseNr1 (argString, 0, 511);
+          final int mask = parseNr1 (argArgParts[1].trim (), 0, 511);
           actions = EnumSet.noneOf (SetupAction.class);
           int i = 1;
           while (i < 512)
