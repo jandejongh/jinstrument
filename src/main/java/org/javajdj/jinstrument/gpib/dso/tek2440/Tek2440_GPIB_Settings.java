@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.gpib.dso.tek2440;
 
 import java.nio.charset.Charset;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -93,7 +94,8 @@ public class Tek2440_GPIB_Settings
     final FormatSettings formatSettings,
     final HysteresisSettings hysteresisSettings,
     final LevelSettings levelSettings,
-    final LockSettings lockSettings)
+    final LockSettings lockSettings,
+    final SetupSettings setupSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -207,6 +209,9 @@ public class Tek2440_GPIB_Settings
     if (lockSettings == null)
       throw new IllegalArgumentException ();
     this.lockSettings = lockSettings;
+    if (setupSettings == null)
+      throw new IllegalArgumentException ();
+    this.setupSettings = setupSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -267,6 +272,7 @@ public class Tek2440_GPIB_Settings
     HysteresisSettings hysteresisSettings = null;
     LevelSettings levelSettings = null;
     LockSettings lockSettings = null;
+    SetupSettings setupSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -411,6 +417,10 @@ public class Tek2440_GPIB_Settings
         case "lock":
           lockSettings = parseLockSettings (argString);
           break;
+        case "setu":
+        case "setup":
+          setupSettings = parseSetupSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -455,7 +465,8 @@ public class Tek2440_GPIB_Settings
       formatSettings,
       hysteresisSettings,
       levelSettings,
-      lockSettings);
+      lockSettings,
+      setupSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -557,7 +568,7 @@ public class Tek2440_GPIB_Settings
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public static enum AutoSetupMode
+  public static enum AutoSetupAction
   {
     FALL,
     PERIOD,
@@ -575,11 +586,11 @@ public class Tek2440_GPIB_Settings
   public static final class AutoSetupSettings
   {
     
-    private final AutoSetupMode mode;
+    private final AutoSetupAction mode;
     
     private final AutoSetupResolution resolution;
 
-    public final AutoSetupMode getMode ()
+    public final AutoSetupAction getMode ()
     {
       return this.mode;
     }
@@ -589,7 +600,7 @@ public class Tek2440_GPIB_Settings
       return this.resolution;
     }
 
-    public AutoSetupSettings (final AutoSetupMode mode, final AutoSetupResolution resolution)
+    public AutoSetupSettings (final AutoSetupAction mode, final AutoSetupResolution resolution)
     {
       if (mode == null || resolution == null)
         throw new IllegalArgumentException ();
@@ -606,7 +617,7 @@ public class Tek2440_GPIB_Settings
     return this.autoSetupSettings;
   }
   
-  public final AutoSetupMode getAutoSetupMode ()
+  public final AutoSetupAction getAutoSetupAction ()
   {
     return getAutoSetupSettings ().getMode ();
   }
@@ -620,7 +631,7 @@ public class Tek2440_GPIB_Settings
   {
     if (argString == null)
       throw new IllegalArgumentException ();
-    AutoSetupMode mode = null;
+    AutoSetupAction mode = null;
     AutoSetupResolution resolution = null;
     final String[] argParts = argString.trim ().toLowerCase ().split (",");
     for (final String argPart: argParts)
@@ -638,23 +649,23 @@ public class Tek2440_GPIB_Settings
           {
             case "fal":
             case "fall":
-              mode = AutoSetupMode.FALL;
+              mode = AutoSetupAction.FALL;
               break;
             case "peri":
             case "period":
-              mode = AutoSetupMode.PERIOD;
+              mode = AutoSetupAction.PERIOD;
               break;
             case "pul":
             case "pulse":
-              mode = AutoSetupMode.PULSE;
+              mode = AutoSetupAction.PULSE;
               break;
             case "ris":
             case "rise":
-              mode = AutoSetupMode.RISE;
+              mode = AutoSetupAction.RISE;
               break;
             case "vie":
             case "view":
-              mode = AutoSetupMode.VIEW;
+              mode = AutoSetupAction.VIEW;
               break;
             default:
               throw new IllegalArgumentException ();
@@ -3779,10 +3790,12 @@ public class Tek2440_GPIB_Settings
         mode = GroupTriggerSRQMode.Step;
         break;
       default:
+      {
         if (argProper.trim ().isEmpty ())
           throw new IllegalArgumentException ();
         mode = GroupTriggerSRQMode.ExecuteSequence;
         sequence = argProper;
+      }
     }
     return new GroupTriggerSRQSettings (mode, sequence);
   }
@@ -3940,6 +3953,109 @@ public class Tek2440_GPIB_Settings
     return new LockSettings (lock);
   }
     
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SETUP SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum SetupAction
+  {
+    Repeat (1),
+    SelfCal (2),
+    SelfTest (4),
+    AutoSetup (8),
+    PrintPlot (16),
+    Bell (32),
+    SRQ (64),
+    Pause (128),
+    Protect (256);
+    
+    final int bitField;
+
+    private SetupAction (final int bitField)
+    {
+      this.bitField = bitField;
+    }
+    
+    public static SetupAction fromBitField (final int bitField)
+    {
+      for (final SetupAction action : SetupAction.values ())
+        if (action.bitField == bitField)
+          return action;
+      throw new IllegalArgumentException ();
+    }
+    
+  }
+  
+  public final static class SetupSettings
+  {
+    
+    private final EnumSet<SetupAction> actions;
+    
+    private final boolean force;
+    
+    public SetupSettings (
+      final EnumSet<SetupAction> actions,
+      final Boolean force)
+    {
+      if (actions == null || force == null)
+        throw new IllegalArgumentException ();
+      this.actions = actions;
+      this.force = force;
+    }
+    
+  }
+  
+  private final SetupSettings setupSettings;
+  
+  public final SetupSettings getSetupSettings ()
+  {
+    return this.setupSettings;
+  }
+  
+  private static SetupSettings parseSetupSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    EnumSet<SetupAction> actions = null;
+    Boolean force = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || argArgParts.length != 2)
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "act":
+        case "actions":
+        {
+          final int mask = parseNr1 (argString, 0, 511);
+          actions = EnumSet.noneOf (SetupAction.class);
+          int i = 1;
+          while (i < 512)
+          {
+            if ((mask & i) != 0)
+              actions.add (SetupAction.fromBitField (i));
+            i <<= 1;
+          }
+          break;
+        }
+        case "forc":
+        case "force":
+        {
+          force = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    return new SetupSettings (actions, force);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
