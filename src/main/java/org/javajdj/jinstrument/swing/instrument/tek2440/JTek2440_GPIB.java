@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing.instrument;
+package org.javajdj.jinstrument.swing.instrument.tek2440;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

@@ -99,7 +99,7 @@ import org.javajdj.jinstrument.swing.instrument.JHP3478A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JHP5316A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JHP6033A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JHP8116A_GPIB;
-import org.javajdj.jinstrument.swing.instrument.JTek2440_GPIB;
+import org.javajdj.jinstrument.swing.instrument.tek2440.JTek2440_GPIB;
 
 
 /** Swing {@code JFrame} for opening and interacting with instruments like RF signal generators, spectrum analyzers, etc.
