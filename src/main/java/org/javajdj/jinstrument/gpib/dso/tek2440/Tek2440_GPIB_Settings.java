@@ -90,7 +90,8 @@ public class Tek2440_GPIB_Settings
     final GroupTriggerSRQSettings groupTriggerSRQSettings,
     final FormatSettings formatSettings,
     final HysteresisSettings hysteresisSettings,
-    final LevelSettings levelSettings)
+    final LevelSettings levelSettings,
+    final LockSettings lockSettings)
   {
     super (bytes, unit);
     if (autoSetup == null)
@@ -195,6 +196,9 @@ public class Tek2440_GPIB_Settings
     if (levelSettings == null)
       throw new IllegalArgumentException ();
     this.levelSettings = levelSettings;
+    if (lockSettings == null)
+      throw new IllegalArgumentException ();
+    this.lockSettings = lockSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -252,6 +256,7 @@ public class Tek2440_GPIB_Settings
     FormatSettings formatSettings = null;
     HysteresisSettings hysteresisSettings = null;
     LevelSettings levelSettings = null;
+    LockSettings lockSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -386,6 +391,10 @@ public class Tek2440_GPIB_Settings
         case "level":
           levelSettings = parseLevelSettings (argString);
           break;
+        case "loc":
+        case "lock":
+          lockSettings = parseLockSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -427,7 +436,8 @@ public class Tek2440_GPIB_Settings
       groupTriggerSRQSettings,
       formatSettings,
       hysteresisSettings,
-      levelSettings);
+      levelSettings,
+      lockSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -3792,6 +3802,54 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     final int level = parseNr1 (argString.trim ().toLowerCase (), Integer.MIN_VALUE, Integer.MAX_VALUE);
     return new LevelSettings (level);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // LOCK SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public static enum Lock
+  {
+    LLO,
+    Off,
+    On;
+  }
+  
+  public final static class LockSettings
+  {
+    
+    private final Lock lock;
+    
+    public LockSettings (final Lock lock)
+    {
+      if (lock == null)
+        throw new IllegalArgumentException ();
+      this.lock = lock;
+    }
+    
+  }
+  
+  private final LockSettings lockSettings;
+  
+  public final LockSettings getLockSettings ()
+  {
+    return this.lockSettings;
+  }
+  
+  private static LockSettings parseLockSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    final Lock lock = parseEnum (argString.trim ().toLowerCase (),
+      new HashMap<String, Lock> ()
+      {{
+        put ("llo", Lock.LLO);
+        put ("off", Lock.Off);
+        put ("on",  Lock.On);
+      }});
+    return new LockSettings (lock);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
