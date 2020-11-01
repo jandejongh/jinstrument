@@ -58,7 +58,7 @@ public class Tek2440_GPIB_Settings
   protected Tek2440_GPIB_Settings (
     final byte[] bytes,
     final Unit unit,
-    final AutoSetupSettings autoSetup,
+    final AutoSetupSettings autoSetupSettings,
     final HorizontalSettings horizontalSettings,
     final ChannelSettings ch1Settings,
     final ChannelSettings ch2Settings,
@@ -100,12 +100,13 @@ public class Tek2440_GPIB_Settings
     final StopSettings stopSettings,
     final UserButtonSRQSettings userButtonSRQSettings,
     final IntensitySettings intensitySettings,
-    final PrintDeviceSettings printDeviceSettings)
+    final PrintDeviceSettings printDeviceSettings,
+    final CursorSettings cursorSettings)
   {
     super (bytes, unit);
-    if (autoSetup == null)
+    if (autoSetupSettings == null)
       throw new IllegalArgumentException ();
-    this.autoSetupSettings = autoSetup;
+    this.autoSetupSettings = autoSetupSettings;
     if (horizontalSettings == null)
       throw new IllegalArgumentException ();
     this.horizontalSettings = horizontalSettings;
@@ -232,6 +233,9 @@ public class Tek2440_GPIB_Settings
     if (printDeviceSettings == null)
       throw new IllegalArgumentException ();
     this.printDeviceSettings = printDeviceSettings;
+    if (cursorSettings == null)
+      throw new IllegalArgumentException ();
+    this.cursorSettings = cursorSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -298,6 +302,7 @@ public class Tek2440_GPIB_Settings
     UserButtonSRQSettings userButtonSRQSettings = null;
     IntensitySettings intensitySettings = null;
     PrintDeviceSettings printDeviceSettings = null;
+    CursorSettings cursorSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -466,6 +471,10 @@ public class Tek2440_GPIB_Settings
         case "device":
           printDeviceSettings = parsePrintDeviceSettings (argString);
           break;
+        case "curs":
+        case "cursor":
+          cursorSettings = parseCursorSettings (argString);
+          break;
         // XXX ParseException of IllegalArgumentException later...
         default:
           // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
@@ -516,7 +525,8 @@ public class Tek2440_GPIB_Settings
       stopSettings,
       userButtonSRQSettings,
       intensitySettings,
-      printDeviceSettings);
+      printDeviceSettings,
+      cursorSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -4471,6 +4481,648 @@ public class Tek2440_GPIB_Settings
       printSettings,
       printText,
       printWaveforms);
+  }
+    
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // CURSOR SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public enum CursorFunction
+  {
+    Off,
+    OnePerTime,
+    Slope,
+    Time,
+    Volts,
+    V_dot_t;
+  }
+    
+  public enum CursorMode
+  {
+    Absolute,
+    Delta;
+  }
+  
+  public enum RefSlopeXUnit
+  {
+    ClockTicks,
+    Divisions,
+    Seconds,
+    Volts,
+    VoltsSquared;
+  }
+  
+  public enum RefSlopeYUnit
+  {
+    Divisions,
+    Volts,
+    VoltsSquared;    
+  }
+  
+  public final static class RefSlope
+  {
+    
+    private final double value;
+    
+    private final RefSlopeXUnit xUnit;
+    
+    private final RefSlopeYUnit yUnit;
+
+    public RefSlope (Double value, RefSlopeXUnit xUnit, RefSlopeYUnit yUnit)
+    {
+      if (value == null || xUnit == null || yUnit == null)
+        throw new IllegalArgumentException ();
+      this.value = value;
+      this.xUnit = xUnit;
+      this.yUnit = yUnit;
+    }
+    
+  }
+  
+  public enum RefTimeUnit
+  {
+    ClockTicks,
+    Seconds;
+  }
+  
+  public final static class RefTime
+  {
+    
+    private final double value;
+    
+    private final RefTimeUnit unit;
+    
+    public RefTime (Double value, RefTimeUnit unit)
+    {
+      if (value == null || unit == null)
+        throw new IllegalArgumentException ();
+      this.value = value;
+      this.unit = unit;
+    }
+    
+  }
+  
+  public enum RefVoltsUnit
+  {
+    Divisions,
+    Volts,
+    VoltsSquared;
+  }
+  
+  public final static class RefVolts
+  {
+    
+    private final double value;
+    
+    private final RefVoltsUnit unit;
+    
+    public RefVolts (Double value, RefVoltsUnit unit)
+    {
+      if (value == null || unit == null)
+        throw new IllegalArgumentException ();
+      this.value = value;
+      this.unit = unit;
+    }
+    
+  }
+  
+  public enum CursorSelect
+  {
+    One,
+    Two;
+  }
+  
+  // XXX Identical to DataSource.
+  public static enum CursorTarget
+  {
+    Ch1,
+    Ch2,
+    Add,
+    Mult,
+    Ref1,
+    Ref2,
+    Ref3,
+    Ref4,
+    Ch1Del,
+    Ch2Del,
+    AddDel,
+    MultDel;
+  }
+  
+  public final static class CursorTimePositions
+  {
+    
+    private final double timePosition1;
+    
+    private final double timePosition2;
+
+    public CursorTimePositions (final Double timePosition1, final Double timePosition2)
+    {
+      if (timePosition1 == null || timePosition2 == null)
+        throw new IllegalArgumentException ();
+      this.timePosition1 = timePosition1;
+      this.timePosition2 = timePosition2;
+    }
+    
+  }
+  
+  public final static class CursorXPositions
+  {
+    
+    private final double xPosition1;
+    
+    private final double xPosition2;
+
+    public CursorXPositions (final Double xPosition1, final Double xPosition2)
+    {
+      if (xPosition1 == null || xPosition2 == null)
+        throw new IllegalArgumentException ();
+      this.xPosition1 = xPosition1;
+      this.xPosition2 = xPosition2;
+    }
+    
+  }
+  
+  public final static class CursorYPositions
+  {
+    
+    private final double yPosition1;
+    
+    private final double yPosition2;
+
+    public CursorYPositions (final Double yPosition1, final Double yPosition2)
+    {
+      if (yPosition1 == null || yPosition2 == null)
+        throw new IllegalArgumentException ();
+      this.yPosition1 = yPosition1;
+      this.yPosition2 = yPosition2;
+    }
+    
+  }
+  
+  public enum CursorUnitSlope
+  {
+    Base,
+    dB,
+    Percent;
+  }
+  
+  public enum CursorUnitTime
+  {
+    Base,
+    Degrees,
+    Percent;
+  }
+  
+  public enum CursorUnitVolts
+  {
+    Base,
+    dB,
+    Percent;
+  }
+  
+  public static final class CursorUnits
+  {
+    
+    private final CursorUnitSlope unitSlope;
+    
+    private final CursorUnitTime unitTime;
+    
+    private final CursorUnitVolts unitVolts;
+
+    public CursorUnits (
+      final CursorUnitSlope unitSlope,
+      final CursorUnitTime unitTime,
+      final CursorUnitVolts unitVolts)
+    {
+      if (unitSlope == null || unitTime == null || unitVolts == null)
+        throw new IllegalArgumentException ();
+      this.unitSlope = unitSlope;
+      this.unitTime = unitTime;
+      this.unitVolts = unitVolts;
+    }
+    
+  }
+  
+  public static class CursorSettings
+  {
+    
+    private final CursorFunction cursorFunction;
+    
+    private final CursorMode cursorMode;
+    
+    private final RefSlope refSlope;
+    
+    private final RefTime refTime;
+    
+    private final RefVolts refVolts;
+    
+    private final CursorSelect select;
+    
+    private final CursorTarget target;
+    
+    private final CursorTimePositions timePositions;
+
+    private final CursorXPositions xPositions;
+    
+    private final CursorYPositions yPositions;
+    
+    private final CursorUnits units;
+    
+    public CursorSettings (
+      final CursorFunction cursorFunction,
+      final CursorMode cursorMode,
+      final RefSlope refSlope,
+      final RefTime refTime,
+      final RefVolts refVolts,
+      final CursorSelect select,
+      final CursorTarget target,
+      final CursorTimePositions timePositions,
+      final CursorXPositions xPositions,
+      final CursorYPositions yPositions,
+      final CursorUnits units)
+    {
+      if (cursorFunction == null)
+        throw new IllegalArgumentException ();
+      this.cursorFunction = cursorFunction;
+      if (cursorMode == null)
+        throw new IllegalArgumentException ();
+      this.cursorMode = cursorMode;
+      if (refSlope == null)
+        throw new IllegalArgumentException ();
+      this.refSlope = refSlope;
+      if (refTime == null)
+        throw new IllegalArgumentException ();
+      this.refTime = refTime;
+      if (refVolts == null)
+        throw new IllegalArgumentException ();
+      this.refVolts = refVolts;
+      if (select == null)
+        throw new IllegalArgumentException ();
+      this.select = select;
+      if (target == null)
+        throw new IllegalArgumentException ();
+      this.target = target;
+      if (timePositions == null)
+        throw new IllegalArgumentException ();
+      this.timePositions = timePositions;
+      if (xPositions == null)
+        throw new IllegalArgumentException ();
+      this.xPositions = xPositions;
+      if (yPositions == null)
+        throw new IllegalArgumentException ();
+      this.yPositions = yPositions;
+      if (units == null)
+        throw new IllegalArgumentException ();
+      this.units = units;
+    }
+      
+  }
+    
+  private final CursorSettings cursorSettings;
+  
+  public final CursorSettings getCursorSettings ()
+  {
+    return this.cursorSettings;
+  }
+  
+  private static CursorSettings parseCursorSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    CursorFunction cursorFunction = null;
+    CursorMode cursorMode = null;
+    Double refSlopeValue = null;
+    RefSlopeXUnit refSlopeXUnit = null;
+    RefSlopeYUnit refSlopeYUnit = null;
+    Double refTimeValue = null;
+    RefTimeUnit refTimeUnit = null;
+    Double refVoltsValue = null;
+    RefVoltsUnit refVoltsUnit = null;
+    CursorSelect select = null;
+    CursorTarget target = null;
+    Double timePosition1 = null;
+    Double timePosition2 = null;
+    Double xPosition1 = null;
+    Double xPosition2 = null;
+    Double yPosition1 = null;
+    Double yPosition2 = null;
+    CursorUnitSlope unitSlope = null;
+    CursorUnitTime unitTime = null;
+    CursorUnitVolts unitVolts = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || (argArgParts.length != 2 && argArgParts.length != 3))
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "fun":
+        case "function":
+        {
+          if (argArgParts.length != 2)
+            throw new IllegalArgumentException ();
+          cursorFunction = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, CursorFunction> ()
+            {{
+              put ("of",       CursorFunction.Off);
+              put ("off",      CursorFunction.Off);
+              put ("one/t",    CursorFunction.OnePerTime);
+              put ("one/time", CursorFunction.OnePerTime);
+              put ("slo",      CursorFunction.Slope);
+              put ("slope",    CursorFunction.Slope);
+              put ("tim",      CursorFunction.Time);
+              put ("time",     CursorFunction.Time);
+              put ("vol",      CursorFunction.Volts); // XXX Manual error...
+              put ("volts",    CursorFunction.Volts);
+              put ("v.t",      CursorFunction.V_dot_t);
+            }});
+          break;
+        }
+        case "mod":
+        case "mode":
+        {
+          if (argArgParts.length != 2)
+            throw new IllegalArgumentException ();
+          cursorMode = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, CursorMode> ()
+            {{
+              put ("abso",     CursorMode.Absolute);
+              put ("absolute", CursorMode.Absolute);
+              put ("delt",     CursorMode.Delta);
+              put ("delta",    CursorMode.Delta);
+            }});
+          break;
+        }
+        case "refs":
+        case "refslope":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "val":
+            case "value":
+              refSlopeValue = parseNr3 (argArgParts[2].trim ());
+              break;
+            case "xun":
+            case "xunit":
+              refSlopeXUnit = parseEnum (argArgParts[2].trim (),
+                new HashMap<String, RefSlopeXUnit> ()
+                {{
+                  put ("clk",  RefSlopeXUnit.ClockTicks);
+                  put ("clks", RefSlopeXUnit.ClockTicks);
+                  put ("div",  RefSlopeXUnit.Divisions);
+                  put ("sec",  RefSlopeXUnit.Seconds);
+                  put ("v",    RefSlopeXUnit.Volts);
+                  put ("vv",   RefSlopeXUnit.VoltsSquared);
+                }});
+              break;
+            case "yun":
+            case "yunit":
+              refSlopeYUnit = parseEnum (argArgParts[2].trim (),
+                new HashMap<String, RefSlopeYUnit> ()
+                {{
+                  put ("div",  RefSlopeYUnit.Divisions);
+                  put ("v",    RefSlopeYUnit.Volts);
+                  put ("vv",   RefSlopeYUnit.VoltsSquared);
+                }});
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "reft":
+        case "reftime":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "val":
+            case "value":
+              refTimeValue = parseNr3 (argArgParts[2].trim ());
+              break;
+            case "uni":
+            case "units":
+              refTimeUnit = parseEnum (argArgParts[2].trim (),
+                new HashMap<String, RefTimeUnit> ()
+                {{
+                  put ("clk",  RefTimeUnit.ClockTicks);
+                  put ("clks", RefTimeUnit.ClockTicks);
+                  put ("sec",  RefTimeUnit.Seconds);
+                }});
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "refv":
+        case "refvolts":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "val":
+            case "value":
+              refVoltsValue = parseNr3 (argArgParts[2].trim ());
+              break;
+            case "uni":
+            case "units":
+              refVoltsUnit = parseEnum (argArgParts[2].trim (),
+                new HashMap<String, RefVoltsUnit> ()
+                {{
+                  put ("div",  RefVoltsUnit.Divisions);
+                  put ("v",    RefVoltsUnit.Volts);
+                  put ("vv",   RefVoltsUnit.VoltsSquared);
+                }});
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "sel":
+        case "select":
+        {
+          if (argArgParts.length != 2)
+            throw new IllegalArgumentException ();
+          select = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, CursorSelect> ()
+            {{
+              put ("one", CursorSelect.One);
+              put ("two", CursorSelect.Two);
+            }});
+          break;
+        }
+        case "tar":
+        case "target":
+        {
+          if (argArgParts.length != 2)
+            throw new IllegalArgumentException ();
+          target = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, CursorTarget> ()
+            {{
+              put ("ch1",     CursorTarget.Ch1);
+              put ("ch2",     CursorTarget.Ch2);
+              put ("add",     CursorTarget.Add);
+              put ("mul",     CursorTarget.Mult);
+              put ("mult",    CursorTarget.Mult);
+              put ("ch1d",    CursorTarget.Ch1Del);
+              put ("ch1del",  CursorTarget.Ch1Del);
+              put ("ch2d",    CursorTarget.Ch2Del);
+              put ("ch2del",  CursorTarget.Ch2Del);
+              put ("addd",    CursorTarget.AddDel);
+              put ("adddel",  CursorTarget.AddDel);
+              put ("multd",   CursorTarget.MultDel);
+              put ("multdel", CursorTarget.MultDel);
+              put ("ref1",    CursorTarget.Ref1);
+              put ("ref2",    CursorTarget.Ref2);
+              put ("ref3",    CursorTarget.Ref3);
+              put ("ref4",    CursorTarget.Ref4);
+            }});
+          break;
+        }
+        case "tpo":
+        case "tpos":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "one":
+              timePosition1 = parseNr3 (argArgParts[2].trim ());
+              break;
+            case "two":
+              timePosition2 = parseNr3 (argArgParts[2].trim ());
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "xpo":
+        case "xpos":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "one":
+              xPosition1 = parseNr3 (argArgParts[2].trim ());
+              break;
+            case "two":
+              xPosition2 = parseNr3 (argArgParts[2].trim ());
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "ypo":
+        case "ypos":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "one":
+              yPosition1 = parseNr3 (argArgParts[2].trim ());
+              break;
+            case "two":
+              yPosition2 = parseNr3 (argArgParts[2].trim ());
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "uni":
+        case "units":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "slo":
+            case "slope":
+              unitSlope = parseEnum (argArgParts[2].trim (),
+                new HashMap<String, CursorUnitSlope> ()
+                {{
+                  put ("bas",     CursorUnitSlope.Base);
+                  put ("base",    CursorUnitSlope.Base);
+                  put ("db",      CursorUnitSlope.dB);
+                  put ("perc",    CursorUnitSlope.Percent);
+                  put ("percent", CursorUnitSlope.Percent);
+                }});
+              break;
+            case "tim":
+            case "time":
+              unitTime = parseEnum (argArgParts[2].trim (),
+                new HashMap<String, CursorUnitTime> ()
+                {{
+                  put ("bas",     CursorUnitTime.Base);
+                  put ("base",    CursorUnitTime.Base);
+                  put ("deg",     CursorUnitTime.Degrees);
+                  put ("degrees", CursorUnitTime.Degrees);
+                  put ("perc",    CursorUnitTime.Percent);
+                  put ("percent", CursorUnitTime.Percent);
+                }});
+              break;
+            case "vol":
+            case "volts":
+              unitVolts = parseEnum (argArgParts[2].trim (),
+                new HashMap<String, CursorUnitVolts> ()
+                {{
+                  put ("bas",     CursorUnitVolts.Base);
+                  put ("base",    CursorUnitVolts.Base);
+                  put ("db",      CursorUnitVolts.dB);
+                  put ("perc",    CursorUnitVolts.Percent);
+                  put ("percent", CursorUnitVolts.Percent);
+                }});
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    final RefSlope refSlope = new RefSlope (refSlopeValue, refSlopeXUnit, refSlopeYUnit);
+    final RefTime refTime = new RefTime (refTimeValue, refTimeUnit);
+    final RefVolts refVolts = new RefVolts (refVoltsValue, refVoltsUnit);
+    final CursorTimePositions timePositions = new CursorTimePositions (timePosition1, timePosition2);
+    final CursorXPositions xPositions = new CursorXPositions (xPosition1, xPosition2);
+    final CursorYPositions yPositions = new CursorYPositions (yPosition1, yPosition2);
+    final CursorUnits units = new CursorUnits (unitSlope, unitTime, unitVolts);
+    return new CursorSettings (
+      cursorFunction,
+      cursorMode,
+      refSlope,
+      refTime,
+      refVolts,
+      select,
+      target,
+      timePositions,
+      xPositions,
+      yPositions,
+      units);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
