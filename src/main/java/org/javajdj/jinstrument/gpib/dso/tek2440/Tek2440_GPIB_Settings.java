@@ -21,6 +21,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.DefaultDigitalStorageOscilloscopeSettings;
 import org.javajdj.jinstrument.DigitalStorageOscilloscopeSettings;
@@ -101,7 +102,8 @@ public class Tek2440_GPIB_Settings
     final UserButtonSRQSettings userButtonSRQSettings,
     final IntensitySettings intensitySettings,
     final PrintDeviceSettings printDeviceSettings,
-    final CursorSettings cursorSettings)
+    final CursorSettings cursorSettings,
+    final MeasurementSettings measurementSettings)
   {
     super (bytes, unit);
     if (autoSetupSettings == null)
@@ -236,6 +238,9 @@ public class Tek2440_GPIB_Settings
     if (cursorSettings == null)
       throw new IllegalArgumentException ();
     this.cursorSettings = cursorSettings;
+    if (measurementSettings == null)
+      throw new IllegalArgumentException ();
+    this.measurementSettings = measurementSettings;
   }
 
   public static Tek2440_GPIB_Settings fromSetData (final byte[] bytes)
@@ -303,6 +308,7 @@ public class Tek2440_GPIB_Settings
     IntensitySettings intensitySettings = null;
     PrintDeviceSettings printDeviceSettings = null;
     CursorSettings cursorSettings = null;
+    MeasurementSettings measurementSettings = null;
     for (final String part : parts)
     {
       final String[] partParts = part.trim ().split (" ", 2);
@@ -475,9 +481,14 @@ public class Tek2440_GPIB_Settings
         case "cursor":
           cursorSettings = parseCursorSettings (argString);
           break;
-        // XXX ParseException of IllegalArgumentException later...
+        case "meas":
+        case "measurement":
+          measurementSettings = parseMeasurementSettings (argString);
+          break;
         default:
-          // System.err.println ("UNKNOWN key=" + keyString + ", arg=" + argString + ".");      
+          LOG.log (Level.SEVERE, "Found unknown key ''{0}'' in part ''{1}''!",
+            new Object[]{keyString, part});
+          throw new IllegalArgumentException ();
       }
     }
     return new Tek2440_GPIB_Settings (
@@ -526,7 +537,8 @@ public class Tek2440_GPIB_Settings
       userButtonSRQSettings,
       intensitySettings,
       printDeviceSettings,
-      cursorSettings);
+      cursorSettings,
+      measurementSettings);
   }
   
   private static boolean parseOnOff (final String argString)
@@ -5125,6 +5137,719 @@ public class Tek2440_GPIB_Settings
       units);
   }
     
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // MEASUREMENT SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum MeasurementMethod
+  {
+    Cursor,
+    Histogram,
+    MinMax;
+  }
+  
+  public enum MeasurementType
+  {
+    
+    Distal,
+    Proximal,
+    Mesial,
+    Minimum,
+    Maximum,
+    Mid,
+    Top,
+    Base,
+    Mean,
+    Peak2Peak,
+    Overshoot,
+    Undershoot,
+    Width,
+    Period,
+    Frequency,
+    DutyCycle,
+    Rise,
+    Fall,
+    RMS,
+    Area,
+    Delay,
+    DMesial;
+    
+    public static MeasurementType fromString (final String string)
+    {
+      if (string == null)
+        throw new IllegalArgumentException ();
+      return parseEnum (string,
+        new HashMap<String, MeasurementType> ()
+        {{
+          put ("dist",       MeasurementType.Distal);
+          put ("distal",     MeasurementType.Distal);
+          put ("prox",       MeasurementType.Proximal);
+          put ("proximal",   MeasurementType.Proximal);
+          put ("mesi",       MeasurementType.Mesial);
+          put ("mesial",     MeasurementType.Mesial);
+          put ("mini",       MeasurementType.Minimum);
+          put ("minimum",    MeasurementType.Minimum);
+          put ("max",        MeasurementType.Maximum);
+          put ("maximum",    MeasurementType.Maximum);
+          put ("mid",        MeasurementType.Mid);
+          put ("top",        MeasurementType.Top);
+          put ("bas",        MeasurementType.Base);
+          put ("base",       MeasurementType.Base);
+          put ("mean",       MeasurementType.Mean);
+          put ("pk2",        MeasurementType.Peak2Peak);
+          put ("pk2pk",      MeasurementType.Peak2Peak);
+          put ("ove",        MeasurementType.Overshoot);
+          put ("overshoot",  MeasurementType.Overshoot);
+          put ("und",        MeasurementType.Undershoot);
+          put ("undershoot", MeasurementType.Undershoot);
+          put ("wid",        MeasurementType.Width);
+          put ("width",      MeasurementType.Width);
+          put ("peri",       MeasurementType.Period);
+          put ("period",     MeasurementType.Period);
+          put ("fre",        MeasurementType.Frequency);
+          put ("frequency",  MeasurementType.Frequency);
+          put ("dut",        MeasurementType.DutyCycle);
+          put ("duty",       MeasurementType.DutyCycle);
+          put ("ris",        MeasurementType.Rise);
+          put ("rise",       MeasurementType.Rise);
+          put ("fal",        MeasurementType.Fall);
+          put ("fall",       MeasurementType.Fall);
+          put ("rms",        MeasurementType.RMS);
+          put ("are",        MeasurementType.Area);
+          put ("area",       MeasurementType.Area);
+          put ("dela",       MeasurementType.Delay);
+          put ("delay",      MeasurementType.Delay);
+          put ("dme",        MeasurementType.DMesial);
+          put ("dmesial",    MeasurementType.DMesial);
+        }});
+    }
+    
+  }
+  
+  // XXX Identical to DataSource.  
+  public enum MeasurementSource
+  {
+    
+    Ch1,
+    Ch2,
+    Add,
+    Mult,
+    Ref1,
+    Ref2,
+    Ref3,
+    Ref4,
+    Ch1Del,
+    Ch2Del,
+    AddDel,
+    MultDel;
+    
+    public static MeasurementSource fromString (final String string)
+    {
+      if (string == null)
+        throw new IllegalArgumentException ();
+      return parseEnum (string,
+        new HashMap<String, MeasurementSource> ()
+        {{
+          put ("ch1",     MeasurementSource.Ch1);
+          put ("ch2",     MeasurementSource.Ch2);
+          put ("add",     MeasurementSource.Add);
+          put ("mul",     MeasurementSource.Mult);
+          put ("mult",    MeasurementSource.Mult);
+          put ("ch1d",    MeasurementSource.Ch1Del);
+          put ("ch1del",  MeasurementSource.Ch1Del);
+          put ("ch2d",    MeasurementSource.Ch2Del);
+          put ("ch2del",  MeasurementSource.Ch2Del);
+          put ("addd",    MeasurementSource.AddDel);
+          put ("adddel",  MeasurementSource.AddDel);
+          put ("multd",   MeasurementSource.MultDel);
+          put ("multdel", MeasurementSource.MultDel);
+          put ("ref1",    MeasurementSource.Ref1);
+          put ("ref2",    MeasurementSource.Ref2);
+          put ("ref3",    MeasurementSource.Ref3);
+          put ("ref4",    MeasurementSource.Ref4);
+        }});      
+    }
+    
+  }
+  
+  public static class MeasurementChannel
+  {
+    
+    private final MeasurementType measurementType;
+    
+    private final MeasurementSource source;
+    
+    private final MeasurementSource delayedSource;
+
+    public MeasurementChannel (
+      final MeasurementType measurementType,
+      final MeasurementSource source,
+      final MeasurementSource delayedSource)
+    {
+      if (measurementType == null)
+        throw new IllegalArgumentException ();
+      this.measurementType = measurementType;
+      if (source == null)
+        throw new IllegalArgumentException ();
+      this.source = source;
+      if (delayedSource == null)
+        throw new IllegalArgumentException ();
+      this.delayedSource = delayedSource;
+    }
+    
+  }
+  
+  public enum DistalUnit
+  {
+    Volts,
+    Percents;
+  }
+  
+  public static class DistalSettings
+  {
+    
+    private final double voltsLevel;
+    
+    private final double percentLevel;
+    
+    private final DistalUnit unit;
+
+    public DistalSettings (final Double voltsLevel, final Double percentLevel, final DistalUnit unit)
+    {
+      if (voltsLevel == null)
+        throw new IllegalArgumentException ();
+      this.voltsLevel = voltsLevel;
+      if (percentLevel == null)
+        throw new IllegalArgumentException ();
+      this.percentLevel = percentLevel;
+      if (unit == null)
+        throw new IllegalArgumentException ();
+      this.unit = unit;
+    }
+    
+  }
+  
+  // XXX Really identical to DistalUnit.
+  public enum MesialUnit
+  {
+    Volts,
+    Percents;
+  }
+  
+  // XXX Really identical to MesialSettings.
+  public static class MesialSettings
+  {
+    
+    private final double voltsLevel;
+    
+    private final double percentLevel;
+    
+    private final MesialUnit unit;
+
+    public MesialSettings (final Double voltsLevel, final Double percentLevel, final MesialUnit unit)
+    {
+      if (voltsLevel == null)
+        throw new IllegalArgumentException ();
+      this.voltsLevel = voltsLevel;
+      if (percentLevel == null)
+        throw new IllegalArgumentException ();
+      this.percentLevel = percentLevel;
+      if (unit == null)
+        throw new IllegalArgumentException ();
+      this.unit = unit;
+    }
+    
+  }
+  
+  // XXX Really identical to DistalUnit.
+  public enum DMesialUnit
+  {
+    Volts,
+    Percents;
+  }
+  
+  // XXX Really identical to MesialSettings.
+  public static class DMesialSettings
+  {
+    
+    private final double voltsLevel;
+    
+    private final double percentLevel;
+    
+    private final DMesialUnit unit;
+
+    public DMesialSettings (final Double voltsLevel, final Double percentLevel, final DMesialUnit unit)
+    {
+      if (voltsLevel == null)
+        throw new IllegalArgumentException ();
+      this.voltsLevel = voltsLevel;
+      if (percentLevel == null)
+        throw new IllegalArgumentException ();
+      this.percentLevel = percentLevel;
+      if (unit == null)
+        throw new IllegalArgumentException ();
+      this.unit = unit;
+    }
+    
+  }
+  
+  // XXX Really identical to DistalUnit.
+  public enum ProximalUnit
+  {
+    Volts,
+    Percents;
+  }
+  
+  // XXX Really identical to MesialSettings.
+  public static class ProximalSettings
+  {
+    
+    private final double voltsLevel;
+    
+    private final double percentLevel;
+    
+    private final ProximalUnit unit;
+
+    public ProximalSettings (final Double voltsLevel, final Double percentLevel, final ProximalUnit unit)
+    {
+      if (voltsLevel == null)
+        throw new IllegalArgumentException ();
+      this.voltsLevel = voltsLevel;
+      if (percentLevel == null)
+        throw new IllegalArgumentException ();
+      this.percentLevel = percentLevel;
+      if (unit == null)
+        throw new IllegalArgumentException ();
+      this.unit = unit;
+    }
+    
+  }
+    
+  public static class MeasurementSettings
+  {
+    
+    private final MeasurementMethod method;
+    
+    private final boolean windowing;
+    
+    private final MeasurementChannel channel1;
+    
+    private final MeasurementChannel channel2;
+    
+    private final MeasurementChannel channel3;
+    
+    private final MeasurementChannel channel4;
+    
+    private final DistalSettings distalSettings;
+    
+    private final MesialSettings mesialSettings;
+    
+    private final DMesialSettings dMesialSettings;
+    
+    private final ProximalSettings proximalSettings;
+    
+    private final boolean display;
+    
+    private final boolean displayThresholdCrossingMarks;
+
+    public MeasurementSettings (
+      final MeasurementMethod method,
+      final Boolean windowing,
+      final MeasurementChannel channel1,
+      final MeasurementChannel channel2,
+      final MeasurementChannel channel3,
+      final MeasurementChannel channel4,
+      final DistalSettings distalSettings,
+      final MesialSettings mesialSettings,
+      final DMesialSettings dMesialSettings,
+      final ProximalSettings proximalSettings,
+      final Boolean display,
+      final Boolean displayThresholdCrossingMarks)
+    {
+      if (method == null)
+        throw new IllegalArgumentException ();
+      this.method = method;
+      if (windowing == null)
+        throw new IllegalArgumentException ();
+      this.windowing = windowing;
+      if (channel1 == null)
+        throw new IllegalArgumentException ();
+      this.channel1 = channel1;
+      if (channel2 == null)
+        throw new IllegalArgumentException ();
+      this.channel2 = channel2;
+      if (channel3 == null)
+        throw new IllegalArgumentException ();
+      this.channel3 = channel3;
+      if (channel4 == null)
+        throw new IllegalArgumentException ();
+      this.channel4 = channel4;
+      if (distalSettings == null)
+        throw new IllegalArgumentException ();
+      this.distalSettings = distalSettings;
+      if (mesialSettings == null)
+        throw new IllegalArgumentException ();
+      this.mesialSettings = mesialSettings;
+      if (dMesialSettings == null)
+        throw new IllegalArgumentException ();
+      this.dMesialSettings = dMesialSettings;
+      if (proximalSettings == null)
+        throw new IllegalArgumentException ();
+      this.proximalSettings = proximalSettings;
+      if (display == null)
+        throw new IllegalArgumentException ();
+      this.display = display;
+      if (displayThresholdCrossingMarks == null)
+        throw new IllegalArgumentException ();
+      this.displayThresholdCrossingMarks = displayThresholdCrossingMarks;
+    }
+    
+  }
+        
+  private final MeasurementSettings measurementSettings;
+  
+  public final MeasurementSettings getMeasurementSettings ()
+  {
+    return this.measurementSettings;
+  }
+  
+  private static MeasurementSettings parseMeasurementSettings (final String argString)
+  {
+    if (argString == null)
+      throw new IllegalArgumentException ();
+    MeasurementMethod method = null;
+    Boolean windowing = null;
+    MeasurementType type1 = null;
+    MeasurementSource source1 = null;
+    MeasurementSource dSource1 = null;
+    MeasurementType type2 = null;
+    MeasurementSource source2 = null;
+    MeasurementSource dSource2 = null;
+    MeasurementType type3 = null;
+    MeasurementSource source3 = null;
+    MeasurementSource dSource3 = null;
+    MeasurementType type4 = null;
+    MeasurementSource source4 = null;
+    MeasurementSource dSource4 = null;
+    Double distalVoltsLevel = null;    
+    Double distalPercentLevel = null;
+    DistalUnit distalUnit = null;
+    Double mesialVoltsLevel = null;    
+    Double mesialPercentLevel = null;
+    MesialUnit mesialUnit = null;
+    Double dMesialVoltsLevel = null;    
+    Double dMesialPercentLevel = null;
+    DMesialUnit dMesialUnit = null;
+    Double proximalVoltsLevel = null;    
+    Double proximalPercentLevel = null;
+    ProximalUnit proximalUnit = null;
+    Boolean display = null;
+    Boolean displayThresholdCrossingMarks = null;
+    final String[] argParts = argString.trim ().toLowerCase ().split (",");
+    for (final String argPart: argParts)
+    {
+      final String[] argArgParts = argPart.trim ().split (":");
+      if (argArgParts == null || (argArgParts.length != 2 && argArgParts.length != 3))
+        throw new IllegalArgumentException ();
+      final String argKey = argArgParts[0].trim ();
+      switch (argKey)
+      {
+        case "met":
+        case "method":
+        {
+          if (argArgParts.length != 2)
+            throw new IllegalArgumentException ();
+          method = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, MeasurementMethod> ()
+            {{
+              put ("curs",      MeasurementMethod.Cursor);
+              put ("cursor",    MeasurementMethod.Cursor);
+              put ("his",       MeasurementMethod.Histogram);
+              put ("histogram", MeasurementMethod.Histogram);
+              put ("minm",      MeasurementMethod.MinMax);
+              put ("minmax",    MeasurementMethod.MinMax);
+            }});
+          break;
+        }
+        case "win":
+        case "window":
+        {
+          if (argArgParts.length != 2)
+            throw new IllegalArgumentException ();
+          windowing = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        case "one":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "typ":
+            case "type":
+              type1 = MeasurementType.fromString (argArgParts[2].trim ());
+              break;
+            case "sou":
+            case "source":
+              source1 = MeasurementSource.fromString (argArgParts[2].trim ());
+              break;
+            case "dso":
+            case "dsource":
+              dSource1 = MeasurementSource.fromString (argArgParts[2].trim ());
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "two":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "typ":
+            case "type":
+              type2 = MeasurementType.fromString (argArgParts[2].trim ());
+              break;
+            case "sou":
+            case "source":
+              source2 = MeasurementSource.fromString (argArgParts[2].trim ());
+              break;
+            case "dso":
+            case "dsource":
+              dSource2 = MeasurementSource.fromString (argArgParts[2].trim ());
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "thr":
+        case "three":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "typ":
+            case "type":
+              type3 = MeasurementType.fromString (argArgParts[2].trim ());
+              break;
+            case "sou":
+            case "source":
+              source3 = MeasurementSource.fromString (argArgParts[2].trim ());
+              break;
+            case "dso":
+            case "dsource":
+              dSource3 = MeasurementSource.fromString (argArgParts[2].trim ());
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "fou":
+        case "four":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "typ":
+            case "type":
+              type4 = MeasurementType.fromString (argArgParts[2].trim ());
+              break;
+            case "sou":
+            case "source":
+              source4 = MeasurementSource.fromString (argArgParts[2].trim ());
+              break;
+            case "dso":
+            case "dsource":
+              dSource4 = MeasurementSource.fromString (argArgParts[2].trim ());
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "dist":
+        case "distal":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "vle":
+            case "vlevel":
+              distalVoltsLevel = parseNr3 (argArgParts[2].trim ());
+              break;
+            case "ple":
+            case "plevel":
+              distalPercentLevel = parseNr3 (argArgParts[2].trim (), 0, 100); // XXX Boundaries guessed here!
+              break;
+            case "uni":
+            case "units":
+              distalUnit = parseEnum (argArgParts[2].trim (),
+                new HashMap<String, DistalUnit> ()
+                {{
+                  put ("perc",    DistalUnit.Percents);
+                  put ("percent", DistalUnit.Percents);
+                  put ("vol",     DistalUnit.Volts);
+                  put ("volts",   DistalUnit.Volts);
+                }});
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "mes":
+        case "mesial":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "vle":
+            case "vlevel":
+              mesialVoltsLevel = parseNr3 (argArgParts[2].trim ());
+              break;
+            case "ple":
+            case "plevel":
+              mesialPercentLevel = parseNr3 (argArgParts[2].trim (), 0, 100); // XXX Boundaries guessed here!
+              break;
+            case "uni":
+            case "units":
+              mesialUnit = parseEnum (argArgParts[2].trim (),
+                new HashMap<String, MesialUnit> ()
+                {{
+                  put ("perc",    MesialUnit.Percents);
+                  put ("percent", MesialUnit.Percents);
+                  put ("vol",     MesialUnit.Volts);
+                  put ("volts",   MesialUnit.Volts);
+                }});
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "dme":
+        case "dmesial":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "vle":
+            case "vlevel":
+              dMesialVoltsLevel = parseNr3 (argArgParts[2].trim ());
+              break;
+            case "ple":
+            case "plevel":
+              dMesialPercentLevel = parseNr3 (argArgParts[2].trim (), 0, 100); // XXX Boundaries guessed here!
+              break;
+            case "uni":
+            case "units":
+              dMesialUnit = parseEnum (argArgParts[2].trim (),
+                new HashMap<String, DMesialUnit> ()
+                {{
+                  put ("perc",    DMesialUnit.Percents);
+                  put ("percent", DMesialUnit.Percents);
+                  put ("vol",     DMesialUnit.Volts);
+                  put ("volts",   DMesialUnit.Volts);
+                }});
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "prox":
+        case "proximal":
+        {
+          if (argArgParts.length != 3)
+            throw new IllegalArgumentException ();
+          final String secArgString = argArgParts[1].trim ();
+          switch (secArgString)
+          {
+            case "vle":
+            case "vlevel":
+              proximalVoltsLevel = parseNr3 (argArgParts[2].trim ());
+              break;
+            case "ple":
+            case "plevel":
+              proximalPercentLevel = parseNr3 (argArgParts[2].trim (), 0, 100); // XXX Boundaries guessed here!
+              break;
+            case "uni":
+            case "units":
+              proximalUnit = parseEnum (argArgParts[2].trim (),
+                new HashMap<String, ProximalUnit> ()
+                {{
+                  put ("perc",    ProximalUnit.Percents);
+                  put ("percent", ProximalUnit.Percents);
+                  put ("vol",     ProximalUnit.Volts);
+                  put ("volts",   ProximalUnit.Volts);
+                }});
+              break;
+            default:
+              throw new IllegalArgumentException ();              
+          }
+          break;
+        }
+        case "disp":
+        case "display":
+        {
+          if (argArgParts.length != 2)
+            throw new IllegalArgumentException ();
+          display = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        case "mar":
+        case "mark":
+        {
+          if (argArgParts.length != 2)
+            throw new IllegalArgumentException ();
+          displayThresholdCrossingMarks = parseOnOff (argArgParts[1].trim ());
+          break;
+        }
+        default:
+          throw new IllegalArgumentException ();
+      }
+    }
+    final MeasurementChannel channel1 = new MeasurementChannel (type1, source1, dSource1);
+    final MeasurementChannel channel2 = new MeasurementChannel (type2, source2, dSource2);
+    final MeasurementChannel channel3 = new MeasurementChannel (type3, source3, dSource3);
+    final MeasurementChannel channel4 = new MeasurementChannel (type4, source4, dSource4);
+    final DistalSettings distalSettings     = new DistalSettings (distalVoltsLevel, distalPercentLevel, distalUnit);
+    final MesialSettings mesialSettings     = new MesialSettings (mesialVoltsLevel, mesialPercentLevel, mesialUnit);
+    final DMesialSettings dMesialSettings   = new DMesialSettings (dMesialVoltsLevel, dMesialPercentLevel, dMesialUnit);
+    final ProximalSettings proximalSettings = new ProximalSettings (proximalVoltsLevel, proximalPercentLevel, proximalUnit);
+    return new MeasurementSettings (
+      method,
+      windowing,
+      channel1,
+      channel2,
+      channel3,
+      channel4,
+      distalSettings,
+      mesialSettings,
+      dMesialSettings,
+      proximalSettings,
+      display,
+      displayThresholdCrossingMarks);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
