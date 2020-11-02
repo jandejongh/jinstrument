@@ -31,7 +31,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
@@ -98,9 +100,11 @@ public class JTek2440_GPIB
     // Next lines ensure that color scheme is consistent across the channels.
     getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1, null);
     getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2, null);
+    //
     add (getTracePanel (), BorderLayout.CENTER);
     //
     this.northPanel = new JPanel ();
+    //
     this.northPanel.setLayout (new FlowLayout (FlowLayout.LEFT));
     final JPanel jSimp = getSmallInstrumentManagementPanel ();
     jSimp.setPreferredSize (new Dimension (60, 80));
@@ -117,9 +121,31 @@ public class JTek2440_GPIB
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
         "Serial Poll"));
     this.northPanel.add (this.jSerialPollStatus);
+    final JPanel jDisplayPanel = new JPanel ();
+    jDisplayPanel.setLayout (new BorderLayout ());
+    jDisplayPanel.setPreferredSize (new Dimension (80, 80));
+    jDisplayPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Display"));
+    final JColorCheckBox jDisplayButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jDisplayButton.setDisplayedValue (true);
+    jDisplayButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jDisplayDialog = new JOptionPane ().createDialog ("Tek-2440 Display Settings");
+    this.jDisplayDialog.setSize (800, 600);
+    this.jDisplayDialog.setLocationRelativeTo (this);
+    this.jDisplayDialog.setContentPane(new JTek2440_GPIB_Display (digitalStorageOscilloscope, level + 1));
+    jDisplayButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB.this.jDisplayDialog.setVisible (true);
+    });
+    jDisplayPanel.add (jDisplayButton, BorderLayout.CENTER);
+    this.northPanel.add (jDisplayPanel);
+    //
     add (northPanel, BorderLayout.NORTH);
     //
     this.eastPanel = new JPanel ();
+    //
     this.eastPanel.setLayout (new GridLayout (2, 1));
     final JPanel eastNorthPanel = new JPanel ();
     eastNorthPanel.setLayout (new GridLayout (1, 2));
@@ -159,12 +185,15 @@ public class JTek2440_GPIB
     for (int i = 1; i <= 28; i++)
       eastSouthPanel.add (new JLabel ());
     this.eastPanel.add (eastSouthPanel);
+    //
     add (this.eastPanel, BorderLayout.EAST);
     //
     this.southPanel = new JPanel ();
+    //
     this.southPanel.setLayout (new GridLayout (1, 2));
     this.southPanel.add (this.xPanel);
     this.southPanel.add (this.triggerPanel);
+    //
     add (this.southPanel, BorderLayout.SOUTH);
     //
     this.westPanel = new JPanel ();
@@ -179,6 +208,8 @@ public class JTek2440_GPIB
   {
     this (digitalStorageOscilloscope, 0);
   }
+  
+  private final JDialog jDisplayDialog;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
