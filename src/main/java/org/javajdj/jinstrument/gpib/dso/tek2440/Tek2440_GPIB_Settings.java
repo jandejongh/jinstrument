@@ -4285,6 +4285,26 @@ public class Tek2440_GPIB_Settings
     return this.intensitySettings;
   }
   
+  public final double getDisplayIntensity ()
+  {
+    return getIntensitySettings ().displayIntensity;
+  }
+  
+  public final double getGraticuleIntensity ()
+  {
+    return getIntensitySettings ().graticuleIntensity;
+  }
+  
+  public final double getIntensifiedZoneIntensity ()
+  {
+    return getIntensitySettings ().intensifiedZoneIntensity;    
+  }
+  
+  public final double getReadoutIntensity ()
+  {
+    return getIntensitySettings ().readoutIntensity;
+  }
+  
   private static IntensitySettings parseIntensitySettings (final String argString)
   {
     if (argString == null)
