@@ -373,6 +373,8 @@ public class Tek2440_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  // EMPTY
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // Tek2440_GPIB_Instrument
@@ -469,6 +471,49 @@ public class Tek2440_GPIB_Instrument
       InstrumentCommand.IC_CHANNEL_POSITION,
       InstrumentCommand.ICARG_CHANNEL_POSITION_CHANNEL, channel,
       InstrumentCommand.ICARG_CHANNEL_POSITION, position));
+  }
+  
+  public enum DisplayIntensityComponent
+  {
+    DISPLAY,
+    GRATICULE,
+    INTENSIFIED_ZONE,
+    READOUT;
+  }
+  
+  public void setDisplayIntensity (
+    final DisplayIntensityComponent component,
+    final double intensity)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_DISPLAY_INTENSITY,
+      InstrumentCommand.ICARG_DISPLAY_INTENSITY_COMPONENT, component,
+      InstrumentCommand.ICARG_DISPLAY_INTENSITY, intensity));
+  }
+  
+  public void setDisplayIntensity_Display (final double intensity)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setDisplayIntensity (DisplayIntensityComponent.DISPLAY, intensity);
+  }
+  
+  public void setDisplayIntensity_Graticule (final double intensity)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setDisplayIntensity (DisplayIntensityComponent.GRATICULE, intensity);
+  }
+  
+  public void setDisplayIntensity_IntensifiedZone (final double intensity)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setDisplayIntensity (DisplayIntensityComponent.INTENSIFIED_ZONE, intensity);
+  }
+  
+  public void setDisplayIntensity_Readout (final double intensity)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setDisplayIntensity (DisplayIntensityComponent.READOUT, intensity);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -669,6 +714,29 @@ public class Tek2440_GPIB_Instrument
             default:
               throw new IllegalArgumentException ();
           }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_DISPLAY_INTENSITY:
+        {
+          final DisplayIntensityComponent component =
+            (DisplayIntensityComponent) instrumentCommand.get (InstrumentCommand.ICARG_DISPLAY_INTENSITY_COMPONENT);
+          if (component == null)
+            throw new IllegalArgumentException ();
+          final Double intensity = (Double) instrumentCommand.get (InstrumentCommand.ICARG_DISPLAY_INTENSITY);
+          if (intensity == null || intensity < 0 || intensity > 100)
+            throw new IllegalArgumentException ();
+          final String componentString;
+          switch (component)
+          {
+            case DISPLAY:          componentString = "DISP:";   break;
+            case GRATICULE:        componentString = "GRA:";    break;
+            case INTENSIFIED_ZONE: componentString = "INTENS:"; break;
+            case READOUT:          componentString = "REA:";    break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          writeSync ("INTENSI " + componentString + Double.toString (intensity) + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
