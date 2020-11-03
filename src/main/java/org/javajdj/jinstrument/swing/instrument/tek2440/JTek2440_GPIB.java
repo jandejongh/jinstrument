@@ -532,7 +532,7 @@ public class JTek2440_GPIB
     };
     
     private final JSlider jVar;
-    
+       
     private final ChangeListener jVarChangeListener = (final ChangeEvent ce) ->
     {
       final JSlider source = (JSlider) ce.getSource ();
