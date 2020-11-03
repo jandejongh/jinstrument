@@ -17,7 +17,7 @@ Apache v2.0.
 For now, given up on trying to create a suitable abstraction for a generic DSO,
 and instead just focus at getting the Tek-2440 up and running...
 Expect to finish by the end of 2020.
-Stay tuned!
+Stay tuned and healthy and wash your hands!
 
 ## Status [20200112 - v0.6]
 
