@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package org.javajdj.jinstrument;
 
+import java.io.IOException;
 import org.javajdj.jservice.Service;
 
 /** A software representation of a (or more) physical instrument.
@@ -46,5 +47,35 @@ public interface Instrument
   void setPoweredOn (boolean poweredOn);
   
   void addCommand (InstrumentCommand instrumentCommand);
+
+  @FunctionalInterface
+  interface InstrumentSetter_1Integer
+  {
     
+    void set (int arg) throws IOException, InterruptedException;
+    
+    default int byteToArg   (final byte   b) { return (int) b; }
+    default int shortToArg  (final short  s) { return (int) s; }
+    default int intToArg    (final int    i) { return (int) i; }
+    default int longToArg   (final long   l) { return (int) l; }
+    default int floatToArg  (final float  f) { return (int) Math.round (f); }
+    default int doubleToArg (final double d) { return (int) Math.round (d); }
+    
+  }
+  
+  @FunctionalInterface
+  interface InstrumentSetter_1Double
+  {
+    
+    void set (double arg) throws IOException, InterruptedException;
+    
+    default double byteToArg   (final byte   b) { return (double) b; }
+    default double shortToArg  (final short  s) { return (double) s; }
+    default double intToArg    (final int    i) { return (double) i; }
+    default double longToArg   (final long   l) { return (double) l; }
+    default double floatToArg  (final float  f) { return (double) f; }
+    default double doubleToArg (final double d) { return (double) d; }
+    
+  }
+  
 }
