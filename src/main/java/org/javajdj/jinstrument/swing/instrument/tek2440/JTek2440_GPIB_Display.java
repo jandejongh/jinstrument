@@ -162,6 +162,7 @@ public class JTek2440_GPIB_Display
     public JDisplayIntensityPanel ()
     {
       super ();
+      final Tek2440_GPIB_Instrument tek = (Tek2440_GPIB_Instrument) JTek2440_GPIB_Display.this.getDigitalStorageOscilloscope ();
       setOpaque (true);
       setLayout (new BorderLayout ());
       final JPanel sliderPanel = new JPanel ();
@@ -174,20 +175,32 @@ public class JTek2440_GPIB_Display
       this.jDisplayIntensity.setPaintTicks (true);
       this.jDisplayIntensity.setPaintLabels (true);
       this.jDisplayIntensity.setToolTipText ("-");
+      this.jDisplayIntensity.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+        "display intensity",
+        tek::setDisplayIntensity_Display,
+        () -> JTek2440_GPIB_Display.this.inhibitInstrumentControl));
       sliderPanel.add (this.jDisplayIntensity);
       this.jGraticuleIntensity = new JSlider (JSlider.VERTICAL, 0, 100, 0);
       this.jGraticuleIntensity.setMajorTickSpacing (50);
       this.jGraticuleIntensity.setMinorTickSpacing (10);
       this.jGraticuleIntensity.setPaintTicks (true);
       this.jGraticuleIntensity.setPaintLabels (true);
-      this.jGraticuleIntensity.setToolTipText ("-");      
+      this.jGraticuleIntensity.setToolTipText ("-");
+      this.jGraticuleIntensity.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+        "graticule intensity",
+        tek::setDisplayIntensity_Graticule,
+        () -> JTek2440_GPIB_Display.this.inhibitInstrumentControl));
       sliderPanel.add (this.jGraticuleIntensity);
       this.jIntensifiedZoneIntensity = new JSlider (JSlider.VERTICAL, 0, 100, 0);
       this.jIntensifiedZoneIntensity.setMajorTickSpacing (50);
       this.jIntensifiedZoneIntensity.setMinorTickSpacing (10);
       this.jIntensifiedZoneIntensity.setPaintTicks (true);
       this.jIntensifiedZoneIntensity.setPaintLabels (true);
-      this.jIntensifiedZoneIntensity.setToolTipText ("-");      
+      this.jIntensifiedZoneIntensity.setToolTipText ("-");
+      this.jIntensifiedZoneIntensity.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+        "intensified-zone intensity",
+        tek::setDisplayIntensity_IntensifiedZone,
+        () -> JTek2440_GPIB_Display.this.inhibitInstrumentControl));
       sliderPanel.add (this.jIntensifiedZoneIntensity);
       this.jReadoutIntensity = new JSlider (JSlider.VERTICAL, 0, 100, 0);
       this.jReadoutIntensity.setMajorTickSpacing (50);
@@ -195,10 +208,12 @@ public class JTek2440_GPIB_Display
       this.jReadoutIntensity.setPaintTicks (true);
       this.jReadoutIntensity.setPaintLabels (true);
       this.jReadoutIntensity.setToolTipText ("-");
+      this.jReadoutIntensity.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+        "readout intensity",
+        tek::setDisplayIntensity_Readout,
+        () -> JTek2440_GPIB_Display.this.inhibitInstrumentControl));
       sliderPanel.add (this.jReadoutIntensity);
-      
       add (sliderPanel, BorderLayout.CENTER);
-      
       final JPanel labelPanel = new JPanel ();
       labelPanel.setLayout (new GridLayout (1, 4));
       labelPanel.setBorder (BorderFactory.createEmptyBorder (10, 0, 10, 0));
@@ -216,7 +231,7 @@ public class JTek2440_GPIB_Display
       labelPanel.add (readoutLabel);
       add (labelPanel, BorderLayout.SOUTH);
     }
-    
+        
   }
   
   private final JDisplayIntensityPanel jDisplayIntensityPanel;
