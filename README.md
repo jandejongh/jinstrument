@@ -66,18 +66,18 @@ Most important changes:
 - Selecting and removing Instrument Views from the Registry.
 - Full-blown HP3478A support (only lacking a few trigger options).
 
-### Release 0.4 [20190104]
+### Release 0.4 [20200104]
 Most important changes:
 - Timeout handling.
 - Added many instrument classes and concrete (placeholder) classes.
 - HP-8116A [partial] enters beta.
 - Improvements to (notably) Controller Debugger.
 
-### Release 0.5 [20190106]
+### Release 0.5 [20200106]
 Most important change:
 - Completed Instrument and InstrumentView implementation for HP-8116A.
 
-### Release 0.6 [20190112]
+### Release 0.6 [20200112]
 Most important change:
 - Reinstated HP-70000 [SpectrumAnalyzer ONLY!] -> alpha.
 - Completed (almost) Instrument and InstrumentView implementation for HP-8663-A -> beta.
