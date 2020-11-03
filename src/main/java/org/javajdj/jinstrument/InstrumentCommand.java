@@ -257,4 +257,8 @@ public interface InstrumentCommand
   public final static String ICARG_CHANNEL_POSITION_CHANNEL = ICARG_CHANNEL;
   public final static String ICARG_CHANNEL_POSITION = "channelPosition";
   
+  public final static String IC_DISPLAY_INTENSITY = "commandDisplayIntensity";
+  public final static String ICARG_DISPLAY_INTENSITY_COMPONENT = "displayIntensityComponent";
+  public final static String ICARG_DISPLAY_INTENSITY = "displayIntensity";
+  
 }
