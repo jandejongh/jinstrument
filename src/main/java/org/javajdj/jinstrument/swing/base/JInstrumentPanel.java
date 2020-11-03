@@ -17,11 +17,17 @@
 package org.javajdj.jinstrument.swing.base;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.javajdj.jinstrument.Instrument;
 
 /** A Swing (base) component for interacting with an {@link Instrument}.
@@ -36,6 +42,14 @@ public class JInstrumentPanel
   extends JPanel
 {
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // LOGGER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private static final Logger LOG = Logger.getLogger (JInstrumentPanel.class.getName ());
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // CONSTRUCTOR(S) / FACTORY / CLONING
@@ -765,6 +779,111 @@ public class JInstrumentPanel
     }
     else
       return null;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  // JSlider LISTENERS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // XXX Is this really unavailable in Java 8?
+  
+  @FunctionalInterface
+  public interface Provider<T>
+  {
+    T apply ();
+  }
+  
+  public class JInstrumentSliderChangeListener_1Integer
+    implements ChangeListener
+  {
+
+    final String settingString;
+    
+    final Instrument.InstrumentSetter_1Integer setter;
+
+    final Provider<Boolean> inhibitSetter;
+    
+    public JInstrumentSliderChangeListener_1Integer (
+      final String settingString,
+      final Instrument.InstrumentSetter_1Integer setter,
+      final Provider<Boolean> inhibitSetter)
+    {
+      if (settingString == null || settingString.trim ().isEmpty () || setter == null)
+        throw new IllegalArgumentException ();
+      this.settingString = settingString;
+      this.setter = setter;
+      this.inhibitSetter = inhibitSetter;
+    }
+    
+    @Override
+    public void stateChanged (final ChangeEvent ce)
+    {
+      final JSlider source = (JSlider) ce.getSource ();
+      source.setToolTipText (Integer.toString (source.getValue ()));
+      if (! source.getValueIsAdjusting ())
+      {
+        if (this.inhibitSetter != null && this.inhibitSetter.apply ())
+          return;
+        try
+        {
+          this.setter.set (this.setter.intToArg (source.getValue ()));
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from slider to {0}: {1}.",
+            new Object[]{source.getValue (), e});
+        }
+      }
+    }
+    
+  }
+  
+  public class JInstrumentSliderChangeListener_1Double
+    implements ChangeListener
+  {
+
+    final String settingString;
+    
+    final Instrument.InstrumentSetter_1Double setter;
+
+    final Provider<Boolean> inhibitSetter;
+    
+    public JInstrumentSliderChangeListener_1Double (
+      final String settingString,
+      final Instrument.InstrumentSetter_1Double setter,
+      final Provider<Boolean> inhibitSetter)
+    {
+      if (settingString == null || settingString.trim ().isEmpty () || setter == null)
+        throw new IllegalArgumentException ();
+      this.settingString = settingString;
+      this.setter = setter;
+      this.inhibitSetter = inhibitSetter;
+    }
+    
+    @Override
+    public void stateChanged (final ChangeEvent ce)
+    {
+      final JSlider source = (JSlider) ce.getSource ();
+      source.setToolTipText (Double.toString (source.getValue ()));
+      if (! source.getValueIsAdjusting ())
+      {
+        if (this.inhibitSetter != null && this.inhibitSetter.apply ())
+          return;
+        try
+        {
+          this.setter.set (this.setter.intToArg (source.getValue ()));
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from slider to {0}: {1}.",
+            new Object[]{source.getValue (), e});
+        }
+      }
+    }
+    
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
