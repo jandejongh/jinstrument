@@ -10,6 +10,15 @@ Either through Maven, or by simply picking up a release's jinstrument-X.Y-jar-wi
 ## License
 Apache v2.0.
 
+## Status [20201103 - v0.7-SNAPSHOT]
+
+### Working on:
+- Tektronix 2440 full implementation.
+For now, given up on trying to create a suitable abstraction for a generic DSO,
+and instead just focus at getting the Tek-2440 up and running...
+Expect to finish by the end of 2020.
+Stay tuned!
+
 ## Status [20200112 - v0.6]
 
 ### Beta:
