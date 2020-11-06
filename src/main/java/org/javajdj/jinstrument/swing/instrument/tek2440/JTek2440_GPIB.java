@@ -90,7 +90,8 @@ public class JTek2440_GPIB
     setLayout (new BorderLayout ());
     //
     this.xPanel = new JTek2440XPanel (digitalStorageOscilloscope);
-    this.triggerPanel = new JTek2440TriggerPanel (digitalStorageOscilloscope);
+    this.aTriggerPanel = new JTek2440_GPIB_ATrigger (digitalStorageOscilloscope, "A Triggering", level + 1, DEFAULT_TRIGGER_COLOR);
+    this.bTriggerPanel = new JTek2440_GPIB_BTrigger (digitalStorageOscilloscope, "B Triggering", level + 1, DEFAULT_TRIGGER_COLOR);
     this.jCh1Panel = new JTek2440ChannelPanel (digitalStorageOscilloscope, Tek2440_GPIB_Instrument.Tek2440Channel.Channel1);
     this.jCh2Panel = new JTek2440ChannelPanel (digitalStorageOscilloscope, Tek2440_GPIB_Instrument.Tek2440Channel.Channel2);
     //
@@ -190,9 +191,10 @@ public class JTek2440_GPIB
     //
     this.southPanel = new JPanel ();
     //
-    this.southPanel.setLayout (new GridLayout (1, 2));
+    this.southPanel.setLayout (new GridLayout (1, 3));
     this.southPanel.add (this.xPanel);
-    this.southPanel.add (this.triggerPanel);
+    this.southPanel.add (this.aTriggerPanel);
+    this.southPanel.add (this.bTriggerPanel);
     //
     add (this.southPanel, BorderLayout.SOUTH);
     //
@@ -390,22 +392,13 @@ public class JTek2440_GPIB
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SWING
-  // TEK 2440 TRIGGER PANEL
+  // TEK 2440 TRIGGER PANELS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final JTek2440TriggerPanel triggerPanel;
+  private final JTek2440_GPIB_ATrigger aTriggerPanel;
   
-  public static class JTek2440TriggerPanel
-    extends JTek2440Panel
-  {
-
-    public JTek2440TriggerPanel (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
-    {
-      super (digitalStorageOscilloscope, "Trigger", 1, JInstrumentPanel.getGuiPreferencesTriggerColor ());
-    }
-    
-  }
+  private final JTek2440_GPIB_BTrigger bTriggerPanel;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
