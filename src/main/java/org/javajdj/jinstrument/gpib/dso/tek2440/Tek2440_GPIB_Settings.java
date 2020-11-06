@@ -2894,6 +2894,11 @@ public class Tek2440_GPIB_Settings
     return this.commandErrorSRQSettings;
   }
   
+  public final boolean isCommandErrorSrqEnabled ()
+  {
+    return getCommandErrorSRQSettings ().srq;
+  }
+  
   private static CommandErrorSRQSettings parseCommandErrorSRQSettings (final String argString)
   {
     if (argString == null)
@@ -2927,6 +2932,11 @@ public class Tek2440_GPIB_Settings
   public final ExecutionErrorSRQSettings getExecutionErrorSRQSettings ()
   {
     return this.executionErrorSRQSettings;
+  }
+  
+  public final boolean isExecutionErrorSrqEnabled ()
+  {
+    return getExecutionErrorSRQSettings ().srq;
   }
   
   private static ExecutionErrorSRQSettings parseExecutionErrorSRQSettings (final String argString)
@@ -2964,6 +2974,11 @@ public class Tek2440_GPIB_Settings
     return this.executionWarningSRQSettings;
   }
   
+  public final boolean isExecutionWarningSrqEnabled ()
+  {
+    return getExecutionWarningSRQSettings ().srq;
+  }
+  
   private static ExecutionWarningSRQSettings parseExecutionWarningSRQSettings (final String argString)
   {
     if (argString == null)
@@ -2997,6 +3012,11 @@ public class Tek2440_GPIB_Settings
   public final InternalErrorSRQSettings getInternalErrorSRQSettings ()
   {
     return this.internalErrorSRQSettings;
+  }
+  
+  public final boolean isInternalErrorSrqEnabled ()
+  {
+    return getInternalErrorSRQSettings ().srq;
   }
   
   private static InternalErrorSRQSettings parseInternalErrorSRQSettings (final String argString)
@@ -3080,6 +3100,7 @@ public class Tek2440_GPIB_Settings
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SERVICE REQUEST [ENABLED] SETTINGS
+  // XXX EVENT [ONLY]
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3102,6 +3123,11 @@ public class Tek2440_GPIB_Settings
   public final ServiceRequestSettings getServiceRequestSettings ()
   {
     return this.serviceRequestSettings;
+  }
+
+  public final boolean isEventSrqEnabled ()
+  {
+    return getServiceRequestSettings ().serviceRequestEnabled;
   }
   
   private static ServiceRequestSettings parseServiceRequestSettings (final String argString)
@@ -3750,6 +3776,11 @@ public class Tek2440_GPIB_Settings
     return this.deviceDependentSRQSettings;
   }
   
+  public final boolean isDeviceDependentSrqEnabled ()
+  {
+    return getDeviceDependentSRQSettings ().srq;
+  }
+  
   private static DeviceDependentSRQSettings parseDeviceDependentSRQSettings (final String argString)
   {
     if (argString == null)
@@ -3785,6 +3816,11 @@ public class Tek2440_GPIB_Settings
     return this.commandCompletionSRQSettings;
   }
   
+  public final boolean isCommandCompletionSrqEnabled ()
+  {
+    return getCommandCompletionSRQSettings ().srq;
+  }
+  
   private static CommandCompletionSRQSettings parseCommandCompletionSRQSettings (final String argString)
   {
     if (argString == null)
@@ -3818,6 +3854,11 @@ public class Tek2440_GPIB_Settings
   public final ProbeIdentifyButtonSRQSettings getProbeIdentifyButtonSRQSettings ()
   {
     return this.probeIdentifyButtonSRQSettings;
+  }
+  
+  public final boolean isProbeIdentifyButtonSrqEnabled ()
+  {
+    return getProbeIdentifyButtonSRQSettings ().srq;
   }
   
   private static ProbeIdentifyButtonSRQSettings parseProbeIdentifyButtonSRQSettings (final String argString)
@@ -4315,6 +4356,11 @@ public class Tek2440_GPIB_Settings
   public final UserButtonSRQSettings getUserButtonSRQSettings ()
   {
     return this.userButtonSRQSettings;
+  }
+  
+  public final boolean isUserButtonSrqEnabled ()
+  {
+    return getUserButtonSRQSettings ().srq;
   }
   
   private static UserButtonSRQSettings parseUserButtonSRQSettings (final String argString)
