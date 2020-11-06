@@ -3741,6 +3741,11 @@ public class Tek2440_GPIB_Settings
     return this.readoutSettings;
   }
   
+  public final boolean isDisplayReadout ()
+  {
+    return getReadoutSettings ().readout;
+  }
+  
   private static ReadoutSettings parseReadoutSettings (final String argString)
   {
     if (argString == null)
@@ -4476,6 +4481,11 @@ public class Tek2440_GPIB_Settings
   public final double getReadoutIntensity ()
   {
     return getIntensitySettings ().readoutIntensity;
+  }
+  
+  public final boolean isDisplayVectors ()
+  {
+    return getIntensitySettings ().vectors;
   }
   
   private static IntensitySettings parseIntensitySettings (final String argString)
