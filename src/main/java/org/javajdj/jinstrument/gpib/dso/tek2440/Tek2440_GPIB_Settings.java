@@ -3495,6 +3495,7 @@ public class Tek2440_GPIB_Settings
 
   public enum RefDisplay
   {
+    // XXX Is Empty really a valid return in the Settings? Looking at the Programming Manual, it's more like a command...
     Empty,
     Off,
     On;
@@ -3532,6 +3533,46 @@ public class Tek2440_GPIB_Settings
   public final RefDisplaySettings getRefDisplaySettings ()
   {
     return this.refDisplaySettings;
+  }
+  
+  public final boolean isDisplayRef1 ()
+  {
+    return getRefDisplaySettings ().refDisplay1 == RefDisplay.On;
+  }
+  
+  public final boolean isDisplayRef2 ()
+  {
+    return getRefDisplaySettings ().refDisplay2 == RefDisplay.On;
+  }
+  
+  public final boolean isDisplayRef3 ()
+  {
+    return getRefDisplaySettings ().refDisplay3 == RefDisplay.On;
+  }
+  
+  public final boolean isDisplayRef4 ()
+  {
+    return getRefDisplaySettings ().refDisplay4 == RefDisplay.On;
+  }
+  
+  public final boolean isEmptyRef1 ()
+  {
+    return getRefDisplaySettings ().refDisplay1 == RefDisplay.Empty;
+  }
+  
+  public final boolean isEmptyRef2 ()
+  {
+    return getRefDisplaySettings ().refDisplay2 == RefDisplay.Empty;
+  }
+  
+  public final boolean isEmptyRef3 ()
+  {
+    return getRefDisplaySettings ().refDisplay3 == RefDisplay.Empty;
+  }
+  
+  public final boolean isEmptyRef4 ()
+  {
+    return getRefDisplaySettings ().refDisplay4 == RefDisplay.Empty;
   }
   
   private static RefDisplaySettings parseRefDisplaySettings (final String argString)
