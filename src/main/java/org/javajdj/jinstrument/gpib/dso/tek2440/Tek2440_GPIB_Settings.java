@@ -2043,13 +2043,6 @@ public class Tek2440_GPIB_Settings
     TV;
   }
   
-  public enum ATriggerLogSource
-  {
-    Off,
-    A_and_B,
-    Word;
-  }
-  
   public enum Slope
   {
     Plus,
@@ -2090,6 +2083,13 @@ public class Tek2440_GPIB_Settings
     ATriggerPosition_30;
   }
   
+  public enum ATriggerLogSource
+  {
+    Off,
+    A_and_B,
+    Word;
+  }
+  
   public enum ABSelect
   {
     A,
@@ -2105,15 +2105,15 @@ public class Tek2440_GPIB_Settings
     
     private final ATriggerCoupling coupling;
     
-    private final ATriggerLogSource logSource;
+    private final Slope slope;
     
     private final double level;
-    
-    private final Slope slope;
     
     private final ATriggerPosition position;
     
     private final double holdoff;
+    
+    private final ATriggerLogSource logSource;
     
     private final ABSelect abSelect;
 
@@ -2121,27 +2121,39 @@ public class Tek2440_GPIB_Settings
       final ATriggerMode mode,
       final ATriggerSource source,
       final ATriggerCoupling coupling,
-      final ATriggerLogSource logSource,
-      final Double level,
       final Slope slope,
+      final Double level,
       final ATriggerPosition position,
       final Double holdoff,
+      final ATriggerLogSource logSource,
       final ABSelect abSelect)
     {
-      if (mode == null || source == null || coupling == null || logSource == null)
-        throw new IllegalArgumentException ();
-      if (level == null || slope == null || position == null || holdoff == null || abSelect == null)
-        throw new IllegalArgumentException ();
-      if (holdoff < 0 || holdoff > 100)
+      if (mode == null)
         throw new IllegalArgumentException ();
       this.mode = mode;
+      if (source == null)
+        throw new IllegalArgumentException ();
       this.source = source;
+      if (coupling == null)
+        throw new IllegalArgumentException ();
       this.coupling = coupling;
-      this.logSource = logSource;
-      this.level = level;
+      if (slope == null)
+        throw new IllegalArgumentException ();
       this.slope = slope;
+      if (level == null)
+        throw new IllegalArgumentException ();
+      this.level = level;
+      if (position == null)
+        throw new IllegalArgumentException ();
       this.position = position;
+      if (holdoff == null || holdoff < 0 || holdoff > 100)
+        throw new IllegalArgumentException ();
       this.holdoff = holdoff;
+      if (logSource == null)
+        throw new IllegalArgumentException ();
+      this.logSource = logSource;
+      if (abSelect == null)
+        throw new IllegalArgumentException ();
       this.abSelect = abSelect;
     }
   }
@@ -2153,6 +2165,51 @@ public class Tek2440_GPIB_Settings
     return this.aTriggerSettings;
   }
   
+  public final ATriggerMode getATriggerMode ()
+  {
+    return getATriggerSettings ().mode;
+  }
+  
+  public final ATriggerSource getATriggerSource ()
+  {
+    return getATriggerSettings ().source;
+  }
+  
+  public final ATriggerCoupling getATriggerCoupling ()
+  {
+    return getATriggerSettings ().coupling;
+  }
+  
+  public final Slope getATriggerSlope ()
+  {
+    return getATriggerSettings ().slope;
+  }
+  
+  public final double getATriggerLevel ()
+  {
+    return getATriggerSettings ().level;
+  }
+  
+  public final ATriggerPosition getATriggerPosition ()
+  {
+    return getATriggerSettings ().position;
+  }
+  
+  public final double getATriggerHoldoff ()
+  {
+    return getATriggerSettings ().holdoff;
+  }
+  
+  public final ATriggerLogSource getATriggerLogSource ()
+  {
+    return getATriggerSettings ().logSource;
+  }
+  
+  public final ABSelect getATriggerABSelect ()
+  {
+    return getATriggerSettings ().abSelect;
+  }
+  
   private static ATriggerSettings parseATriggerSettings (final String argString)
   {
     if (argString == null)
@@ -2160,11 +2217,11 @@ public class Tek2440_GPIB_Settings
     ATriggerMode mode = null;
     ATriggerSource source = null;
     ATriggerCoupling coupling = null;
-    ATriggerLogSource logSource = null;
-    Double level = null;
     Slope slope = null;
+    Double level = null;
     ATriggerPosition position = null;
     Double holdoff = null;
+    ATriggerLogSource logSource = null;
     ABSelect abSelect = null;
     final String[] argParts = argString.trim ().toLowerCase ().split (",");
     for (final String argPart: argParts)
@@ -2248,25 +2305,6 @@ public class Tek2440_GPIB_Settings
             }});
           break;
         }
-        case "log":
-        case "logsrc":
-        {
-          logSource = parseEnum (argArgParts[1].trim (),
-            new HashMap<String, ATriggerLogSource> ()
-            {{
-              put ("off",  ATriggerLogSource.Off);
-              put ("a.b",  ATriggerLogSource.A_and_B);
-              put ("wor",  ATriggerLogSource.Word);
-              put ("word", ATriggerLogSource.Word);
-            }});
-          break;
-        }
-        case "lev":
-        case "level":
-        {
-          level = parseNr3 (argArgParts[1].trim ());
-          break;
-        }
         case "slo":
         case "slope":
         {
@@ -2280,6 +2318,12 @@ public class Tek2440_GPIB_Settings
             }});
           break;
         }
+        case "lev":
+        case "level":
+        {
+          level = parseNr3 (argArgParts[1].trim ());
+          break;
+        }
         case "pos":
         case "position":
         {
@@ -2290,6 +2334,19 @@ public class Tek2440_GPIB_Settings
         case "holdoff":
         {
           holdoff = parseNr3 (argArgParts[1].trim (), 0, 100);
+          break;
+        }
+        case "log":
+        case "logsrc":
+        {
+          logSource = parseEnum (argArgParts[1].trim (),
+            new HashMap<String, ATriggerLogSource> ()
+            {{
+              put ("off",  ATriggerLogSource.Off);
+              put ("a.b",  ATriggerLogSource.A_and_B);
+              put ("wor",  ATriggerLogSource.Word);
+              put ("word", ATriggerLogSource.Word);
+            }});
           break;
         }
         case "abse":
@@ -2311,11 +2368,11 @@ public class Tek2440_GPIB_Settings
       mode,
       source,
       coupling,
-      logSource,
-      level,
       slope,
+      level,
       position,
       holdoff,
+      logSource,
       abSelect);
   }
     
@@ -2391,26 +2448,26 @@ public class Tek2440_GPIB_Settings
     
     private final BTriggerMode mode;
     
-    private final boolean extClk;
-    
     private final BTriggerSource source;
     
     private final BTriggerCoupling coupling;
     
-    private final double level;
-    
     private final Slope slope;
+    
+    private final double level;
     
     private final BTriggerPosition position;
 
+    private final boolean extClk;
+    
     public BTriggerSettings (
       final BTriggerMode mode,
-      final Boolean extClk,
       final BTriggerSource source,
       final BTriggerCoupling coupling,
-      final Double level,
       final Slope slope,
-      final BTriggerPosition position)
+      final Double level,
+      final BTriggerPosition position,
+      final Boolean extClk)
     {
       if (mode == null || extClk == null || source == null || coupling == null)
         throw new IllegalArgumentException ();
@@ -2433,17 +2490,52 @@ public class Tek2440_GPIB_Settings
     return this.bTriggerSettings;
   }
   
+  public final BTriggerMode getBTriggerMode ()
+  {
+    return getBTriggerSettings ().mode;
+  }
+  
+  public final BTriggerSource getBTriggerSource ()
+  {
+    return getBTriggerSettings ().source;
+  }
+  
+  public final BTriggerCoupling getBTriggerCoupling ()
+  {
+    return getBTriggerSettings ().coupling;
+  }
+  
+  public final Slope getBTriggerSlope ()
+  {
+    return getBTriggerSettings ().slope;
+  }
+  
+  public final double getBTriggerLevel ()
+  {
+    return getBTriggerSettings ().level;
+  }
+  
+  public final BTriggerPosition getBTriggerPosition ()
+  {
+    return getBTriggerSettings ().position;
+  }
+  
+  public final boolean getBTriggerExtClock ()
+  {
+    return getBTriggerSettings ().extClk;
+  }
+  
   private static BTriggerSettings parseBTriggerSettings (final String argString)
   {
     if (argString == null)
       throw new IllegalArgumentException ();
     BTriggerMode mode = null;
-    Boolean extClk = null;
     BTriggerSource source = null;
     BTriggerCoupling coupling = null;
-    Double level = null;
     Slope slope = null;
+    Double level = null;
     BTriggerPosition position = null;
+    Boolean extClk = null;
     final String[] argParts = argString.trim ().toLowerCase ().split (",");
     for (final String argPart: argParts)
     {
@@ -2464,12 +2556,6 @@ public class Tek2440_GPIB_Settings
               put ("tri",     BTriggerMode.TrigAft);
               put ("trigaft", BTriggerMode.TrigAft);
             }});
-          break;
-        }
-        case "extcl":
-        case "extclk":
-        {
-          extClk = parseOnOff (argArgParts[1].trim ());
           break;
         }
         case "sou":
@@ -2506,12 +2592,6 @@ public class Tek2440_GPIB_Settings
             }});
           break;
         }
-        case "lev":
-        case "level":
-        {
-          level = parseNr3 (argArgParts[1].trim ());
-          break;
-        }
         case "slo":
         case "slope":
         {
@@ -2525,10 +2605,22 @@ public class Tek2440_GPIB_Settings
             }});
           break;
         }
+        case "lev":
+        case "level":
+        {
+          level = parseNr3 (argArgParts[1].trim ());
+          break;
+        }
         case "pos":
         case "position":
         {
           position = parseEnumFromOrdinal (argArgParts[1].trim (), BTriggerPosition.class, 1);
+          break;
+        }
+        case "extcl":
+        case "extclk":
+        {
+          extClk = parseOnOff (argArgParts[1].trim ());
           break;
         }
         default:
@@ -2537,12 +2629,12 @@ public class Tek2440_GPIB_Settings
     }
     return new BTriggerSettings (
       mode,
-      extClk,
       source,
       coupling,
-      level,
       slope,
-      position);
+      level,
+      position,
+      extClk);
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
