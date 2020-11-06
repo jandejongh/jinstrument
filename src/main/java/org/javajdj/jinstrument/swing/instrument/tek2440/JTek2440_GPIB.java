@@ -122,6 +122,13 @@ public class JTek2440_GPIB
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
         "Serial Poll"));
     this.northPanel.add (this.jSerialPollStatus);
+    final JPanel jAutoSetupPanel = new JTek2440_GPIB_AutoSetup (
+      digitalStorageOscilloscope,
+      "Auto Setup",
+      level + 2,
+      DEFAULT_MANAGEMENT_COLOR);
+    jAutoSetupPanel.setPreferredSize (new Dimension (200, 80));
+    this.northPanel.add (jAutoSetupPanel);
     final JPanel jDisplayPanel = new JPanel ();
     jDisplayPanel.setLayout (new BorderLayout ());
     jDisplayPanel.setPreferredSize (new Dimension (80, 80));
