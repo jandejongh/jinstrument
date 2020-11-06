@@ -1904,6 +1904,31 @@ public class Tek2440_GPIB_Settings
     return this.acquisitionSettings;
   }
   
+  public final AcquisitionMode getAcquisitionMode ()
+  {
+    return getAcquisitionSettings ().mode;
+  }
+  
+  public final boolean isAcquisitionRepetitive ()
+  {
+    return getAcquisitionSettings ().repetitive;
+  }
+  
+  public final NumberOfAcquisitionsAveraged getNumberOfAcquisitionsAveraged ()
+  {
+    return getAcquisitionSettings ().acquisitionsAveraged;
+  }
+  
+  public final NumberOfEnvelopeSweeps getNumberOfEnvelopeSweeps ()
+  {
+    return getAcquisitionSettings ().envelopeSweeps;
+  }
+  
+  public final boolean isAcquisitionSaveOnDelta ()
+  {
+    return getAcquisitionSettings ().saveOnDelta;
+  }
+  
   private static AcquisitionSettings parseAcquisitionSettings (final String argString)
   {
     if (argString == null)
@@ -2670,6 +2695,11 @@ public class Tek2440_GPIB_Settings
     return this.runSettings;
   }
   
+  public final RunMode getRunMode ()
+  {
+    return getRunSettings ().mode;
+  }
+  
   private static RunSettings parseRunSettings (final String argString)
   {
     if (argString == null)
@@ -2857,6 +2887,11 @@ public class Tek2440_GPIB_Settings
   public final SmoothSettings getSmoothSettings ()
   {
     return this.smoothSettings;
+  }
+  
+  public final boolean isSmoothing ()
+  {
+    return getSmoothSettings ().smooth;
   }
   
   private static SmoothSettings parseSmoothSettings (final String argString)
