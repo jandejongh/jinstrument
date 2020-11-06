@@ -36,6 +36,7 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
+import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
 /** A Swing panel for several (all) display settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -67,15 +68,39 @@ public class JTek2440_GPIB_Display
     super (digitalStorageOscilloscope, level);
     //
     removeAll ();
-    setLayout (new GridLayout (2, 1, 0, 2));
+    setLayout (new GridLayout (2, 1, 6, 6));
     //
-    final JLabel northLabel = new JLabel ("Other Display Settings; TBD!");
-    northLabel.setHorizontalAlignment (SwingConstants.CENTER);
-    northLabel.setBorder (
+    final JPanel northPanel = new JPanel ();
+    northPanel.setBorder (
       BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (Color.blue, 2),
-        "Other Display Settings; TBD!"));
-    add (northLabel);
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
+        "Display Selections"));
+    northPanel.setLayout (new GridLayout (6, 4));
+    add (northPanel);
+    for (int i = 0; i < 8; i++)
+      northPanel.add (new JLabel ());
+    final JPanel readoutPanel = new JPanel ();
+    readoutPanel.setLayout (new GridLayout (1, 2));
+    readoutPanel.add (new JLabel ("Readout"));
+    this.jReadout = new JColorCheckBox.JBoolean (Color.green);
+    this.jReadout.setEnabled (false);
+    readoutPanel.add (this.jReadout);
+    northPanel.add (readoutPanel);
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
+    final JPanel vectorsPanel = new JPanel ();
+    vectorsPanel.setLayout (new GridLayout (1, 2));
+    vectorsPanel.add (new JLabel ("Vectors"));
+    this.jVectors = new JColorCheckBox.JBoolean (Color.green);
+    this.jVectors.setEnabled (false);
+    vectorsPanel.add (this.jVectors);
+    northPanel.add (vectorsPanel);
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
+    for (int i = 16; i < 24; i++)
+      northPanel.add (new JLabel ());
     //
     this.jDisplayIntensityPanel = new JDisplayIntensityPanel ();
     this.jDisplayIntensityPanel.setBorder (
@@ -139,6 +164,17 @@ public class JTek2440_GPIB_Display
   {
     return getInstrumentViewUrl ();
   }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  // DISPLAY SELECTION SETTINGS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private JColorCheckBox.JBoolean jReadout;
+  
+  private JColorCheckBox.JBoolean jVectors;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -264,6 +300,10 @@ public class JTek2440_GPIB_Display
         JTek2440_GPIB_Display.this.inhibitInstrumentControl = true;
         try
         {
+          final boolean readout = settings.isDisplayReadout ();
+          JTek2440_GPIB_Display.this.jReadout.setDisplayedValue (readout);
+          final boolean vectors = settings.isDisplayVectors ();
+          JTek2440_GPIB_Display.this.jVectors.setDisplayedValue (vectors);
           final int displayIntensity = (int) Math.round (settings.getDisplayIntensity ());
           JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jDisplayIntensity.setValue (displayIntensity);
           JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jDisplayIntensity.setToolTipText (
