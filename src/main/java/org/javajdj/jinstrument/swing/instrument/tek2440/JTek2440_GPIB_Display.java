@@ -77,30 +77,36 @@ public class JTek2440_GPIB_Display
         "Display Selections"));
     northPanel.setLayout (new GridLayout (6, 4));
     add (northPanel);
-    for (int i = 0; i < 8; i++)
-      northPanel.add (new JLabel ());
-    final JPanel readoutPanel = new JPanel ();
-    readoutPanel.setLayout (new GridLayout (1, 2));
-    readoutPanel.add (new JLabel ("Readout"));
-    this.jReadout = new JColorCheckBox.JBoolean (Color.green);
-    this.jReadout.setEnabled (false);
-    readoutPanel.add (this.jReadout);
-    northPanel.add (readoutPanel);
+    this.jReadout = new SelectionPanel ("Readout");
+    northPanel.add (this.jReadout);
     northPanel.add (new JLabel ());
     northPanel.add (new JLabel ());
     northPanel.add (new JLabel ());
-    final JPanel vectorsPanel = new JPanel ();
-    vectorsPanel.setLayout (new GridLayout (1, 2));
-    vectorsPanel.add (new JLabel ("Vectors"));
-    this.jVectors = new JColorCheckBox.JBoolean (Color.green);
-    this.jVectors.setEnabled (false);
-    vectorsPanel.add (this.jVectors);
-    northPanel.add (vectorsPanel);
+    this.jVectors = new SelectionPanel ("Vectors");
+    northPanel.add (this.jVectors);
     northPanel.add (new JLabel ());
     northPanel.add (new JLabel ());
     northPanel.add (new JLabel ());
-    for (int i = 16; i < 24; i++)
-      northPanel.add (new JLabel ());
+    this.jRef1 = new SelectionPanel ("Ref 1");
+    northPanel.add (this.jRef1);
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
+    this.jRef2 = new SelectionPanel ("Ref 2");
+    northPanel.add (this.jRef2);
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
+    this.jRef3 = new SelectionPanel ("Ref 3");
+    northPanel.add (this.jRef3);
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
+    this.jRef4 = new SelectionPanel ("Ref 4");
+    northPanel.add (this.jRef4);
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
+    northPanel.add (new JLabel ());
     //
     this.jDisplayIntensityPanel = new JDisplayIntensityPanel ();
     this.jDisplayIntensityPanel.setBorder (
@@ -168,13 +174,45 @@ public class JTek2440_GPIB_Display
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SWING
+  // SELECTION PANEL
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private class SelectionPanel
+    extends JPanel
+  {
+    
+    private final JColorCheckBox.JBoolean jBoolean;
+
+    public SelectionPanel (final String key)
+    {
+      setLayout (new GridLayout (1, 2));
+      add (new JLabel (key));
+      this.jBoolean = new JColorCheckBox.JBoolean (Color.green);
+      this.jBoolean.setEnabled (false);
+      add (this.jBoolean);
+    }
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
   // DISPLAY SELECTION SETTINGS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  private JColorCheckBox.JBoolean jReadout;
+  private final SelectionPanel jReadout;
   
-  private JColorCheckBox.JBoolean jVectors;
+  private final SelectionPanel jVectors;
+  
+  private final SelectionPanel jRef1;
+  
+  private final SelectionPanel jRef2;
+  
+  private final SelectionPanel jRef3;
+  
+  private final SelectionPanel jRef4;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -301,9 +339,17 @@ public class JTek2440_GPIB_Display
         try
         {
           final boolean readout = settings.isDisplayReadout ();
-          JTek2440_GPIB_Display.this.jReadout.setDisplayedValue (readout);
+          JTek2440_GPIB_Display.this.jReadout.jBoolean.setDisplayedValue (readout);
           final boolean vectors = settings.isDisplayVectors ();
-          JTek2440_GPIB_Display.this.jVectors.setDisplayedValue (vectors);
+          JTek2440_GPIB_Display.this.jVectors.jBoolean.setDisplayedValue (vectors);
+          final boolean ref1 = settings.isDisplayRef1 ();
+          JTek2440_GPIB_Display.this.jRef1.jBoolean.setDisplayedValue (ref1);
+          final boolean ref2 = settings.isDisplayRef1 ();
+          JTek2440_GPIB_Display.this.jRef2.jBoolean.setDisplayedValue (ref2);
+          final boolean ref3 = settings.isDisplayRef1 ();
+          JTek2440_GPIB_Display.this.jRef3.jBoolean.setDisplayedValue (ref3);
+          final boolean ref4 = settings.isDisplayRef1 ();
+          JTek2440_GPIB_Display.this.jRef4.jBoolean.setDisplayedValue (ref4);
           final int displayIntensity = (int) Math.round (settings.getDisplayIntensity ());
           JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jDisplayIntensity.setValue (displayIntensity);
           JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jDisplayIntensity.setToolTipText (
