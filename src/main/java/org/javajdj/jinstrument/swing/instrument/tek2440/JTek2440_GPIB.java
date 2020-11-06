@@ -142,6 +142,26 @@ public class JTek2440_GPIB
     });
     jDisplayPanel.add (jDisplayButton, BorderLayout.CENTER);
     this.northPanel.add (jDisplayPanel);
+    final JPanel jSrqPanel = new JPanel ();
+    jSrqPanel.setLayout (new BorderLayout ());
+    jSrqPanel.setPreferredSize (new Dimension (80, 80));
+    jSrqPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "SRQ"));
+    final JColorCheckBox jSrqButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jSrqButton.setDisplayedValue (true);
+    jSrqButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jSrqDialog = new JOptionPane ().createDialog ("Tek-2440 GPIB Service Request Settings");
+    this.jSrqDialog.setSize (800, 600);
+    this.jSrqDialog.setLocationRelativeTo (this);
+    this.jSrqDialog.setContentPane(new JTek2440_GPIB_SRQ (digitalStorageOscilloscope, level + 1));
+    jSrqButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB.this.jSrqDialog.setVisible (true);
+    });
+    jSrqPanel.add (jSrqButton, BorderLayout.CENTER);
+    this.northPanel.add (jSrqPanel);
     //
     add (northPanel, BorderLayout.NORTH);
     //
@@ -212,6 +232,8 @@ public class JTek2440_GPIB
   }
   
   private final JDialog jDisplayDialog;
+  
+  private final JDialog jSrqDialog;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
