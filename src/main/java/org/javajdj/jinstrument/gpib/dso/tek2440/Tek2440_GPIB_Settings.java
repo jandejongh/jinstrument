@@ -640,7 +640,7 @@ public class Tek2440_GPIB_Settings
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public static enum AutoSetupAction
+  public static enum AutoSetupMode
   {
     FALL,
     PERIOD,
@@ -658,11 +658,11 @@ public class Tek2440_GPIB_Settings
   public static final class AutoSetupSettings
   {
     
-    private final AutoSetupAction mode;
+    private final AutoSetupMode mode;
     
     private final AutoSetupResolution resolution;
 
-    public final AutoSetupAction getMode ()
+    public final AutoSetupMode getMode ()
     {
       return this.mode;
     }
@@ -672,7 +672,7 @@ public class Tek2440_GPIB_Settings
       return this.resolution;
     }
 
-    public AutoSetupSettings (final AutoSetupAction mode, final AutoSetupResolution resolution)
+    public AutoSetupSettings (final AutoSetupMode mode, final AutoSetupResolution resolution)
     {
       if (mode == null || resolution == null)
         throw new IllegalArgumentException ();
@@ -689,7 +689,7 @@ public class Tek2440_GPIB_Settings
     return this.autoSetupSettings;
   }
   
-  public final AutoSetupAction getAutoSetupAction ()
+  public final AutoSetupMode getAutoSetupMode ()
   {
     return getAutoSetupSettings ().getMode ();
   }
@@ -703,7 +703,7 @@ public class Tek2440_GPIB_Settings
   {
     if (argString == null)
       throw new IllegalArgumentException ();
-    AutoSetupAction mode = null;
+    AutoSetupMode mode = null;
     AutoSetupResolution resolution = null;
     final String[] argParts = argString.trim ().toLowerCase ().split (",");
     for (final String argPart: argParts)
@@ -721,23 +721,23 @@ public class Tek2440_GPIB_Settings
           {
             case "fal":
             case "fall":
-              mode = AutoSetupAction.FALL;
+              mode = AutoSetupMode.FALL;
               break;
             case "peri":
             case "period":
-              mode = AutoSetupAction.PERIOD;
+              mode = AutoSetupMode.PERIOD;
               break;
             case "pul":
             case "pulse":
-              mode = AutoSetupAction.PULSE;
+              mode = AutoSetupMode.PULSE;
               break;
             case "ris":
             case "rise":
-              mode = AutoSetupAction.RISE;
+              mode = AutoSetupMode.RISE;
               break;
             case "vie":
             case "view":
-              mode = AutoSetupAction.VIEW;
+              mode = AutoSetupMode.VIEW;
               break;
             default:
               throw new IllegalArgumentException ();
