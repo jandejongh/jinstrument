@@ -129,6 +129,26 @@ public class JTek2440_GPIB
       DEFAULT_MANAGEMENT_COLOR);
     jAutoSetupPanel.setPreferredSize (new Dimension (200, 80));
     this.northPanel.add (jAutoSetupPanel);
+    final JPanel jAcquisitionPanel = new JPanel ();
+    jAcquisitionPanel.setLayout (new BorderLayout ());
+    jAcquisitionPanel.setPreferredSize (new Dimension (120, 80));
+    jAcquisitionPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Acquisition"));
+    final JColorCheckBox jAcquisitionButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jAcquisitionButton.setDisplayedValue (true);
+    jAcquisitionButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jAcquisitionDialog = new JOptionPane ().createDialog ("Tek-2440 Acquisition Settings");
+    this.jAcquisitionDialog.setSize (460, 460);
+    this.jAcquisitionDialog.setLocationRelativeTo (this);
+    this.jAcquisitionDialog.setContentPane(new JTek2440_GPIB_Acquisition (digitalStorageOscilloscope, level + 1));
+    jAcquisitionButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB.this.jAcquisitionDialog.setVisible (true);
+    });
+    jAcquisitionPanel.add (jAcquisitionButton, BorderLayout.CENTER);
+    this.northPanel.add (jAcquisitionPanel);
     final JPanel jDisplayPanel = new JPanel ();
     jDisplayPanel.setLayout (new BorderLayout ());
     jDisplayPanel.setPreferredSize (new Dimension (80, 80));
@@ -238,10 +258,6 @@ public class JTek2440_GPIB
     this (digitalStorageOscilloscope, 0);
   }
   
-  private final JDialog jDisplayDialog;
-  
-  private final JDialog jSrqDialog;
-  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENT VIEW TYPE
@@ -312,6 +328,12 @@ public class JTek2440_GPIB
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   private final JByte jSerialPollStatus;
+  
+  private final JDialog jDisplayDialog;
+  
+  private final JDialog jAcquisitionDialog;
+  
+  private final JDialog jSrqDialog;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
