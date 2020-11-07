@@ -49,6 +49,14 @@ public interface Instrument
   void addCommand (InstrumentCommand instrumentCommand);
 
   @FunctionalInterface
+  interface InstrumentSetter_1Enum<E extends Enum<E>>
+  {
+    
+    void set (E arg) throws IOException, InterruptedException;
+    
+  }
+  
+  @FunctionalInterface
   interface InstrumentSetter_1Integer
   {
     
