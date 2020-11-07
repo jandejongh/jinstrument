@@ -3697,6 +3697,31 @@ public class Tek2440_GPIB_Settings
     return this.refPositionSettings;
   }
   
+  public final RefPositionMode getRefPositionMode ()
+  {
+    return getRefPositionSettings ().mode;
+  }
+  
+  public final double getRefPosition1 ()
+  {
+    return getRefPositionSettings ().refPosition1;
+  }
+  
+  public final double getRefPosition2 ()
+  {
+    return getRefPositionSettings ().refPosition2;
+  }
+  
+  public final double getRefPosition3 ()
+  {
+    return getRefPositionSettings ().refPosition3;
+  }
+  
+  public final double getRefPosition4 ()
+  {
+    return getRefPositionSettings ().refPosition4;
+  }
+  
   private static RefPositionSettings parseRefPositionSettings (final String argString)
   {
     if (argString == null)
