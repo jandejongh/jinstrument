@@ -49,10 +49,10 @@ public interface Instrument
   void addCommand (InstrumentCommand instrumentCommand);
 
   @FunctionalInterface
-  interface InstrumentSetter_1Enum<E extends Enum<E>>
+  interface InstrumentSetter_1Boolean
   {
     
-    void set (E arg) throws IOException, InterruptedException;
+    void set (boolean arg) throws IOException, InterruptedException;
     
   }
   
@@ -83,6 +83,22 @@ public interface Instrument
     default double longToArg   (final long   l) { return (double) l; }
     default double floatToArg  (final float  f) { return (double) f; }
     default double doubleToArg (final double d) { return (double) d; }
+    
+  }
+  
+  @FunctionalInterface
+  interface InstrumentSetter_1Enum<E extends Enum<E>>
+  {
+    
+    void set (E arg) throws IOException, InterruptedException;
+    
+  }
+  
+  @FunctionalInterface
+  interface InstrumentSetter_1String
+  {
+    
+    void set (String arg) throws IOException, InterruptedException;
     
   }
   
