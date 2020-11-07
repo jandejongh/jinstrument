@@ -17,6 +17,8 @@
 package org.javajdj.jinstrument.swing.base;
 
 import java.awt.Color;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -880,6 +882,54 @@ public class JInstrumentPanel
         {
           LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from slider to {0}: {1}.",
             new Object[]{source.getValue (), e});
+        }
+      }
+    }
+    
+  }
+  
+  public class JInstrumentComboBoxItemListener_Enum<E extends Enum<E>>
+    implements ItemListener
+  {
+
+    final String settingString;
+    
+    final Class<E> clazz;
+    
+    final Instrument.InstrumentSetter_1Enum<E> setter;
+
+    final Provider<Boolean> inhibitSetter;
+
+    public JInstrumentComboBoxItemListener_Enum (
+      final String settingString,
+      final Class<E> clazz,
+      final Instrument.InstrumentSetter_1Enum setter,
+      final Provider<Boolean> inhibitSetter)
+    {
+      if (settingString == null || settingString.trim ().isEmpty () || clazz == null || setter == null)
+        throw new IllegalArgumentException ();
+      this.settingString = settingString;
+      this.clazz = clazz;
+      this.setter = setter;
+      this.inhibitSetter = inhibitSetter;
+    }
+    
+    @Override
+    public void itemStateChanged (final ItemEvent ie)
+    {
+      if (ie.getStateChange () == ItemEvent.SELECTED)
+      {
+        final E newValue = (E) ie.getItem ();
+        if (this.inhibitSetter != null && this.inhibitSetter.apply ())
+          return;
+        try
+        {
+          this.setter.set (newValue);
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from combo box to {0}: {1}.",
+            new Object[]{ie.getItem (), e});
         }
       }
     }
