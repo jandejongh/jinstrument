@@ -131,11 +131,11 @@ public class JTek2440_GPIB
     this.northPanel.add (jAutoSetupPanel);
     final JPanel jAcquisitionPanel = new JPanel ();
     jAcquisitionPanel.setLayout (new BorderLayout ());
-    jAcquisitionPanel.setPreferredSize (new Dimension (120, 80));
+    jAcquisitionPanel.setPreferredSize (new Dimension (80, 80));
     jAcquisitionPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
-        "Acquisition"));
+        "Acq"));
     final JColorCheckBox jAcquisitionButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
     jAcquisitionButton.setDisplayedValue (true);
     jAcquisitionButton.setHorizontalAlignment (SwingConstants.CENTER);
@@ -189,6 +189,46 @@ public class JTek2440_GPIB
     });
     jSrqPanel.add (jSrqButton, BorderLayout.CENTER);
     this.northPanel.add (jSrqPanel);
+    final JPanel jRefPanel = new JPanel ();
+    jRefPanel.setLayout (new BorderLayout ());
+    jRefPanel.setPreferredSize (new Dimension (80, 80));
+    jRefPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Ref"));
+    final JColorCheckBox jRefButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jRefButton.setDisplayedValue (true);
+    jRefButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jRefDialog = new JOptionPane ().createDialog ("Tek-2440 Service Reference (Waveform Memory) Settings");
+    this.jRefDialog.setSize (800, 600);
+    this.jRefDialog.setLocationRelativeTo (this);
+    this.jRefDialog.setContentPane(new JTek2440_GPIB_Ref (digitalStorageOscilloscope, level + 1));
+    jRefButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB.this.jRefDialog.setVisible (true);
+    });
+    jRefPanel.add (jRefButton, BorderLayout.CENTER);
+    this.northPanel.add (jRefPanel);
+    final JPanel jSequencerPanel = new JPanel ();
+    jSequencerPanel.setLayout (new BorderLayout ());
+    jSequencerPanel.setPreferredSize (new Dimension (80, 80));
+    jSequencerPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Seq"));
+    final JColorCheckBox jSequencerButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jSequencerButton.setDisplayedValue (true);
+    jSequencerButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jSequencerDialog = new JOptionPane ().createDialog ("Tek-2440 Sequencer Settings");
+    this.jSequencerDialog.setSize (800, 600);
+    this.jSequencerDialog.setLocationRelativeTo (this);
+    this.jSequencerDialog.setContentPane(new JTek2440_GPIB_SRQ (digitalStorageOscilloscope, level + 1));
+    jSequencerButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB.this.jSequencerDialog.setVisible (true);
+    });
+    jSequencerPanel.add (jSequencerButton, BorderLayout.CENTER);
+    this.northPanel.add (jSequencerPanel);
     //
     add (northPanel, BorderLayout.NORTH);
     //
@@ -334,6 +374,10 @@ public class JTek2440_GPIB
   private final JDialog jAcquisitionDialog;
   
   private final JDialog jSrqDialog;
+  
+  private final JDialog jRefDialog;
+  
+  private final JDialog jSequencerDialog;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
