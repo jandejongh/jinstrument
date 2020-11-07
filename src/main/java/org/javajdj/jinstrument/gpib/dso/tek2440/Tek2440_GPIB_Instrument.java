@@ -516,6 +516,50 @@ public class Tek2440_GPIB_Instrument
     setDisplayIntensity (DisplayIntensityComponent.READOUT, intensity);
   }
   
+  public void setReferencePositionMode (
+    final Tek2440_GPIB_Settings.RefPositionMode mode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_REFERENCE_POSITION_MODE,
+      InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_MODE, mode));
+  }
+  
+  public void setReferencePosition (
+    final int referenceNumber,
+    final double referencePosition)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_REFERENCE_POSITION,
+      InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_NUMBER, referenceNumber,
+      InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION, referencePosition));
+  }
+  
+  public void setReferencePosition_1 (final double referencePosition)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setReferencePosition (1, referencePosition);
+  }
+  
+  public void setReferencePosition_2 (final double referencePosition)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setReferencePosition (2, referencePosition);
+  }
+  
+  public void setReferencePosition_3 (final double referencePosition)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setReferencePosition (3, referencePosition);
+  }
+  
+  public void setReferencePosition_4 (final double referencePosition)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setReferencePosition (4, referencePosition);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -737,6 +781,44 @@ public class Tek2440_GPIB_Instrument
               throw new IllegalArgumentException ();
           }
           writeSync ("INTENSI " + componentString + Double.toString (intensity) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_REFERENCE_POSITION_MODE:
+        {
+          final Tek2440_GPIB_Settings.RefPositionMode mode =
+            (Tek2440_GPIB_Settings.RefPositionMode) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_MODE);
+          if (mode == null)
+            throw new IllegalArgumentException ();
+          switch (mode)
+          {
+            case Independent:
+              writeSync ("REFP MOD:IND\r\n");
+              break;
+            case Lock:
+              writeSync ("REFP MOD:LOC\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_REFERENCE_POSITION:
+        {
+          final int refNumber = (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_NUMBER);
+          final double refPosition = (double) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION);
+          if (refPosition < 0 || refPosition > 1023)
+            throw new IllegalArgumentException ();
+          switch (refNumber)
+          {
+            case 1: writeSync ("REFP REF1:" + Double.toString (refPosition) + "\r\n"); break;
+            case 2: writeSync ("REFP REF2:" + Double.toString (refPosition) + "\r\n"); break;
+            case 3: writeSync ("REFP REF3:" + Double.toString (refPosition) + "\r\n"); break;
+            case 4: writeSync ("REFP REF4:" + Double.toString (refPosition) + "\r\n"); break;
+            default: throw new IllegalArgumentException ();
+              
+          }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
