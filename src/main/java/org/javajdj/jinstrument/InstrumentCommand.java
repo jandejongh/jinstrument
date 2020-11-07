@@ -261,4 +261,11 @@ public interface InstrumentCommand
   public final static String ICARG_DISPLAY_INTENSITY_COMPONENT = "displayIntensityComponent";
   public final static String ICARG_DISPLAY_INTENSITY = "displayIntensity";
   
+  public final static String IC_TEK2440_REFERENCE_POSITION_MODE = "commandTek2440ReferencePositionMode";
+  public final static String ICARG_TEK2440_REFERENCE_POSITION_MODE = "tek2440ReferencePositionMode";
+  
+  public final static String IC_TEK2440_REFERENCE_POSITION = "commandTek2440ReferencePosition";
+  public final static String ICARG_TEK2440_REFERENCE_POSITION_NUMBER = "tek2440ReferencePositionNumber";
+  public final static String ICARG_TEK2440_REFERENCE_POSITION = "tek2440ReferencePosition";
+  
 }
