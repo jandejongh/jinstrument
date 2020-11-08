@@ -17,6 +17,8 @@
 package org.javajdj.jinstrument.swing.base;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
@@ -796,6 +798,53 @@ public class JInstrumentPanel
   public interface Provider<T>
   {
     T apply ();
+  }
+  
+  public class JInstrumentActionListener_0
+    implements ActionListener
+  {
+
+    final String actionString;
+    
+    final Instrument.InstrumentAction action;
+    
+    final Provider<Boolean> inhibitAction;
+    
+    public JInstrumentActionListener_0 (
+      final String actionString,
+      final Instrument.InstrumentAction action,
+      final Provider<Boolean> inhibitAction)
+    {
+      if (actionString == null || actionString.trim ().isEmpty () || action == null)
+        throw new IllegalArgumentException ();
+      this.actionString = actionString;
+      this.action = action;
+      this.inhibitAction = inhibitAction;
+    }
+    
+    public JInstrumentActionListener_0 (
+      final String actionString,
+      final Instrument.InstrumentAction action)
+    {
+      this (actionString, action, null);
+    }
+    
+    @Override
+    public void actionPerformed (final ActionEvent ae)
+    {
+      if (this.inhibitAction != null && this.inhibitAction.apply ())
+        return;
+      try
+      {
+        this.action.action ();
+      }
+      catch (IOException | InterruptedException e)
+      {
+        LOG.log (Level.INFO, "Caught exception with action {0}: {1}.",
+          new Object[]{this.actionString, e});
+      }
+    }
+    
   }
   
   public class JInstrumentSliderChangeListener_1Integer
