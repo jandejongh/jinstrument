@@ -49,6 +49,14 @@ public interface Instrument
   void addCommand (InstrumentCommand instrumentCommand);
 
   @FunctionalInterface
+  interface InstrumentAction
+  {
+    
+    void action () throws IOException, InterruptedException;
+    
+  }
+  
+  @FunctionalInterface
   interface InstrumentSetter_1Boolean
   {
     
