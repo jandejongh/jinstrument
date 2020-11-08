@@ -83,30 +83,29 @@ public class JTek2440_GPIB
   
   public JTek2440_GPIB (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
   {
-    //
+    
     super (digitalStorageOscilloscope, level);
-    //
+    
     removeAll ();
     setLayout (new BorderLayout ());
-    //
+    
     this.xPanel = new JTek2440XPanel (digitalStorageOscilloscope);
     this.aTriggerPanel = new JTek2440_GPIB_ATrigger (digitalStorageOscilloscope, "A Triggering", level + 1, DEFAULT_TRIGGER_COLOR);
     this.bTriggerPanel = new JTek2440_GPIB_BTrigger (digitalStorageOscilloscope, "B Triggering", level + 1, DEFAULT_TRIGGER_COLOR);
     this.jCh1Panel = new JTek2440ChannelPanel (digitalStorageOscilloscope, Tek2440_GPIB_Instrument.Tek2440Channel.Channel1);
     this.jCh2Panel = new JTek2440ChannelPanel (digitalStorageOscilloscope, Tek2440_GPIB_Instrument.Tek2440Channel.Channel2);
-    //
+    
     getTracePanel ().setBorder (null);
     getTracePanel ().getJTrace ().setXDivisions (Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS);
     getTracePanel ().getJTrace ().setYDivisions (Tek2440_GPIB_Instrument.TEK2440_Y_DIVISIONS);
     // Next lines ensure that color scheme is consistent across the channels.
     getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1, null);
     getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2, null);
-    //
     add (getTracePanel (), BorderLayout.CENTER);
-    //
-    this.northPanel = new JPanel ();
-    //
-    this.northPanel.setLayout (new FlowLayout (FlowLayout.LEFT));
+    
+    this.northPanel = new JPanel ();    
+    this.northPanel.setLayout (new FlowLayout (FlowLayout.LEFT, 2, 5));
+    
     final JPanel jSimp = getSmallInstrumentManagementPanel ();
     jSimp.setPreferredSize (new Dimension (60, 80));
     jSimp.setBorder (
@@ -114,6 +113,7 @@ public class JTek2440_GPIB
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
         "Inst"));
     this.northPanel.add (jSimp);
+    
     this.jSerialPollStatus = new JByte (Color.red,
       Arrays.asList (new String[]{"  ?", "RQS", "  ?", "  ?", "  ?", "  ?", "  ?", "  ?"}));
     this.jSerialPollStatus.setPreferredSize (new Dimension (240, 80));
@@ -122,6 +122,7 @@ public class JTek2440_GPIB
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
         "Serial Poll"));
     this.northPanel.add (this.jSerialPollStatus);
+    
     final JPanel jAutoSetupPanel = new JTek2440_GPIB_AutoSetup (
       digitalStorageOscilloscope,
       "Auto Setup",
@@ -129,6 +130,7 @@ public class JTek2440_GPIB
       DEFAULT_MANAGEMENT_COLOR);
     jAutoSetupPanel.setPreferredSize (new Dimension (200, 80));
     this.northPanel.add (jAutoSetupPanel);
+    
     final JPanel jAcquisitionPanel = new JPanel ();
     jAcquisitionPanel.setLayout (new BorderLayout ());
     jAcquisitionPanel.setPreferredSize (new Dimension (80, 80));
@@ -149,6 +151,7 @@ public class JTek2440_GPIB
     });
     jAcquisitionPanel.add (jAcquisitionButton, BorderLayout.CENTER);
     this.northPanel.add (jAcquisitionPanel);
+    
     final JPanel jDisplayPanel = new JPanel ();
     jDisplayPanel.setLayout (new BorderLayout ());
     jDisplayPanel.setPreferredSize (new Dimension (80, 80));
@@ -169,6 +172,7 @@ public class JTek2440_GPIB
     });
     jDisplayPanel.add (jDisplayButton, BorderLayout.CENTER);
     this.northPanel.add (jDisplayPanel);
+    
     final JPanel jSrqPanel = new JPanel ();
     jSrqPanel.setLayout (new BorderLayout ());
     jSrqPanel.setPreferredSize (new Dimension (80, 80));
@@ -189,6 +193,7 @@ public class JTek2440_GPIB
     });
     jSrqPanel.add (jSrqButton, BorderLayout.CENTER);
     this.northPanel.add (jSrqPanel);
+    
     final JPanel jRefPanel = new JPanel ();
     jRefPanel.setLayout (new BorderLayout ());
     jRefPanel.setPreferredSize (new Dimension (80, 80));
@@ -209,6 +214,28 @@ public class JTek2440_GPIB
     });
     jRefPanel.add (jRefButton, BorderLayout.CENTER);
     this.northPanel.add (jRefPanel);
+    
+    final JPanel jDataPanel = new JPanel ();
+    jDataPanel.setLayout (new BorderLayout ());
+    jDataPanel.setPreferredSize (new Dimension (80, 80));
+    jDataPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Data"));
+    final JColorCheckBox jDataButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jDataButton.setDisplayedValue (true);
+    jDataButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jDataDialog = new JOptionPane ().createDialog ("Tek-2440 Data Settings");
+    this.jDataDialog.setSize (800, 600);
+    this.jDataDialog.setLocationRelativeTo (this);
+    this.jDataDialog.setContentPane(new JTek2440_GPIB_Data (digitalStorageOscilloscope, level + 1));
+    jDataButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB.this.jDataDialog.setVisible (true);
+    });
+    jDataPanel.add (jDataButton, BorderLayout.CENTER);
+    this.northPanel.add (jDataPanel);
+    
     final JPanel jSequencerPanel = new JPanel ();
     jSequencerPanel.setLayout (new BorderLayout ());
     jSequencerPanel.setPreferredSize (new Dimension (80, 80));
@@ -229,11 +256,11 @@ public class JTek2440_GPIB
     });
     jSequencerPanel.add (jSequencerButton, BorderLayout.CENTER);
     this.northPanel.add (jSequencerPanel);
-    //
+    
     add (northPanel, BorderLayout.NORTH);
-    //
+    
     this.eastPanel = new JPanel ();
-    //
+    
     this.eastPanel.setLayout (new GridLayout (2, 1));
     final JPanel eastNorthPanel = new JPanel ();
     eastNorthPanel.setLayout (new GridLayout (1, 2));
@@ -273,24 +300,22 @@ public class JTek2440_GPIB
     for (int i = 1; i <= 28; i++)
       eastSouthPanel.add (new JLabel ());
     this.eastPanel.add (eastSouthPanel);
-    //
+    
     add (this.eastPanel, BorderLayout.EAST);
-    //
+    
     this.southPanel = new JPanel ();
-    //
     this.southPanel.setLayout (new GridLayout (1, 3));
     this.southPanel.add (this.xPanel);
     this.southPanel.add (this.aTriggerPanel);
-    this.southPanel.add (this.bTriggerPanel);
-    //
+    this.southPanel.add (this.bTriggerPanel);    
     add (this.southPanel, BorderLayout.SOUTH);
-    //
+    
     this.westPanel = new JPanel ();
     // this.westPanel.add (new JLabel ("west"));
     add (this.westPanel, BorderLayout.WEST);
-    //
+    
     getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
-    //
+    
   }
   
   public JTek2440_GPIB (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
@@ -376,6 +401,8 @@ public class JTek2440_GPIB
   private final JDialog jSrqDialog;
   
   private final JDialog jRefDialog;
+  
+  private final JDialog jDataDialog;
   
   private final JDialog jSequencerDialog;
   
