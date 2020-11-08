@@ -560,6 +560,117 @@ public class Tek2440_GPIB_Instrument
     setReferencePosition (4, referencePosition);
   }
   
+  public void setReferenceSource (final Tek2440_GPIB_Settings.RefFrom refSource)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_REFERENCE_SOURCE,
+      InstrumentCommand.ICARG_TEK2440_REFERENCE_SOURCE, refSource));
+  }
+  
+  public void clearReference (final int referenceNumber)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_REFERENCE_CLEAR,
+      InstrumentCommand.ICARG_TEK2440_REFERENCE_CLEAR_NUMBER, referenceNumber));
+  }
+  
+  public void clearReference1 ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    clearReference (1);
+  }
+  
+  public void clearReference2 ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    clearReference (2);
+  }
+  
+  public void clearReference3 ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    clearReference (3);
+  }
+  
+  public void clearReference4 ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    clearReference (4);
+  }
+  
+  public void writeReference (final int referenceNumber)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_REFERENCE_WRITE,
+      InstrumentCommand.ICARG_TEK2440_REFERENCE_WRITE_NUMBER, referenceNumber));
+  }
+  
+  public void writeReferenceStack ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    writeReference (0);
+  }
+  
+  public void writeReference1 ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    writeReference (1);
+  }
+  
+  public void writeReference2 ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    writeReference (2);
+  }
+  
+  public void writeReference3 ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    writeReference (3);
+  }
+  
+  public void writeReference4 ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    writeReference (4);
+  }
+  
+  public void displayReference (final int referenceNumber, final boolean display)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_REFERENCE_DISPLAY,
+      InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY_NUMBER, referenceNumber,
+      InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY, display));
+  }
+  
+  public void displayReference1 (final boolean display)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    displayReference (1, display);
+  }
+  
+  public void displayReference2 (final boolean display)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    displayReference (2, display);
+  }
+  
+  public void displayReference3 (final boolean display)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    displayReference (3, display);
+  }
+  
+  public void displayReference4 (final boolean display)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    displayReference (4, display);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -816,6 +927,78 @@ public class Tek2440_GPIB_Instrument
             case 2: writeSync ("REFP REF2:" + Double.toString (refPosition) + "\r\n"); break;
             case 3: writeSync ("REFP REF3:" + Double.toString (refPosition) + "\r\n"); break;
             case 4: writeSync ("REFP REF4:" + Double.toString (refPosition) + "\r\n"); break;
+            default: throw new IllegalArgumentException ();
+              
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_REFERENCE_SOURCE:
+        {
+          final Tek2440_GPIB_Settings.RefFrom refSource = (Tek2440_GPIB_Settings.RefFrom) instrumentCommand.get (
+            InstrumentCommand.ICARG_TEK2440_REFERENCE_SOURCE);
+          if (refSource == null)
+            throw new IllegalArgumentException ();
+          switch (refSource)
+          {
+            case Ch1:     writeSync ("REFF CH1\r\n");   break;
+            case Ch2:     writeSync ("REFF CH2\r\n");   break;
+            case Add:     writeSync ("REFF ADD\r\n");   break;
+            case Mult:    writeSync ("REFF MUL\r\n");   break;
+            case Ch1Del:  writeSync ("REFF CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("REFF CH2D\r\n");  break;
+            case AddDel:  writeSync ("REFF ADDD\r\n");  break;
+            case MultDel: writeSync ("REFF MULTD\r\n"); break;
+            case Ref1:    writeSync ("REFF REF1\r\n");  break;
+            case Ref2:    writeSync ("REFF REF2\r\n");  break;
+            case Ref3:    writeSync ("REFF REF3\r\n");  break;
+            case Ref4:    writeSync ("REFF REF4\r\n");  break;
+            default: throw new IllegalArgumentException ();           
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_REFERENCE_CLEAR:
+        {
+          final int refNumber = (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_CLEAR_NUMBER);
+          switch (refNumber)
+          {
+            case 1: writeSync ("REFD REF1:EMP\r\n"); break;
+            case 2: writeSync ("REFD REF2:EMP\r\n"); break;
+            case 3: writeSync ("REFD REF3:EMP\r\n"); break;
+            case 4: writeSync ("REFD REF4:EMP\r\n"); break;
+            default: throw new IllegalArgumentException ();
+              
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_REFERENCE_WRITE:
+        {
+          final int refNumber = (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_WRITE_NUMBER);
+          switch (refNumber)
+          {
+            case 0: writeSync ("SAVER STAC\r\n"); break;
+            case 1: writeSync ("SAVER REF1\r\n"); break;
+            case 2: writeSync ("SAVER REF2\r\n"); break;
+            case 3: writeSync ("SAVER REF3\r\n"); break;
+            case 4: writeSync ("SAVER REF4\r\n"); break;
+            default: throw new IllegalArgumentException ();
+              
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_REFERENCE_DISPLAY:
+        {
+          final int refNumber = (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY_NUMBER);
+          final boolean display = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY);
+          switch (refNumber)
+          {
+            case 1: writeSync ("REFD REF1:" + (display? "ON" : "OFF") + "\r\n"); break;
+            case 2: writeSync ("REFD REF2:" + (display? "ON" : "OFF") + "\r\n"); break;
+            case 3: writeSync ("REFD REF3:" + (display? "ON" : "OFF") + "\r\n"); break;
+            case 4: writeSync ("REFD REF4:" + (display? "ON" : "OFF") + "\r\n"); break;
             default: throw new IllegalArgumentException ();
               
           }
