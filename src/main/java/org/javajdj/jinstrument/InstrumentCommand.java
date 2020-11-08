@@ -283,4 +283,7 @@ public interface InstrumentCommand
   public final static String ICARG_TEK2440_REFERENCE_DISPLAY_NUMBER = ICARG_TEK2440_REFERENCE_NUMBER;
   public final static String ICARG_TEK2440_REFERENCE_DISPLAY = "tek2440ReferenceDisplay";
 
+  public final static String IC_TEK2440_LONG_RESPONSE = "commandTek2440LongResponse";
+  public final static String ICARG_TEK2440_LONG_RESPONSE = "tek2440LongResponse";
+
 }
