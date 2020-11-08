@@ -671,6 +671,14 @@ public class Tek2440_GPIB_Instrument
     displayReference (4, display);
   }
   
+  public void setUseLongResponse (final boolean useLongResponse)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_LONG_RESPONSE,
+      InstrumentCommand.ICARG_TEK2440_LONG_RESPONSE, useLongResponse));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1002,6 +1010,13 @@ public class Tek2440_GPIB_Instrument
             default: throw new IllegalArgumentException ();
               
           }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_LONG_RESPONSE:
+        {
+          final boolean longResponse = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_LONG_RESPONSE);
+          writeSync ("LONG " + (longResponse? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
