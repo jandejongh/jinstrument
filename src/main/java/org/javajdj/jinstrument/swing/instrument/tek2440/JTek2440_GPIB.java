@@ -222,7 +222,7 @@ public class JTek2440_GPIB
     this.jSequencerDialog = new JOptionPane ().createDialog ("Tek-2440 Sequencer Settings");
     this.jSequencerDialog.setSize (800, 600);
     this.jSequencerDialog.setLocationRelativeTo (this);
-    this.jSequencerDialog.setContentPane(new JTek2440_GPIB_SRQ (digitalStorageOscilloscope, level + 1));
+    this.jSequencerDialog.setContentPane(new JTek2440_GPIB_Sequencer (digitalStorageOscilloscope, level + 1));
     jSequencerButton.addActionListener ((ae) ->
     {
       JTek2440_GPIB.this.jSequencerDialog.setVisible (true);
