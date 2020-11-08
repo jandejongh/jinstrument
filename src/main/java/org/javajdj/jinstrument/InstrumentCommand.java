@@ -260,12 +260,27 @@ public interface InstrumentCommand
   public final static String IC_DISPLAY_INTENSITY = "commandDisplayIntensity";
   public final static String ICARG_DISPLAY_INTENSITY_COMPONENT = "displayIntensityComponent";
   public final static String ICARG_DISPLAY_INTENSITY = "displayIntensity";
+
+  public final static String ICARG_TEK2440_REFERENCE_NUMBER = "tek2440ReferenceNumber";
   
   public final static String IC_TEK2440_REFERENCE_POSITION_MODE = "commandTek2440ReferencePositionMode";
   public final static String ICARG_TEK2440_REFERENCE_POSITION_MODE = "tek2440ReferencePositionMode";
   
   public final static String IC_TEK2440_REFERENCE_POSITION = "commandTek2440ReferencePosition";
-  public final static String ICARG_TEK2440_REFERENCE_POSITION_NUMBER = "tek2440ReferencePositionNumber";
+  public final static String ICARG_TEK2440_REFERENCE_POSITION_NUMBER = ICARG_TEK2440_REFERENCE_NUMBER;
   public final static String ICARG_TEK2440_REFERENCE_POSITION = "tek2440ReferencePosition";
   
+  public final static String IC_TEK2440_REFERENCE_SOURCE = "commandTek2440ReferenceSource";
+  public final static String ICARG_TEK2440_REFERENCE_SOURCE = "tek2440ReferenceSource";
+
+  public final static String IC_TEK2440_REFERENCE_CLEAR = "commandTek2440ReferenceClear";
+  public final static String ICARG_TEK2440_REFERENCE_CLEAR_NUMBER = ICARG_TEK2440_REFERENCE_NUMBER;
+
+  public final static String IC_TEK2440_REFERENCE_WRITE = "commandTek2440ReferenceWrite";
+  public final static String ICARG_TEK2440_REFERENCE_WRITE_NUMBER = ICARG_TEK2440_REFERENCE_NUMBER; // 0 == STACK.
+
+  public final static String IC_TEK2440_REFERENCE_DISPLAY = "commandTek2440ReferenceDisplay";
+  public final static String ICARG_TEK2440_REFERENCE_DISPLAY_NUMBER = ICARG_TEK2440_REFERENCE_NUMBER;
+  public final static String ICARG_TEK2440_REFERENCE_DISPLAY = "tek2440ReferenceDisplay";
+
 }
