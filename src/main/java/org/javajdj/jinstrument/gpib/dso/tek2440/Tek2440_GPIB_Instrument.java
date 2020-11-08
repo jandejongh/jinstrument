@@ -679,6 +679,14 @@ public class Tek2440_GPIB_Instrument
       InstrumentCommand.ICARG_TEK2440_LONG_RESPONSE, useLongResponse));
   }
   
+  public void setUsePath (final boolean usePath)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_USE_PATH,
+      InstrumentCommand.ICARG_TEK2440_USE_PATH, usePath));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1016,7 +1024,14 @@ public class Tek2440_GPIB_Instrument
         case InstrumentCommand.IC_TEK2440_LONG_RESPONSE:
         {
           final boolean longResponse = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_LONG_RESPONSE);
-          writeSync ("LONG " + (longResponse? "ON" : "OFF") + "\r\n");
+          writeSync ("LON " + (longResponse? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_USE_PATH:
+        {
+          final boolean usePath = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_USE_PATH);
+          writeSync ("PAT " + (usePath? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
