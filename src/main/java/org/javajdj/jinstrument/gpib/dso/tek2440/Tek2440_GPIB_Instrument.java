@@ -266,7 +266,7 @@ public class Tek2440_GPIB_Instrument
     final Tek2440_GPIB_Settings settings;
     if (SETTINGS_USE_LOW_LEVEL)
     {
-      settingsBytes = writeAndReadEOISync ("LLSET?\n");
+      settingsBytes = writeAndReadEOISync ("LLS?\n");
       settings = Tek2440_GPIB_Settings.fromLlSetData (settingsBytes);
       // XXX DEBUG
       fireInstrumentDebug (
@@ -284,7 +284,7 @@ public class Tek2440_GPIB_Instrument
       settingsBytes = writeAndReadEOISync ("SET?\n");
       settings = Tek2440_GPIB_Settings.fromSetData (settingsBytes);
       // XXX DEBUG
-      final byte[] debugSettingsBytes = writeAndReadEOISync ("LLSET?\n");
+      final byte[] debugSettingsBytes = writeAndReadEOISync ("LLS?\n");
       fireInstrumentDebug (
         this,
         InstrumentListener.INSTRUMENT_DEBUG_ID_SETTINGS_BYTES_1,
