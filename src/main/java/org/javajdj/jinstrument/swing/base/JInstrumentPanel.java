@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -247,6 +248,26 @@ public class JInstrumentPanel
    * 
    */
   protected boolean inhibitInstrumentControl = false;
+  
+  protected final boolean isInhibitInstrumentControl ()
+  {
+    return this.inhibitInstrumentControl;
+  }
+  
+  protected final void setInhibitInstrumentControl (final boolean inhibitInstrumentControl)
+  {
+    this.inhibitInstrumentControl = inhibitInstrumentControl;
+  }
+  
+  protected final void setInhibitInstrumentControl ()
+  {
+    setInhibitInstrumentControl (true);
+  }
+  
+  protected final void resetInhibitInstrumentControl ()
+  {
+    setInhibitInstrumentControl (false);
+  }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -847,6 +868,52 @@ public class JInstrumentPanel
     
   }
   
+  public class JInstrumentActionListener_1Boolean
+    implements ActionListener
+  {
+
+    final String settingString;
+    
+    final Provider<Boolean> getter;
+    
+    final Instrument.InstrumentSetter_1Boolean setter;
+    
+    final Provider<Boolean> inhibitSetter;
+    
+    public JInstrumentActionListener_1Boolean (
+      final String settingString,
+      final Provider<Boolean> getter,
+      final Instrument.InstrumentSetter_1Boolean setter,
+      final Provider<Boolean> inhibitSetter)
+    {
+      if (settingString == null || settingString.trim ().isEmpty () || getter == null || setter == null)
+        throw new IllegalArgumentException ();
+      this.settingString = settingString;
+      this.getter = getter;
+      this.setter = setter;
+      this.inhibitSetter = inhibitSetter;
+    }
+    
+    @Override
+    public void actionPerformed (final ActionEvent ae)
+    {
+      if (this.inhibitSetter != null && this.inhibitSetter.apply ())
+        return;
+      final Boolean currentValue = this.getter.apply ();
+      final boolean newValue = currentValue == null || (! currentValue);
+      try
+      {
+        this.setter.set (newValue);
+      }
+      catch (IOException | InterruptedException e)
+      {
+        LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " to {0} on instrument {1}: {2}.",
+          new Object[]{newValue, getInstrument (), Arrays.toString (e.getStackTrace ())});
+      }
+    }
+    
+  }
+  
   public class JInstrumentSliderChangeListener_1Integer
     implements ChangeListener
   {
@@ -885,7 +952,7 @@ public class JInstrumentPanel
         catch (IOException | InterruptedException e)
         {
           LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from slider to {0}: {1}.",
-            new Object[]{source.getValue (), e});
+            new Object[]{source.getValue (), Arrays.toString (e.getStackTrace ())});
         }
       }
     }
@@ -930,7 +997,7 @@ public class JInstrumentPanel
         catch (IOException | InterruptedException e)
         {
           LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from slider to {0}: {1}.",
-            new Object[]{source.getValue (), e});
+            new Object[]{source.getValue (), Arrays.toString (e.getStackTrace ())});
         }
       }
     }
@@ -978,7 +1045,7 @@ public class JInstrumentPanel
         catch (IOException | InterruptedException e)
         {
           LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from combo box to {0}: {1}.",
-            new Object[]{ie.getItem (), e});
+            new Object[]{ie.getItem (), Arrays.toString (e.getStackTrace ())});
         }
       }
     }
