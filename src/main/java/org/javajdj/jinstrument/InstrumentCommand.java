@@ -286,4 +286,7 @@ public interface InstrumentCommand
   public final static String IC_TEK2440_LONG_RESPONSE = "commandTek2440LongResponse";
   public final static String ICARG_TEK2440_LONG_RESPONSE = "tek2440LongResponse";
 
+  public final static String IC_TEK2440_USE_PATH = "commandTek2440UsePath";
+  public final static String ICARG_TEK2440_USE_PATH = "tek2440UsePath";
+
 }
