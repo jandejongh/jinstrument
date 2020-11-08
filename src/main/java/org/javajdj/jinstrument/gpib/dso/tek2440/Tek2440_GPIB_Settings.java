@@ -264,6 +264,11 @@ public class Tek2440_GPIB_Settings
   private static Tek2440_GPIB_Settings parserFromSetData (final byte[] bytes)
   {
     final String[] parts = new String (bytes, Charset.forName ("US-ASCII")).split (";");
+    // Just make sure we have at least one part.
+    if (parts == null || parts.length == 0)
+      throw new IllegalArgumentException ();
+    // See if PATh is ON.
+    final boolean usePath = parts[0].trim ().toLowerCase ().startsWith ("autos");
     AutoSetupSettings autoSetupSettings = null;
     HorizontalSettings horizontalSettings = null;
     ChannelSettings ch1Settings = null;
@@ -309,187 +314,241 @@ public class Tek2440_GPIB_Settings
     PrintDeviceSettings printDeviceSettings = null;
     CursorSettings cursorSettings = null;
     MeasurementSettings measurementSettings = null;
-    for (final String part : parts)
+    if (usePath)
     {
-      final String[] partParts = part.trim ().split (" ", 2);
-      final String keyString = partParts[0].trim ().toLowerCase ();
-      final String argString = partParts[1].trim ().toLowerCase ();
-      switch (keyString)
+      for (final String part : parts)
       {
-        case "autos":
-        case "autosetup":
-          autoSetupSettings = parseAutoSetupSettings (argString);
-          break;
-        case "hor":
-        case "horizontal":
-          horizontalSettings = parseHorizontalSettings (argString);
-          break;
-        case "ch1":
-          ch1Settings = parseChannelSettings (argString, Tek2440_GPIB_Instrument.Tek2440Channel.Channel1);
-          break;
-        case "ch2":
-          ch2Settings = parseChannelSettings (argString, Tek2440_GPIB_Instrument.Tek2440Channel.Channel2);
-          break;
-        case "dat":
-        case "data":
-          dataSettings = parseDataSettings (argString);
-          break;
-        case "vmo":
-        case "vmode":
-          vModeSettings = parseVModeSettings (argString);
-          break;
-        case "bwl":
-        case "bwlimit":
-          bandwidthLimitSettings = parseBandwidthLimitSettings (argString);
-          break;
-        case "acq":
-        case "acquire":
-          acquisitionSettings = parseAcquisitionSettings (argString);
-          break;
-        case "atr":
-        case "atrigger":
-          aTriggerSettings = parseATriggerSettings (argString);
-          break;
-        case "btr":
-        case "btrigger":
-          bTriggerSettings = parseBTriggerSettings (argString);
-          break;
-        case "run":
-          runSettings = parseRunSettings (argString);
-          break;
-        case "dlyt":
-        case "dlytime":
-          delayTimeSettings = parseDelayTimeSettings (argString);
-          break;
-        case "dlye":
-        case "dlyevts":
-          delayEventsSettings = parseDelayEventsSettings (argString);
-          break;
-        case "smo":
-        case "smooth":
-          smoothSettings = parseSmoothSettings (argString);
-          break;
-        case ("cer"):
-          commandErrorSRQSettings = parseCommandErrorSRQSettings (argString);
-          break;
-        case ("exr"):
-          executionErrorSRQSettings = parseExecutionErrorSRQSettings (argString);
-          break;
-        case ("exw"):
-          executionWarningSRQSettings = parseExecutionWarningSRQSettings (argString);
-          break;
-        case ("inr"):
-          internalErrorSRQSettings = parseInternalErrorSRQSettings (argString);
-          break;
-        case "lon":
-        case "long":
-          longSettings = parseLongSettings (argString);
-          break;
-        case "pat":
-        case "path":
-          pathSettings = parsePathSettings (argString);
-          break;
-        case "rqs":
-          serviceRequestSettings = parseServiceRequestSettings (argString);
-          break;
-        case "setw":
-        case "setword":
-          setWordSettings = parseSetWordSettings (argString);
-          break;
-        case "extg":
-        case "extgain":
-          extGainSettings = parseExtGainSettings (argString);
-          break;
-        case "reff":
-        case "reffrom":
-          refFromSettings = parseRefFromSettings (argString);
-          break;
-        case "refd":
-        case "refdisp":
-          refDisplaySettings = parseRefDisplaySettings (argString);
-          break;
-        case "refp":
-        case "refpos":
-          refPositionSettings = parseRefPositionSettings (argString);
-          break;
-        case "rea":
-        case "readout":
-          readoutSettings = parseReadoutSettings (argString);
-          break;
-        case "deb":
-        case "debug":
-          debugSettings = parseDebugSettings (argString);
-          break;
-        case "devd":
-        case "devdep":
-          deviceDependentSRQSettings = parseDeviceDependentSRQSettings (argString);
-          break;
-        case "opc":
-          commandCompletionSRQSettings = parseCommandCompletionSRQSettings (argString);
-          break;
-        case "pid":
-          probeIdentifyButtonSRQSettings = parseProbeIdentifyButtonSRQSettings (argString);
-          break;
-        case "dir":
-        case "direction":
-          directionSettings = parseDirectionSettings (argString);
-          break;
-        case "dt":
-          groupTriggerSRQSettings = parseGroupTriggerSRQSettings (argString);
-          break;
-        case "form":
-        case "format":
-          formatSettings = parseFormatSettings (argString);
-          break;
-        case "hys":
-        case "hysteresis":
-          hysteresisSettings = parseHysteresisSettings (argString);
-          break;
-        case "lev":
-        case "level":
-          levelSettings = parseLevelSettings (argString);
-          break;
-        case "loc":
-        case "lock":
-          lockSettings = parseLockSettings (argString);
-          break;
-        case "setu":
-        case "setup":
-          setupSettings = parseSetupSettings (argString);
-          break;
-        case "star":
-        case "start":
-          startSettings = parseStartSettings (argString);
-          break;
-        case "sto":
-        case "stop":
-          stopSettings = parseStopSettings (argString);
-          break;
-        case "use":
-        case "user":
-          userButtonSRQSettings = parseUserButtonSRQSettings (argString);
-          break;
-        case "intensi":
-        case "intensity":
-          intensitySettings = parseIntensitySettings (argString);
-          break;
-        case "devi":
-        case "device":
-          printDeviceSettings = parsePrintDeviceSettings (argString);
-          break;
-        case "curs":
-        case "cursor":
-          cursorSettings = parseCursorSettings (argString);
-          break;
-        case "meas":
-        case "measurement":
-          measurementSettings = parseMeasurementSettings (argString);
-          break;
-        default:
-          LOG.log (Level.SEVERE, "Found unknown key ''{0}'' in part ''{1}''!",
-            new Object[]{keyString, part});
-          throw new IllegalArgumentException ();
+        final String[] partParts = part.trim ().split (" ", 2);
+        final String keyString = partParts[0].trim ().toLowerCase ();
+        final String argString = partParts[1].trim ().toLowerCase ();
+        switch (keyString)
+        {
+          case "autos":
+          case "autosetup":
+            autoSetupSettings = parseAutoSetupSettings (argString);
+            break;
+          case "hor":
+          case "horizontal":
+            horizontalSettings = parseHorizontalSettings (argString);
+            break;
+          case "ch1":
+            ch1Settings = parseChannelSettings (argString, Tek2440_GPIB_Instrument.Tek2440Channel.Channel1);
+            break;
+          case "ch2":
+            ch2Settings = parseChannelSettings (argString, Tek2440_GPIB_Instrument.Tek2440Channel.Channel2);
+            break;
+          case "dat":
+          case "data":
+            dataSettings = parseDataSettings (argString);
+            break;
+          case "vmo":
+          case "vmode":
+            vModeSettings = parseVModeSettings (argString);
+            break;
+          case "bwl":
+          case "bwlimit":
+            bandwidthLimitSettings = parseBandwidthLimitSettings (argString);
+            break;
+          case "acq":
+          case "acquire":
+            acquisitionSettings = parseAcquisitionSettings (argString);
+            break;
+          case "atr":
+          case "atrigger":
+            aTriggerSettings = parseATriggerSettings (argString);
+            break;
+          case "btr":
+          case "btrigger":
+            bTriggerSettings = parseBTriggerSettings (argString);
+            break;
+          case "run":
+            runSettings = parseRunSettings (argString);
+            break;
+          case "dlyt":
+          case "dlytime":
+            delayTimeSettings = parseDelayTimeSettings (argString);
+            break;
+          case "dlye":
+          case "dlyevts":
+            delayEventsSettings = parseDelayEventsSettings (argString);
+            break;
+          case "smo":
+          case "smooth":
+            smoothSettings = parseSmoothSettings (argString);
+            break;
+          case ("cer"):
+            commandErrorSRQSettings = parseCommandErrorSRQSettings (argString);
+            break;
+          case ("exr"):
+            executionErrorSRQSettings = parseExecutionErrorSRQSettings (argString);
+            break;
+          case ("exw"):
+            executionWarningSRQSettings = parseExecutionWarningSRQSettings (argString);
+            break;
+          case ("inr"):
+            internalErrorSRQSettings = parseInternalErrorSRQSettings (argString);
+            break;
+          case "lon":
+          case "long":
+            longSettings = parseLongSettings (argString);
+            break;
+          case "pat":
+          case "path":
+            pathSettings = parsePathSettings (argString);
+            break;
+          case "rqs":
+            serviceRequestSettings = parseServiceRequestSettings (argString);
+            break;
+          case "setw":
+          case "setword":
+            setWordSettings = parseSetWordSettings (argString);
+            break;
+          case "extg":
+          case "extgain":
+            extGainSettings = parseExtGainSettings (argString);
+            break;
+          case "reff":
+          case "reffrom":
+            refFromSettings = parseRefFromSettings (argString);
+            break;
+          case "refd":
+          case "refdisp":
+            refDisplaySettings = parseRefDisplaySettings (argString);
+            break;
+          case "refp":
+          case "refpos":
+            refPositionSettings = parseRefPositionSettings (argString);
+            break;
+          case "rea":
+          case "readout":
+            readoutSettings = parseReadoutSettings (argString);
+            break;
+          case "deb":
+          case "debug":
+            debugSettings = parseDebugSettings (argString);
+            break;
+          case "devd":
+          case "devdep":
+            deviceDependentSRQSettings = parseDeviceDependentSRQSettings (argString);
+            break;
+          case "opc":
+            commandCompletionSRQSettings = parseCommandCompletionSRQSettings (argString);
+            break;
+          case "pid":
+            probeIdentifyButtonSRQSettings = parseProbeIdentifyButtonSRQSettings (argString);
+            break;
+          case "dir":
+          case "direction":
+            directionSettings = parseDirectionSettings (argString);
+            break;
+          case "dt":
+            groupTriggerSRQSettings = parseGroupTriggerSRQSettings (argString);
+            break;
+          case "form":
+          case "format":
+            formatSettings = parseFormatSettings (argString);
+            break;
+          case "hys":
+          case "hysteresis":
+            hysteresisSettings = parseHysteresisSettings (argString);
+            break;
+          case "lev":
+          case "level":
+            levelSettings = parseLevelSettings (argString);
+            break;
+          case "loc":
+          case "lock":
+            lockSettings = parseLockSettings (argString);
+            break;
+          case "setu":
+          case "setup":
+            setupSettings = parseSetupSettings (argString);
+            break;
+          case "star":
+          case "start":
+            startSettings = parseStartSettings (argString);
+            break;
+          case "sto":
+          case "stop":
+            stopSettings = parseStopSettings (argString);
+            break;
+          case "use":
+          case "user":
+            userButtonSRQSettings = parseUserButtonSRQSettings (argString);
+            break;
+          case "intensi":
+          case "intensity":
+            intensitySettings = parseIntensitySettings (argString);
+            break;
+          case "devi":
+          case "device":
+            printDeviceSettings = parsePrintDeviceSettings (argString);
+            break;
+          case "curs":
+          case "cursor":
+            cursorSettings = parseCursorSettings (argString);
+            break;
+          case "meas":
+          case "measurement":
+            measurementSettings = parseMeasurementSettings (argString);
+            break;
+          default:
+            LOG.log (Level.SEVERE, "Found unknown key ''{0}'' in part ''{1}''!",
+              new Object[]{keyString, part});
+            throw new IllegalArgumentException ();
+        }
       }
+    }
+    else
+    {
+      // We need exactly 45 parts; might as well crash when not.
+      if (parts.length != 45)
+        throw new IllegalArgumentException ();
+      autoSetupSettings = parseAutoSetupSettingsNoPath (parts[0].trim ().toLowerCase ().split (","));
+      ch1Settings = parseChannelSettingsNoPath (parts[1].trim ().toLowerCase ().split (","));
+      ch2Settings = parseChannelSettingsNoPath (parts[2].trim ().toLowerCase ().split (","));
+      vModeSettings = parseVModeSettingsNoPath (parts[3].trim ().toLowerCase ().split (","));
+      aTriggerSettings = parseATriggerSettingsNoPath (parts[4].trim ().toLowerCase ().split (","));
+      acquisitionSettings = parseAcquisitionSettingsNoPath (parts[5].trim ().toLowerCase ().split (","));
+      delayTimeSettings = parseDelayTimeSettingsNoPath (parts[6].trim ().toLowerCase ().split (","));
+      cursorSettings = parseCursorSettingsNoPath (parts[7].trim ().toLowerCase ().split (","));
+      runSettings = parseRunsSettingsNoPath (parts[8].trim ().toLowerCase ().split (","));
+      bTriggerSettings = parseBTriggerSettingsNoPath (parts[9].trim ().toLowerCase ().split (","));
+      horizontalSettings = parseHorizontalSettingsNoPath (parts[10].trim ().toLowerCase ().split (","));
+      setWordSettings = parseSetWordSettingsNoPath (parts[11].trim ().toLowerCase ().split (","));
+      extGainSettings = parseExtGainSettingsNoPath (parts[12].trim ().toLowerCase ().split (","));
+      refFromSettings = parseRefFromSettingsNoPath (parts[13].trim ().toLowerCase ().split (","));
+      refDisplaySettings = parseRefDisplaySettingsNoPath (parts[14].trim ().toLowerCase ().split (","));
+      bandwidthLimitSettings = parseBandwidthLimitSettingsNoPath (parts[15].trim ().toLowerCase ().split (","));
+      delayEventsSettings = parseDelayEventsSettingsNoPath (parts[16].trim ().toLowerCase ().split (","));
+      intensitySettings = parseIntensitySettingsNoPath (parts[17].trim ().toLowerCase ().split (","));
+      measurementSettings = parseMeasurementSettingsNoPath (parts[18].trim ().toLowerCase ().split (","));
+      printDeviceSettings = parsePrintDeviceSettingsNoPath (parts[19].trim ().toLowerCase ().split (","));
+      readoutSettings = parseReadoutSettingsNoPath (parts[20].trim ().toLowerCase ().split (","));
+      refPositionSettings = parseRefPositionSettingsNoPath (parts[21].trim ().toLowerCase ().split (","));
+      smoothSettings = parseSmoothSettingsNoPath (parts[22].trim ().toLowerCase ().split (","));
+      commandErrorSRQSettings = parseCommandErrorSRQSettingsNoPath (parts[23].trim ().toLowerCase ().split (","));
+      dataSettings = parseDataSettingsNoPath (parts[24].trim ().toLowerCase ().split (","));
+      debugSettings = parseDebugSettingsNoPath (parts[25].trim ().toLowerCase ().split (","));
+      deviceDependentSRQSettings = parseDeviceDependentSRQSettingsNoPath (parts[26].trim ().toLowerCase ().split (","));
+      directionSettings = parseDirectionSettingsNoPath (parts[27].trim ().toLowerCase ().split (","));
+      groupTriggerSRQSettings = parseGroupTriggerSRQSettingsNoPath (parts[28].trim ().toLowerCase ().split (","));
+      executionErrorSRQSettings = parseExecutionErrorSRQSettingsNoPath (parts[29].trim ().toLowerCase ().split (","));
+      executionWarningSRQSettings = parseExecutionWarningSRQSettingsNoPath (parts[30].trim ().toLowerCase ().split (","));
+      formatSettings = parseFormatSettingsNoPath (parts[31].trim ().toLowerCase ().split (","));
+      hysteresisSettings = parseHysteresisSettingsNoPath (parts[32].trim ().toLowerCase ().split (","));
+      internalErrorSRQSettings = parseInternalErrorSRQSettingsNoPath (parts[33].trim ().toLowerCase ().split (","));
+      levelSettings = parseLevelSettingsNoPath (parts[34].trim ().toLowerCase ().split (","));
+      lockSettings = parseLockSettingsNoPath (parts[35].trim ().toLowerCase ().split (","));
+      longSettings = parseLongSettingsNoPath (parts[36].trim ().toLowerCase ().split (","));
+      commandCompletionSRQSettings = parseCommandCompletionSRQSettingsNoPath (parts[37].trim ().toLowerCase ().split (","));
+      pathSettings = parsePathSettingsNoPath (parts[38].trim ().toLowerCase ().split (","));
+      probeIdentifyButtonSRQSettings = parseProbeIdentifyButtonSRQSettingsNoPath (parts[39].trim ().toLowerCase ().split (","));
+      serviceRequestSettings = parseServiceRequestSettingsNoPath (parts[40].trim ().toLowerCase ().split (","));
+      setupSettings = parseSetupSettingsNoPath (parts[41].trim ().toLowerCase ().split (","));
+      startSettings = parseStartSettingsNoPath (parts[42].trim ().toLowerCase ().split (","));
+      stopSettings = parseStopSettingsNoPath (parts[43].trim ().toLowerCase ().split (","));
+      userButtonSRQSettings = parseUserButtonSRQSettingsNoPath (parts[44].trim ().toLowerCase ().split (","));
     }
     return new Tek2440_GPIB_Settings (
       bytes,
@@ -762,6 +821,51 @@ public class Tek2440_GPIB_Settings
     return new AutoSetupSettings (mode, resolution);
   }
   
+  private static AutoSetupSettings parseAutoSetupSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 2)
+      throw new IllegalArgumentException ();
+    final AutoSetupMode mode;
+    final AutoSetupResolution resolution;
+    switch (parts[0].trim ())
+    {
+      case "fal":
+      case "fall":
+        mode = AutoSetupMode.FALL;
+        break;
+      case "peri":
+      case "period":
+        mode = AutoSetupMode.PERIOD;
+        break;
+      case "pul":
+      case "pulse":
+        mode = AutoSetupMode.PULSE;
+        break;
+      case "ris":
+      case "rise":
+        mode = AutoSetupMode.RISE;
+        break;
+      case "vie":
+      case "view":
+        mode = AutoSetupMode.VIEW;
+        break;
+      default:
+        throw new IllegalArgumentException ();
+    }
+    switch (parts[1].trim ())
+    {
+      case "hi":
+        resolution = AutoSetupResolution.HIGH;
+        break;
+      case "lo":
+        resolution = AutoSetupResolution.LOW;
+        break;
+      default:
+        throw new IllegalArgumentException ();
+    }
+    return new AutoSetupSettings (mode, resolution);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // HORIZONTAL SETTINGS
@@ -1050,6 +1154,35 @@ public class Tek2440_GPIB_Settings
           throw new IllegalArgumentException ();
       }
     }
+    return new HorizontalSettings (aSecDiv, bSecDiv, extExp, mode, position);
+  }
+  
+  private static HorizontalSettings parseHorizontalSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 5)
+      throw new IllegalArgumentException ();
+    final HorizontalMode mode;
+    switch (parts[0].trim ())
+    {
+      case "ain":
+      case "aintb":
+        mode = HorizontalMode.AInTb;
+        break;
+      case "asw":
+      case "asweep":
+        mode = HorizontalMode.ASweep;
+        break;
+      case "bsw":
+      case "bsweep":
+        mode = HorizontalMode.BSweep;
+        break;
+      default:
+        throw new IllegalArgumentException ();
+    }
+    final Double position = parseNr3 (parts[1].trim (), 0, 1023);
+    final SecondsPerDivision aSecDiv = SecondsPerDivision.fromDouble (parseNr3 (parts[2]));
+    final SecondsPerDivision bSecDiv = SecondsPerDivision.fromDouble (parseNr3 (parts[3]));
+    final HorizontalExternalExpansionFactor extExp = HorizontalExternalExpansionFactor.fromInteger (parseNr1 (parts[4].trim ()));
     return new HorizontalSettings (aSecDiv, bSecDiv, extExp, mode, position);
   }
   
@@ -1391,6 +1524,25 @@ public class Tek2440_GPIB_Settings
     return new ChannelSettings (channelCoupling, fifty, invert, position, variable, volts);
   }
   
+  private static ChannelSettings parseChannelSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 6)
+      throw new IllegalArgumentException ();
+    final Double volts = parseNr3 (parts[0].trim ());
+    final Double variable = parseNr3 (parts[1].trim ());
+    final Double position = parseNr3 (parts[2].trim ());
+    final ChannelCoupling channelCoupling = parseEnum (parts[3].trim (),
+      new HashMap<String, ChannelCoupling> ()
+      {{
+        put ("ac",  ChannelCoupling.AC);
+        put ("dc",  ChannelCoupling.DC);
+        put ("gnd", ChannelCoupling.GND);
+      }});
+    final Boolean fifty = parseOnOff (parts[4].trim ());
+    final Boolean invert = parseOnOff (parts[5].trim ());
+    return new ChannelSettings (channelCoupling, fifty, invert, position, variable, volts);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DATA SETTINGS
@@ -1538,7 +1690,6 @@ public class Tek2440_GPIB_Settings
             dSource = thisSource;
           else
             source = thisSource;
-          // System.err.println ("  Found data/" + argKey + " definition: " + argPart + ".");
           break;
         }
         case "enc":
@@ -1592,6 +1743,93 @@ public class Tek2440_GPIB_Settings
     return new DataSettings (source, dSource, encoding, target);
   }
   
+  private static DataSettings parseDataSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 4)
+      throw new IllegalArgumentException ();
+    final DataEncoding encoding;
+    switch (parts[0].trim ())
+    {
+      case "asc":
+      case "ascii":
+        encoding = DataEncoding.ASCII;
+        break;
+      case "rpb":
+      case "rpbinary":
+        encoding = DataEncoding.RPBinary;
+        break;
+      case "rib":
+      case "ribinary":
+        encoding = DataEncoding.RIBinary;
+        break;
+      case "rpp":
+      case "rppartial":
+        encoding = DataEncoding.RPPartial;
+        break;
+      case "rip":
+      case "ripartial":
+        encoding = DataEncoding.RIPartial;
+        break;
+      default:
+        throw new IllegalArgumentException ();
+    }
+    final DataTarget target;
+    switch (parts[1].trim ())
+    {
+      case "ref1": target = DataTarget.Ref1; break;
+      case "ref2": target = DataTarget.Ref2; break;
+      case "ref3": target = DataTarget.Ref3; break;
+      case "ref4": target = DataTarget.Ref4; break;
+      default:
+        throw new IllegalArgumentException ();
+    }
+    final DataSource source;
+    switch (parts[2].trim ())
+    {
+      case "ch1":     source = DataSource.Ch1;     break;
+      case "ch2":     source = DataSource.Ch2;     break;
+      case "add":     source = DataSource.Add;     break;
+      case "mul":
+      case "mult":    source = DataSource.Mult;    break;
+      case "ref1":    source = DataSource.Ref1;    break;
+      case "ref2":    source = DataSource.Ref2;    break;
+      case "ref3":    source = DataSource.Ref3;    break;
+      case "ref4":    source = DataSource.Ref4;    break;
+      case "ch1d":
+      case "ch1del":  source = DataSource.Ch1Del;  break;
+      case "ch2d":
+      case "ch2del":  source = DataSource.Ch2Del;  break;
+      case "addd":
+      case "adddel":  source = DataSource.AddDel;  break;
+      case "multd":
+      case "multdel": source = DataSource.MultDel; break;
+      default: throw new IllegalArgumentException ();
+    }
+    final DataSource dSource;
+    switch (parts[3].trim ())
+    {
+      case "ch1":     dSource = DataSource.Ch1;     break;
+      case "ch2":     dSource = DataSource.Ch2;     break;
+      case "add":     dSource = DataSource.Add;     break;
+      case "mul":
+      case "mult":    dSource = DataSource.Mult;    break;
+      case "ref1":    dSource = DataSource.Ref1;    break;
+      case "ref2":    dSource = DataSource.Ref2;    break;
+      case "ref3":    dSource = DataSource.Ref3;    break;
+      case "ref4":    dSource = DataSource.Ref4;    break;
+      case "ch1d":
+      case "ch1del":  dSource = DataSource.Ch1Del;  break;
+      case "ch2d":
+      case "ch2del":  dSource = DataSource.Ch2Del;  break;
+      case "addd":
+      case "adddel":  dSource = DataSource.AddDel;  break;
+      case "multd":
+      case "multdel": dSource = DataSource.MultDel; break;
+      default: throw new IllegalArgumentException ();
+    }
+    return new DataSettings (source, dSource, encoding, target);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // VERTICAL MODE SETTINGS
@@ -1744,6 +1982,23 @@ public class Tek2440_GPIB_Settings
     return new VModeSettings (channel1, channel2, add, mult, display);
   }
   
+  private static VModeSettings parseVModeSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 5)
+      throw new IllegalArgumentException ();
+    final Boolean channel1 = parseOnOff (parts[0].trim ());
+    final Boolean channel2 = parseOnOff (parts[1].trim ());
+    final Boolean add = parseOnOff (parts[2].trim ());
+    final Boolean mult = parseOnOff (parts[3].trim ());
+    final VModeDisplay display = parseEnum (parts[4].trim (),
+          new HashMap<String, VModeDisplay> ()
+          {{
+            put ("yt",  VModeDisplay.YT);
+            put ("xy",  VModeDisplay.XY);
+          }});
+    return new VModeSettings (channel1, channel2, add, mult, display);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // BANDWIDTH LIMIT SETTINGS
@@ -1824,6 +2079,14 @@ public class Tek2440_GPIB_Settings
         throw new IllegalArgumentException ();
     }
     return new BandwidthLimitSettings (bandwidthLimit);
+  }
+  
+  private static BandwidthLimitSettings parseBandwidthLimitSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final BandwidthLimitSettings bandwidthLimitSettings = parseBandwidthLimitSettings (parts[0]);
+    return bandwidthLimitSettings;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2037,6 +2300,61 @@ public class Tek2440_GPIB_Settings
     return new AcquisitionSettings (acquisitionMode, repetitive, acquisitionsAveraged, envelopeSweeps, saveOnDelta);
   }
   
+  private static AcquisitionSettings parseAcquisitionSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 5)
+      throw new IllegalArgumentException ();
+    final AcquisitionMode acquisitionMode;
+    switch (parts[0].trim ())
+    {
+      case "avg":
+        acquisitionMode = AcquisitionMode.AVERAGE;
+        break;
+      case "env":
+        acquisitionMode = AcquisitionMode.ENVELOPE;
+        break;
+      case "nor":
+      case "normal":
+        acquisitionMode = AcquisitionMode.NORMAL;
+        break;
+      default:
+        throw new IllegalArgumentException ();
+    }
+    final Boolean repetitive = parseOnOff (parts[1].trim ());
+    final NumberOfEnvelopeSweeps envelopeSweeps;
+    switch (parts[2].trim ())
+    {
+      // Value "1" should not happen; but it does... Encoding for ENV_SWEEPS_CONTROL??
+      case   "1":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_1;   break;
+      case   "2":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_2;   break;
+      case   "4":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_4;   break;
+      case   "8":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_8;   break;
+      case  "16":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_16;  break;
+      case  "32":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_32;  break;
+      case  "64":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_64;  break;
+      case "128":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_128; break;
+      case "256":  envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_256; break;
+      case "con":
+      case "cont": envelopeSweeps = NumberOfEnvelopeSweeps.ENV_SWEEPS_CONTROL; break;
+      default: throw new IllegalArgumentException ();
+    }
+    final NumberOfAcquisitionsAveraged acquisitionsAveraged;
+    switch (parts[3].trim ())
+    {
+      case   "2": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_2;   break;
+      case   "4": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_4;   break;
+      case   "8": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_8;   break;
+      case  "16": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_16;  break;
+      case  "32": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_32;  break;
+      case  "64": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_64;  break;
+      case "128": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_128; break;
+      case "256": acquisitionsAveraged = NumberOfAcquisitionsAveraged.ACQ_AVG_256; break;
+      default: throw new IllegalArgumentException ();
+    }
+    final Boolean saveOnDelta = parseOnOff (parts[4].trim ());
+    return new AcquisitionSettings (acquisitionMode, repetitive, acquisitionsAveraged, envelopeSweeps, saveOnDelta);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // A-TRIGGER SETTINGS
@@ -2404,6 +2722,74 @@ public class Tek2440_GPIB_Settings
       abSelect);
   }
     
+  private static ATriggerSettings parseATriggerSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 9)
+      throw new IllegalArgumentException ();
+    final ATriggerMode mode = parseEnum (parts[0].trim (),
+      new HashMap<String, ATriggerMode> ()
+      {{
+        put ("auto",      ATriggerMode.Auto);
+        put ("autol",     ATriggerMode.AutoLevel);
+        put ("autolevel", ATriggerMode.AutoLevel);
+        put ("nor",       ATriggerMode.Normal);
+        put ("normal",    ATriggerMode.Normal);
+        put ("sgl",       ATriggerMode.SingleSequence);
+        put ("sglseq",    ATriggerMode.SingleSequence);
+      }});
+    final ATriggerSource source = parseEnum (parts[1].trim (),
+      new HashMap<String, ATriggerSource> ()
+      {{
+        put ("ch1",      ATriggerSource.Ch1);
+        put ("ch2",      ATriggerSource.Ch2);
+        put ("ext1",     ATriggerSource.Ext1);
+        put ("ext2",     ATriggerSource.Ext2);
+        put ("lin",      ATriggerSource.Line);
+        put ("line",     ATriggerSource.Line);
+        put ("ver",      ATriggerSource.Vertical);
+        put ("vertical", ATriggerSource.Vertical);
+      }});
+    final ATriggerCoupling coupling = parseEnum (parts[2].trim (),
+      new HashMap<String, ATriggerCoupling> ()
+      {{
+        put ("ac",       ATriggerCoupling.AC);
+        put ("dc",       ATriggerCoupling.DC);
+        put ("lfr",      ATriggerCoupling.LFReject);
+        put ("lfrej",    ATriggerCoupling.LFReject);
+        put ("hfr",      ATriggerCoupling.HFReject);
+        put ("hfrej",    ATriggerCoupling.HFReject);
+        put ("noi",      ATriggerCoupling.NoiseReject);
+        put ("noiserej", ATriggerCoupling.NoiseReject);
+        put ("tv",       ATriggerCoupling.TV);
+      }});
+    final ATriggerLogSource logSource = parseEnum (parts[3].trim (),
+      new HashMap<String, ATriggerLogSource> ()
+      {{
+        put ("off",  ATriggerLogSource.Off);
+        put ("a.b",  ATriggerLogSource.A_and_B);
+        put ("wor",  ATriggerLogSource.Word);
+        put ("word", ATriggerLogSource.Word);
+      }});
+    final Double level = parseNr3 (parts[4].trim ());
+    final Slope slope = parseEnum (parts[5].trim (),
+      new HashMap<String, Slope> ()
+      {{
+        put ("plu",   Slope.Plus);
+        put ("plus",  Slope.Plus);
+        put ("minu",  Slope.Minus);
+        put ("minus", Slope.Minus);
+      }});
+    final ATriggerPosition position = parseEnumFromOrdinal (parts[6].trim (), ATriggerPosition.class, 1);
+    final Double holdoff = parseNr3 (parts[7].trim (), 0, 100);
+    final ABSelect abSelect = parseEnum (parts[8].trim (),
+      new HashMap<String, ABSelect> ()
+      {{
+        put ("a", ABSelect.A);
+        put ("b", ABSelect.B);
+      }});
+    return new ATriggerSettings (mode, source, coupling, slope, level, position, holdoff, logSource, abSelect);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // B-TRIGGER SETTINGS
@@ -2665,6 +3051,56 @@ public class Tek2440_GPIB_Settings
       extClk);
   }
     
+  private static BTriggerSettings parseBTriggerSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 7)
+      throw new IllegalArgumentException ();
+    final BTriggerMode mode = parseEnum (parts[0].trim (),
+      new HashMap<String, BTriggerMode> ()
+      {{
+        put ("runs",    BTriggerMode.RunsAft);
+        put ("runsaft", BTriggerMode.RunsAft);
+        put ("tri",     BTriggerMode.TrigAft);
+        put ("trigaft", BTriggerMode.TrigAft);
+      }});
+    final Boolean extClk = parseOnOff (parts[1].trim ());
+    final BTriggerSource source = parseEnum (parts[2].trim (),
+      new HashMap<String, BTriggerSource> ()
+      {{
+        put ("ch1",      BTriggerSource.Ch1);
+        put ("ch2",      BTriggerSource.Ch2);
+        put ("ext1",     BTriggerSource.Ext1);
+        put ("ext2",     BTriggerSource.Ext2);
+        put ("wor",      BTriggerSource.Word);
+        put ("word",     BTriggerSource.Word);
+        put ("ver",      BTriggerSource.Vertical);
+        put ("vertical", BTriggerSource.Vertical);
+      }});
+    final BTriggerCoupling coupling = parseEnum (parts[3].trim (),
+      new HashMap<String, BTriggerCoupling> ()
+      {{
+        put ("ac",       BTriggerCoupling.AC);
+        put ("dc",       BTriggerCoupling.DC);
+        put ("lfr",      BTriggerCoupling.LFReject);
+        put ("lfrej",    BTriggerCoupling.LFReject);
+        put ("hfr",      BTriggerCoupling.HFReject);
+        put ("hfrej",    BTriggerCoupling.HFReject);
+        put ("noi",      BTriggerCoupling.NoiseReject);
+        put ("noiserej", BTriggerCoupling.NoiseReject);
+      }});
+    final Double level = parseNr3 (parts[4].trim ());
+    final Slope slope = parseEnum (parts[5].trim (),
+      new HashMap<String, Slope> ()
+      {{
+        put ("plu",   Slope.Plus);
+        put ("plus",  Slope.Plus);
+        put ("minu",  Slope.Minus);
+        put ("minus", Slope.Minus);
+      }});
+    final BTriggerPosition position = parseEnumFromOrdinal (parts[6].trim (), BTriggerPosition.class, 1);
+    return new BTriggerSettings (mode, source, coupling, slope, level, position, extClk);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // RUN SETTINGS
@@ -2718,6 +3154,14 @@ public class Tek2440_GPIB_Settings
     return new RunSettings (mode);
   }
     
+  private static RunSettings parseRunsSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final RunSettings runSettings = parseRunSettings (parts[0]);
+    return runSettings;
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DELAY TIME SETTINGS
@@ -2797,6 +3241,16 @@ public class Tek2440_GPIB_Settings
     return new DelayTimeSettings (delta, delay1, delay2);
   }
     
+  private static DelayTimeSettings parseDelayTimeSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 3)
+      throw new IllegalArgumentException ();
+    final Boolean delta = parseOnOff (parts[0].trim ());
+    final Double delay1 = parseNr3 (parts[1].trim ());
+    final Double delay2 = parseNr3 (parts[2].trim ());
+    return new DelayTimeSettings (delta, delay1, delay2);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DELAY EVENTS SETTINGS
@@ -2865,6 +3319,15 @@ public class Tek2440_GPIB_Settings
     return new DelayEventsSettings (mode, value);
   }
     
+  private static DelayEventsSettings parseDelayEventsSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 2)
+      throw new IllegalArgumentException ();
+    final Boolean mode = parseOnOff (parts[0].trim ());
+    final Integer value = parseNr1 (parts[1].trim (), 1, 65536);
+    return new DelayEventsSettings (mode, value);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SMOOTH SETTINGS
@@ -2905,6 +3368,14 @@ public class Tek2440_GPIB_Settings
     return new SmoothSettings (smooth);
   }
     
+  private static SmoothSettings parseSmoothSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final SmoothSettings smoothSettings = parseSmoothSettings (parts[0]);
+    return smoothSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // COMMAND ERROR SRQ SETTINGS
@@ -2945,6 +3416,14 @@ public class Tek2440_GPIB_Settings
     return new CommandErrorSRQSettings (srq);
   }
     
+  private static CommandErrorSRQSettings parseCommandErrorSRQSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final CommandErrorSRQSettings commandErrorSRQSettings = parseCommandErrorSRQSettings (parts[0]);
+    return commandErrorSRQSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // EXECUTION ERROR SRQ SETTINGS
@@ -2985,6 +3464,14 @@ public class Tek2440_GPIB_Settings
     return new ExecutionErrorSRQSettings (srq);
   }
     
+  private static ExecutionErrorSRQSettings parseExecutionErrorSRQSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final ExecutionErrorSRQSettings executionErrorSRQSettings = parseExecutionErrorSRQSettings (parts[0]);
+    return executionErrorSRQSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // EXECUTION WARNING SRQ SETTINGS
@@ -3025,6 +3512,14 @@ public class Tek2440_GPIB_Settings
     return new ExecutionWarningSRQSettings (srq);
   }
 
+  private static ExecutionWarningSRQSettings parseExecutionWarningSRQSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final ExecutionWarningSRQSettings executionWarningSRQSettings = parseExecutionWarningSRQSettings (parts[0]);
+    return executionWarningSRQSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INTERNAL ERROR SRQ SETTINGS
@@ -3065,6 +3560,14 @@ public class Tek2440_GPIB_Settings
     return new InternalErrorSRQSettings (srq);
   }
     
+  private static InternalErrorSRQSettings parseInternalErrorSRQSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final InternalErrorSRQSettings internalErrorSRQSettings = parseInternalErrorSRQSettings (parts[0]);
+    return internalErrorSRQSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // LONG [RESPONSE] SETTINGS
@@ -3105,6 +3608,14 @@ public class Tek2440_GPIB_Settings
     return new LongSettings (longResponse);
   }
     
+  private static LongSettings parseLongSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final LongSettings longSettings = parseLongSettings (parts[0]);
+    return longSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // PATH SETTINGS
@@ -3145,6 +3656,14 @@ public class Tek2440_GPIB_Settings
     return new PathSettings (path);
   }
     
+  private static PathSettings parsePathSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final PathSettings pathSettings = parsePathSettings (parts[0]);
+    return pathSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SERVICE REQUEST [ENABLED] SETTINGS
@@ -3186,6 +3705,14 @@ public class Tek2440_GPIB_Settings
     return new ServiceRequestSettings (serviceRequestEnabled);
   }
     
+  private static ServiceRequestSettings parseServiceRequestSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final ServiceRequestSettings serviceRequestSettings = parseServiceRequestSettings (parts[0]);
+    return serviceRequestSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SET WORD SETTINGS
@@ -3296,6 +3823,30 @@ public class Tek2440_GPIB_Settings
     return new SetWordSettings (word, clock, radix);
   }
     
+  private static SetWordSettings parseSetWordSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 3)
+      throw new IllegalArgumentException ();
+    final SetWordRadix radix = parseEnum (parts[0].trim (),
+      new HashMap<String, SetWordRadix> ()
+      {{
+        put ("hex",  SetWordRadix.Hexagonal);
+        put ("oct",  SetWordRadix.Octal);
+      }});
+    final SetWordClock clock = parseEnum (parts[1].trim (),
+      new HashMap<String, SetWordClock> ()
+      {{
+        put ("ris",   SetWordClock.Rise);
+        put ("rise",  SetWordClock.Rise);
+        put ("fal",   SetWordClock.Fall);
+        put ("fall",  SetWordClock.Fall);
+        put ("asy",   SetWordClock.ASync);
+        put ("async", SetWordClock.ASync);
+      }});
+    final String word = parts[2].trim ();
+    return new SetWordSettings (word, clock, radix);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // EXT GAIN SETTINGS
@@ -3428,6 +3979,26 @@ public class Tek2440_GPIB_Settings
     return new ExtGainSettings (extGain1, extGain2, position);
   }
     
+  private static ExtGainSettings parseExtGainSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 2)
+      throw new IllegalArgumentException ();
+    final ExtGain extGain1 = parseEnum (parts[0].trim (),
+      new HashMap<String, ExtGain> ()
+      {{
+        put ("div1", ExtGain.Div1);
+        put ("div5", ExtGain.Div5);
+      }});
+    final ExtGain extGain2 = parseEnum (parts[1].trim (),
+      new HashMap<String, ExtGain> ()
+      {{
+        put ("div1", ExtGain.Div1);
+        put ("div5", ExtGain.Div5);
+      }});
+    final ExtInputPosition position = null;
+    return new ExtGainSettings (extGain1, extGain2, position);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // REF FROM SETTINGS
@@ -3505,6 +4076,14 @@ public class Tek2440_GPIB_Settings
     return new RefFromSettings (refFrom);
   }
     
+  private static RefFromSettings parseRefFromSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final RefFromSettings refFromSettings = parseRefFromSettings (parts[0]);
+    return refFromSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // REF DISPLAY SETTINGS
@@ -3664,7 +4243,46 @@ public class Tek2440_GPIB_Settings
     }
     return new RefDisplaySettings (refDisplay1, refDisplay2, refDisplay3, refDisplay4);
   }
-    
+  
+  private static RefDisplaySettings parseRefDisplaySettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 4)
+      throw new IllegalArgumentException ();
+    final RefDisplay refDisplay1 = parseEnum (parts[0].trim (),
+      new HashMap<String, RefDisplay> ()
+      {{
+        put ("emp",   RefDisplay.Empty);
+        put ("empty", RefDisplay.Empty);
+        put ("off",   RefDisplay.Off);
+        put ("on",    RefDisplay.On);
+      }});
+    final RefDisplay refDisplay2 = parseEnum (parts[1].trim (),
+      new HashMap<String, RefDisplay> ()
+      {{
+        put ("emp",   RefDisplay.Empty);
+        put ("empty", RefDisplay.Empty);
+        put ("off",   RefDisplay.Off);
+        put ("on",    RefDisplay.On);
+      }});
+    final RefDisplay refDisplay3 = parseEnum (parts[2].trim (),
+      new HashMap<String, RefDisplay> ()
+      {{
+        put ("emp",   RefDisplay.Empty);
+        put ("empty", RefDisplay.Empty);
+        put ("off",   RefDisplay.Off);
+        put ("on",    RefDisplay.On);
+      }});
+    final RefDisplay refDisplay4 = parseEnum (parts[3].trim (),
+      new HashMap<String, RefDisplay> ()
+      {{
+        put ("emp",   RefDisplay.Empty);
+        put ("empty", RefDisplay.Empty);
+        put ("off",   RefDisplay.Off);
+        put ("on",    RefDisplay.On);
+      }});
+    return new RefDisplaySettings (refDisplay1, refDisplay2, refDisplay3, refDisplay4);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // REF POSITION SETTINGS
@@ -3798,6 +4416,25 @@ public class Tek2440_GPIB_Settings
     return new RefPositionSettings (mode, refPosition1, refPosition2, refPosition3, refPosition4);
   }
 
+  private static RefPositionSettings parseRefPositionSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 5)
+      throw new IllegalArgumentException ();
+    final RefPositionMode mode = parseEnum (parts[0].trim (),
+      new HashMap<String, RefPositionMode> ()
+      {{
+        put ("independent", RefPositionMode.Independent);
+        put ("ind",         RefPositionMode.Independent);
+        put ("loc",         RefPositionMode.Lock);
+        put ("lock",        RefPositionMode.Lock);
+      }});
+    final Double refPosition1 = parseNr3 (parts[1].trim (), 0, 1023);
+    final Double refPosition2 = parseNr3 (parts[2].trim (), 0, 1023);
+    final Double refPosition3 = parseNr3 (parts[3].trim (), 0, 1023);
+    final Double refPosition4 = parseNr3 (parts[4].trim (), 0, 1023);
+    return new RefPositionSettings (mode, refPosition1, refPosition2, refPosition3, refPosition4);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // READOUT SETTINGS
@@ -3838,6 +4475,14 @@ public class Tek2440_GPIB_Settings
     return new ReadoutSettings (readout);
   }
     
+  private static ReadoutSettings parseReadoutSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final ReadoutSettings readoutSettings = parseReadoutSettings (parts[0]);
+    return readoutSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DEBUG SETTINGS
@@ -3873,6 +4518,14 @@ public class Tek2440_GPIB_Settings
     return new DebugSettings (debug);
   }
 
+  private static DebugSettings parseDebugSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final DebugSettings debugSettings = parseDebugSettings (parts[0]);
+    return debugSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DEVICE DEPENDENT SRQ SETTINGS
@@ -3913,6 +4566,14 @@ public class Tek2440_GPIB_Settings
     return new DeviceDependentSRQSettings (srq);
   }
     
+  private static DeviceDependentSRQSettings parseDeviceDependentSRQSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final DeviceDependentSRQSettings deviceDependentSRQSettings = parseDeviceDependentSRQSettings (parts[0]);
+    return deviceDependentSRQSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // COMMAND COMPLETION SRQ SETTINGS
@@ -3953,6 +4614,14 @@ public class Tek2440_GPIB_Settings
     return new CommandCompletionSRQSettings (srq);
   }
     
+  private static CommandCompletionSRQSettings parseCommandCompletionSRQSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final CommandCompletionSRQSettings commandCompletionSRQSettings = parseCommandCompletionSRQSettings (parts[0]);
+    return commandCompletionSRQSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // PROBE IDENTIFY BUTTON SRQ SETTINGS
@@ -3993,6 +4662,14 @@ public class Tek2440_GPIB_Settings
     return new ProbeIdentifyButtonSRQSettings (srq);
   }
     
+  private static ProbeIdentifyButtonSRQSettings parseProbeIdentifyButtonSRQSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final ProbeIdentifyButtonSRQSettings probeIdentifyButtonSRQSettings = parseProbeIdentifyButtonSRQSettings (parts[0]);
+    return probeIdentifyButtonSRQSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DIRECTION SETTINGS
@@ -4041,6 +4718,14 @@ public class Tek2440_GPIB_Settings
     return new DirectionSettings (direction);
   }
     
+  private static DirectionSettings parseDirectionSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final DirectionSettings directionSettings = parseDirectionSettings (parts[0]);
+    return directionSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // GROUP TRIGGER SRQ [DT] SETTINGS
@@ -4129,6 +4814,14 @@ public class Tek2440_GPIB_Settings
     return new GroupTriggerSRQSettings (mode, sequence);
   }
     
+  private static GroupTriggerSRQSettings parseGroupTriggerSRQSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final GroupTriggerSRQSettings groupTriggerSRQSettings = parseGroupTriggerSRQSettings (parts[0]);
+    return groupTriggerSRQSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // FORMAT SETTINGS
@@ -4164,6 +4857,14 @@ public class Tek2440_GPIB_Settings
     return new FormatSettings (format);
   }
     
+  private static FormatSettings parseFormatSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final FormatSettings formatSettings = parseFormatSettings (parts[0]);
+    return formatSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // HYSTERESIS SETTINGS
@@ -4199,6 +4900,14 @@ public class Tek2440_GPIB_Settings
     return new HysteresisSettings (hysteresis);
   }
     
+  private static HysteresisSettings parseHysteresisSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final HysteresisSettings hysteresisSettings = parseHysteresisSettings (parts[0]);
+    return hysteresisSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // LEVEL SETTINGS
@@ -4234,6 +4943,14 @@ public class Tek2440_GPIB_Settings
     return new LevelSettings (level);
   }
     
+  private static LevelSettings parseLevelSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final LevelSettings levelSettings = parseLevelSettings (parts[0]);
+    return levelSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // LOCK SETTINGS
@@ -4282,6 +4999,14 @@ public class Tek2440_GPIB_Settings
     return new LockSettings (lock);
   }
     
+  private static LockSettings parseLockSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final LockSettings lockSettings = parseLockSettings (parts[0]);
+    return lockSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SETUP SETTINGS
@@ -4385,6 +5110,25 @@ public class Tek2440_GPIB_Settings
     return new SetupSettings (actions, force);
   }
 
+  private static SetupSettings parseSetupSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 2)
+      throw new IllegalArgumentException ();
+    final int mask = parseNr1 (parts[0].trim (), 0, 511);
+    final EnumSet<SetupAction> actions = EnumSet.noneOf (SetupAction.class);
+    {
+      int i = 1;
+      while (i < 512)
+      {
+        if ((mask & i) != 0)
+          actions.add (SetupAction.fromBitField (i));
+        i <<= 1;
+      }
+    }
+    final Boolean force = parseOnOff (parts[1].trim ());
+    return new SetupSettings (actions, force);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // START SETTINGS
@@ -4420,6 +5164,14 @@ public class Tek2440_GPIB_Settings
     return new StartSettings (start);
   }
     
+  private static StartSettings parseStartSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final StartSettings startSettings = parseStartSettings (parts[0]);
+    return startSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // STOP SETTINGS
@@ -4455,6 +5207,14 @@ public class Tek2440_GPIB_Settings
     return new StopSettings (stop);
   }
     
+  private static StopSettings parseStopSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final StopSettings stopSettings = parseStopSettings (parts[0]);
+    return stopSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // USER BUTTON SRQ SETTINGS
@@ -4495,6 +5255,14 @@ public class Tek2440_GPIB_Settings
     return new UserButtonSRQSettings (srq);
   }
     
+  private static UserButtonSRQSettings parseUserButtonSRQSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 1)
+      throw new IllegalArgumentException ();
+    final UserButtonSRQSettings userButtonSRQSettings = parseUserButtonSRQSettings (parts[0]);
+    return userButtonSRQSettings;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INTENSITY SETTINGS
@@ -4631,6 +5399,18 @@ public class Tek2440_GPIB_Settings
       vectors);
   }
     
+  private static IntensitySettings parseIntensitySettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 5)
+      throw new IllegalArgumentException ();
+    final Double displayIntensity = parseNr3 (parts[0].trim (), 0, 100);
+    final Double readoutIntensity = parseNr3 (parts[1].trim (), 0, 100);
+    final Double graticuleIntensity = parseNr3 (parts[2].trim (), 0, 100);
+    final Double intensifiedZoneIntensity = parseNr3 (parts[3].trim (), 0, 100);
+    final Boolean vectors = parseOnOff (parts[4].trim ());
+    return new IntensitySettings (displayIntensity, graticuleIntensity, intensifiedZoneIntensity, readoutIntensity, vectors);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // [PRINT] DEVICE SETTINGS
@@ -4691,7 +5471,6 @@ public class Tek2440_GPIB_Settings
         throw new IllegalArgumentException ();
       this.printWaveforms = printWaveforms;
     }
-    
     
   }
     
@@ -4782,6 +5561,37 @@ public class Tek2440_GPIB_Settings
       printWaveforms);
   }
     
+  private static PrintDeviceSettings parsePrintDeviceSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 6)
+      throw new IllegalArgumentException ();
+    final PrintDeviceType deviceType = parseEnum (parts[0].trim (),
+      new HashMap<String, PrintDeviceType> ()
+      {{
+        put ("thi",      PrintDeviceType.ThinkJet);
+        put ("thinkjet", PrintDeviceType.ThinkJet);
+        put ("hpg",      PrintDeviceType.HPGL);
+        put ("hpgl",     PrintDeviceType.HPGL);
+      }});
+    final Boolean printSettings = parseOnOff (parts[1].trim ());
+    final Boolean printGraticule = parseOnOff (parts[2].trim ());
+    final Boolean printText = parseOnOff (parts[3].trim ());
+    final Boolean printWaveforms = parseOnOff (parts[4].trim ());
+    final PrintPageSize pageSize = parseEnum (parts[5].trim (),
+      new HashMap<String, PrintPageSize> ()
+      {{
+        put ("a4", PrintPageSize.A4);
+        put ("us", PrintPageSize.US);
+      }});
+    return new PrintDeviceSettings (
+      deviceType,
+      pageSize,
+      printGraticule,
+      printSettings,
+      printText,
+      printWaveforms);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // CURSOR SETTINGS
@@ -5424,6 +6234,149 @@ public class Tek2440_GPIB_Settings
       units);
   }
     
+  private static CursorSettings parseCursorSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 20)
+      throw new IllegalArgumentException ();
+    final CursorFunction cursorFunction = parseEnum (parts[0].trim (),
+      new HashMap<String, CursorFunction> ()
+      {{
+        put ("of",       CursorFunction.Off);
+        put ("off",      CursorFunction.Off);
+        put ("one/t",    CursorFunction.OnePerTime);
+        put ("one/time", CursorFunction.OnePerTime);
+        put ("slo",      CursorFunction.Slope);
+        put ("slope",    CursorFunction.Slope);
+        put ("tim",      CursorFunction.Time);
+        put ("time",     CursorFunction.Time);
+        put ("vol",      CursorFunction.Volts); // XXX Manual error...
+        put ("volts",    CursorFunction.Volts);
+        put ("v.t",      CursorFunction.V_dot_t);
+     }});
+    final CursorTarget target = parseEnum (parts[1].trim (),
+      new HashMap<String, CursorTarget> ()
+      {{
+        put ("ch1",     CursorTarget.Ch1);
+        put ("ch2",     CursorTarget.Ch2);
+        put ("add",     CursorTarget.Add);
+        put ("mul",     CursorTarget.Mult);
+        put ("mult",    CursorTarget.Mult);
+        put ("ch1d",    CursorTarget.Ch1Del);
+        put ("ch1del",  CursorTarget.Ch1Del);
+        put ("ch2d",    CursorTarget.Ch2Del);
+        put ("ch2del",  CursorTarget.Ch2Del);
+        put ("addd",    CursorTarget.AddDel);
+        put ("adddel",  CursorTarget.AddDel);
+        put ("multd",   CursorTarget.MultDel);
+        put ("multdel", CursorTarget.MultDel);
+        put ("ref1",    CursorTarget.Ref1);
+        put ("ref2",    CursorTarget.Ref2);
+        put ("ref3",    CursorTarget.Ref3);
+        put ("ref4",    CursorTarget.Ref4);
+      }});
+    final CursorUnitTime unitTime = parseEnum (parts[2].trim (),
+      new HashMap<String, CursorUnitTime> ()
+      {{
+        put ("bas",     CursorUnitTime.Base);
+        put ("base",    CursorUnitTime.Base);
+        put ("deg",     CursorUnitTime.Degrees);
+        put ("degrees", CursorUnitTime.Degrees);
+        put ("perc",    CursorUnitTime.Percent);
+        put ("percent", CursorUnitTime.Percent);
+      }});
+    final CursorUnitSlope unitSlope = parseEnum (parts[3].trim (),
+      new HashMap<String, CursorUnitSlope> ()
+      {{
+        put ("bas",     CursorUnitSlope.Base);
+        put ("base",    CursorUnitSlope.Base);
+        put ("db",      CursorUnitSlope.dB);
+        put ("perc",    CursorUnitSlope.Percent);
+        put ("percent", CursorUnitSlope.Percent);
+      }});
+    final CursorUnitVolts unitVolts = parseEnum (parts[4].trim (),
+      new HashMap<String, CursorUnitVolts> ()
+      {{
+        put ("bas",     CursorUnitVolts.Base);
+        put ("base",    CursorUnitVolts.Base);
+        put ("db",      CursorUnitVolts.dB);
+        put ("perc",    CursorUnitVolts.Percent);
+        put ("percent", CursorUnitVolts.Percent);
+      }});
+    final RefVoltsUnit refVoltsUnit = parseEnum (parts[5].trim (),
+      new HashMap<String, RefVoltsUnit> ()
+      {{
+        put ("div",  RefVoltsUnit.Divisions);
+        put ("v",    RefVoltsUnit.Volts);
+        put ("vv",   RefVoltsUnit.VoltsSquared);
+      }});
+    final Double refVoltsValue = parseNr3 (parts[6].trim ());
+    final RefSlopeXUnit refSlopeXUnit = parseEnum (parts[7].trim (),
+      new HashMap<String, RefSlopeXUnit> ()
+      {{
+        put ("clk",  RefSlopeXUnit.ClockTicks);
+        put ("clks", RefSlopeXUnit.ClockTicks);
+        put ("div",  RefSlopeXUnit.Divisions);
+        put ("sec",  RefSlopeXUnit.Seconds);
+        put ("v",    RefSlopeXUnit.Volts);
+        put ("vv",   RefSlopeXUnit.VoltsSquared);
+      }});
+    final RefSlopeYUnit refSlopeYUnit = parseEnum (parts[8].trim (),
+      new HashMap<String, RefSlopeYUnit> ()
+      {{
+        put ("div",  RefSlopeYUnit.Divisions);
+        put ("v",    RefSlopeYUnit.Volts);
+        put ("vv",   RefSlopeYUnit.VoltsSquared);
+      }});
+    final Double refSlopeValue = parseNr3 (parts[9].trim ());
+    final RefTimeUnit refTimeUnit = parseEnum (parts[10].trim (),
+      new HashMap<String, RefTimeUnit> ()
+      {{
+        put ("clk",  RefTimeUnit.ClockTicks);
+        put ("clks", RefTimeUnit.ClockTicks);
+        put ("sec",  RefTimeUnit.Seconds);
+      }});
+    final Double refTimeValue = parseNr3 (parts[11].trim ());
+    final Double xPosition1 = parseNr3 (parts[12].trim ());
+    final Double xPosition2 = parseNr3 (parts[13].trim ());
+    final Double yPosition1 = parseNr3 (parts[14].trim ());
+    final Double yPosition2 = parseNr3 (parts[15].trim ());
+    final Double timePosition1 = parseNr3 (parts[16].trim ());
+    final Double timePosition2 = parseNr3 (parts[17].trim ());    
+    final CursorMode cursorMode = parseEnum (parts[18].trim (),
+      new HashMap<String, CursorMode> ()
+      {{
+        put ("abso",     CursorMode.Absolute);
+        put ("absolute", CursorMode.Absolute);
+        put ("delt",     CursorMode.Delta);
+        put ("delta",    CursorMode.Delta);
+      }});
+    final CursorSelect select = parseEnum (parts[19].trim (),
+      new HashMap<String, CursorSelect> ()
+      {{
+        put ("one", CursorSelect.One);
+        put ("two", CursorSelect.Two);
+      }});
+    final RefSlope refSlope = new RefSlope (refSlopeValue, refSlopeXUnit, refSlopeYUnit);
+    final RefTime refTime = new RefTime (refTimeValue, refTimeUnit);
+    final RefVolts refVolts = new RefVolts (refVoltsValue, refVoltsUnit);
+    final CursorTimePositions timePositions = new CursorTimePositions (timePosition1, timePosition2);
+    final CursorXPositions xPositions = new CursorXPositions (xPosition1, xPosition2);
+    final CursorYPositions yPositions = new CursorYPositions (yPosition1, yPosition2);
+    final CursorUnits units = new CursorUnits (unitSlope, unitTime, unitVolts);
+    return new CursorSettings (
+      cursorFunction,
+      cursorMode,
+      refSlope,
+      refTime,
+      refVolts,
+      select,
+      target,
+      timePositions,
+      xPositions,
+      yPositions,
+      units);
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // MEASUREMENT SETTINGS
@@ -6137,6 +7090,98 @@ public class Tek2440_GPIB_Settings
       displayThresholdCrossingMarks);
   }
 
+  private static MeasurementSettings parseMeasurementSettingsNoPath (final String[] parts)
+  {
+    if (parts == null || parts.length != 28)
+      throw new IllegalArgumentException ();
+    final Boolean displayThresholdCrossingMarks = parseOnOff (parts[0].trim ());
+    final Boolean display = parseOnOff (parts[1].trim ());
+    final Boolean windowing = parseOnOff (parts[2].trim ());
+    final MeasurementType type1 = MeasurementType.fromString (parts[3].trim ());
+    final MeasurementSource source1 = MeasurementSource.fromString (parts[4].trim ());
+    final MeasurementSource dSource1 = MeasurementSource.fromString (parts[5].trim ());
+    final MeasurementType type2 = MeasurementType.fromString (parts[6].trim ());
+    final MeasurementSource source2 = MeasurementSource.fromString (parts[7].trim ());
+    final MeasurementSource dSource2 = MeasurementSource.fromString (parts[8].trim ());
+    final MeasurementType type3 = MeasurementType.fromString (parts[9].trim ());
+    final MeasurementSource source3 = MeasurementSource.fromString (parts[10].trim ());
+    final MeasurementSource dSource3 = MeasurementSource.fromString (parts[11].trim ());
+    final MeasurementType type4 = MeasurementType.fromString (parts[12].trim ());
+    final MeasurementSource source4 = MeasurementSource.fromString (parts[13].trim ());
+    final MeasurementSource dSource4 = MeasurementSource.fromString (parts[14].trim ());
+    final DistalUnit distalUnit = parseEnum (parts[15].trim (),
+      new HashMap<String, DistalUnit> ()
+      {{
+        put ("perc",    DistalUnit.Percents);
+        put ("percent", DistalUnit.Percents);
+        put ("vol",     DistalUnit.Volts);
+        put ("volts",   DistalUnit.Volts);
+      }});
+    final Double distalPercentLevel = parseNr3 (parts[16].trim (), 0, 100); // XXX Boundaries guessed here!
+    final Double distalVoltsLevel = parseNr3 (parts[17].trim ());
+    final MesialUnit mesialUnit = parseEnum (parts[18].trim (),
+      new HashMap<String, MesialUnit> ()
+      {{
+        put ("perc",    MesialUnit.Percents);
+        put ("percent", MesialUnit.Percents);
+        put ("vol",     MesialUnit.Volts);
+        put ("volts",   MesialUnit.Volts);
+      }});
+    final Double mesialPercentLevel = parseNr3 (parts[19].trim (), 0, 100); // XXX Boundaries guessed here!
+    final Double mesialVoltsLevel = parseNr3 (parts[20].trim ());
+    final ProximalUnit proximalUnit = parseEnum (parts[21].trim (),
+      new HashMap<String, ProximalUnit> ()
+      {{
+        put ("perc",    ProximalUnit.Percents);
+        put ("percent", ProximalUnit.Percents);
+        put ("vol",     ProximalUnit.Volts);
+        put ("volts",   ProximalUnit.Volts);
+      }});
+    final Double proximalPercentLevel = parseNr3 (parts[22].trim (), 0, 100); // XXX Boundaries guessed here!
+    final Double proximalVoltsLevel = parseNr3 (parts[23].trim ());
+    final DMesialUnit dMesialUnit = parseEnum (parts[24].trim (),
+      new HashMap<String, DMesialUnit> ()
+      {{
+        put ("perc",    DMesialUnit.Percents);
+        put ("percent", DMesialUnit.Percents);
+        put ("vol",     DMesialUnit.Volts);
+        put ("volts",   DMesialUnit.Volts);
+      }});
+    final Double dMesialPercentLevel = parseNr3 (parts[25].trim (), 0, 100); // XXX Boundaries guessed here!
+    final Double dMesialVoltsLevel = parseNr3 (parts[26].trim ());
+    final MeasurementMethod method = parseEnum (parts[27].trim (),
+      new HashMap<String, MeasurementMethod> ()
+      {{
+        put ("curs",      MeasurementMethod.Cursor);
+        put ("cursor",    MeasurementMethod.Cursor);
+        put ("his",       MeasurementMethod.Histogram);
+        put ("histogram", MeasurementMethod.Histogram);
+        put ("minm",      MeasurementMethod.MinMax);
+        put ("minmax",    MeasurementMethod.MinMax);
+      }});
+    final MeasurementChannel channel1 = new MeasurementChannel (type1, source1, dSource1);
+    final MeasurementChannel channel2 = new MeasurementChannel (type2, source2, dSource2);
+    final MeasurementChannel channel3 = new MeasurementChannel (type3, source3, dSource3);
+    final MeasurementChannel channel4 = new MeasurementChannel (type4, source4, dSource4);
+    final DistalSettings distalSettings     = new DistalSettings (distalVoltsLevel, distalPercentLevel, distalUnit);
+    final MesialSettings mesialSettings     = new MesialSettings (mesialVoltsLevel, mesialPercentLevel, mesialUnit);
+    final DMesialSettings dMesialSettings   = new DMesialSettings (dMesialVoltsLevel, dMesialPercentLevel, dMesialUnit);
+    final ProximalSettings proximalSettings = new ProximalSettings (proximalVoltsLevel, proximalPercentLevel, proximalUnit);
+    return new MeasurementSettings (
+      method,
+      windowing,
+      channel1,
+      channel2,
+      channel3,
+      channel4,
+      distalSettings,
+      mesialSettings,
+      dMesialSettings,
+      proximalSettings,
+      display,
+      displayThresholdCrossingMarks);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
