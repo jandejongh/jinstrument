@@ -1502,6 +1502,9 @@ public class Tek2440_GPIB_Settings
       boolean isDSource = false;
       switch (argKey)
       {
+        // Programming Manual says "dsou", but I'm getting "dso" from my scope.
+        // Let's allow both; seems harmless.
+        case "dso":
         case "dsou":
         case "dsource":
           isDSource = true;
@@ -2595,7 +2598,7 @@ public class Tek2440_GPIB_Settings
               put ("ext2",     BTriggerSource.Ext2);
               put ("wor",      BTriggerSource.Word);
               put ("word",     BTriggerSource.Word);
-              put ("vert",     BTriggerSource.Vertical);
+              put ("ver",      BTriggerSource.Vertical);
               put ("vertical", BTriggerSource.Vertical);
             }});
           break;
@@ -3089,6 +3092,11 @@ public class Tek2440_GPIB_Settings
     return this.longSettings;
   }
   
+  public final boolean getUseLongResponse ()
+  {
+    return getLongSettings ().longResponse;
+  }
+  
   private static LongSettings parseLongSettings (final String argString)
   {
     if (argString == null)
@@ -3122,6 +3130,11 @@ public class Tek2440_GPIB_Settings
   public final PathSettings getPathSettings ()
   {
     return this.pathSettings;
+  }
+  
+  public final boolean getUsePath ()
+  {
+    return getPathSettings ().path;
   }
   
   private static PathSettings parsePathSettings (final String argString)
@@ -5985,7 +5998,7 @@ public class Tek2440_GPIB_Settings
           }
           break;
         }
-        case "mes":
+        case "mesi":
         case "mesial":
         {
           if (argArgParts.length != 3)
