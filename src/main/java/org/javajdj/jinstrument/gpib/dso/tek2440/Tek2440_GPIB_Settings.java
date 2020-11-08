@@ -3459,6 +3459,11 @@ public class Tek2440_GPIB_Settings
     return this.refFromSettings;
   }
   
+  public final RefFrom getRefSource ()
+  {
+    return getRefFromSettings ().refFrom;
+  }
+  
   private static RefFromSettings parseRefFromSettings (final String argString)
   {
     if (argString == null)
