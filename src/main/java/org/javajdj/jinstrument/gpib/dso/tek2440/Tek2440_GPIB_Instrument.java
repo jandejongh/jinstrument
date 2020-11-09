@@ -687,6 +687,22 @@ public class Tek2440_GPIB_Instrument
       InstrumentCommand.ICARG_TEK2440_USE_PATH, usePath));
   }
   
+  public void setDelayEventsMode (final boolean delayEventsEnabled)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_DELAY_EVENTS_MODE,
+      InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS_MODE, delayEventsEnabled));
+  }
+  
+  public void setDelayEvents (final int delayEvents)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_DELAY_EVENTS,
+      InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS, delayEvents));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1032,6 +1048,20 @@ public class Tek2440_GPIB_Instrument
         {
           final boolean usePath = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_USE_PATH);
           writeSync ("PAT " + (usePath? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_DELAY_EVENTS_MODE:
+        {
+          final boolean delayEventsEnabled = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS_MODE);
+          writeSync ("DLYE MOD:" + (delayEventsEnabled? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_DELAY_EVENTS:
+        {
+          final int delayEvents = (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS);
+          writeSync ("DLYE VAL:" + Integer.toString (delayEvents) + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

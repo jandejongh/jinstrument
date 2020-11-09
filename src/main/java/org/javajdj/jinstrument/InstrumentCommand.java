@@ -289,4 +289,10 @@ public interface InstrumentCommand
   public final static String IC_TEK2440_USE_PATH = "commandTek2440UsePath";
   public final static String ICARG_TEK2440_USE_PATH = "tek2440UsePath";
 
+  public final static String IC_TEK2440_DELAY_EVENTS_MODE = "commandTek2440DelayEventsMode";
+  public final static String ICARG_TEK2440_DELAY_EVENTS_MODE = "tek2440DelayEventsMode";
+
+  public final static String IC_TEK2440_DELAY_EVENTS = "commandTek2440DelayEvents";
+  public final static String ICARG_TEK2440_DELAY_EVENTS = "tek2440DelayEvents";
+
 }

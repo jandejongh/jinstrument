@@ -3285,6 +3285,16 @@ public class Tek2440_GPIB_Settings
     return this.delayEventsSettings;
   }
   
+  public final boolean isDelayEventsEnabled ()
+  {
+    return getDelayEventsSettings ().mode;
+  }
+  
+  public final int getDelayEventsValue ()
+  {
+    return getDelayEventsSettings ().value;
+  }
+  
   private static DelayEventsSettings parseDelayEventsSettings (final String argString)
   {
     if (argString == null)

@@ -297,7 +297,29 @@ public class JTek2440_GPIB
     this.jMul.setEnabled (false);
     // this.jMul.setHorizontalAlignment (SwingConstants.CENTER);
     eastSouthPanel.add (this.jMul);
-    for (int i = 1; i <= 28; i++)
+
+    eastSouthPanel.add (new JLabel ());
+    eastSouthPanel.add (new JLabel ());
+    eastSouthPanel.add (new JLabel ());
+    eastSouthPanel.add (new JLabel ());
+    
+    eastSouthPanel.add (new JLabel ("Delay"));
+    final JColorCheckBox jDelayButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jDelayButton.setDisplayedValue (true);
+    // jDelayButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jDelayDialog = new JOptionPane ().createDialog ("Tek-2440 Delay Settings");
+    this.jDelayDialog.setSize (800, 600);
+    this.jDelayDialog.setLocationRelativeTo (this);
+    this.jDelayDialog.setContentPane (new JTek2440_GPIB_Delay (digitalStorageOscilloscope, level + 1));
+    jDelayButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB.this.jDelayDialog.setVisible (true);
+    });
+    eastSouthPanel.add (jDelayButton);
+    eastSouthPanel.add (new JLabel ());
+    eastSouthPanel.add (new JLabel ());
+
+    for (int i = 1; i <= 20; i++)
       eastSouthPanel.add (new JLabel ());
     this.eastPanel.add (eastSouthPanel);
     
@@ -405,6 +427,15 @@ public class JTek2440_GPIB
   private final JDialog jDataDialog;
   
   private final JDialog jSequencerDialog;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  // EAST SOUTH PANEL
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JDialog jDelayDialog;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
