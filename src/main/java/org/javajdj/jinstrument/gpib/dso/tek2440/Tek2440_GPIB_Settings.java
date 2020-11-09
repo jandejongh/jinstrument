@@ -3202,6 +3202,21 @@ public class Tek2440_GPIB_Settings
     return this.delayTimeSettings;
   }
   
+  public final boolean isDelayTimeDelta ()
+  {
+    return getDelayTimeSettings ().delta;
+  }
+  
+  public final double getDelayTime1_s ()
+  {
+    return getDelayTimeSettings ().delay1;
+  }
+  
+  public final double getDelayTime2_s ()
+  {
+    return getDelayTimeSettings ().delay2;
+  }
+  
   private static DelayTimeSettings parseDelayTimeSettings (final String argString)
   {
     if (argString == null)

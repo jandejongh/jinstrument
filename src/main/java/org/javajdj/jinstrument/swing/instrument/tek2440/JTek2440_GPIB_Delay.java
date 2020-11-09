@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.swing.instrument.tek2440;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.io.IOException;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -116,6 +117,11 @@ public class JTek2440_GPIB_Delay
     delayTimesPanel.setLayout (new GridLayout (6, 4));
     delayTimesPanel.add (new JLabel ("Delta"));
     this.jDelta = new JColorCheckBox.JBoolean (Color.green);
+    this.jDelta.addActionListener (new JInstrumentActionListener_1Boolean (
+      "delay time delta",
+      this.jDelta::getDisplayedValue,
+      tek2440::setDelayTimesDelta,
+      JTek2440_GPIB_Delay.this::isInhibitInstrumentControl));
     delayTimesPanel.add (this.jDelta);
     delayTimesPanel.add (new JLabel ());
     delayTimesPanel.add (new JLabel ());
@@ -125,42 +131,74 @@ public class JTek2440_GPIB_Delay
     this.jDelay1_s.setMinorTickSpacing (10);
     this.jDelay1_s.setPaintTicks (true);
     this.jDelay1_s.setPaintLabels (true);
+    this.jDelay1_s.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+      "delay 1 [s]",
+      this::setDelay1,
+      JTek2440_GPIB_Delay.this::isInhibitInstrumentControl));
     this.jDelay1_ms = new JSlider (0, 999);
     this.jDelay1_ms.setMajorTickSpacing (999);
     this.jDelay1_ms.setMinorTickSpacing (100);
     this.jDelay1_ms.setPaintTicks (true);
     this.jDelay1_ms.setPaintLabels (true);
+    this.jDelay1_ms.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+      "delay 1 [ms]",
+      this::setDelay1,
+      JTek2440_GPIB_Delay.this::isInhibitInstrumentControl));
     this.jDelay1_mus = new JSlider (0, 999);
     this.jDelay1_mus.setMajorTickSpacing (999);
     this.jDelay1_mus.setMinorTickSpacing (100);
     this.jDelay1_mus.setPaintTicks (true);
     this.jDelay1_mus.setPaintLabels (true);
+    this.jDelay1_mus.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+      "delay 1 [\u03BCs]",
+      this::setDelay1,
+      JTek2440_GPIB_Delay.this::isInhibitInstrumentControl));
     this.jDelay1_ns = new JSlider (0, 999);
     this.jDelay1_ns.setMajorTickSpacing (999);
     this.jDelay1_ns.setMinorTickSpacing (100);
     this.jDelay1_ns.setPaintTicks (true);
     this.jDelay1_ns.setPaintLabels (true);
+    this.jDelay1_ns.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+      "delay 1 [ns]",
+      this::setDelay1,
+      JTek2440_GPIB_Delay.this::isInhibitInstrumentControl));
     
     this.jDelay2_s = new JSlider (0, 100);
     this.jDelay2_s.setMajorTickSpacing (100);
     this.jDelay2_s.setMinorTickSpacing (10);
     this.jDelay2_s.setPaintTicks (true);
     this.jDelay2_s.setPaintLabels (true);
+    this.jDelay2_s.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+      "delay 2 [s]",
+      this::setDelay2,
+      JTek2440_GPIB_Delay.this::isInhibitInstrumentControl));
     this.jDelay2_ms = new JSlider (0, 999);
     this.jDelay2_ms.setMajorTickSpacing (999);
     this.jDelay2_ms.setMinorTickSpacing (100);
     this.jDelay2_ms.setPaintTicks (true);
     this.jDelay2_ms.setPaintLabels (true);
+    this.jDelay2_ms.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+      "delay 2 [ms]",
+      this::setDelay2,
+      JTek2440_GPIB_Delay.this::isInhibitInstrumentControl));
     this.jDelay2_mus = new JSlider (0, 999);
     this.jDelay2_mus.setMajorTickSpacing (999);
     this.jDelay2_mus.setMinorTickSpacing (100);
     this.jDelay2_mus.setPaintTicks (true);
     this.jDelay2_mus.setPaintLabels (true);
+    this.jDelay2_mus.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+      "delay 2 [\u03BCs]",
+      this::setDelay2,
+      JTek2440_GPIB_Delay.this::isInhibitInstrumentControl));
     this.jDelay2_ns = new JSlider (0, 999);
     this.jDelay2_ns.setMajorTickSpacing (999);
     this.jDelay2_ns.setMinorTickSpacing (100);
     this.jDelay2_ns.setPaintTicks (true);
     this.jDelay2_ns.setPaintLabels (true);
+    this.jDelay2_ns.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+      "delay 2 [ns]",
+      this::setDelay2,
+      JTek2440_GPIB_Delay.this::isInhibitInstrumentControl));
     
     delayTimesPanel.add (new JLabel ("Delay 1"));
     delayTimesPanel.add (new JLabel ());
@@ -275,7 +313,27 @@ public class JTek2440_GPIB_Delay
   private final JSlider jDelay2_mus;
   
   private final JSlider jDelay2_ns;
-    
+  
+  private void setDelay1 (final double dummyReading)
+    throws InterruptedException, IOException
+  {
+    final double delay1_s = this.jDelay1_s.getValue () +
+      1e-3 * this.jDelay1_ms.getValue () +
+      1e-6 * this.jDelay1_mus.getValue () +
+      1e-9 * this.jDelay1_ns.getValue ();
+    ((Tek2440_GPIB_Instrument) getInstrument ()).setDelayTime1 (delay1_s);
+  }
+  
+  private void setDelay2 (final double dummyReading)
+    throws InterruptedException, IOException
+  {
+    final double delay2_s = this.jDelay2_s.getValue () +
+      1e-3 * this.jDelay2_ms.getValue () +
+      1e-6 * this.jDelay2_mus.getValue () +
+      1e-9 * this.jDelay2_ns.getValue ();
+    ((Tek2440_GPIB_Instrument) getInstrument ()).setDelayTime2 (delay2_s);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENT LISTENER
@@ -307,6 +365,54 @@ public class JTek2440_GPIB_Delay
           JTek2440_GPIB_Delay.this.jDelayEventsMode.setDisplayedValue (settings.isDelayEventsEnabled ());
           JTek2440_GPIB_Delay.this.jDelayEvents.setValue (settings.getDelayEventsValue ());
           JTek2440_GPIB_Delay.this.jDelayEvents.setToolTipText (Integer.toString (settings.getDelayEventsValue ()));
+          JTek2440_GPIB_Delay.this.jDelta.setDisplayedValue (settings.isDelayTimeDelta ());
+          
+          final double delayTime1_double_s = settings.getDelayTime1_s ();
+          final int delayTime1_int_s = (int) Math.floor (delayTime1_double_s);
+          JTek2440_GPIB_Delay.this.jDelay1_s.setValue (delayTime1_int_s);
+          JTek2440_GPIB_Delay.this.jDelay1_s.setToolTipText (Double.toString (delayTime1_double_s) + "s");
+          
+          final double delayTime1_double_rem_s = delayTime1_double_s - delayTime1_int_s;
+          final double delayTime1_double_rem_s_ms = 1000 * delayTime1_double_rem_s;
+          final int delayTime1_int_ms = (int) Math.floor (delayTime1_double_rem_s_ms);
+          JTek2440_GPIB_Delay.this.jDelay1_ms.setValue (delayTime1_int_ms);
+          JTek2440_GPIB_Delay.this.jDelay1_ms.setToolTipText (Double.toString (delayTime1_double_rem_s_ms) + "ms");
+          
+          final double delayTime1_double_rem_ms = delayTime1_double_rem_s_ms - delayTime1_int_ms;
+          final double delayTime1_double_rem_ms_mus = 1000 * delayTime1_double_rem_ms;
+          final int delayTime1_int_mus = (int) Math.floor (delayTime1_double_rem_ms_mus);
+          JTek2440_GPIB_Delay.this.jDelay1_mus.setValue (delayTime1_int_mus);
+          JTek2440_GPIB_Delay.this.jDelay1_mus.setToolTipText (Double.toString (delayTime1_double_rem_ms_mus) + "\u03BCs");
+          
+          final double delayTime1_double_rem_mus = delayTime1_double_rem_ms_mus - delayTime1_int_mus;
+          final double delayTime1_double_rem_mus_ns = 1000 * delayTime1_double_rem_mus;
+          final int delayTime1_int_ns = (int) Math.floor (delayTime1_double_rem_mus_ns);
+          JTek2440_GPIB_Delay.this.jDelay1_ns.setValue (delayTime1_int_ns);
+          JTek2440_GPIB_Delay.this.jDelay1_ns.setToolTipText (Double.toString (delayTime1_double_rem_mus_ns) + "ns");
+          
+          final double delayTime2_double_s = settings.getDelayTime2_s ();
+          final int delayTime2_int_s = (int) Math.floor (delayTime2_double_s);
+          JTek2440_GPIB_Delay.this.jDelay2_s.setValue (delayTime2_int_s);
+          JTek2440_GPIB_Delay.this.jDelay2_s.setToolTipText (Double.toString (delayTime2_double_s) + "s");
+          
+          final double delayTime2_double_rem_s = delayTime2_double_s - delayTime2_int_s;
+          final double delayTime2_double_rem_s_ms = 1000 * delayTime2_double_rem_s;
+          final int delayTime2_int_ms = (int) Math.floor (delayTime2_double_rem_s_ms);
+          JTek2440_GPIB_Delay.this.jDelay2_ms.setValue (delayTime2_int_ms);
+          JTek2440_GPIB_Delay.this.jDelay2_ms.setToolTipText (Double.toString (delayTime2_double_rem_s_ms) + "ms");
+          
+          final double delayTime2_double_rem_ms = delayTime2_double_rem_s_ms - delayTime2_int_ms;
+          final double delayTime2_double_rem_ms_mus = 1000 * delayTime2_double_rem_ms;
+          final int delayTime2_int_mus = (int) Math.floor (delayTime2_double_rem_ms_mus);
+          JTek2440_GPIB_Delay.this.jDelay2_mus.setValue (delayTime2_int_mus);
+          JTek2440_GPIB_Delay.this.jDelay2_mus.setToolTipText (Double.toString (delayTime2_double_rem_ms_mus) + "\u03BCs");
+          
+          final double delayTime2_double_rem_mus = delayTime2_double_rem_ms_mus - delayTime2_int_mus;
+          final double delayTime2_double_rem_mus_ns = 1000 * delayTime2_double_rem_mus;
+          final int delayTime2_int_ns = (int) Math.floor (delayTime2_double_rem_mus_ns);
+          JTek2440_GPIB_Delay.this.jDelay2_ns.setValue (delayTime2_int_ns);
+          JTek2440_GPIB_Delay.this.jDelay2_ns.setToolTipText (Double.toString (delayTime2_double_rem_mus_ns) + "ns");
+          
         }
         finally
         {

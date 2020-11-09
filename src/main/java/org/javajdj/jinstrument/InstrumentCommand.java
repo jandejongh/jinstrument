@@ -295,4 +295,11 @@ public interface InstrumentCommand
   public final static String IC_TEK2440_DELAY_EVENTS = "commandTek2440DelayEvents";
   public final static String ICARG_TEK2440_DELAY_EVENTS = "tek2440DelayEvents";
 
+  public final static String IC_TEK2440_DELAY_TIMES_DELTA = "commandTek2440DelayTimesDelta";
+  public final static String ICARG_TEK2440_DELAY_TIMES_DELTA = "tek2440DelayTimesDelta";
+
+  public final static String IC_TEK2440_DELAY_TIME = "commandTek2440DelayTime";
+  public final static String ICARG_TEK2440_DELAY_TIME_TARGET = "tek2440DelayTimeTarget";
+  public final static String ICARG_TEK2440_DELAY_TIME = "tek2440DelayTime";
+
 }

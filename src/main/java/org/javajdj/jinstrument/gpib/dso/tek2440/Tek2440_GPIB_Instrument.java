@@ -703,6 +703,35 @@ public class Tek2440_GPIB_Instrument
       InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS, delayEvents));
   }
   
+  public void setDelayTimesDelta (final boolean delayTimesDelta)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_DELAY_TIMES_DELTA,
+      InstrumentCommand.ICARG_TEK2440_DELAY_TIMES_DELTA, delayTimesDelta));
+  }
+  
+  public void setDelayTime (final int delayTimeTarget, final double delayTime_s)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_DELAY_TIME,
+      InstrumentCommand.ICARG_TEK2440_DELAY_TIME_TARGET, delayTimeTarget,
+      InstrumentCommand.ICARG_TEK2440_DELAY_TIME, delayTime_s));
+  }
+  
+  public void setDelayTime1 (final double delayTime_s)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setDelayTime (1, delayTime_s);
+  }
+  
+  public void setDelayTime2 (final double delayTime_s)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setDelayTime (2, delayTime_s);    
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1062,6 +1091,30 @@ public class Tek2440_GPIB_Instrument
         {
           final int delayEvents = (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS);
           writeSync ("DLYE VAL:" + Integer.toString (delayEvents) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_DELAY_TIMES_DELTA:
+        {
+          final boolean delayTimesDelta = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DELAY_TIMES_DELTA);
+          writeSync ("DLYT DELT:" + (delayTimesDelta? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_DELAY_TIME:
+        {
+          final int delayTimeTarget = (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DELAY_TIME_TARGET);
+          final double delayTime_s = (double) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DELAY_TIME);
+          switch (delayTimeTarget)
+          {
+            case 1:
+              writeSync ("DLYT DLY1:" + delayTime_s + "\r\n");
+            case 2:
+              writeSync ("DLYT DLY2:" + delayTime_s + "\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
