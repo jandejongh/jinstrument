@@ -100,21 +100,41 @@ public class Tek2440_GPIB_Trace
     return channel;    
   }
   
+  private static int HEADER_SAMPLE_LENGTH = 10;
+  
   private static double[] toSamples (final Tek2440_GPIB_Settings settings, final byte[] bytes)
   {
     if (settings == null || bytes == null)
       throw new IllegalArgumentException ();
-    if (bytes.length < TEK_2440_SAMPLE_LENGTH + "CURVE %".length () + 2)
+    if (bytes.length < HEADER_SAMPLE_LENGTH) // For now; we need a header sample to be more accurate.
+      throw new IllegalArgumentException ();
+    final String headerSample =
+      new String (Arrays.copyOf (bytes, HEADER_SAMPLE_LENGTH), Charset.forName ("US-ASCII")).toLowerCase ();
+    final int pastPercentSign;
+    if (headerSample.startsWith ("curve %"))
+      pastPercentSign = 7; // "curve %".length ();
+    else if (headerSample.startsWith ("curv %"))
+      pastPercentSign = 6; // "curv %".length ();
+    else if (headerSample.startsWith ("%"))
+      pastPercentSign = 1; // "%".length ();
+    else
+      throw new IllegalArgumentException ();
+    if (bytes.length < TEK_2440_SAMPLE_LENGTH + pastPercentSign + 2 /* length encoding */ + 1 /* checksum */)
+      throw new IllegalArgumentException ();
+    if (! (bytes[pastPercentSign] == 0x04 && bytes[pastPercentSign + 1] == 0x01))
+      throw new IllegalArgumentException ();
+    final int header = pastPercentSign + 2;
+    return toSamples (settings, bytes, header);
+  }
+
+  private static double[] toSamples (
+    final Tek2440_GPIB_Settings settings,
+    final byte[] bytes,
+    final int header)
+  {
+    if (settings == null || bytes == null)
       throw new IllegalArgumentException ();
     final double[] samples = new double[TEK_2440_SAMPLE_LENGTH];
-    final String headerSample = new String (Arrays.copyOf (bytes, "CURVE %".length () + 10), Charset.forName ("US-ASCII"));
-    if (! headerSample.startsWith ("CURVE %"))
-      throw new IllegalArgumentException ();
-    // Check for proper length encoding of the trace (0x0401)...
-    // Note: The length field includes the checksum.
-    if (! (bytes["CURVE %".length ()] == 0x04 && bytes["CURVE %".length () + 1] == 0x01))
-      throw new IllegalArgumentException ();
-    final int header = "CURVE %".length () + 2;
     final Tek2440_GPIB_Instrument.Tek2440Channel channel;
     switch (settings.getDataSource ())
     {
