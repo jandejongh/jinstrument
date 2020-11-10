@@ -753,6 +753,30 @@ public class Tek2440_GPIB_Instrument
     setExtGain (2, extGain);    
   }
   
+  public void setWordClock (final Tek2440_GPIB_Settings.WordClock clock)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_WORD_CLOCK,
+      InstrumentCommand.ICARG_TEK2440_WORD_CLOCK, clock));
+  }
+  
+  public void setWordRadix (final Tek2440_GPIB_Settings.WordRadix radix)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_WORD_RADIX,
+      InstrumentCommand.ICARG_TEK2440_WORD_RADIX, radix));
+  }
+    
+  public void setWord (final String word)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_WORD,
+      InstrumentCommand.ICARG_TEK2440_WORD, word));
+  }
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1153,6 +1177,64 @@ public class Tek2440_GPIB_Instrument
               break;
             case 2:
               writeSync ("EXTG EXT2:" + extGain.toTek2440String () + "\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_WORD_CLOCK:
+        {
+          final Tek2440_GPIB_Settings.WordClock clock =
+            (Tek2440_GPIB_Settings.WordClock) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_WORD_CLOCK);
+          switch (clock)
+          {
+            case ASync:
+              writeSync ("SETW CLO:ASY\r\n");
+              break;
+            case Fall:
+              writeSync ("SETW CLO:FAL\r\n");
+              break;
+            case Rise:
+              writeSync ("SETW CLO:RIS\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_WORD_RADIX:
+        {
+          final Tek2440_GPIB_Settings.WordRadix radix =
+            (Tek2440_GPIB_Settings.WordRadix) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_WORD_RADIX);
+          switch (radix)
+          {
+            case Octal:
+              writeSync ("SETW RAD:OCT\r\n");
+              break;
+            case Hexadecimal:
+              writeSync ("SETW RAD:HEX\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_WORD:
+        {
+          final String word = ((String) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_WORD)).trim ();
+          if (word == null)
+            throw new IllegalArgumentException ();
+          switch (word.length ())
+          {
+            case 17:
+              writeSync ("SETW WOR:#Y" + word + "\r\n");
+              break;
+            case 19:
+              writeSync ("SETW WOR:" + word + "\r\n");
               break;
             default:
               throw new IllegalArgumentException ();

@@ -80,7 +80,7 @@ public class Tek2440_GPIB_Settings
     final LongSettings longSettings,
     final PathSettings pathSettings,
     final ServiceRequestSettings serviceRequestSettings,
-    final SetWordSettings setWordSettings,
+    final WordSettings wordSettings,
     final ExtGainSettings extGainSettings,
     final RefFromSettings refFromSettings,
     final RefDisplaySettings refDisplaySettings,
@@ -169,9 +169,9 @@ public class Tek2440_GPIB_Settings
     if (serviceRequestSettings == null)
       throw new IllegalArgumentException ();
     this.serviceRequestSettings = serviceRequestSettings;
-    if (setWordSettings == null)
+    if (wordSettings == null)
       throw new IllegalArgumentException ();
-    this.setWordSettings = setWordSettings;
+    this.wordSettings = wordSettings;
     if (extGainSettings == null)
       throw new IllegalArgumentException ();
     this.extGainSettings = extGainSettings;
@@ -290,7 +290,7 @@ public class Tek2440_GPIB_Settings
     LongSettings longSettings = null;
     PathSettings pathSettings = null;
     ServiceRequestSettings serviceRequestSettings = null;
-    SetWordSettings setWordSettings = null;
+    WordSettings wordSettings = null;
     ExtGainSettings extGainSettings = null;
     RefFromSettings refFromSettings = null;
     RefDisplaySettings refDisplaySettings = null;
@@ -401,7 +401,7 @@ public class Tek2440_GPIB_Settings
             break;
           case "setw":
           case "setword":
-            setWordSettings = parseSetWordSettings (argString);
+            wordSettings = parseWordSettings (argString);
             break;
           case "extg":
           case "extgain":
@@ -515,7 +515,7 @@ public class Tek2440_GPIB_Settings
       runSettings = parseRunsSettingsNoPath (parts[8].trim ().toLowerCase ().split (","));
       bTriggerSettings = parseBTriggerSettingsNoPath (parts[9].trim ().toLowerCase ().split (","));
       horizontalSettings = parseHorizontalSettingsNoPath (parts[10].trim ().toLowerCase ().split (","));
-      setWordSettings = parseSetWordSettingsNoPath (parts[11].trim ().toLowerCase ().split (","));
+      wordSettings = parseWordSettingsNoPath (parts[11].trim ().toLowerCase ().split (","));
       extGainSettings = parseExtGainSettingsNoPath (parts[12].trim ().toLowerCase ().split (","));
       refFromSettings = parseRefFromSettingsNoPath (parts[13].trim ().toLowerCase ().split (","));
       refDisplaySettings = parseRefDisplaySettingsNoPath (parts[14].trim ().toLowerCase ().split (","));
@@ -574,7 +574,7 @@ public class Tek2440_GPIB_Settings
       longSettings,
       pathSettings,
       serviceRequestSettings,
-      setWordSettings,
+      wordSettings,
       extGainSettings,
       refFromSettings,
       refDisplaySettings,
@@ -3745,7 +3745,7 @@ public class Tek2440_GPIB_Settings
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // XXX Erroneous in Programming Manual??
-  public enum SetWordClock
+  public enum WordClock
   {
     Rise,
     Fall,
@@ -3753,25 +3753,25 @@ public class Tek2440_GPIB_Settings
   }
   
   // XXX Erroneous in Programming Manual??
-  public enum SetWordRadix
+  public enum WordRadix
   {
     Octal,
-    Hexagonal;
+    Hexadecimal;
   }
   
-  public final static class SetWordSettings
+  public final static class WordSettings
   {
     
+    private final WordClock clock;
+    
+    private final WordRadix radix;
+
     private final String word;
     
-    private final SetWordClock clock;
-    
-    private final SetWordRadix radix;
-
-    public SetWordSettings (
+    public WordSettings (
       final String word,
-      final SetWordClock clock,
-      final SetWordRadix radix)
+      final WordClock clock,
+      final WordRadix radix)
     {
       if (word == null || word.length () != 19)
         throw new IllegalArgumentException ();
@@ -3786,20 +3786,35 @@ public class Tek2440_GPIB_Settings
     
   }
   
-  private final SetWordSettings setWordSettings;
+  private final WordSettings wordSettings;
   
-  public final SetWordSettings getSetWordSettings ()
+  public final WordSettings getWordSettings ()
   {
-    return this.setWordSettings;
+    return this.wordSettings;
   }
   
-  private static SetWordSettings parseSetWordSettings (final String argString)
+  public final WordClock getWordClock ()
+  {
+    return getWordSettings ().clock;
+  }
+  
+  public final WordRadix getWordRadix ()
+  {
+    return getWordSettings ().radix;
+  }
+  
+  public final String getWord ()
+  {
+    return getWordSettings ().word;
+  }
+  
+  private static WordSettings parseWordSettings (final String argString)
   {
     if (argString == null)
       throw new IllegalArgumentException ();
     String word = null;
-    SetWordClock clock = null;
-    SetWordRadix radix = null;
+    WordClock clock = null;
+    WordRadix radix = null;
     final String[] argParts = argString.trim ().toLowerCase ().split (",");
     for (final String argPart: argParts)
     {
@@ -3819,14 +3834,14 @@ public class Tek2440_GPIB_Settings
         case "clock":
         {
           clock = parseEnum (argArgParts[1].trim (),
-            new HashMap<String, SetWordClock> ()
+            new HashMap<String, WordClock> ()
             {{
-              put ("ris",   SetWordClock.Rise);
-              put ("rise",  SetWordClock.Rise);
-              put ("fal",   SetWordClock.Fall);
-              put ("fall",  SetWordClock.Fall);
-              put ("asy",   SetWordClock.ASync);
-              put ("async", SetWordClock.ASync);
+              put ("ris",   WordClock.Rise);
+              put ("rise",  WordClock.Rise);
+              put ("fal",   WordClock.Fall);
+              put ("fall",  WordClock.Fall);
+              put ("asy",   WordClock.ASync);
+              put ("async", WordClock.ASync);
             }});
           break;
         }
@@ -3834,10 +3849,10 @@ public class Tek2440_GPIB_Settings
         case "radix":
         {
           radix = parseEnum (argArgParts[1].trim (),
-            new HashMap<String, SetWordRadix> ()
+            new HashMap<String, WordRadix> ()
             {{
-              put ("hex",  SetWordRadix.Hexagonal);
-              put ("oct",  SetWordRadix.Octal);
+              put ("hex",  WordRadix.Hexadecimal);
+              put ("oct",  WordRadix.Octal);
             }});
           break;
         }
@@ -3845,31 +3860,31 @@ public class Tek2440_GPIB_Settings
           throw new IllegalArgumentException ();
       }
     }
-    return new SetWordSettings (word, clock, radix);
+    return new WordSettings (word, clock, radix);
   }
     
-  private static SetWordSettings parseSetWordSettingsNoPath (final String[] parts)
+  private static WordSettings parseWordSettingsNoPath (final String[] parts)
   {
     if (parts == null || parts.length != 3)
       throw new IllegalArgumentException ();
-    final SetWordRadix radix = parseEnum (parts[0].trim (),
-      new HashMap<String, SetWordRadix> ()
+    final WordRadix radix = parseEnum (parts[0].trim (),
+      new HashMap<String, WordRadix> ()
       {{
-        put ("hex",  SetWordRadix.Hexagonal);
-        put ("oct",  SetWordRadix.Octal);
+        put ("hex",  WordRadix.Hexadecimal);
+        put ("oct",  WordRadix.Octal);
       }});
-    final SetWordClock clock = parseEnum (parts[1].trim (),
-      new HashMap<String, SetWordClock> ()
+    final WordClock clock = parseEnum (parts[1].trim (),
+      new HashMap<String, WordClock> ()
       {{
-        put ("ris",   SetWordClock.Rise);
-        put ("rise",  SetWordClock.Rise);
-        put ("fal",   SetWordClock.Fall);
-        put ("fall",  SetWordClock.Fall);
-        put ("asy",   SetWordClock.ASync);
-        put ("async", SetWordClock.ASync);
+        put ("ris",   WordClock.Rise);
+        put ("rise",  WordClock.Rise);
+        put ("fal",   WordClock.Fall);
+        put ("fall",  WordClock.Fall);
+        put ("asy",   WordClock.ASync);
+        put ("async", WordClock.ASync);
       }});
     final String word = parts[2].trim ();
-    return new SetWordSettings (word, clock, radix);
+    return new WordSettings (word, clock, radix);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

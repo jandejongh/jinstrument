@@ -19,6 +19,7 @@ package org.javajdj.jinstrument.swing.base;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
@@ -34,6 +35,7 @@ import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jswing.jtextfieldlistener.JTextFieldListener;
 
 /** A Swing (base) component for interacting with an {@link Instrument}.
  * 
@@ -999,6 +1001,52 @@ public class JInstrumentPanel
           LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from slider to {0}: {1}.",
             new Object[]{source.getValue (), Arrays.toString (e.getStackTrace ())});
         }
+      }
+    }
+    
+  }
+  
+  public class JInstrumentTextFieldListener_1String
+    extends JTextFieldListener
+    implements FocusListener, ActionListener
+  {
+
+    final String settingString;
+    
+    final Provider<String> getter;
+    
+    final Instrument.InstrumentSetter_1String setter;
+
+    final Provider<Boolean> inhibitSetter;
+    
+    public JInstrumentTextFieldListener_1String (
+      final String settingString,
+      final Provider<String> getter,
+      final Instrument.InstrumentSetter_1String setter,
+      final Provider<Boolean> inhibitSetter)
+    {
+      if (settingString == null || settingString.trim ().isEmpty () || setter == null)
+        throw new IllegalArgumentException ();
+      this.settingString = settingString;
+      this.getter = getter;
+      this.setter = setter;
+      this.inhibitSetter = inhibitSetter;
+    }
+
+    @Override
+    public void actionPerformed ()
+    {
+      if (this.inhibitSetter != null && this.inhibitSetter.apply ())
+        return;
+      final String newValue = this.getter.apply ();
+      try
+      {
+        this.setter.set (newValue);
+      }
+      catch (IOException | InterruptedException e)
+      {
+        LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " to {0} on instrument {1}: {2}.",
+          new Object[]{newValue, getInstrument (), Arrays.toString (e.getStackTrace ())});
       }
     }
     

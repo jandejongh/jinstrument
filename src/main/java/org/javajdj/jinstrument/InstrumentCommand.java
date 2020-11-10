@@ -306,4 +306,13 @@ public interface InstrumentCommand
   public final static String ICARG_TEK2440_EXT_GAIN_TARGET = "tek2440ExtGainTarget";
   public final static String ICARG_TEK2440_EXT_GAIN = "tek2440ExtGain";
 
+  public final static String IC_TEK2440_WORD_CLOCK = "commandTek2440WordClock";
+  public final static String ICARG_TEK2440_WORD_CLOCK = "tek2440WordClock";
+
+  public final static String IC_TEK2440_WORD_RADIX = "commandTek2440WordRadix";
+  public final static String ICARG_TEK2440_WORD_RADIX = "tek2440WordRadix";
+  
+  public final static String IC_TEK2440_WORD = "commandTek2440Word";
+  public final static String ICARG_TEK2440_WORD = "tek2440Word";
+  
 }

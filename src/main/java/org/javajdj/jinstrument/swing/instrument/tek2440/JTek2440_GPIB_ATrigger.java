@@ -20,7 +20,9 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
@@ -35,6 +37,7 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
+import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
 /** A Swing panel for the ATrigger settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -66,80 +69,97 @@ public class JTek2440_GPIB_ATrigger
     final int level,
     final Color panelColor)
   {
-    //
+
     super (digitalStorageOscilloscope, title, level, panelColor);
-    //
+    if (! (digitalStorageOscilloscope instanceof Tek2440_GPIB_Instrument))
+      throw new IllegalArgumentException ();
+    final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
+
     removeAll ();
     setLayout (new GridLayout (1, 2, 10, 0));
-    //
+
     final JPanel leftPanel = new JPanel ();
     leftPanel.setLayout (new GridLayout (5, 1, 0, 10));
     add (leftPanel);
     final JPanel rightPanel = new JPanel ();
     rightPanel.setLayout (new GridLayout (5, 1, 0, 10));
     add (rightPanel);
-    //
+
     leftPanel.add (new JLabel ("Mode"));
     this.jMode = new JComboBox<>  (Tek2440_GPIB_Settings.ATriggerMode.values ());
     this.jMode.setSelectedItem (null);
     this.jMode.setEditable (false);
     this.jMode.setEnabled (false);
     leftPanel.add (this.jMode);
-    //
+
     leftPanel.add (new JLabel ("Source"));
     this.jSource = new JComboBox<> (Tek2440_GPIB_Settings.ATriggerSource.values ());
     this.jSource.setSelectedItem (null);
     this.jSource.setEditable (false);
     this.jSource.setEnabled (false);
     leftPanel.add (this.jSource);
-    //
+
     leftPanel.add (new JLabel ("Coupling"));
     this.jCoupling = new JComboBox<> (Tek2440_GPIB_Settings.ATriggerCoupling.values ());
     this.jCoupling.setSelectedItem (null);
     this.jCoupling.setEditable (false);
     this.jCoupling.setEnabled (false);
     leftPanel.add (this.jCoupling);
-    //
+
     leftPanel.add (new JLabel ("Slope"));
     this.jSlope = new JComboBox<> (Tek2440_GPIB_Settings.Slope.values ());
     this.jSlope.setSelectedItem (null);
     this.jSlope.setEditable (false);
     this.jSlope.setEnabled (false);
     leftPanel.add (this.jSlope);
-    //
+
     leftPanel.add (new JLabel ("Level"));
     this.jLevel = new JSlider ();
     this.jLevel.setEnabled (false);
     leftPanel.add (this.jLevel);
-    //
+
     rightPanel.add (new JLabel ("Position"));
     this.jPosition = new JComboBox<> (Tek2440_GPIB_Settings.ATriggerPosition.values ());
     this.jPosition.setSelectedItem (null);
     this.jPosition.setEditable (false);
     this.jPosition.setEnabled (false);
     rightPanel.add (this.jPosition);
-    //
+
     rightPanel.add (new JLabel ("Holdoff"));
     this.jHoldoff = new JSlider ();
     this.jHoldoff.setEnabled (false);
     rightPanel.add (this.jHoldoff);
-    //
+
     rightPanel.add (new JLabel ("Log Source"));
     this.jLogSource = new JComboBox<> (Tek2440_GPIB_Settings.ATriggerLogSource.values ());
     this.jLogSource.setSelectedItem (null);
     this.jLogSource.setEditable (false);
     this.jLogSource.setEnabled (false);
     rightPanel.add (this.jLogSource);
-    //
+
     rightPanel.add (new JLabel ("A/B Select"));
     this.jABSelect = new JComboBox<> (Tek2440_GPIB_Settings.ABSelect.values ());
     this.jABSelect.setSelectedItem (null);
     this.jABSelect.setEditable (false);
     this.jABSelect.setEnabled (false);
     rightPanel.add (this.jABSelect);
-    //
+
+    rightPanel.add (new JLabel ("Word"));
+    final JColorCheckBox jWordButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jWordButton.setDisplayedValue (true);
+    // jWordButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jWordDialog = new JOptionPane ().createDialog ("Tek-2440 Word Settings");
+    this.jWordDialog.setSize (640, 480);
+    this.jWordDialog.setLocationRelativeTo (this);
+    this.jWordDialog.setContentPane (new JTek2440_GPIB_Word (tek2440, level + 1));
+    jWordButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB_ATrigger.this.jWordDialog.setVisible (true);
+    });
+    rightPanel.add (jWordButton);
+
     getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
-    //
+    
   }
 
   public JTek2440_GPIB_ATrigger (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
@@ -222,6 +242,8 @@ public class JTek2440_GPIB_ATrigger
   private final JComboBox<Tek2440_GPIB_Settings.ATriggerLogSource> jLogSource;
   
   private final JComboBox<Tek2440_GPIB_Settings.ABSelect> jABSelect;
+  
+  private final JDialog jWordDialog;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
