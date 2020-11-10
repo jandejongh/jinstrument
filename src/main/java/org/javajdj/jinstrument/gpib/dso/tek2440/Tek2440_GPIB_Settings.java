@@ -3882,6 +3882,16 @@ public class Tek2440_GPIB_Settings
   {
     Div1,
     Div5;
+    
+    public final String toTek2440String ()
+    {
+      switch (this)
+      {
+        case Div1: return "DIV1";
+        case Div5: return "DIV5";
+        default: throw new RuntimeException ();
+      }
+    }
   }
   
   // Undocumented; assumed to be identical in semantics to A Trigger Position.
@@ -3952,6 +3962,16 @@ public class Tek2440_GPIB_Settings
   public final ExtGainSettings getExtGainSettings ()
   {
     return this.extGainSettings;
+  }
+  
+  public final ExtGain getExtGain1 ()
+  {
+    return getExtGainSettings ().extGain1;
+  }
+  
+  public final ExtGain getExtGain2 ()
+  {
+    return getExtGainSettings ().extGain2;
   }
   
   private static ExtGainSettings parseExtGainSettings (final String argString)

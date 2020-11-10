@@ -732,6 +732,27 @@ public class Tek2440_GPIB_Instrument
     setDelayTime (2, delayTime_s);    
   }
   
+  public void setExtGain (final int extGainTarget, final Tek2440_GPIB_Settings.ExtGain extGain)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_EXT_GAIN,
+      InstrumentCommand.ICARG_TEK2440_EXT_GAIN_TARGET, extGainTarget,
+      InstrumentCommand.ICARG_TEK2440_EXT_GAIN, extGain));
+  }
+  
+  public void setExtGain1 (final Tek2440_GPIB_Settings.ExtGain extGain)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setExtGain (1, extGain);
+  }
+  
+  public void setExtGain2 (final Tek2440_GPIB_Settings.ExtGain extGain)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setExtGain (2, extGain);    
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1109,8 +1130,29 @@ public class Tek2440_GPIB_Instrument
           {
             case 1:
               writeSync ("DLYT DLY1:" + delayTime_s + "\r\n");
+              break;
             case 2:
               writeSync ("DLYT DLY2:" + delayTime_s + "\r\n");
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_EXT_GAIN:
+        {
+          final int extGainTarget =
+            (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_EXT_GAIN_TARGET);
+          final Tek2440_GPIB_Settings.ExtGain extGain =
+            (Tek2440_GPIB_Settings.ExtGain) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_EXT_GAIN);
+          switch (extGainTarget)
+          {
+            case 1:
+              writeSync ("EXTG EXT1:" + extGain.toTek2440String () + "\r\n");
+              break;
+            case 2:
+              writeSync ("EXTG EXT2:" + extGain.toTek2440String () + "\r\n");
               break;
             default:
               throw new IllegalArgumentException ();

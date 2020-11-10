@@ -267,43 +267,43 @@ public class JTek2440_GPIB
     eastNorthPanel.add (this.jCh1Panel);
     eastNorthPanel.add (this.jCh2Panel);
     this.eastPanel.add (eastNorthPanel);
+    
     final JPanel eastSouthPanel = new JPanel ();
-    eastSouthPanel.setBorder (
+    eastSouthPanel.setLayout (new GridLayout (2, 1));
+    this.eastPanel.add (eastSouthPanel);
+    
+    final JPanel centerPanel = new JPanel ();
+    centerPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
         "Generic"));
-    eastSouthPanel.setLayout (new GridLayout (10, 4, 10, 2));
-    eastSouthPanel.add (new JLabel ("Bandwidth"));
+    centerPanel.setLayout (new GridLayout (3, 4, 4, 2));
+    
+    centerPanel.add (new JLabel ("Bandwidth"));
     this.jBandwithLimit = new JComboBox<> (Tek2440_GPIB_Settings.BandwidthLimit.values ());
     this.jBandwithLimit.setEditable (false);
     this.jBandwithLimit.setEnabled (false);
-    eastSouthPanel.add (this.jBandwithLimit);
-    eastSouthPanel.add (new JLabel ("Display Mode"));
+    centerPanel.add (this.jBandwithLimit);
+    
+    centerPanel.add (new JLabel ("Display Mode"));
     this.jVModeDisplay = new JComboBox<> (Tek2440_GPIB_Settings.VModeDisplay.values ());
     this.jVModeDisplay.setEditable (false);
     this.jVModeDisplay.setEnabled (false);
-    eastSouthPanel.add (this.jVModeDisplay);
-    eastSouthPanel.add (new JLabel ());
-    eastSouthPanel.add (new JLabel ());
-    eastSouthPanel.add (new JLabel ());
-    eastSouthPanel.add (new JLabel ());
-    eastSouthPanel.add (new JLabel ("Add"));
+    centerPanel.add (this.jVModeDisplay);
+    
+    centerPanel.add (new JLabel ("Add"));
     this.jAdd = new JColorCheckBox.JBoolean (Color.red);
     this.jAdd.setEnabled (false);
     // this.jAdd.setHorizontalAlignment (SwingConstants.CENTER);
-    eastSouthPanel.add (this.jAdd);
-    eastSouthPanel.add (new JLabel ("Mul"));
+    centerPanel.add (this.jAdd);
+    
+    centerPanel.add (new JLabel ("Mul"));
     this.jMul = new JColorCheckBox.JBoolean (Color.red);
     this.jMul.setEnabled (false);
     // this.jMul.setHorizontalAlignment (SwingConstants.CENTER);
-    eastSouthPanel.add (this.jMul);
-
-    eastSouthPanel.add (new JLabel ());
-    eastSouthPanel.add (new JLabel ());
-    eastSouthPanel.add (new JLabel ());
-    eastSouthPanel.add (new JLabel ());
+    centerPanel.add (this.jMul);
     
-    eastSouthPanel.add (new JLabel ("Delay"));
+    centerPanel.add (new JLabel ("Delay"));
     final JColorCheckBox jDelayButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
     jDelayButton.setDisplayedValue (true);
     // jDelayButton.setHorizontalAlignment (SwingConstants.CENTER);
@@ -315,13 +315,19 @@ public class JTek2440_GPIB
     {
       JTek2440_GPIB.this.jDelayDialog.setVisible (true);
     });
-    eastSouthPanel.add (jDelayButton);
-    eastSouthPanel.add (new JLabel ());
-    eastSouthPanel.add (new JLabel ());
+    centerPanel.add (jDelayButton);
+    centerPanel.add (new JLabel ());
+    centerPanel.add (new JLabel ());
 
-    for (int i = 1; i <= 20; i++)
-      eastSouthPanel.add (new JLabel ());
-    this.eastPanel.add (eastSouthPanel);
+    eastSouthPanel.add (centerPanel);
+    
+    final JPanel extGainPanel = new JTek2440_GPIB_ExtGain (
+      digitalStorageOscilloscope,
+      "Ext Gain",
+      level + 1,
+      DEFAULT_TRIGGER_COLOR);
+    
+    eastSouthPanel.add (extGainPanel);
     
     add (this.eastPanel, BorderLayout.EAST);
     

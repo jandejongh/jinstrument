@@ -302,4 +302,8 @@ public interface InstrumentCommand
   public final static String ICARG_TEK2440_DELAY_TIME_TARGET = "tek2440DelayTimeTarget";
   public final static String ICARG_TEK2440_DELAY_TIME = "tek2440DelayTime";
 
+  public final static String IC_TEK2440_EXT_GAIN = "commandTek2440ExtGain";
+  public final static String ICARG_TEK2440_EXT_GAIN_TARGET = "tek2440ExtGainTarget";
+  public final static String ICARG_TEK2440_EXT_GAIN = "tek2440ExtGain";
+
 }
