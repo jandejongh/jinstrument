@@ -105,12 +105,14 @@ public class JTek2440_GPIB_Ref
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
         "Reference [Waveform] Contents"));
     add (northPanel);
+    
     final JPanel centerPanel = new JPanel ();
     centerPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
         "Reference [Waveform] Transfer"));
     add (centerPanel);
+    
     final JPanel southPanel = new JTek2440_GPIB_RefPos (
       digitalStorageOscilloscope,
       "Reference [Waveform] Positions",
@@ -232,6 +234,7 @@ public class JTek2440_GPIB_Ref
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 1),
         "Source"));
     jFromPanel.setLayout (new BoxLayout (jFromPanel, BoxLayout.Y_AXIS));
+    
     this.jRefSaveFrom = new JComboBox<> (Tek2440_GPIB_Settings.RefFrom.values ());
     this.jRefSaveFrom.setEditable (false);
     this.jRefSaveFrom.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
@@ -249,6 +252,7 @@ public class JTek2440_GPIB_Ref
     jFromPanel.add (Box.createGlue ());
     jFromPanel.add (fromPanelX);
     jFromPanel.add (Box.createGlue ());
+    
     centerPanel.add (jFromPanel);
     
     final JPanel jRefSavePanel = new JPanel ();
