@@ -297,12 +297,6 @@ public class JTek2440_GPIB
     // this.jAdd.setHorizontalAlignment (SwingConstants.CENTER);
     centerPanel.add (this.jAdd);
     
-    centerPanel.add (new JLabel ("Mul"));
-    this.jMul = new JColorCheckBox.JBoolean (Color.red);
-    this.jMul.setEnabled (false);
-    // this.jMul.setHorizontalAlignment (SwingConstants.CENTER);
-    centerPanel.add (this.jMul);
-    
     centerPanel.add (new JLabel ("Delay"));
     final JColorCheckBox jDelayButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
     jDelayButton.setDisplayedValue (true);
@@ -316,9 +310,16 @@ public class JTek2440_GPIB
       JTek2440_GPIB.this.jDelayDialog.setVisible (true);
     });
     centerPanel.add (jDelayButton);
+    
+    centerPanel.add (new JLabel ("Mul"));
+    this.jMul = new JColorCheckBox.JBoolean (Color.red);
+    this.jMul.setEnabled (false);
+    // this.jMul.setHorizontalAlignment (SwingConstants.CENTER);
+    centerPanel.add (this.jMul);
+    
     centerPanel.add (new JLabel ());
     centerPanel.add (new JLabel ());
-
+    
     eastSouthPanel.add (centerPanel);
     
     final JPanel extGainPanel = new JTek2440_GPIB_ExtGain (
