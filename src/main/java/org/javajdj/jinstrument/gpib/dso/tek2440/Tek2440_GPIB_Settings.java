@@ -4841,6 +4841,16 @@ public class Tek2440_GPIB_Settings
     return this.groupTriggerSRQSettings;
   }
   
+  public final GroupTriggerSRQMode getGroupTriggerSRQMode ()
+  {
+    return getGroupTriggerSRQSettings ().mode;
+  }
+  
+  public final String getGroupTriggerSequence ()
+  {
+    return getGroupTriggerSRQSettings ().sequence;
+  }
+  
   private static GroupTriggerSRQSettings parseGroupTriggerSRQSettings (final String argString)
   {
     if (argString == null)
