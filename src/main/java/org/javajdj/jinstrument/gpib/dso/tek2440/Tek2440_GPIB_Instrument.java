@@ -777,6 +777,22 @@ public class Tek2440_GPIB_Instrument
       InstrumentCommand.ICARG_TEK2440_WORD, word));
   }
     
+  public void setDisplayVectors (final boolean display)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_DISPLAY_VECTORS,
+      InstrumentCommand.ICARG_TEK2440_DISPLAY_VECTORS, display));
+  }
+  
+  public void setDisplayReadout (final boolean display)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_DISPLAY_READOUT,
+      InstrumentCommand.ICARG_TEK2440_DISPLAY_READOUT, display));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1239,6 +1255,20 @@ public class Tek2440_GPIB_Instrument
             default:
               throw new IllegalArgumentException ();
           }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_DISPLAY_VECTORS:
+        {
+          final boolean display = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DISPLAY_VECTORS);
+          writeSync ("INTENSI VEC:" + (display? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_DISPLAY_READOUT:
+        {
+          final boolean display = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DISPLAY_READOUT);
+          writeSync ("REA " + (display? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

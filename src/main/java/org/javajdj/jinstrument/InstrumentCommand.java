@@ -315,4 +315,10 @@ public interface InstrumentCommand
   public final static String IC_TEK2440_WORD = "commandTek2440Word";
   public final static String ICARG_TEK2440_WORD = "tek2440Word";
   
+  public final static String IC_TEK2440_DISPLAY_VECTORS = "commandTek2440DisplayVectors";
+  public final static String ICARG_TEK2440_DISPLAY_VECTORS = "tek2440DisplayVectors";
+  
+  public final static String IC_TEK2440_DISPLAY_READOUT = "commandTek2440DisplayReadout";
+  public final static String ICARG_TEK2440_DISPLAY_READOUT = "tek2440DisplayReadout";
+  
 }
