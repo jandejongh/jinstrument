@@ -793,6 +793,14 @@ public class Tek2440_GPIB_Instrument
       InstrumentCommand.ICARG_TEK2440_DISPLAY_READOUT, display));
   }
   
+  public void setBandwidthLimit (final Tek2440_GPIB_Settings.BandwidthLimit bandwidthLimit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      InstrumentCommand.IC_TEK2440_BANDWIDTH_LIMIT,
+      InstrumentCommand.ICARG_TEK2440_BANDWIDTH_LIMIT, bandwidthLimit));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1269,6 +1277,21 @@ public class Tek2440_GPIB_Instrument
         {
           final boolean display = (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DISPLAY_READOUT);
           writeSync ("REA " + (display? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case InstrumentCommand.IC_TEK2440_BANDWIDTH_LIMIT:
+        {
+          final Tek2440_GPIB_Settings.BandwidthLimit bandwidthLimit =
+            (Tek2440_GPIB_Settings.BandwidthLimit) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_BANDWIDTH_LIMIT);
+          switch (bandwidthLimit)
+          {
+            case BWL_20_MHz:  writeSync ("BWL TWE\r\n"); break;
+            case BWL_100_MHz: writeSync ("BWL HUN\r\n"); break;
+            case BWL_FULL:    writeSync ("BWL FUL\r\n"); break;
+            default:
+              throw new IllegalArgumentException ();
+          }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

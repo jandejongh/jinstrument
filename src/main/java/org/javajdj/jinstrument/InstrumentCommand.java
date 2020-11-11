@@ -321,4 +321,7 @@ public interface InstrumentCommand
   public final static String IC_TEK2440_DISPLAY_READOUT = "commandTek2440DisplayReadout";
   public final static String ICARG_TEK2440_DISPLAY_READOUT = "tek2440DisplayReadout";
   
+  public final static String IC_TEK2440_BANDWIDTH_LIMIT = "commandTek2440BandwidthLimit";
+  public final static String ICARG_TEK2440_BANDWIDTH_LIMIT = "tek2440BandwidthLimit";
+  
 }

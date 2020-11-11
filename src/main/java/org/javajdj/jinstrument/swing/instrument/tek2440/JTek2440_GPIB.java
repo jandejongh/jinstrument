@@ -85,6 +85,9 @@ public class JTek2440_GPIB
   {
     
     super (digitalStorageOscilloscope, level);
+    if (! (digitalStorageOscilloscope instanceof Tek2440_GPIB_Instrument))
+      throw new IllegalArgumentException ();
+    final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
     
     removeAll ();
     setLayout (new BorderLayout ());
@@ -282,7 +285,12 @@ public class JTek2440_GPIB
     centerPanel.add (new JLabel ("Bandwidth"));
     this.jBandwithLimit = new JComboBox<> (Tek2440_GPIB_Settings.BandwidthLimit.values ());
     this.jBandwithLimit.setEditable (false);
-    this.jBandwithLimit.setEnabled (false);
+    this.jBandwithLimit.setSelectedItem (null);
+    this.jBandwithLimit.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "bandwidth limit",
+      Tek2440_GPIB_Settings.BandwidthLimit.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.BandwidthLimit>) tek2440::setBandwidthLimit,
+      JTek2440_GPIB.this::isInhibitInstrumentControl));
     centerPanel.add (this.jBandwithLimit);
     
     centerPanel.add (new JLabel ("Display Mode"));
