@@ -251,7 +251,7 @@ public class JInstrumentPanel
    */
   protected boolean inhibitInstrumentControl = false;
   
-  protected final boolean isInhibitInstrumentControl ()
+  public final boolean isInhibitInstrumentControl ()
   {
     return this.inhibitInstrumentControl;
   }

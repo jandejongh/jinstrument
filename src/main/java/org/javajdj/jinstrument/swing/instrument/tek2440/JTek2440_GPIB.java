@@ -182,11 +182,11 @@ public class JTek2440_GPIB
     jSrqPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
-        "SRQ"));
+        "SRQ/GET"));
     final JColorCheckBox jSrqButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
     jSrqButton.setDisplayedValue (true);
     jSrqButton.setHorizontalAlignment (SwingConstants.CENTER);
-    this.jSrqDialog = new JOptionPane ().createDialog ("Tek-2440 GPIB Service Request Settings");
+    this.jSrqDialog = new JOptionPane ().createDialog ("Tek-2440 GPIB Service Request and GET Settings");
     this.jSrqDialog.setSize (800, 600);
     this.jSrqDialog.setLocationRelativeTo (this);
     this.jSrqDialog.setContentPane(new JTek2440_GPIB_SRQ (digitalStorageOscilloscope, level + 1));

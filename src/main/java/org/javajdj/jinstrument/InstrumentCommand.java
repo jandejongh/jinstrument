@@ -324,4 +324,35 @@ public interface InstrumentCommand
   public final static String IC_TEK2440_BANDWIDTH_LIMIT = "commandTek2440BandwidthLimit";
   public final static String ICARG_TEK2440_BANDWIDTH_LIMIT = "tek2440BandwidthLimit";
   
+  public final static String IC_TEK2440_ENABLE_SRQ_INTERNAL_ERROR = "commandTek2440EnableSrqInternalError";
+  public final static String ICARG_TEK2440_ENABLE_SRQ_INTERNAL_ERROR = "tek2440EnableSrqInternalError";
+  
+  public final static String IC_TEK2440_ENABLE_SRQ_COMMAND_ERROR = "commandTek2440EnableSrqCommandError";
+  public final static String ICARG_TEK2440_ENABLE_SRQ_COMMAND_ERROR = "tek2440EnableSrqCommandError";
+  
+  public final static String IC_TEK2440_ENABLE_SRQ_EXECUTION_ERROR = "commandTek2440EnableSrqExecutionError";
+  public final static String ICARG_TEK2440_ENABLE_SRQ_EXECUTION_ERROR = "tek2440EnableSrqExecutionError";
+  
+  public final static String IC_TEK2440_ENABLE_SRQ_EXECUTION_WARNING = "commandTek2440EnableSrqExecutionWarning";
+  public final static String ICARG_TEK2440_ENABLE_SRQ_EXECUTION_WARNING = "tek2440EnableSrqExecutionWarning";
+  
+  public final static String IC_TEK2440_ENABLE_SRQ_COMMAND_COMPLETION = "commandTek2440EnableSrqCommandCompletion";
+  public final static String ICARG_TEK2440_ENABLE_SRQ_COMMAND_COMPLETION = "tek2440EnableSrqCommandCompletion";
+  
+  public final static String IC_TEK2440_ENABLE_SRQ_ON_EVENT = "commandTek2440EnableSrqOnEvent";
+  public final static String ICARG_TEK2440_ENABLE_SRQ_ON_EVENT = "tek2440EnableSrqOnEvent";
+  
+  public final static String IC_TEK2440_ENABLE_SRQ_DEVICE_DEPENDENT = "commandTek2440EnableSrqDeviceDependent";
+  public final static String ICARG_TEK2440_ENABLE_SRQ_DEVICE_DEPENDENT = "tek2440EnableSrqDeviceDependent";
+  
+  public final static String IC_TEK2440_ENABLE_SRQ_ON_USER_BUTTON = "commandTek2440EnableSrqOnUserButton";
+  public final static String ICARG_TEK2440_ENABLE_SRQ_ON_USER_BUTTON = "tek2440EnableSrqOnUserButton";
+  
+  public final static String IC_TEK2440_ENABLE_SRQ_ON_PROBE_IDENTIFY_BUTTON = "commandTek2440EnableSrqOnProbeIdentifyButton";
+  public final static String ICARG_TEK2440_ENABLE_SRQ_ON_PROBE_IDENTIFY_BUTTON = "tek2440EnableSrqOnProbeIdentifyButton";
+  
+  public final static String IC_TEK2440_GROUP_EXECUTE_TRIGGER_MODE = "commandTek2440GroupExecuteTriggerMode";
+  public final static String ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE = "tek2440GroupExecuteTriggerMode";
+  public final static String ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE_USER_SEQUENCE = "tek2440GroupExecuteTriggerModeUserSequence";
+  
 }
