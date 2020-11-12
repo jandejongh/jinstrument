@@ -54,6 +54,7 @@ import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalStorageOscilloscopeView;
 import org.javajdj.jswing.jbyte.JByte;
+import org.javajdj.jswing.jcenter.JCenter;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jtrace.JTrace;
 
@@ -330,13 +331,27 @@ public class JTek2440_GPIB
     
     eastSouthPanel.add (centerPanel);
     
+    final JPanel eastSouthSouthPanel = new JPanel ();
+    eastSouthPanel.add (eastSouthSouthPanel);
+    
+    eastSouthSouthPanel.setLayout (new GridLayout (1, 2));
+    
     final JPanel extGainPanel = new JTek2440_GPIB_ExtGain (
       digitalStorageOscilloscope,
       "Ext Gain",
       level + 1,
       DEFAULT_TRIGGER_COLOR);
     
-    eastSouthPanel.add (extGainPanel);
+    eastSouthSouthPanel.add (extGainPanel);
+    
+    final JLabel eastSouthSouthWestPanel = new JLabel ();
+    eastSouthSouthWestPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Misc"));
+    eastSouthSouthPanel.add (eastSouthSouthWestPanel);
+    
+    eastSouthSouthWestPanel.setLayout (new GridLayout (2, 2));
     
     add (this.eastPanel, BorderLayout.EAST);
     

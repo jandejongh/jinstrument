@@ -75,7 +75,7 @@ public class JTek2440_GPIB_ExtGain
     final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
 
     removeAll ();
-    setLayout (new GridLayout (1, 4, 10, 0));
+    setLayout (new GridLayout (2, 2, 0, 4));
 
     add (new JLabel ("Ext 1"));
     this.jExtGain1 = new JComboBox<>  (Tek2440_GPIB_Settings.ExtGain.values ());
