@@ -209,7 +209,7 @@ public class JTek2440_GPIB_Acquisition
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Tektronix 2440 [GPIB] ATrigger Settings";
+      return "Tektronix 2440 [GPIB] Acquisition Settings";
     }
 
     @Override
