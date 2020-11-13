@@ -386,6 +386,15 @@ public class Tek2440_GPIB_Instrument
   
   public final static int TEK2440_Y_DIVISIONS = 8;
   
+  public void setHorizontalMode (
+    final Tek2440_GPIB_Settings.HorizontalMode mode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_HORIZONTAL_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_HORIZONTAL_MODE, mode));
+  }
+  
   public void setChannelTimebase (
     final Tek2440Channel channel,
     final Tek2440_GPIB_Settings.SecondsPerDivision secondsPerDivision)
@@ -395,6 +404,24 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.IC_TEK2440_TIMEBASE,
       Tek2440_InstrumentCommand.ICARG_TEK2440_TIMEBASE_CHANNEL, channel,
       Tek2440_InstrumentCommand.ICARG_TEK2440_TIMEBASE, secondsPerDivision));
+  }
+  
+  public void setHorizontalPosition (
+    final double position)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_HORIZONTAL_POSITION,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_HORIZONTAL_POSITION, position));
+  }
+  
+  public void setHorizontalExternalExpansion (
+    final Tek2440_GPIB_Settings.HorizontalExternalExpansionFactor expansion)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_HORIZONTAL_EXTERNAL_EXPANSION,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_HORIZONTAL_EXTERNAL_EXPANSION, expansion));
   }
   
   public void setChannelEnable (
@@ -1004,6 +1031,22 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
+        case Tek2440_InstrumentCommand.IC_TEK2440_HORIZONTAL_MODE:
+        {
+          final Tek2440_GPIB_Settings.HorizontalMode mode =
+            (Tek2440_GPIB_Settings.HorizontalMode) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_HORIZONTAL_MODE);
+          switch (mode)
+          {
+            case A_Sweep:         writeSync ("HOR MOD:ASW\r\n"); break;
+            case B_Sweep:         writeSync ("HOR MOD:BSW\r\n"); break;
+            case A_Intensified_B: writeSync ("HOR MOD:AIN\r\n"); break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
         case Tek2440_InstrumentCommand.IC_TEK2440_TIMEBASE:
         {
           final Tek2440Channel channel =
@@ -1023,6 +1066,26 @@ public class Tek2440_GPIB_Instrument
             default:
               throw new IllegalArgumentException ();
           }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_HORIZONTAL_POSITION:
+        {
+          final double position =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_HORIZONTAL_POSITION);
+          writeSync ("HOR POS:" + Double.toString (position) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_HORIZONTAL_EXTERNAL_EXPANSION:
+        {
+          final Tek2440_GPIB_Settings.HorizontalExternalExpansionFactor expansion =
+            (Tek2440_GPIB_Settings.HorizontalExternalExpansionFactor) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_HORIZONTAL_EXTERNAL_EXPANSION);
+          if (expansion == null)
+            throw new IllegalArgumentException ();
+          writeSync ("HOR EXTE:" + Integer.toString (expansion.toInt ()) + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
@@ -1709,7 +1772,7 @@ public class Tek2440_GPIB_Instrument
               Tek2440_InstrumentCommand.ICARG_TEK2440_ACQUISITION_NR_AVERAGED);
           if (number == null)
             throw new IllegalArgumentException ();
-          writeSync ("ACQ NUMAV:" + number.getIntValue () + "\r\n");
+          writeSync ("ACQ NUMAV:" + number.toInt () + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

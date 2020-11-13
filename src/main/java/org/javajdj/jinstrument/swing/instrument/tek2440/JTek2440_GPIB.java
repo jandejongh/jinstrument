@@ -92,9 +92,6 @@ public class JTek2440_GPIB
     removeAll ();
     setLayout (new BorderLayout ());
     
-    this.xPanel = new JTek2440XPanel (digitalStorageOscilloscope);
-    this.aTriggerPanel = new JTek2440_GPIB_ATrigger (digitalStorageOscilloscope, "A Triggering", level + 1, DEFAULT_TRIGGER_COLOR);
-    this.bTriggerPanel = new JTek2440_GPIB_BTrigger (digitalStorageOscilloscope, "B Triggering", level + 1, DEFAULT_TRIGGER_COLOR);
     this.jCh1Panel = new JTek2440ChannelPanel (digitalStorageOscilloscope, Tek2440_GPIB_Instrument.Tek2440Channel.Channel1);
     this.jCh2Panel = new JTek2440ChannelPanel (digitalStorageOscilloscope, Tek2440_GPIB_Instrument.Tek2440Channel.Channel2);
     
@@ -356,9 +353,27 @@ public class JTek2440_GPIB
     
     this.southPanel = new JPanel ();
     this.southPanel.setLayout (new GridLayout (1, 3));
-    this.southPanel.add (this.xPanel);
-    this.southPanel.add (this.aTriggerPanel);
-    this.southPanel.add (this.bTriggerPanel);    
+    final JPanel horizontalPanel = new JTek2440_GPIB_Horizontal (
+      digitalStorageOscilloscope,
+      "Horizontal",
+      level + 1,
+      DEFAULT_TIME_COLOR);
+    this.southPanel.add (horizontalPanel);
+    
+    final JPanel aTriggerPanel = new JTek2440_GPIB_ATrigger (
+      digitalStorageOscilloscope,
+      "A Triggering",
+      level + 1,
+      DEFAULT_TRIGGER_COLOR);
+    this.southPanel.add (aTriggerPanel);
+    
+    final JPanel bTriggerPanel = new JTek2440_GPIB_BTrigger (
+      digitalStorageOscilloscope,
+      "B Triggering",
+      level + 1,
+      DEFAULT_TRIGGER_COLOR);
+    this.southPanel.add (bTriggerPanel);
+    
     add (this.southPanel, BorderLayout.SOUTH);
     
     this.westPanel = new JPanel ();
@@ -492,95 +507,6 @@ public class JTek2440_GPIB
     }
     
   }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  // TEK 2440 X PANEL
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final JTek2440XPanel xPanel;
-  
-  public class JTek2440XPanel
-    extends JTek2440Panel
-  {
-
-    public JTek2440XPanel (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
-    {
-      super (digitalStorageOscilloscope, "X", 1, JInstrumentPanel.getGuiPreferencesTimeColor ());
-      setLayout (new GridLayout (5, 2, 0, 10));
-      add (new JLabel ("A Timebase"));
-      this.jChATimebase = new JComboBox<> (Tek2440_GPIB_Settings.SecondsPerDivision.values ());
-      this.jChATimebase.addItemListener (JTek2440_GPIB.this.jChTimebaseListener);
-      add (this.jChATimebase);
-      add (new JLabel ("B Timebase"));
-      this.jChBTimebase = new JComboBox<> (Tek2440_GPIB_Settings.SecondsPerDivision.values ());
-      this.jChBTimebase.addItemListener (JTek2440_GPIB.this.jChTimebaseListener);
-      add (this.jChBTimebase);
-      add (new JLabel ("Hor Ext Expansion"));
-      this.jExtExp = new JComboBox (Tek2440_GPIB_Settings.HorizontalExternalExpansionFactor.values ());
-      this.jExtExp.setEditable (false);
-      this.jExtExp.setEnabled (false);
-      add (this.jExtExp);
-      add (new JLabel ("Position"));
-      this.jPosition = new JSlider (0, 1023);
-      this.jPosition.setEnabled (false);
-      add (this.jPosition);
-      add (new JLabel ("Mode"));
-      this.jMode = new JComboBox<> (Tek2440_GPIB_Settings.HorizontalMode.values ());
-      this.jMode.setEditable (false);
-      this.jMode.setEnabled (false);
-      add (this.jMode);
-    }
-    
-    private final JComboBox<Tek2440_GPIB_Settings.SecondsPerDivision> jChATimebase;
-    
-    private final JComboBox<Tek2440_GPIB_Settings.SecondsPerDivision> jChBTimebase;  
-    
-    private final JComboBox<Tek2440_GPIB_Settings.HorizontalExternalExpansionFactor> jExtExp;
-    
-    private final JSlider jPosition;
-    
-    private final JComboBox<Tek2440_GPIB_Settings.HorizontalMode> jMode;
-    
-  }
-  
-  private final ItemListener jChTimebaseListener = (ItemEvent ie) ->
-  {
-    if (ie.getStateChange () == ItemEvent.SELECTED)
-    {
-      final Tek2440_GPIB_Settings.SecondsPerDivision newValue = (Tek2440_GPIB_Settings.SecondsPerDivision) ie.getItem ();
-      final Tek2440_GPIB_Instrument tek2440 = ((Tek2440_GPIB_Instrument) getDigitalStorageOscilloscope ());
-      if (! JTek2440_GPIB.this.inhibitInstrumentControl)
-        try
-        {
-          if (ie.getSource () == JTek2440_GPIB.this.xPanel.jChATimebase)
-            tek2440.setChannelTimebase (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1, newValue);
-          else if (ie.getSource () == JTek2440_GPIB.this.xPanel.jChBTimebase)
-            tek2440.setChannelTimebase (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2, newValue);
-          else
-            LOG.log (Level.SEVERE, "Unexpected event source!");            
-        }
-        catch (IOException | InterruptedException e)
-        {
-          LOG.log (Level.WARNING, "Caught exception while setting Secs/Div on instrument"
-            + " from combo box to {0}: {1}.",
-            new Object[]{newValue, e});
-        }
-    }
-  };
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  // TEK 2440 TRIGGER PANELS
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final JTek2440_GPIB_ATrigger aTriggerPanel;
-  
-  private final JTek2440_GPIB_BTrigger bTriggerPanel;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -872,13 +798,6 @@ public class JTek2440_GPIB
         JTek2440_GPIB.this.inhibitInstrumentControl = true;
         try
         {
-          JTek2440_GPIB.this.xPanel.jChATimebase.setSelectedItem (settings.getASecondsPerDivision ());
-          JTek2440_GPIB.this.xPanel.jChBTimebase.setSelectedItem (settings.getBSecondsPerDivision ());
-          JTek2440_GPIB.this.xPanel.jExtExp.setSelectedItem (settings.getHorizontalExternalExpansionFactor ());
-          final int roundedXPosition = (int) Math.round (settings.getHorizontalPosition ());
-          JTek2440_GPIB.this.xPanel.jPosition.setValue (roundedXPosition);
-          JTek2440_GPIB.this.xPanel.jPosition.setToolTipText (Integer.toString (roundedXPosition));
-          JTek2440_GPIB.this.xPanel.jMode.setSelectedItem (settings.getHorizontalMode ());
           JTek2440_GPIB.this.jCh1Panel.jEnabled.setDisplayedValue (settings.isVModeChannel1 ());
           JTek2440_GPIB.this.jCh2Panel.jEnabled.setDisplayedValue (settings.isVModeChannel2 ());
           if (! settings.isVModeChannel1 ())

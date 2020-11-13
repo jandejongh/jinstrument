@@ -868,6 +868,13 @@ public class Tek2440_GPIB_Settings
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  public static enum HorizontalMode
+  {
+    A_Sweep,
+    B_Sweep,
+    A_Intensified_B;
+  }
+  
   public static enum SecondsPerDivision
   {
     
@@ -975,6 +982,11 @@ public class Tek2440_GPIB_Settings
       }
     }
 
+    public final int toInt ()
+    {
+      return this.heef;
+    }
+    
     @Override
     public final String toString ()
     {
@@ -983,43 +995,36 @@ public class Tek2440_GPIB_Settings
     
   }
   
-  public static enum HorizontalMode
-  {
-    AInTb,
-    ASweep,
-    BSweep;
-  }
-  
   public static class HorizontalSettings
   {
+    private final HorizontalMode mode;
     private final SecondsPerDivision aSecDiv;
     private final SecondsPerDivision bSecDiv;
-    private final HorizontalExternalExpansionFactor extExp;
-    private final HorizontalMode mode;
     private final Double position;
+    private final HorizontalExternalExpansionFactor extExp;
 
     public HorizontalSettings (
+      final HorizontalMode mode,
       final SecondsPerDivision aSecDiv,
       final SecondsPerDivision bSecDiv,
-      final HorizontalExternalExpansionFactor extExp,
-      final HorizontalMode mode,
-      final Double position)
+      final Double position,
+      final HorizontalExternalExpansionFactor extExp)
     {
+      if (mode == null)
+        throw new IllegalArgumentException ();
+      this.mode = mode;
       if (aSecDiv == null)
         throw new IllegalArgumentException ();
       this.aSecDiv = aSecDiv;
       if (bSecDiv == null)
         throw new IllegalArgumentException ();
       this.bSecDiv = bSecDiv;
-      if (extExp == null)
-        throw new IllegalArgumentException ();
-      this.extExp = extExp;
-      if (mode == null)
-        throw new IllegalArgumentException ();
-      this.mode = mode;
       if (position == null || position < 0 || position > 1023)
         throw new IllegalArgumentException ();
       this.position = position;
+      if (extExp == null)
+        throw new IllegalArgumentException ();
+      this.extExp = extExp;
     }
     
   }
@@ -1031,6 +1036,11 @@ public class Tek2440_GPIB_Settings
     return this.horizontalSettings;
   }
       
+  public final HorizontalMode getHorizontalMode ()
+  {
+    return getHorizontalSettings ().mode;
+  }
+  
   public final SecondsPerDivision getASecondsPerDivision ()
   {
     return getHorizontalSettings ().aSecDiv;
@@ -1041,30 +1051,25 @@ public class Tek2440_GPIB_Settings
     return getHorizontalSettings ().bSecDiv;
   }
   
-  public final HorizontalExternalExpansionFactor getHorizontalExternalExpansionFactor ()
-  {
-    return getHorizontalSettings ().extExp;
-  }
-  
-  public final HorizontalMode getHorizontalMode ()
-  {
-    return getHorizontalSettings ().mode;
-  }
-  
   public final double getHorizontalPosition ()
   {
     return getHorizontalSettings ().position;
+  }
+  
+  public final HorizontalExternalExpansionFactor getHorizontalExternalExpansionFactor ()
+  {
+    return getHorizontalSettings ().extExp;
   }
   
   private static HorizontalSettings parseHorizontalSettings (final String argString)
   {
     if (argString == null)
       throw new IllegalArgumentException ();
+    HorizontalMode mode = null;
     SecondsPerDivision aSecDiv = null;
     SecondsPerDivision bSecDiv = null;
-    HorizontalExternalExpansionFactor extExp = null;
-    HorizontalMode mode = null;
     Double position = null;
+    HorizontalExternalExpansionFactor extExp = null;
     final String[] argParts = argString.trim ().toLowerCase ().split (",");
     for (final String argPart: argParts)
     {
@@ -1075,6 +1080,28 @@ public class Tek2440_GPIB_Settings
       boolean isASecDiv = false;
       switch (argKey)
       {
+        case "mod":
+        case "mode":
+        {
+          switch (argArgParts[1].trim ())
+          {
+            case "asw":
+            case "asweep":
+              mode = HorizontalMode.A_Sweep;
+              break;
+            case "bsw":
+            case "bsweep":
+              mode = HorizontalMode.B_Sweep;
+              break;
+            case "ain":
+            case "aintb":
+              mode = HorizontalMode.A_Intensified_B;
+              break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          break;
+        }
         case "ase":
         case "asecdiv":
           isASecDiv = true;
@@ -1096,41 +1123,6 @@ public class Tek2440_GPIB_Settings
           }
           break;
         }
-        case "exte":
-        case "extexp":
-        {
-          try
-          {
-            extExp = HorizontalExternalExpansionFactor.fromInteger (Integer.parseInt (argArgParts[1].trim ()));
-          }
-          catch (NumberFormatException nfe)
-          {
-            throw new IllegalArgumentException ();
-          }
-          break;
-        }
-        case "mod":
-        case "mode":
-        {
-          switch (argArgParts[1].trim ())
-          {
-            case "ain":
-            case "aintb":
-              mode = HorizontalMode.AInTb;
-              break;
-            case "asw":
-            case "asweep":
-              mode = HorizontalMode.ASweep;
-              break;
-            case "bsw":
-            case "bsweep":
-              mode = HorizontalMode.BSweep;
-              break;
-            default:
-              throw new IllegalArgumentException ();
-          }
-          break;
-        }
         case "pos":
         case "position":
         {
@@ -1146,11 +1138,24 @@ public class Tek2440_GPIB_Settings
             throw new IllegalArgumentException ();
           break;
         }
+        case "exte":
+        case "extexp":
+        {
+          try
+          {
+            extExp = HorizontalExternalExpansionFactor.fromInteger (Integer.parseInt (argArgParts[1].trim ()));
+          }
+          catch (NumberFormatException nfe)
+          {
+            throw new IllegalArgumentException ();
+          }
+          break;
+        }
         default:
           throw new IllegalArgumentException ();
       }
     }
-    return new HorizontalSettings (aSecDiv, bSecDiv, extExp, mode, position);
+    return new HorizontalSettings (mode, aSecDiv, bSecDiv, position, extExp);
   }
   
   private static HorizontalSettings parseHorizontalSettingsNoPath (final String[] parts)
@@ -1160,26 +1165,26 @@ public class Tek2440_GPIB_Settings
     final HorizontalMode mode;
     switch (parts[0].trim ())
     {
-      case "ain":
-      case "aintb":
-        mode = HorizontalMode.AInTb;
-        break;
       case "asw":
       case "asweep":
-        mode = HorizontalMode.ASweep;
+        mode = HorizontalMode.A_Sweep;
         break;
       case "bsw":
       case "bsweep":
-        mode = HorizontalMode.BSweep;
+        mode = HorizontalMode.B_Sweep;
+        break;
+      case "ain":
+      case "aintb":
+        mode = HorizontalMode.A_Intensified_B;
         break;
       default:
         throw new IllegalArgumentException ();
     }
-    final Double position = parseNr3 (parts[1].trim (), 0, 1023);
     final SecondsPerDivision aSecDiv = SecondsPerDivision.fromDouble (parseNr3 (parts[2]));
     final SecondsPerDivision bSecDiv = SecondsPerDivision.fromDouble (parseNr3 (parts[3]));
+    final Double position = parseNr3 (parts[1].trim (), 0, 1023);
     final HorizontalExternalExpansionFactor extExp = HorizontalExternalExpansionFactor.fromInteger (parseNr1 (parts[4].trim ()));
-    return new HorizontalSettings (aSecDiv, bSecDiv, extExp, mode, position);
+    return new HorizontalSettings (mode, aSecDiv, bSecDiv, position, extExp);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2117,7 +2122,7 @@ public class Tek2440_GPIB_Settings
       this.intValue = intValue;
     }
 
-    public final int getIntValue ()
+    public final int toInt ()
     {
       return this.intValue;
     }
