@@ -1891,6 +1891,19 @@ public class Tek2440_GPIB_Settings
     return this.vModeSettings.channel2;
   }
   
+  public final boolean isVModeChannel (final Tek2440_GPIB_Instrument.Tek2440Channel channel)
+  {
+    if (channel == null)
+      throw new IllegalArgumentException ();
+    switch (channel)
+    {
+      case Channel1: return isVModeChannel1 ();
+      case Channel2: return isVModeChannel2 ();
+      default:
+        throw new IllegalArgumentException ();
+    }    
+  }
+  
   public final boolean isVModeAdd ()
   {
     return this.vModeSettings.add;
