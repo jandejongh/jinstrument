@@ -256,7 +256,8 @@ public class JTek2440_GPIB
     final JPanel jCh1Panel = new JTek2440_GPIB_Channel (
       digitalStorageOscilloscope,
       Tek2440_GPIB_Instrument.Tek2440Channel.Channel1,
-      channel1Color, "Channel 1",
+      channel1Color,
+      "Channel 1",
       level + 1,
       DEFAULT_AMPLITUDE_COLOR);
     eastNorthPanel.add (jCh1Panel);
@@ -296,19 +297,27 @@ public class JTek2440_GPIB
     
     centerPanel.add (new JLabel ("Display Mode"));
     this.jVModeDisplay = new JComboBox<> (Tek2440_GPIB_Settings.VModeDisplay.values ());
+    this.jVModeDisplay.setSelectedItem (null);
     this.jVModeDisplay.setEditable (false);
-    this.jVModeDisplay.setEnabled (false);
+    this.jVModeDisplay.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "vertical (display) mode",
+      Tek2440_GPIB_Settings.VModeDisplay.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.VModeDisplay>) tek2440::setVerticalDisplayMode,
+      this::isInhibitInstrumentControl));
     centerPanel.add (this.jVModeDisplay);
     
     centerPanel.add (new JLabel ("Add"));
-    this.jAdd = new JColorCheckBox.JBoolean (Color.red);
-    this.jAdd.setEnabled (false);
+    this.jAdd = new JColorCheckBox.JBoolean (Color.green);
+    this.jAdd.addActionListener (new JInstrumentActionListener_1Boolean (
+      "display addition (of channels 1 and 2)",
+      this.jAdd::getDisplayedValue,
+      tek2440::setAddEnable,
+      this::isInhibitInstrumentControl));
     centerPanel.add (this.jAdd);
     
     centerPanel.add (new JLabel ("Delay"));
     final JColorCheckBox jDelayButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
     jDelayButton.setDisplayedValue (true);
-    // jDelayButton.setHorizontalAlignment (SwingConstants.CENTER);
     this.jDelayDialog = new JOptionPane ().createDialog ("Tek-2440 Delay Settings");
     this.jDelayDialog.setSize (800, 600);
     this.jDelayDialog.setLocationRelativeTo (this);
@@ -320,8 +329,12 @@ public class JTek2440_GPIB
     centerPanel.add (jDelayButton);
     
     centerPanel.add (new JLabel ("Mul"));
-    this.jMul = new JColorCheckBox.JBoolean (Color.red);
-    this.jMul.setEnabled (false);
+    this.jMul = new JColorCheckBox.JBoolean (Color.green);
+    this.jMul.addActionListener (new JInstrumentActionListener_1Boolean (
+      "display multiplication (of channels 1 and 2)",
+      this.jMul::getDisplayedValue,
+      tek2440::setMultEnable,
+      this::isInhibitInstrumentControl));
     centerPanel.add (this.jMul);
     
     centerPanel.add (new JLabel ());

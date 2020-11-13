@@ -46,6 +46,15 @@ public interface Tek2440_InstrumentCommand
   public final static String ICARG_TEK2440_CHANNEL_ENABLE_CHANNEL = ICARG_TEK2440_CHANNEL;
   public final static String ICARG_TEK2440_CHANNEL_ENABLE = "tek2440ChannelEnable";
   
+  public final static String IC_TEK2440_ADD_ENABLE = "commandTek2440AddEnable";
+  public final static String ICARG_TEK2440_ADD_ENABLE = "tek2440AddEnable";
+  
+  public final static String IC_TEK2440_MULT_ENABLE = "commandTek2440MultEnable";
+  public final static String ICARG_TEK2440_MULT_ENABLE = "tek2440MultEnable";
+  
+  public final static String IC_TEK2440_VERTICAL_DISPLAY_MODE = "commandTek2440VerticalDisplayMode";
+  public final static String ICARG_TEK2440_VERTICAL_DISPLAY_MODE = "tek2440VerticalDisplayMode";
+  
   public final static String IC_TEK2440_VOLTS_PER_DIV = "commandTek2440VoltsPerDiv";
   public final static String ICARG_TEK2440_VOLTS_PER_DIV_CHANNEL = ICARG_TEK2440_CHANNEL;
   public final static String ICARG_TEK2440_VOLTS_PER_DIV = "tek2440VoltsPerDiv";

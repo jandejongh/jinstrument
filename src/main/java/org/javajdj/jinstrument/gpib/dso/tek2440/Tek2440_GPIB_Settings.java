@@ -503,7 +503,11 @@ public class Tek2440_GPIB_Settings
     {
       // We need exactly 45 parts; might as well crash when not.
       if (parts.length != 45)
+      {
+        LOG.log (Level.SEVERE, "Found unexpected number of parts in Settings Data (expected 45): {0}.",
+          parts.length);
         throw new IllegalArgumentException ();
+      }
       autoSetupSettings = parseAutoSetupSettingsNoPath (parts[0].trim ().toLowerCase ().split (","));
       ch1Settings = parseChannelSettingsNoPath (parts[1].trim ().toLowerCase ().split (","));
       ch2Settings = parseChannelSettingsNoPath (parts[2].trim ().toLowerCase ().split (","));

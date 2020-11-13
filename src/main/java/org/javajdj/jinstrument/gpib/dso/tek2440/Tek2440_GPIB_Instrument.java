@@ -435,6 +435,33 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_CHANNEL_ENABLE, channelEnable));
   }
   
+  public void setAddEnable (
+    final boolean enable)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_ADD_ENABLE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ADD_ENABLE, enable));
+  }
+  
+  public void setMultEnable (
+    final boolean enable)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MULT_ENABLE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MULT_ENABLE, enable));
+  }
+  
+  public void setVerticalDisplayMode (
+    final Tek2440_GPIB_Settings.VModeDisplay mode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_VERTICAL_DISPLAY_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_VERTICAL_DISPLAY_MODE, mode));
+  }
+  
   public void setVoltsPerDiv (
     final Tek2440Channel channel,
     final Tek2440_GPIB_Settings.VoltsPerDivision voltsPerDivision)
@@ -1151,6 +1178,38 @@ public class Tek2440_GPIB_Instrument
               break;
             default:
               throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_ADD_ENABLE:
+        {
+          final boolean enable =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_ADD_ENABLE);
+          writeSync ("VMO ADD:" + (enable ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MULT_ENABLE:
+        {
+          final boolean enable =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MULT_ENABLE);
+          writeSync ("VMO MUL:" + (enable ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_VERTICAL_DISPLAY_MODE:
+        {
+          final Tek2440_GPIB_Settings.VModeDisplay mode =
+            (Tek2440_GPIB_Settings.VModeDisplay) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_VERTICAL_DISPLAY_MODE);
+          switch (mode)
+          {
+            case YT: writeSync ("VMO DISP:YT\r\n"); break;
+            case XY: writeSync ("VMO DISP:XY\r\n"); break;
+            default: throw new IllegalArgumentException ();
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
