@@ -913,6 +913,62 @@ public class Tek2440_GPIB_Instrument
     addCommand (new DefaultInstrumentCommand (Tek2440_InstrumentCommand.IC_TEK2440_AUTO_SETUP));
   }
   
+  public void setAcquisitionRepetitive (final boolean repetitive)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_ACQUISITION_REPETITIVE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ACQUISITION_REPETITIVE, repetitive));
+  }
+  
+  public void setAcquisitionMode (final Tek2440_GPIB_Settings.AcquisitionMode mode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_ACQUISITION_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ACQUISITION_MODE, mode));
+  }
+  
+  public void setNumberOfAcquisitionsAveraged (final Tek2440_GPIB_Settings.NumberOfAcquisitionsAveraged number)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_ACQUISITION_NR_AVERAGED,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ACQUISITION_NR_AVERAGED, number));
+  }
+  
+  public void setNumberOfEnvelopeSweeps (final Tek2440_GPIB_Settings.NumberOfEnvelopeSweeps number)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_ACQUISITION_NR_ENV_SWEEPS,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ACQUISITION_NR_ENV_SWEEPS, number));
+  }
+  
+  public void setAcquisitionSaveOnDelta (final boolean saveOnDelta)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_ACQUISITION_SAVE_ON_DELTA,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ACQUISITION_SAVE_ON_DELTA, saveOnDelta));
+  }
+  
+  public void setRunMode (final Tek2440_GPIB_Settings.RunMode mode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_RUN_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_RUN_MODE, mode));
+  }
+  
+  public void setSmoothing (final boolean smoothing)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_SMOOTHING,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_SMOOTHING, smoothing));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1618,6 +1674,89 @@ public class Tek2440_GPIB_Instrument
         case Tek2440_InstrumentCommand.IC_TEK2440_AUTO_SETUP:
         {
           writeSync ("AUTOS EXE\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_ACQUISITION_MODE:
+        {
+          final Tek2440_GPIB_Settings.AcquisitionMode mode =
+            (Tek2440_GPIB_Settings.AcquisitionMode) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_ACQUISITION_MODE);
+          switch (mode)
+          {
+            case Normal:   writeSync ("ACQ MOD:NOR\r\n"); break;
+            case Average:  writeSync ("ACQ MOD:AVG\r\n"); break;
+            case Envelope: writeSync ("ACQ MOD:ENV\r\n"); break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_ACQUISITION_REPETITIVE:
+        {
+          final boolean repetitive =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_ACQUISITION_REPETITIVE);
+          writeSync ("ACQ REP:" + (repetitive ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_ACQUISITION_NR_AVERAGED:
+        {
+          final Tek2440_GPIB_Settings.NumberOfAcquisitionsAveraged number =
+            (Tek2440_GPIB_Settings.NumberOfAcquisitionsAveraged) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_ACQUISITION_NR_AVERAGED);
+          if (number == null)
+            throw new IllegalArgumentException ();
+          writeSync ("ACQ NUMAV:" + number.getIntValue () + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_ACQUISITION_NR_ENV_SWEEPS:
+        {
+          final Tek2440_GPIB_Settings.NumberOfEnvelopeSweeps number =
+            (Tek2440_GPIB_Settings.NumberOfEnvelopeSweeps) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_ACQUISITION_NR_ENV_SWEEPS);
+          if (number == null)
+            throw new IllegalArgumentException ();
+          if (number == Tek2440_GPIB_Settings.NumberOfEnvelopeSweeps.ENV_SWEEPS_CONTROL)
+            writeSync ("ACQ NUME:CON\r\n");
+          else
+            writeSync ("ACQ NUME:" + number.getIntValue () + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_ACQUISITION_SAVE_ON_DELTA:
+        {
+          final boolean saveOnDelta =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_ACQUISITION_SAVE_ON_DELTA);
+          writeSync ("ACQ SAVD:" + (saveOnDelta ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_RUN_MODE:
+        {
+          final Tek2440_GPIB_Settings.RunMode mode =
+            (Tek2440_GPIB_Settings.RunMode) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_RUN_MODE);
+          switch (mode)
+          {
+            case Acquire: writeSync ("RUN ACQ\r\n"); break;
+            case Save:    writeSync ("RUN SAV\r\n"); break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_SMOOTHING:
+        {
+          final boolean smoothing =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_SMOOTHING);
+          writeSync ("SMO " + (smoothing ? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

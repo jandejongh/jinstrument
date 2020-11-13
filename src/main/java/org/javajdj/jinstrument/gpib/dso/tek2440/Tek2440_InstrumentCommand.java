@@ -167,4 +167,25 @@ public interface Tek2440_InstrumentCommand
   
   public final static String IC_TEK2440_AUTO_SETUP = "commandTek2440AutoSetup";
   
+  public final static String IC_TEK2440_ACQUISITION_MODE = "commandTek2440AcquisitionMode";
+  public final static String ICARG_TEK2440_ACQUISITION_MODE = "tek2440AcquisitionMode";
+  
+  public final static String IC_TEK2440_ACQUISITION_REPETITIVE = "commandTek2440AcquisitionRepetitive";
+  public final static String ICARG_TEK2440_ACQUISITION_REPETITIVE = "tek2440AcquisitionRepetitive";
+  
+  public final static String IC_TEK2440_ACQUISITION_NR_AVERAGED = "commandTek2440AcquisitionNrAveraged";
+  public final static String ICARG_TEK2440_ACQUISITION_NR_AVERAGED = "tek2440AcquisitionNrAveraged";
+  
+  public final static String IC_TEK2440_ACQUISITION_NR_ENV_SWEEPS = "commandTek2440AcquisitionNrEnvSweeps";
+  public final static String ICARG_TEK2440_ACQUISITION_NR_ENV_SWEEPS = "tek2440AcquisitionNrEnvSweeps";
+  
+  public final static String IC_TEK2440_ACQUISITION_SAVE_ON_DELTA = "commandTek2440AcquisitionSaveOnDelta";
+  public final static String ICARG_TEK2440_ACQUISITION_SAVE_ON_DELTA = "tek2440AcquisitionSaveOnDelta";
+  
+  public final static String IC_TEK2440_RUN_MODE = "commandTek2440RunMode";
+  public final static String ICARG_TEK2440_RUN_MODE = "tek2440RunMode";
+  
+  public final static String IC_TEK2440_SMOOTHING = "commandTek2440Smoothing";
+  public final static String ICARG_TEK2440_SMOOTHING = "tek2440Smoothing";
+  
 }

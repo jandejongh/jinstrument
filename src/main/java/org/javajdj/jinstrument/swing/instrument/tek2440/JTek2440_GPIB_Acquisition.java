@@ -73,12 +73,15 @@ public class JTek2440_GPIB_Acquisition
     final int level,
     final Color panelColor)
   {
-    //
+    
     super (digitalStorageOscilloscope, title, level, panelColor);
-    //
+    if (! (digitalStorageOscilloscope instanceof Tek2440_GPIB_Instrument))
+      throw new IllegalArgumentException ();
+    final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
+    
     removeAll ();
     setLayout (new GridLayout (2, 1, 0, 0));
-    //
+    
     final JPanel northPanel = new JPanel ();
     northPanel.setLayout (new GridLayout (5, 2, 0, 10));
     northPanel.setBorder (
@@ -103,54 +106,85 @@ public class JTek2440_GPIB_Acquisition
         "Smooth"));
     southEastPanel.setLayout (new BorderLayout ());
     southPanel.add (southEastPanel);
-    //
+    
     northPanel.add (new JLabel ("Acquisition Mode"));
     this.jAcquisitionMode = new JComboBox<>  (Tek2440_GPIB_Settings.AcquisitionMode.values ());
     this.jAcquisitionMode.setSelectedItem (null);
     this.jAcquisitionMode.setEditable (false);
-    this.jAcquisitionMode.setEnabled (false);
+    this.jAcquisitionMode.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "acquisition mode",
+      Tek2440_GPIB_Settings.AcquisitionMode.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.AcquisitionMode>) tek2440::setAcquisitionMode,
+      this::isInhibitInstrumentControl));
     northPanel.add (this.jAcquisitionMode);
-    //
+    
     northPanel.add (new JLabel ("Repetitive"));
     this.jAcquisitionRepetitive = new JColorCheckBox.JBoolean (Color.green);
-    this.jAcquisitionRepetitive.setEnabled (false);
+    this.jAcquisitionRepetitive.addActionListener (new JInstrumentActionListener_1Boolean (
+      "acquisition repetitive",
+      this.jAcquisitionRepetitive::getDisplayedValue,
+      tek2440::setAcquisitionRepetitive,
+      this::isInhibitInstrumentControl));
     northPanel.add (this.jAcquisitionRepetitive);
-    //
+    
     northPanel.add (new JLabel ("Number of Acquisitions Averaged"));
     this.jNumberOfAcquisitionsAveraged = new JComboBox<>  (Tek2440_GPIB_Settings.NumberOfAcquisitionsAveraged.values ());
     this.jNumberOfAcquisitionsAveraged.setSelectedItem (null);
     this.jNumberOfAcquisitionsAveraged.setEditable (false);
-    this.jNumberOfAcquisitionsAveraged.setEnabled (false);
+    this.jNumberOfAcquisitionsAveraged.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "number of acquisitions averaged",
+      Tek2440_GPIB_Settings.NumberOfAcquisitionsAveraged.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.NumberOfAcquisitionsAveraged>)
+        tek2440::setNumberOfAcquisitionsAveraged,
+      this::isInhibitInstrumentControl));
     northPanel.add (this.jNumberOfAcquisitionsAveraged);
-    //
+    
     northPanel.add (new JLabel ("Number of Envelope Sweeps"));
     this.jNumberOfEnvelopeSweeps = new JComboBox<>  (Tek2440_GPIB_Settings.NumberOfEnvelopeSweeps.values ());
     this.jNumberOfEnvelopeSweeps.setSelectedItem (null);
     this.jNumberOfEnvelopeSweeps.setEditable (false);
-    this.jNumberOfEnvelopeSweeps.setEnabled (false);
+    this.jNumberOfEnvelopeSweeps.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "number of envelope sweeps",
+      Tek2440_GPIB_Settings.NumberOfEnvelopeSweeps.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.NumberOfEnvelopeSweeps>)
+        tek2440::setNumberOfEnvelopeSweeps,
+      this::isInhibitInstrumentControl));
     northPanel.add (this.jNumberOfEnvelopeSweeps);
-    //
+    
     northPanel.add (new JLabel ("Save on Delta"));
     this.jAcquisitionSaveOnDelta = new JColorCheckBox.JBoolean (Color.green);
-    this.jAcquisitionSaveOnDelta.setEnabled (false);
+    this.jAcquisitionSaveOnDelta.addActionListener (new JInstrumentActionListener_1Boolean (
+      "acquisition save-on-delta",
+      this.jAcquisitionSaveOnDelta::getDisplayedValue,
+      tek2440::setAcquisitionSaveOnDelta,
+      this::isInhibitInstrumentControl));
     northPanel.add (this.jAcquisitionSaveOnDelta);
-    //
+    
     this.jRunMode = new JComboBox<> (Tek2440_GPIB_Settings.RunMode.values ());
     this.jRunMode.setSelectedItem (null);
     this.jRunMode.setEditable (false);
-    this.jRunMode.setEnabled (false);
+    this.jRunMode.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "run mode",
+      Tek2440_GPIB_Settings.RunMode.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.RunMode>)
+        tek2440::setRunMode,
+      this::isInhibitInstrumentControl));    
     this.jRunMode.setMaximumSize (new Dimension (120, 20));
     southWestPanel.add (Box.createGlue ());
     southWestPanel.add (this.jRunMode);
     southWestPanel.add (Box.createGlue ());
-    //
+    
     this.jSmooth = new JColorCheckBox.JBoolean (Color.green);
-    this.jSmooth.setEnabled (false);
+    this.jSmooth.addActionListener (new JInstrumentActionListener_1Boolean (
+      "smoothing",
+      this.jSmooth::getDisplayedValue,
+      tek2440::setSmoothing,
+      this::isInhibitInstrumentControl));
     this.jSmooth.setHorizontalAlignment (SwingConstants.CENTER);
     southEastPanel.add (this.jSmooth, BorderLayout.CENTER);
-    //
+    
     getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
-    //
+    
   }
 
   public JTek2440_GPIB_Acquisition (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)

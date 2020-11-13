@@ -2093,39 +2093,63 @@ public class Tek2440_GPIB_Settings
   
   public enum AcquisitionMode
   {
-    AVERAGE,
-    ENVELOPE,
-    NORMAL;
+    Normal,
+    Average,
+    Envelope;
   }
   
   public enum NumberOfAcquisitionsAveraged
   {
     
-    ACQ_AVG_2,
-    ACQ_AVG_4,
-    ACQ_AVG_8,
-    ACQ_AVG_16,
-    ACQ_AVG_32,
-    ACQ_AVG_64,
-    ACQ_AVG_128,
-    ACQ_AVG_256;
+    ACQ_AVG_2 (2),
+    ACQ_AVG_4 (4),
+    ACQ_AVG_8 (8),
+    ACQ_AVG_16 (16),
+    ACQ_AVG_32 (32),
+    ACQ_AVG_64 (64),
+    ACQ_AVG_128 (128),
+    ACQ_AVG_256 (256);
     
+    private final int intValue;
+
+    private NumberOfAcquisitionsAveraged (final int intValue)
+    {
+      this.intValue = intValue;
+    }
+
+    public final int getIntValue ()
+    {
+      return this.intValue;
+    }
+
   }
   
   public enum NumberOfEnvelopeSweeps
   {
     
-    ENV_SWEEPS_1, // XXX Should not get this value; is this the encoding for ENV_SWEEPS_CONTROL??
-    ENV_SWEEPS_2,
-    ENV_SWEEPS_4,
-    ENV_SWEEPS_8,
-    ENV_SWEEPS_16,
-    ENV_SWEEPS_32,
-    ENV_SWEEPS_64,
-    ENV_SWEEPS_128,
-    ENV_SWEEPS_256,
-    ENV_SWEEPS_CONTROL;
+    ENV_SWEEPS_1 (1), // XXX Should not get this value; is this the encoding for ENV_SWEEPS_CONTROL??
+    ENV_SWEEPS_2 (2),
+    ENV_SWEEPS_4 (4),
+    ENV_SWEEPS_8 (8),
+    ENV_SWEEPS_16 (16),
+    ENV_SWEEPS_32 (32),
+    ENV_SWEEPS_64 (64),
+    ENV_SWEEPS_128 (128),
+    ENV_SWEEPS_256 (256),
+    ENV_SWEEPS_CONTROL (1); // XXX Is this correct???
     
+    private final int intValue;
+
+    private NumberOfEnvelopeSweeps (final int intValue)
+    {
+      this.intValue = intValue;
+    }
+
+    public final int getIntValue ()
+    {
+      return this.intValue;
+    }
+
   }
   
   public static class AcquisitionSettings
@@ -2214,15 +2238,15 @@ public class Tek2440_GPIB_Settings
         {
           switch (argArgParts[1].trim ())
           {
-            case "avg":
-              acquisitionMode = AcquisitionMode.AVERAGE;
-              break;
-            case "env":
-              acquisitionMode = AcquisitionMode.ENVELOPE;
-              break;
             case "nor":
             case "normal":
-              acquisitionMode = AcquisitionMode.NORMAL;
+              acquisitionMode = AcquisitionMode.Normal;
+              break;
+            case "avg":
+              acquisitionMode = AcquisitionMode.Average;
+              break;
+            case "env":
+              acquisitionMode = AcquisitionMode.Envelope;
               break;
             default:
               throw new IllegalArgumentException ();
@@ -2303,15 +2327,15 @@ public class Tek2440_GPIB_Settings
     final AcquisitionMode acquisitionMode;
     switch (parts[0].trim ())
     {
-      case "avg":
-        acquisitionMode = AcquisitionMode.AVERAGE;
-        break;
-      case "env":
-        acquisitionMode = AcquisitionMode.ENVELOPE;
-        break;
       case "nor":
       case "normal":
-        acquisitionMode = AcquisitionMode.NORMAL;
+        acquisitionMode = AcquisitionMode.Normal;
+        break;
+      case "avg":
+        acquisitionMode = AcquisitionMode.Average;
+        break;
+      case "env":
+        acquisitionMode = AcquisitionMode.Envelope;
         break;
       default:
         throw new IllegalArgumentException ();
