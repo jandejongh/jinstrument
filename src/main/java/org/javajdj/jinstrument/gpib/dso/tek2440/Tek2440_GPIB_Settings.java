@@ -701,17 +701,17 @@ public class Tek2440_GPIB_Settings
 
   public static enum AutoSetupMode
   {
-    FALL,
-    PERIOD,
-    PULSE,
-    RISE,
-    VIEW
+    View,
+    Period,
+    Pulse,
+    Rise,
+    Fall;
   }
   
   public static enum AutoSetupResolution
   {
-    HIGH,
-    LOW
+    Low,
+    High;
   }
   
   public static final class AutoSetupSettings
@@ -778,25 +778,25 @@ public class Tek2440_GPIB_Settings
         {
           switch (argArgParts[1].trim ())
           {
-            case "fal":
-            case "fall":
-              mode = AutoSetupMode.FALL;
+            case "vie":
+            case "view":
+              mode = AutoSetupMode.View;
               break;
             case "peri":
             case "period":
-              mode = AutoSetupMode.PERIOD;
+              mode = AutoSetupMode.Period;
               break;
             case "pul":
             case "pulse":
-              mode = AutoSetupMode.PULSE;
+              mode = AutoSetupMode.Pulse;
               break;
             case "ris":
             case "rise":
-              mode = AutoSetupMode.RISE;
+              mode = AutoSetupMode.Rise;
               break;
-            case "vie":
-            case "view":
-              mode = AutoSetupMode.VIEW;
+            case "fal":
+            case "fall":
+              mode = AutoSetupMode.Fall;
               break;
             default:
               throw new IllegalArgumentException ();
@@ -808,8 +808,8 @@ public class Tek2440_GPIB_Settings
         {
           switch (argArgParts[1].trim ())
           {
-            case "hi": resolution = AutoSetupResolution.HIGH; break;
-            case "lo": resolution = AutoSetupResolution.LOW;  break;
+            case "lo": resolution = AutoSetupResolution.Low;  break;
+            case "hi": resolution = AutoSetupResolution.High; break;
             default: throw new IllegalArgumentException ();
           }
           break;
@@ -829,37 +829,33 @@ public class Tek2440_GPIB_Settings
     final AutoSetupResolution resolution;
     switch (parts[0].trim ())
     {
-      case "fal":
-      case "fall":
-        mode = AutoSetupMode.FALL;
+      case "vie":
+      case "view":
+        mode = AutoSetupMode.View;
         break;
       case "peri":
       case "period":
-        mode = AutoSetupMode.PERIOD;
+        mode = AutoSetupMode.Period;
         break;
       case "pul":
       case "pulse":
-        mode = AutoSetupMode.PULSE;
+        mode = AutoSetupMode.Pulse;
         break;
       case "ris":
       case "rise":
-        mode = AutoSetupMode.RISE;
+        mode = AutoSetupMode.Rise;
         break;
-      case "vie":
-      case "view":
-        mode = AutoSetupMode.VIEW;
+      case "fal":
+      case "fall":
+        mode = AutoSetupMode.Fall;
         break;
       default:
         throw new IllegalArgumentException ();
     }
     switch (parts[1].trim ())
     {
-      case "hi":
-        resolution = AutoSetupResolution.HIGH;
-        break;
-      case "lo":
-        resolution = AutoSetupResolution.LOW;
-        break;
+      case "lo": resolution = AutoSetupResolution.Low;  break;
+      case "hi": resolution = AutoSetupResolution.High; break;
       default:
         throw new IllegalArgumentException ();
     }

@@ -890,6 +890,28 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE_USER_SEQUENCE, userSequenceString));
   }
   
+  public void setAutoSetupMode (final Tek2440_GPIB_Settings.AutoSetupMode mode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_AUTO_SETUP_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_AUTO_SETUP_MODE, mode));
+  }
+  
+  public void setAutoSetupResolution (final Tek2440_GPIB_Settings.AutoSetupResolution resolution)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_AUTO_SETUP_RESOLUTION,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_AUTO_SETUP_RESOLUTION, resolution));
+  }
+  
+  public void autoSetup ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (Tek2440_InstrumentCommand.IC_TEK2440_AUTO_SETUP));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1506,6 +1528,45 @@ public class Tek2440_GPIB_Instrument
             default:
               throw new IllegalArgumentException ();
           }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_AUTO_SETUP_MODE:
+        {
+          final Tek2440_GPIB_Settings.AutoSetupMode mode =
+            (Tek2440_GPIB_Settings.AutoSetupMode) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_AUTO_SETUP_MODE);
+          switch (mode)
+          {
+            case View:   writeSync ("AUTOS MOD:VIE\r\n");  break;
+            case Period: writeSync ("AUTOS MOD:PERI\r\n"); break;
+            case Pulse:  writeSync ("AUTOS MOD:PUL\r\n");  break;
+            case Rise:   writeSync ("AUTOS MOD:RIS\r\n");  break;
+            case Fall:   writeSync ("AUTOS MOD:FAL\r\n");  break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_AUTO_SETUP_RESOLUTION:
+        {
+          final Tek2440_GPIB_Settings.AutoSetupResolution resolution =
+            (Tek2440_GPIB_Settings.AutoSetupResolution) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_AUTO_SETUP_RESOLUTION);
+          switch (resolution)
+          {
+            case Low:  writeSync ("AUTOS RES:LO\r\n"); break;
+            case High: writeSync ("AUTOS RES:HI\r\n"); break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_AUTO_SETUP:
+        {
+          writeSync ("AUTOS EXE\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

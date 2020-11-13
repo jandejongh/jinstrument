@@ -54,7 +54,6 @@ import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalStorageOscilloscopeView;
 import org.javajdj.jswing.jbyte.JByte;
-import org.javajdj.jswing.jcenter.JCenter;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jtrace.JTrace;
 

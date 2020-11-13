@@ -65,33 +65,48 @@ public class JTek2440_GPIB_AutoSetup
     final int level,
     final Color panelColor)
   {
-    //
+    
     super (digitalStorageOscilloscope, title, level, panelColor);
-    //
+    if (! (digitalStorageOscilloscope instanceof Tek2440_GPIB_Instrument))
+      throw new IllegalArgumentException ();
+    final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
+    
     removeAll ();
     setLayout (new GridLayout (3, 2, 2, 2));
-    //
+    
     add (new JLabel ("Mode"));
     this.jMode = new JComboBox<>  (Tek2440_GPIB_Settings.AutoSetupMode.values ());
     this.jMode.setSelectedItem (null);
     this.jMode.setEditable (false);
-    this.jMode.setEnabled (false);
+    this.jMode.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "auto setup mode",
+      Tek2440_GPIB_Settings.AutoSetupMode.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.AutoSetupMode>) tek2440::setAutoSetupMode,
+      this::isInhibitInstrumentControl));
     add (this.jMode);
-    //
+    
     add (new JLabel ("Resolution"));
     this.jResolution = new JComboBox<> (Tek2440_GPIB_Settings.AutoSetupResolution.values ());
     this.jResolution.setSelectedItem (null);
     this.jResolution.setEditable (false);
-    this.jResolution.setEnabled (false);
+    this.jResolution.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "auto setup resolution",
+      Tek2440_GPIB_Settings.AutoSetupResolution.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.AutoSetupResolution>) tek2440::setAutoSetupResolution,
+      this::isInhibitInstrumentControl));
     add (this.jResolution);
-    //
+    
     add (new JLabel ("Execute"));
-    this.jAutoSetup = new JColorCheckBox.JBoolean (Color.red);
-    this.jAutoSetup.setEnabled (false);
+    this.jAutoSetup = new JColorCheckBox.JBoolean (Color.blue);
+    // this.jAutoSetup.setEnabled (false);
+    this.jAutoSetup.setDisplayedValue (true);
+    this.jAutoSetup.addActionListener (new JInstrumentActionListener_0 (
+      "auto setup",
+      tek2440::autoSetup));
     add (this.jAutoSetup);
-    //
+    
     getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
-    //
+    
   }
 
   public JTek2440_GPIB_AutoSetup (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)

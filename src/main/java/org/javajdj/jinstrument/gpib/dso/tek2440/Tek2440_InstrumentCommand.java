@@ -121,4 +121,12 @@ public interface Tek2440_InstrumentCommand
   public final static String ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE = "tek2440GroupExecuteTriggerMode";
   public final static String ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE_USER_SEQUENCE = "tek2440GroupExecuteTriggerModeUserSequence";
   
+  public final static String IC_TEK2440_AUTO_SETUP_MODE = "commandTek2440AutoSetupMode";
+  public final static String ICARG_TEK2440_AUTO_SETUP_MODE = "tek2440AutoSetupMode";
+  
+  public final static String IC_TEK2440_AUTO_SETUP_RESOLUTION = "commandTek2440AutoSetupResolution";
+  public final static String ICARG_TEK2440_AUTO_SETUP_RESOLUTION = "tek2440AutoSetupResolution";
+  
+  public final static String IC_TEK2440_AUTO_SETUP = "commandTek2440AutoSetup";
+  
 }
