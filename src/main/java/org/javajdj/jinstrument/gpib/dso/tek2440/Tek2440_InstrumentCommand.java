@@ -27,6 +27,44 @@ public interface Tek2440_InstrumentCommand
   extends InstrumentCommand
 {
   
+  public final static String ICARG_TEK2440_CHANNEL = "channel";
+  
+  public final static String IC_TEK2440_TIMEBASE = "commandTimebase";
+  public final static String ICARG_TEK2440_TIMEBASE_CHANNEL = ICARG_TEK2440_CHANNEL;
+  public final static String ICARG_TEK2440_TIMEBASE = "timebase";
+  
+  public final static String IC_TEK2440_CHANNEL_ENABLE = "commandChannelEnable";
+  public final static String ICARG_TEK2440_CHANNEL_ENABLE_CHANNEL = ICARG_TEK2440_CHANNEL;
+  public final static String ICARG_TEK2440_CHANNEL_ENABLE = "channelEnable";
+  
+  public final static String IC_TEK2440_VOLTS_PER_DIV = "commandVoltsPerDiv";
+  public final static String ICARG_TEK2440_VOLTS_PER_DIV_CHANNEL = ICARG_TEK2440_CHANNEL;
+  public final static String ICARG_TEK2440_VOLTS_PER_DIV = "voltsPerDiv";
+  
+  public final static String IC_TEK2440_CHANNEL_VARIABLE_Y = "commandChannelVariableY";
+  public final static String ICARG_TEK2440_CHANNEL_VARIABLE_Y_CHANNEL = ICARG_TEK2440_CHANNEL;
+  public final static String ICARG_TEK2440_CHANNEL_VARIABLE_Y = "channelVariableY";
+  
+  public final static String IC_TEK2440_CHANNEL_COUPLING = "commandChannelCoupling";
+  public final static String ICARG_TEK2440_CHANNEL_COUPLING_CHANNEL = ICARG_TEK2440_CHANNEL;
+  public final static String ICARG_TEK2440_CHANNEL_COUPLING = "channelCoupling";
+  
+  public final static String IC_TEK2440_CHANNEL_50_OHMS = "commandChannel50Ohms";
+  public final static String ICARG_TEK2440_CHANNEL_50_OHMS_CHANNEL = ICARG_TEK2440_CHANNEL;
+  public final static String ICARG_TEK2440_CHANNEL_50_OHMS = "channel50Ohms";
+  
+  public final static String IC_TEK2440_CHANNEL_INVERT = "commandChannelInvert";
+  public final static String ICARG_TEK2440_CHANNEL_INVERT_CHANNEL = ICARG_TEK2440_CHANNEL;
+  public final static String ICARG_TEK2440_CHANNEL_INVERT = "channelInvert";
+  
+  public final static String IC_TEK2440_CHANNEL_POSITION = "commandChannelPosition";
+  public final static String ICARG_TEK2440_CHANNEL_POSITION_CHANNEL = ICARG_TEK2440_CHANNEL;
+  public final static String ICARG_TEK2440_CHANNEL_POSITION = "channelPosition";
+  
+  public final static String IC_TEK2440_DISPLAY_INTENSITY = "commandDisplayIntensity";
+  public final static String ICARG_TEK2440_DISPLAY_INTENSITY_COMPONENT = "displayIntensityComponent";
+  public final static String ICARG_TEK2440_DISPLAY_INTENSITY = "displayIntensity";
+
   public final static String ICARG_TEK2440_REFERENCE_NUMBER = "tek2440ReferenceNumber";
   
   public final static String IC_TEK2440_REFERENCE_POSITION_MODE = "commandTek2440ReferencePositionMode";
