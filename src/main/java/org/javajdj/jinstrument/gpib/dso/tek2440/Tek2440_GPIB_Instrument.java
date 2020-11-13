@@ -521,8 +521,8 @@ public class Tek2440_GPIB_Instrument
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_REFERENCE_POSITION_MODE,
-      InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_MODE, mode));
+      Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_POSITION_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_MODE, mode));
   }
   
   public void setReferencePosition (
@@ -531,9 +531,9 @@ public class Tek2440_GPIB_Instrument
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_REFERENCE_POSITION,
-      InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_NUMBER, referenceNumber,
-      InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION, referencePosition));
+      Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_POSITION,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_NUMBER, referenceNumber,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION, referencePosition));
   }
   
   public void setReferencePosition_1 (final double referencePosition)
@@ -564,16 +564,16 @@ public class Tek2440_GPIB_Instrument
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_REFERENCE_SOURCE,
-      InstrumentCommand.ICARG_TEK2440_REFERENCE_SOURCE, refSource));
+      Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_SOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_SOURCE, refSource));
   }
   
   public void clearReference (final int referenceNumber)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_REFERENCE_CLEAR,
-      InstrumentCommand.ICARG_TEK2440_REFERENCE_CLEAR_NUMBER, referenceNumber));
+      Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_CLEAR,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_CLEAR_NUMBER, referenceNumber));
   }
   
   public void clearReference1 ()
@@ -604,8 +604,8 @@ public class Tek2440_GPIB_Instrument
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_REFERENCE_WRITE,
-      InstrumentCommand.ICARG_TEK2440_REFERENCE_WRITE_NUMBER, referenceNumber));
+      Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_WRITE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_WRITE_NUMBER, referenceNumber));
   }
   
   public void writeReferenceStack ()
@@ -642,9 +642,9 @@ public class Tek2440_GPIB_Instrument
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_REFERENCE_DISPLAY,
-      InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY_NUMBER, referenceNumber,
-      InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY, display));
+      Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_DISPLAY,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY_NUMBER, referenceNumber,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY, display));
   }
   
   public void displayReference1 (final boolean display)
@@ -675,49 +675,49 @@ public class Tek2440_GPIB_Instrument
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_LONG_RESPONSE,
-      InstrumentCommand.ICARG_TEK2440_LONG_RESPONSE, useLongResponse));
+      Tek2440_InstrumentCommand.IC_TEK2440_LONG_RESPONSE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_LONG_RESPONSE, useLongResponse));
   }
   
   public void setUsePath (final boolean usePath)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_USE_PATH,
-      InstrumentCommand.ICARG_TEK2440_USE_PATH, usePath));
+      Tek2440_InstrumentCommand.IC_TEK2440_USE_PATH,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_USE_PATH, usePath));
   }
   
   public void setDelayEventsMode (final boolean delayEventsEnabled)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_DELAY_EVENTS_MODE,
-      InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS_MODE, delayEventsEnabled));
+      Tek2440_InstrumentCommand.IC_TEK2440_DELAY_EVENTS_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS_MODE, delayEventsEnabled));
   }
   
   public void setDelayEvents (final int delayEvents)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_DELAY_EVENTS,
-      InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS, delayEvents));
+      Tek2440_InstrumentCommand.IC_TEK2440_DELAY_EVENTS,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS, delayEvents));
   }
   
   public void setDelayTimesDelta (final boolean delayTimesDelta)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_DELAY_TIMES_DELTA,
-      InstrumentCommand.ICARG_TEK2440_DELAY_TIMES_DELTA, delayTimesDelta));
+      Tek2440_InstrumentCommand.IC_TEK2440_DELAY_TIMES_DELTA,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_DELAY_TIMES_DELTA, delayTimesDelta));
   }
   
   public void setDelayTime (final int delayTimeTarget, final double delayTime_s)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_DELAY_TIME,
-      InstrumentCommand.ICARG_TEK2440_DELAY_TIME_TARGET, delayTimeTarget,
-      InstrumentCommand.ICARG_TEK2440_DELAY_TIME, delayTime_s));
+      Tek2440_InstrumentCommand.IC_TEK2440_DELAY_TIME,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_DELAY_TIME_TARGET, delayTimeTarget,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_DELAY_TIME, delayTime_s));
   }
   
   public void setDelayTime1 (final double delayTime_s)
@@ -736,9 +736,9 @@ public class Tek2440_GPIB_Instrument
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_EXT_GAIN,
-      InstrumentCommand.ICARG_TEK2440_EXT_GAIN_TARGET, extGainTarget,
-      InstrumentCommand.ICARG_TEK2440_EXT_GAIN, extGain));
+      Tek2440_InstrumentCommand.IC_TEK2440_EXT_GAIN,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_EXT_GAIN_TARGET, extGainTarget,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_EXT_GAIN, extGain));
   }
   
   public void setExtGain1 (final Tek2440_GPIB_Settings.ExtGain extGain)
@@ -757,120 +757,120 @@ public class Tek2440_GPIB_Instrument
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_WORD_CLOCK,
-      InstrumentCommand.ICARG_TEK2440_WORD_CLOCK, clock));
+      Tek2440_InstrumentCommand.IC_TEK2440_WORD_CLOCK,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_WORD_CLOCK, clock));
   }
   
   public void setWordRadix (final Tek2440_GPIB_Settings.WordRadix radix)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_WORD_RADIX,
-      InstrumentCommand.ICARG_TEK2440_WORD_RADIX, radix));
+      Tek2440_InstrumentCommand.IC_TEK2440_WORD_RADIX,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_WORD_RADIX, radix));
   }
     
   public void setWord (final String word)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_WORD,
-      InstrumentCommand.ICARG_TEK2440_WORD, word));
+      Tek2440_InstrumentCommand.IC_TEK2440_WORD,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_WORD, word));
   }
     
   public void setDisplayVectors (final boolean display)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_DISPLAY_VECTORS,
-      InstrumentCommand.ICARG_TEK2440_DISPLAY_VECTORS, display));
+      Tek2440_InstrumentCommand.IC_TEK2440_DISPLAY_VECTORS,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_DISPLAY_VECTORS, display));
   }
   
   public void setDisplayReadout (final boolean display)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_DISPLAY_READOUT,
-      InstrumentCommand.ICARG_TEK2440_DISPLAY_READOUT, display));
+      Tek2440_InstrumentCommand.IC_TEK2440_DISPLAY_READOUT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_DISPLAY_READOUT, display));
   }
   
   public void setBandwidthLimit (final Tek2440_GPIB_Settings.BandwidthLimit bandwidthLimit)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_BANDWIDTH_LIMIT,
-      InstrumentCommand.ICARG_TEK2440_BANDWIDTH_LIMIT, bandwidthLimit));
+      Tek2440_InstrumentCommand.IC_TEK2440_BANDWIDTH_LIMIT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_BANDWIDTH_LIMIT, bandwidthLimit));
   }
   
   public void setEnableSrqInternalError (final boolean enable)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_ENABLE_SRQ_INTERNAL_ERROR,
-      InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_INTERNAL_ERROR, enable));
+      Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_INTERNAL_ERROR,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_INTERNAL_ERROR, enable));
   }
   
   public void setEnableSrqCommandError (final boolean enable)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_ENABLE_SRQ_COMMAND_ERROR,
-      InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_COMMAND_ERROR, enable));
+      Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_COMMAND_ERROR,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_COMMAND_ERROR, enable));
   }
   
   public void setEnableSrqExecutionError (final boolean enable)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_ENABLE_SRQ_EXECUTION_ERROR,
-      InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_EXECUTION_ERROR, enable));
+      Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_EXECUTION_ERROR,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_EXECUTION_ERROR, enable));
   }
   
   public void setEnableSrqExecutionWarning (final boolean enable)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_ENABLE_SRQ_EXECUTION_WARNING,
-      InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_EXECUTION_WARNING, enable));
+      Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_EXECUTION_WARNING,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_EXECUTION_WARNING, enable));
   }
   
   public void setEnableSrqCommandCompletion (final boolean enable)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_ENABLE_SRQ_COMMAND_COMPLETION,
-      InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_COMMAND_COMPLETION, enable));
+      Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_COMMAND_COMPLETION,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_COMMAND_COMPLETION, enable));
   }
   
   public void setEnableSrqOnEvent (final boolean enable)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_EVENT,
-      InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_EVENT, enable));
+      Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_EVENT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_EVENT, enable));
   }
   
   public void setEnableSrqDeviceDependent (final boolean enable)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_ENABLE_SRQ_DEVICE_DEPENDENT,
-      InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_DEVICE_DEPENDENT, enable));
+      Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_DEVICE_DEPENDENT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_DEVICE_DEPENDENT, enable));
   }
   
   public void setEnableSrqOnUserButton (final boolean enable)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_USER_BUTTON,
-      InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_USER_BUTTON, enable));
+      Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_USER_BUTTON,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_USER_BUTTON, enable));
   }
   
   public void setEnableSrqOnProbeIdentifyButton (final boolean enable)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_PROBE_IDENTIFY_BUTTON,
-      InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_PROBE_IDENTIFY_BUTTON, enable));
+      Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_PROBE_IDENTIFY_BUTTON,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_PROBE_IDENTIFY_BUTTON, enable));
   }
   
   public void setGroupExecuteTriggerMode (final Tek2440_GPIB_Settings.GroupTriggerSRQMode mode, final String userSequence)
@@ -885,9 +885,9 @@ public class Tek2440_GPIB_Instrument
       throw new IllegalArgumentException ();
     final String userSequenceString = (userSequence == null) ? null : userSequence.trim ();
     addCommand (new DefaultInstrumentCommand (
-      InstrumentCommand.IC_TEK2440_GROUP_EXECUTE_TRIGGER_MODE,
-      InstrumentCommand.ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE, mode,
-      InstrumentCommand.ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE_USER_SEQUENCE, userSequenceString));
+      Tek2440_InstrumentCommand.IC_TEK2440_GROUP_EXECUTE_TRIGGER_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE, mode,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE_USER_SEQUENCE, userSequenceString));
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -903,13 +903,13 @@ public class Tek2440_GPIB_Instrument
   {
     if (instrumentCommand == null)
       throw new IllegalArgumentException ();
-    if (! instrumentCommand.containsKey (InstrumentCommand.IC_COMMAND_KEY))
+    if (! instrumentCommand.containsKey (Tek2440_InstrumentCommand.IC_COMMAND_KEY))
       throw new IllegalArgumentException ();
-    if (instrumentCommand.get (InstrumentCommand.IC_COMMAND_KEY) == null)
+    if (instrumentCommand.get (Tek2440_InstrumentCommand.IC_COMMAND_KEY) == null)
       throw new IllegalArgumentException ();
-    if (! (instrumentCommand.get (InstrumentCommand.IC_COMMAND_KEY) instanceof String))
+    if (! (instrumentCommand.get (Tek2440_InstrumentCommand.IC_COMMAND_KEY) instanceof String))
       throw new IllegalArgumentException ();
-    final String commandString = (String) instrumentCommand.get (InstrumentCommand.IC_COMMAND_KEY);
+    final String commandString = (String) instrumentCommand.get (Tek2440_InstrumentCommand.IC_COMMAND_KEY);
     if (commandString.trim ().isEmpty ())
       throw new IllegalArgumentException ();
     final GpibDevice device = (GpibDevice) getDevice ();
@@ -918,19 +918,19 @@ public class Tek2440_GPIB_Instrument
     {
       switch (commandString)
       {
-        case InstrumentCommand.IC_NOP_KEY:
+        case Tek2440_InstrumentCommand.IC_NOP_KEY:
           break;
-        case InstrumentCommand.IC_GET_SETTINGS_KEY:
+        case Tek2440_InstrumentCommand.IC_GET_SETTINGS_KEY:
         {
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TIMEBASE:
+        case Tek2440_InstrumentCommand.IC_TIMEBASE:
         {
           final Tek2440Channel channel =
-            (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_TIMEBASE_CHANNEL);
+            (Tek2440Channel) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TIMEBASE_CHANNEL);
           final Tek2440_GPIB_Settings.SecondsPerDivision secondsPerDivision =
-            (Tek2440_GPIB_Settings.SecondsPerDivision) instrumentCommand.get (InstrumentCommand.ICARG_TIMEBASE);
+            (Tek2440_GPIB_Settings.SecondsPerDivision) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TIMEBASE);
           switch (channel)
           {
             case Channel1:
@@ -945,12 +945,12 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_VOLTS_PER_DIV:
+        case Tek2440_InstrumentCommand.IC_VOLTS_PER_DIV:
         {
           final Tek2440Channel channel =
-            (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_VOLTS_PER_DIV_CHANNEL);
+            (Tek2440Channel) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_VOLTS_PER_DIV_CHANNEL);
           final Tek2440_GPIB_Settings.VoltsPerDivision voltsPerDivision =
-            (Tek2440_GPIB_Settings.VoltsPerDivision) instrumentCommand.get (InstrumentCommand.ICARG_VOLTS_PER_DIV);
+            (Tek2440_GPIB_Settings.VoltsPerDivision) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_VOLTS_PER_DIV);
           switch (channel)
           {
             case Channel1:
@@ -965,12 +965,12 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_CHANNEL_VARIABLE_Y:
+        case Tek2440_InstrumentCommand.IC_CHANNEL_VARIABLE_Y:
         {
           final Tek2440Channel channel =
-            (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_VARIABLE_Y_CHANNEL);
+            (Tek2440Channel) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_VARIABLE_Y_CHANNEL);
           final double variableY =
-            (double) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_VARIABLE_Y);
+            (double) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_VARIABLE_Y);
           switch (channel)
           {
             case Channel1:
@@ -985,12 +985,12 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_CHANNEL_ENABLE:
+        case Tek2440_InstrumentCommand.IC_CHANNEL_ENABLE:
         {
           final Tek2440Channel channel =
-            (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_ENABLE_CHANNEL);
+            (Tek2440Channel) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_ENABLE_CHANNEL);
           final boolean channelEnable =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_ENABLE);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_ENABLE);
           switch (channel)
           {
             case Channel1:
@@ -1005,12 +1005,12 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_CHANNEL_COUPLING:
+        case Tek2440_InstrumentCommand.IC_CHANNEL_COUPLING:
         {
           final Tek2440Channel channel =
-            (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_COUPLING_CHANNEL);
+            (Tek2440Channel) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_COUPLING_CHANNEL);
           final Tek2440_GPIB_Settings.ChannelCoupling channelCoupling =
-            (Tek2440_GPIB_Settings.ChannelCoupling) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_COUPLING);
+            (Tek2440_GPIB_Settings.ChannelCoupling) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_COUPLING);
           switch (channel)
           {
             case Channel1:
@@ -1039,12 +1039,12 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_CHANNEL_50_OHMS:
+        case Tek2440_InstrumentCommand.IC_CHANNEL_50_OHMS:
         {
           final Tek2440Channel channel =
-            (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_50_OHMS_CHANNEL);
+            (Tek2440Channel) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_50_OHMS_CHANNEL);
           final boolean channelFiftyOhms =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_50_OHMS);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_50_OHMS);
           switch (channel)
           {
             case Channel1:
@@ -1059,12 +1059,12 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_CHANNEL_INVERT:
+        case Tek2440_InstrumentCommand.IC_CHANNEL_INVERT:
         {
           final Tek2440Channel channel =
-            (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_INVERT_CHANNEL);
+            (Tek2440Channel) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_INVERT_CHANNEL);
           final boolean channelInvert =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_INVERT);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_INVERT);
           switch (channel)
           {
             case Channel1:
@@ -1079,12 +1079,12 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_CHANNEL_POSITION:
+        case Tek2440_InstrumentCommand.IC_CHANNEL_POSITION:
         {
           final Tek2440Channel channel =
-            (Tek2440Channel) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_POSITION_CHANNEL);
+            (Tek2440Channel) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_POSITION_CHANNEL);
           final double channelPosition =
-            (double) instrumentCommand.get (InstrumentCommand.ICARG_CHANNEL_POSITION);
+            (double) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_CHANNEL_POSITION);
           switch (channel)
           {
             case Channel1:
@@ -1099,14 +1099,14 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_DISPLAY_INTENSITY:
+        case Tek2440_InstrumentCommand.IC_DISPLAY_INTENSITY:
         {
           final DisplayIntensityComponent component =
-            (DisplayIntensityComponent) instrumentCommand.get (InstrumentCommand.ICARG_DISPLAY_INTENSITY_COMPONENT);
+            (DisplayIntensityComponent) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_DISPLAY_INTENSITY_COMPONENT);
           if (component == null)
             throw new IllegalArgumentException ();
           final Double intensity =
-            (Double) instrumentCommand.get (InstrumentCommand.ICARG_DISPLAY_INTENSITY);
+            (Double) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_DISPLAY_INTENSITY);
           if (intensity == null || intensity < 0 || intensity > 100)
             throw new IllegalArgumentException ();
           final String componentString;
@@ -1123,10 +1123,10 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_REFERENCE_POSITION_MODE:
+        case Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_POSITION_MODE:
         {
           final Tek2440_GPIB_Settings.RefPositionMode mode =
-            (Tek2440_GPIB_Settings.RefPositionMode) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_MODE);
+            (Tek2440_GPIB_Settings.RefPositionMode) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_MODE);
           if (mode == null)
             throw new IllegalArgumentException ();
           switch (mode)
@@ -1143,12 +1143,12 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_REFERENCE_POSITION:
+        case Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_POSITION:
         {
           final int refNumber =
-            (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_NUMBER);
+            (int) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION_NUMBER);
           final double refPosition =
-            (double) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION);
+            (double) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_POSITION);
           if (refPosition < 0 || refPosition > 1023)
             throw new IllegalArgumentException ();
           switch (refNumber)
@@ -1163,10 +1163,10 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_REFERENCE_SOURCE:
+        case Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_SOURCE:
         {
           final Tek2440_GPIB_Settings.RefFrom refSource =
-            (Tek2440_GPIB_Settings.RefFrom) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_SOURCE);
+            (Tek2440_GPIB_Settings.RefFrom) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_SOURCE);
           if (refSource == null)
             throw new IllegalArgumentException ();
           switch (refSource)
@@ -1188,10 +1188,10 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_REFERENCE_CLEAR:
+        case Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_CLEAR:
         {
           final int refNumber =
-            (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_CLEAR_NUMBER);
+            (int) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_CLEAR_NUMBER);
           switch (refNumber)
           {
             case 1: writeSync ("REFD REF1:EMP\r\n"); break;
@@ -1204,10 +1204,10 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_REFERENCE_WRITE:
+        case Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_WRITE:
         {
           final int refNumber =
-            (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_WRITE_NUMBER);
+            (int) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_WRITE_NUMBER);
           switch (refNumber)
           {
             case 0: writeSync ("SAVER STAC\r\n"); break;
@@ -1221,12 +1221,12 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_REFERENCE_DISPLAY:
+        case Tek2440_InstrumentCommand.IC_TEK2440_REFERENCE_DISPLAY:
         {
           final int refNumber =
-            (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY_NUMBER);
+            (int) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY_NUMBER);
           final boolean display =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY);
           switch (refNumber)
           {
             case 1: writeSync ("REFD REF1:" + (display? "ON" : "OFF") + "\r\n"); break;
@@ -1239,52 +1239,52 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_LONG_RESPONSE:
+        case Tek2440_InstrumentCommand.IC_TEK2440_LONG_RESPONSE:
         {
           final boolean longResponse =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_LONG_RESPONSE);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_LONG_RESPONSE);
           writeSync ("LON " + (longResponse? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_USE_PATH:
+        case Tek2440_InstrumentCommand.IC_TEK2440_USE_PATH:
         {
           final boolean usePath =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_USE_PATH);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_USE_PATH);
           writeSync ("PAT " + (usePath? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_DELAY_EVENTS_MODE:
+        case Tek2440_InstrumentCommand.IC_TEK2440_DELAY_EVENTS_MODE:
         {
           final boolean delayEventsEnabled =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS_MODE);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS_MODE);
           writeSync ("DLYE MOD:" + (delayEventsEnabled? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_DELAY_EVENTS:
+        case Tek2440_InstrumentCommand.IC_TEK2440_DELAY_EVENTS:
         {
           final int delayEvents =
-            (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS);
+            (int) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_DELAY_EVENTS);
           writeSync ("DLYE VAL:" + Integer.toString (delayEvents) + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_DELAY_TIMES_DELTA:
+        case Tek2440_InstrumentCommand.IC_TEK2440_DELAY_TIMES_DELTA:
         {
           final boolean delayTimesDelta =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DELAY_TIMES_DELTA);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_DELAY_TIMES_DELTA);
           writeSync ("DLYT DELT:" + (delayTimesDelta? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_DELAY_TIME:
+        case Tek2440_InstrumentCommand.IC_TEK2440_DELAY_TIME:
         {
           final int delayTimeTarget =
-            (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DELAY_TIME_TARGET);
+            (int) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_DELAY_TIME_TARGET);
           final double delayTime_s =
-            (double) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DELAY_TIME);
+            (double) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_DELAY_TIME);
           switch (delayTimeTarget)
           {
             case 1:
@@ -1299,12 +1299,12 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_EXT_GAIN:
+        case Tek2440_InstrumentCommand.IC_TEK2440_EXT_GAIN:
         {
           final int extGainTarget =
-            (int) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_EXT_GAIN_TARGET);
+            (int) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_EXT_GAIN_TARGET);
           final Tek2440_GPIB_Settings.ExtGain extGain =
-            (Tek2440_GPIB_Settings.ExtGain) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_EXT_GAIN);
+            (Tek2440_GPIB_Settings.ExtGain) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_EXT_GAIN);
           switch (extGainTarget)
           {
             case 1:
@@ -1319,10 +1319,10 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_WORD_CLOCK:
+        case Tek2440_InstrumentCommand.IC_TEK2440_WORD_CLOCK:
         {
           final Tek2440_GPIB_Settings.WordClock clock =
-            (Tek2440_GPIB_Settings.WordClock) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_WORD_CLOCK);
+            (Tek2440_GPIB_Settings.WordClock) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_WORD_CLOCK);
           switch (clock)
           {
             case ASync:
@@ -1340,10 +1340,10 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_WORD_RADIX:
+        case Tek2440_InstrumentCommand.IC_TEK2440_WORD_RADIX:
         {
           final Tek2440_GPIB_Settings.WordRadix radix =
-            (Tek2440_GPIB_Settings.WordRadix) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_WORD_RADIX);
+            (Tek2440_GPIB_Settings.WordRadix) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_WORD_RADIX);
           switch (radix)
           {
             case Octal:
@@ -1358,10 +1358,10 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_WORD:
+        case Tek2440_InstrumentCommand.IC_TEK2440_WORD:
         {
           final String word =
-            ((String) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_WORD)).trim ();
+            ((String) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_WORD)).trim ();
           if (word == null)
             throw new IllegalArgumentException ();
           switch (word.length ())
@@ -1378,26 +1378,26 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_DISPLAY_VECTORS:
+        case Tek2440_InstrumentCommand.IC_TEK2440_DISPLAY_VECTORS:
         {
           final boolean display =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DISPLAY_VECTORS);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_DISPLAY_VECTORS);
           writeSync ("INTENSI VEC:" + (display? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_DISPLAY_READOUT:
+        case Tek2440_InstrumentCommand.IC_TEK2440_DISPLAY_READOUT:
         {
           final boolean display =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_DISPLAY_READOUT);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_DISPLAY_READOUT);
           writeSync ("REA " + (display? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_BANDWIDTH_LIMIT:
+        case Tek2440_InstrumentCommand.IC_TEK2440_BANDWIDTH_LIMIT:
         {
           final Tek2440_GPIB_Settings.BandwidthLimit bandwidthLimit =
-            (Tek2440_GPIB_Settings.BandwidthLimit) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_BANDWIDTH_LIMIT);
+            (Tek2440_GPIB_Settings.BandwidthLimit) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_BANDWIDTH_LIMIT);
           switch (bandwidthLimit)
           {
             case BWL_20_MHz:  writeSync ("BWL TWE\r\n"); break;
@@ -1409,86 +1409,86 @@ public class Tek2440_GPIB_Instrument
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_ENABLE_SRQ_INTERNAL_ERROR:
+        case Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_INTERNAL_ERROR:
         {
           final boolean enable =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_INTERNAL_ERROR);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_INTERNAL_ERROR);
           writeSync ("INR " + (enable? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_ENABLE_SRQ_COMMAND_ERROR:
+        case Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_COMMAND_ERROR:
         {
           final boolean enable =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_COMMAND_ERROR);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_COMMAND_ERROR);
           writeSync ("CER " + (enable? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_ENABLE_SRQ_EXECUTION_ERROR:
+        case Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_EXECUTION_ERROR:
         {
           final boolean enable =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_EXECUTION_ERROR);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_EXECUTION_ERROR);
           writeSync ("EXR " + (enable? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_ENABLE_SRQ_EXECUTION_WARNING:
+        case Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_EXECUTION_WARNING:
         {
           final boolean enable =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_EXECUTION_WARNING);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_EXECUTION_WARNING);
           writeSync ("EXW " + (enable? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_ENABLE_SRQ_COMMAND_COMPLETION:
+        case Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_COMMAND_COMPLETION:
         {
           final boolean enable =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_COMMAND_COMPLETION);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_COMMAND_COMPLETION);
           writeSync ("OPC " + (enable? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_EVENT:
+        case Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_EVENT:
         {
           final boolean enable =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_EVENT);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_EVENT);
           writeSync ("RQS " + (enable? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_ENABLE_SRQ_DEVICE_DEPENDENT:
+        case Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_DEVICE_DEPENDENT:
         {
           final boolean enable =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_DEVICE_DEPENDENT);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_DEVICE_DEPENDENT);
           writeSync ("DEVD " + (enable? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_USER_BUTTON:
+        case Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_USER_BUTTON:
         {
           final boolean enable =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_USER_BUTTON);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_USER_BUTTON);
           writeSync ("USE " + (enable? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_PROBE_IDENTIFY_BUTTON:
+        case Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_SRQ_ON_PROBE_IDENTIFY_BUTTON:
         {
           final boolean enable =
-            (boolean) instrumentCommand.get (InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_PROBE_IDENTIFY_BUTTON);
+            (boolean) instrumentCommand.get (Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_SRQ_ON_PROBE_IDENTIFY_BUTTON);
           writeSync ("PID " + (enable? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
-        case InstrumentCommand.IC_TEK2440_GROUP_EXECUTE_TRIGGER_MODE:
+        case Tek2440_InstrumentCommand.IC_TEK2440_GROUP_EXECUTE_TRIGGER_MODE:
         {
           final Tek2440_GPIB_Settings.GroupTriggerSRQMode mode =
             (Tek2440_GPIB_Settings.GroupTriggerSRQMode) instrumentCommand.get (
-              InstrumentCommand.ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE);
+              Tek2440_InstrumentCommand.ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE);
           final String userSequence =
             (String) instrumentCommand.get (
-              InstrumentCommand.ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE_USER_SEQUENCE);
+              Tek2440_InstrumentCommand.ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE_USER_SEQUENCE);
           if (mode == null)
             throw new IllegalArgumentException ();
           if (mode == Tek2440_GPIB_Settings.GroupTriggerSRQMode.ExecuteSequence
