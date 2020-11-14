@@ -89,59 +89,95 @@ public class JTek2440_GPIB_ATrigger
     this.jMode = new JComboBox<>  (Tek2440_GPIB_Settings.ATriggerMode.values ());
     this.jMode.setSelectedItem (null);
     this.jMode.setEditable (false);
-    this.jMode.setEnabled (false);
+    this.jMode.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "A trigger mode",
+      Tek2440_GPIB_Settings.ATriggerMode.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ATriggerMode>) tek2440::setATriggerMode,
+      this::isInhibitInstrumentControl));
     leftPanel.add (this.jMode);
 
     leftPanel.add (new JLabel ("Source"));
     this.jSource = new JComboBox<> (Tek2440_GPIB_Settings.ATriggerSource.values ());
     this.jSource.setSelectedItem (null);
     this.jSource.setEditable (false);
-    this.jSource.setEnabled (false);
+    this.jSource.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "A trigger source",
+      Tek2440_GPIB_Settings.ATriggerSource.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ATriggerSource>) tek2440::setATriggerSource,
+      this::isInhibitInstrumentControl));
     leftPanel.add (this.jSource);
 
     leftPanel.add (new JLabel ("Coupling"));
     this.jCoupling = new JComboBox<> (Tek2440_GPIB_Settings.ATriggerCoupling.values ());
     this.jCoupling.setSelectedItem (null);
     this.jCoupling.setEditable (false);
-    this.jCoupling.setEnabled (false);
+    this.jCoupling.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "A trigger coupling",
+      Tek2440_GPIB_Settings.ATriggerCoupling.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ATriggerCoupling>) tek2440::setATriggerCoupling,
+      this::isInhibitInstrumentControl));
     leftPanel.add (this.jCoupling);
 
     leftPanel.add (new JLabel ("Slope"));
     this.jSlope = new JComboBox<> (Tek2440_GPIB_Settings.Slope.values ());
     this.jSlope.setSelectedItem (null);
     this.jSlope.setEditable (false);
-    this.jSlope.setEnabled (false);
+    this.jSlope.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "A trigger slope",
+      Tek2440_GPIB_Settings.Slope.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.Slope>) tek2440::setATriggerSlope,
+      this::isInhibitInstrumentControl));
     leftPanel.add (this.jSlope);
 
-    leftPanel.add (new JLabel ("Level"));
-    this.jLevel = new JSlider ();
-    this.jLevel.setEnabled (false);
+    leftPanel.add (new JLabel ("Level [V]"));
+    this.jLevel = new JSlider (-200, 200); // XXX Arbitrary!
+    this.jLevel.setToolTipText ("-");
+    this.jLevel.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+      "A trigger level",
+      tek2440::setATriggerLevel,
+      this::isInhibitInstrumentControl));
     leftPanel.add (this.jLevel);
 
     rightPanel.add (new JLabel ("Position"));
     this.jPosition = new JComboBox<> (Tek2440_GPIB_Settings.ATriggerPosition.values ());
     this.jPosition.setSelectedItem (null);
     this.jPosition.setEditable (false);
-    this.jPosition.setEnabled (false);
+    this.jPosition.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "A trigger position",
+      Tek2440_GPIB_Settings.ATriggerPosition.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ATriggerPosition>) tek2440::setATriggerPosition,
+      this::isInhibitInstrumentControl));
     rightPanel.add (this.jPosition);
 
     rightPanel.add (new JLabel ("Holdoff"));
-    this.jHoldoff = new JSlider ();
-    this.jHoldoff.setEnabled (false);
+    this.jHoldoff = new JSlider (0, 100);
+    this.jHoldoff.setToolTipText ("-");
+    this.jHoldoff.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+      "A trigger holdoff",
+      tek2440::setATriggerHoldoff,
+      this::isInhibitInstrumentControl));
     rightPanel.add (this.jHoldoff);
 
     rightPanel.add (new JLabel ("Log Source"));
     this.jLogSource = new JComboBox<> (Tek2440_GPIB_Settings.ATriggerLogSource.values ());
     this.jLogSource.setSelectedItem (null);
     this.jLogSource.setEditable (false);
-    this.jLogSource.setEnabled (false);
+    this.jLogSource.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "A trigger log source",
+      Tek2440_GPIB_Settings.ATriggerLogSource.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ATriggerLogSource>) tek2440::setATriggerLogSource,
+      this::isInhibitInstrumentControl));
     rightPanel.add (this.jLogSource);
 
     rightPanel.add (new JLabel ("A/B Select"));
     this.jABSelect = new JComboBox<> (Tek2440_GPIB_Settings.ABSelect.values ());
     this.jABSelect.setSelectedItem (null);
     this.jABSelect.setEditable (false);
-    this.jABSelect.setEnabled (false);
+    this.jABSelect.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "A/B (trigger) select",
+      Tek2440_GPIB_Settings.ABSelect.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ABSelect>) tek2440::setTriggerABSelect,
+      this::isInhibitInstrumentControl));
     rightPanel.add (this.jABSelect);
 
     rightPanel.add (new JLabel ("Word"));
@@ -270,24 +306,24 @@ public class JTek2440_GPIB_ATrigger
       final Tek2440_GPIB_Settings settings = (Tek2440_GPIB_Settings) instrumentSettings;
       SwingUtilities.invokeLater (() ->
       {
-        JTek2440_GPIB_ATrigger.this.inhibitInstrumentControl = true;
+        JTek2440_GPIB_ATrigger.this.setInhibitInstrumentControl ();
         try
         {
           JTek2440_GPIB_ATrigger.this.jMode.setSelectedItem (settings.getATriggerMode ());
           JTek2440_GPIB_ATrigger.this.jSource.setSelectedItem (settings.getATriggerSource ());
           JTek2440_GPIB_ATrigger.this.jCoupling.setSelectedItem (settings.getATriggerCoupling ());
           JTek2440_GPIB_ATrigger.this.jSlope.setSelectedItem (settings.getATriggerSlope ());
-          // JTek2440_GPIB_ATrigger.this.jLevel.setValue (XXX);
+          JTek2440_GPIB_ATrigger.this.jLevel.setValue ((int) Math.round (settings.getATriggerLevel ()));
           JTek2440_GPIB_ATrigger.this.jLevel.setToolTipText (Double.toString (settings.getATriggerLevel ()));
           JTek2440_GPIB_ATrigger.this.jPosition.setSelectedItem (settings.getATriggerPosition ());
-          // JTek2440_GPIB_ATrigger.this.jHoldoff.setValue (XXX);
+          JTek2440_GPIB_ATrigger.this.jHoldoff.setValue ((int) Math.round (settings.getATriggerHoldoff ()));
           JTek2440_GPIB_ATrigger.this.jHoldoff.setToolTipText (Double.toString (settings.getATriggerHoldoff ()));
           JTek2440_GPIB_ATrigger.this.jLogSource.setSelectedItem (settings.getATriggerLogSource ());
           JTek2440_GPIB_ATrigger.this.jABSelect.setSelectedItem (settings.getATriggerABSelect ());          
         }
         finally
         {
-          JTek2440_GPIB_ATrigger.this.inhibitInstrumentControl = false;
+          JTek2440_GPIB_ATrigger.this.resetInhibitInstrumentControl ();
         }
       });
     }

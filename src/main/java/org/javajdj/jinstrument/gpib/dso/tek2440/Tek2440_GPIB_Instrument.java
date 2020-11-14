@@ -1023,6 +1023,134 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_SMOOTHING, smoothing));
   }
   
+  public void setATriggerMode (final Tek2440_GPIB_Settings.ATriggerMode mode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_MODE, mode));
+  }
+  
+  public void setATriggerSource (final Tek2440_GPIB_Settings.ATriggerSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_SOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_SOURCE, source));
+  }
+  
+  public void setATriggerCoupling (final Tek2440_GPIB_Settings.ATriggerCoupling coupling)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_COUPLING,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_COUPLING, coupling));
+  }
+  
+  public void setATriggerSlope (final Tek2440_GPIB_Settings.Slope slope)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_SLOPE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_SLOPE, slope));
+  }
+  
+  public void setATriggerLevel (final double level)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_LEVEL,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_LEVEL, level));
+  }
+  
+  public void setATriggerPosition (final Tek2440_GPIB_Settings.ATriggerPosition position)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_POSITION,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_POSITION, position));
+  }
+  
+  public void setATriggerHoldoff (final double holdoff)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_HOLDOFF,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_HOLDOFF, holdoff));
+  }
+  
+  public void setATriggerLogSource (final Tek2440_GPIB_Settings.ATriggerLogSource logSource)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_LOG_SOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_LOG_SOURCE, logSource));
+  }
+  
+  public void setTriggerABSelect (final Tek2440_GPIB_Settings.ABSelect abSelect)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_TRIGGER_A_B_SELECT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_TRIGGER_A_B_SELECT, abSelect));
+  }
+  
+  public void setBTriggerMode (final Tek2440_GPIB_Settings.BTriggerMode mode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_MODE, mode));
+  }
+  
+  public void setBTriggerSource (final Tek2440_GPIB_Settings.BTriggerSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_SOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_SOURCE, source));
+  }
+  
+  public void setBTriggerCoupling (final Tek2440_GPIB_Settings.BTriggerCoupling coupling)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_COUPLING,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_COUPLING, coupling));
+  }
+  
+  public void setBTriggerSlope (final Tek2440_GPIB_Settings.Slope slope)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_SLOPE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_SLOPE, slope));
+  }
+  
+  public void setBTriggerLevel (final double level)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_LEVEL,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_LEVEL, level));
+  }
+  
+  public void setBTriggerPosition (final Tek2440_GPIB_Settings.BTriggerPosition position)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_POSITION,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_POSITION, position));
+  }
+  
+  public void setBTriggerExternalClock (final boolean externalClock)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_EXTERNAL_CLOCK,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_EXTERNAL_CLOCK, externalClock));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1879,6 +2007,228 @@ public class Tek2440_GPIB_Instrument
             (boolean) instrumentCommand.get (
               Tek2440_InstrumentCommand.ICARG_TEK2440_SMOOTHING);
           writeSync ("SMO " + (smoothing ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_MODE:
+        {
+          final Tek2440_GPIB_Settings.ATriggerMode mode =
+            (Tek2440_GPIB_Settings.ATriggerMode) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_MODE);
+          switch (mode)
+          {
+            case Auto:           writeSync ("ATR MOD:AUTO\r\n");  break;
+            case AutoLevel:      writeSync ("ATR MOD:AUTOL\r\n"); break;
+            case Normal:         writeSync ("ATR MOD:NOR\r\n");   break;
+            case SingleSequence: writeSync ("ATR MOD:SGL\r\n");   break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_SOURCE:
+        {
+          final Tek2440_GPIB_Settings.ATriggerSource source =
+            (Tek2440_GPIB_Settings.ATriggerSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_SOURCE);
+          switch (source)
+          {
+            case Ch1:      writeSync ("ATR SOU:CH1\r\n");  break;
+            case Ch2:      writeSync ("ATR SOU:CH2\r\n");  break;
+            case Ext1:     writeSync ("ATR SOU:EXT1\r\n"); break;
+            case Ext2:     writeSync ("ATR SOU:EXT2\r\n"); break;
+            case Line:     writeSync ("ATR SOU:LIN\r\n");  break;
+            case Vertical: writeSync ("ATR SOU:VER\r\n");  break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_COUPLING:
+        {
+          final Tek2440_GPIB_Settings.ATriggerCoupling coupling =
+            (Tek2440_GPIB_Settings.ATriggerCoupling) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_COUPLING);
+          switch (coupling)
+          {
+            case AC:          writeSync ("ATR COU:AC\r\n");  break;
+            case DC:          writeSync ("ATR COU:DC\r\n");  break;
+            case LFReject:    writeSync ("ATR COU:LFR\r\n"); break;
+            case HFReject:    writeSync ("ATR COU:HFR\r\n"); break;
+            case NoiseReject: writeSync ("ATR COU:NOI\r\n"); break;
+            case TV:          writeSync ("ATR COU:TV\r\n");  break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_SLOPE:
+        {
+          final Tek2440_GPIB_Settings.Slope slope =
+            (Tek2440_GPIB_Settings.Slope) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_SLOPE);
+          switch (slope)
+          {
+            case Plus:  writeSync ("ATR SLO:PLU\r\n");  break;
+            case Minus: writeSync ("ATR SLO:MINU\r\n"); break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_LEVEL:
+        {
+          final double level =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_LEVEL);
+          writeSync ("ATR LEV:" + Double.toString (level) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_POSITION:
+        {
+          final Tek2440_GPIB_Settings.ATriggerPosition position =
+            (Tek2440_GPIB_Settings.ATriggerPosition) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_POSITION);
+          writeSync ("ATR POS:" + Integer.toString (position.toInt ()) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_HOLDOFF:
+        {
+          final double holdoff =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_HOLDOFF);
+          writeSync ("ATR HOL:" + Double.toString (holdoff) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_A_TRIGGER_LOG_SOURCE:
+        {
+          final Tek2440_GPIB_Settings.ATriggerLogSource logSource =
+            (Tek2440_GPIB_Settings.ATriggerLogSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_A_TRIGGER_LOG_SOURCE);
+          switch (logSource)
+          {
+            case Off:     writeSync ("ATR LOG:OFF\r\n"); break;
+            case A_and_B: writeSync ("ATR LOG:A.B\r\n"); break;
+            case Word:    writeSync ("ATR LOG:WOR\r\n"); break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_TRIGGER_A_B_SELECT:
+        {
+          final Tek2440_GPIB_Settings.ABSelect abSelect =
+            (Tek2440_GPIB_Settings.ABSelect) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_TRIGGER_A_B_SELECT);
+          switch (abSelect)
+          {
+            case A: writeSync ("ATR ABSE:A\r\n"); break;
+            case B: writeSync ("ATR ABSE:B\r\n"); break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_MODE:
+        {
+          final Tek2440_GPIB_Settings.BTriggerMode mode =
+            (Tek2440_GPIB_Settings.BTriggerMode) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_MODE);
+          switch (mode)
+          {
+            case RunsAft: writeSync ("BTR MOD:RUNS\r\n"); break;
+            case TrigAft: writeSync ("BTR MOD:TRI\r\n");  break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_SOURCE:
+        {
+          final Tek2440_GPIB_Settings.BTriggerSource source =
+            (Tek2440_GPIB_Settings.BTriggerSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_SOURCE);
+          switch (source)
+          {
+            case Ch1:      writeSync ("BTR SOU:CH1\r\n");  break;
+            case Ch2:      writeSync ("BTR SOU:CH2\r\n");  break;
+            case Ext1:     writeSync ("BTR SOU:EXT1\r\n"); break;
+            case Ext2:     writeSync ("BTR SOU:EXT2\r\n"); break;
+            case Vertical: writeSync ("BTR SOU:VER\r\n");  break;
+            case Word:     writeSync ("BTR SOU:WOR\r\n");  break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_COUPLING:
+        {
+          final Tek2440_GPIB_Settings.BTriggerCoupling coupling =
+            (Tek2440_GPIB_Settings.BTriggerCoupling) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_COUPLING);
+          switch (coupling)
+          {
+            case AC:          writeSync ("BTR COU:AC\r\n");  break;
+            case DC:          writeSync ("BTR COU:DC\r\n");  break;
+            case LFReject:    writeSync ("BTR COU:LFR\r\n"); break;
+            case HFReject:    writeSync ("BTR COU:HFR\r\n"); break;
+            case NoiseReject: writeSync ("BTR COU:NOI\r\n"); break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_SLOPE:
+        {
+          final Tek2440_GPIB_Settings.Slope slope =
+            (Tek2440_GPIB_Settings.Slope) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_SLOPE);
+          switch (slope)
+          {
+            case Plus:  writeSync ("BTR SLO:PLU\r\n");  break;
+            case Minus: writeSync ("BTR SLO:MINU\r\n"); break;
+            default:
+              throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_LEVEL:
+        {
+          final double level =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_LEVEL);
+          writeSync ("BTR LEV:" + Double.toString (level) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_POSITION:
+        {
+          final Tek2440_GPIB_Settings.BTriggerPosition position =
+            (Tek2440_GPIB_Settings.BTriggerPosition) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_POSITION);
+          writeSync ("BTR POS:" + Integer.toString (position.toInt ()) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_B_TRIGGER_EXTERNAL_CLOCK:
+        {
+          final boolean externalClock =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_EXTERNAL_CLOCK);
+          writeSync ("BTR EXTCL:" + (externalClock ? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

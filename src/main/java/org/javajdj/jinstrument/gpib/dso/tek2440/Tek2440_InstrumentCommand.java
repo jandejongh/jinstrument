@@ -206,4 +206,52 @@ public interface Tek2440_InstrumentCommand
   public final static String IC_TEK2440_SMOOTHING = "commandTek2440Smoothing";
   public final static String ICARG_TEK2440_SMOOTHING = "tek2440Smoothing";
   
+  public final static String IC_TEK2440_A_TRIGGER_MODE = "commandTek2440ATriggerMode";
+  public final static String ICARG_TEK2440_A_TRIGGER_MODE = "tek2440ATriggerMode";
+  
+  public final static String IC_TEK2440_A_TRIGGER_SOURCE = "commandTek2440ATriggerSource";
+  public final static String ICARG_TEK2440_A_TRIGGER_SOURCE = "tek2440ATriggerSource";
+  
+  public final static String IC_TEK2440_A_TRIGGER_COUPLING = "commandTek2440ATriggerCoupling";
+  public final static String ICARG_TEK2440_A_TRIGGER_COUPLING = "tek2440ATriggerCoupling";
+  
+  public final static String IC_TEK2440_A_TRIGGER_SLOPE = "commandTek2440ATriggerSlope";
+  public final static String ICARG_TEK2440_A_TRIGGER_SLOPE = "tek2440ATriggerSlope";
+  
+  public final static String IC_TEK2440_A_TRIGGER_LEVEL = "commandTek2440ATriggerLevel";
+  public final static String ICARG_TEK2440_A_TRIGGER_LEVEL = "tek2440ATriggerLevel";
+  
+  public final static String IC_TEK2440_A_TRIGGER_POSITION = "commandTek2440ATriggerPosition";
+  public final static String ICARG_TEK2440_A_TRIGGER_POSITION = "tek2440ATriggerPosition";
+  
+  public final static String IC_TEK2440_A_TRIGGER_HOLDOFF = "commandTek2440ATriggerHoldoff";
+  public final static String ICARG_TEK2440_A_TRIGGER_HOLDOFF = "tek2440ATriggerHoldoff";
+  
+  public final static String IC_TEK2440_A_TRIGGER_LOG_SOURCE = "commandTek2440ATriggerLogSource";
+  public final static String ICARG_TEK2440_A_TRIGGER_LOG_SOURCE = "tek2440ATriggerLogSource";
+  
+  public final static String IC_TEK2440_TRIGGER_A_B_SELECT = "commandTek2440TriggerABSelect";
+  public final static String ICARG_TEK2440_TRIGGER_A_B_SELECT = "tek2440TriggerABSelect";
+  
+  public final static String IC_TEK2440_B_TRIGGER_MODE = "commandTek2440BTriggerMode";
+  public final static String ICARG_TEK2440_B_TRIGGER_MODE = "tek2440BTriggerMode";
+  
+  public final static String IC_TEK2440_B_TRIGGER_SOURCE = "commandTek2440BTriggerSource";
+  public final static String ICARG_TEK2440_B_TRIGGER_SOURCE = "tek2440BTriggerSource";
+  
+  public final static String IC_TEK2440_B_TRIGGER_COUPLING = "commandTek2440BTriggerCoupling";
+  public final static String ICARG_TEK2440_B_TRIGGER_COUPLING = "tek2440BTriggerCoupling";
+  
+  public final static String IC_TEK2440_B_TRIGGER_SLOPE = "commandTek2440BTriggerSlope";
+  public final static String ICARG_TEK2440_B_TRIGGER_SLOPE = "tek2440BTriggerSlope";
+  
+  public final static String IC_TEK2440_B_TRIGGER_LEVEL = "commandTek2440BTriggerLevel";
+  public final static String ICARG_TEK2440_B_TRIGGER_LEVEL = "tek2440BTriggerLevel";
+  
+  public final static String IC_TEK2440_B_TRIGGER_POSITION = "commandTek2440BTriggerPosition";
+  public final static String ICARG_TEK2440_B_TRIGGER_POSITION = "tek2440BTriggerPosition";
+  
+  public final static String IC_TEK2440_B_TRIGGER_EXTERNAL_CLOCK = "commandTek2440BTriggerExternalClock";
+  public final static String ICARG_TEK2440_B_TRIGGER_EXTERNAL_CLOCK = "tek2440BTriggerExternalClock";
+  
 }

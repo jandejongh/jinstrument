@@ -67,73 +67,104 @@ public class JTek2440_GPIB_BTrigger
     final int level,
     final Color panelColor)
   {
-    //
+    
     super (digitalStorageOscilloscope, title, level, panelColor);
-    //
+    if (! (digitalStorageOscilloscope instanceof Tek2440_GPIB_Instrument))
+      throw new IllegalArgumentException ();
+    final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
+    
     removeAll ();
     setLayout (new GridLayout (1, 2, 10, 0));
-    //
+    
     final JPanel leftPanel = new JPanel ();
     leftPanel.setLayout (new GridLayout (5, 1, 0, 10));
     add (leftPanel);
     final JPanel rightPanel = new JPanel ();
     rightPanel.setLayout (new GridLayout (5, 1, 0, 10));
     add (rightPanel);
-    //
+    
     leftPanel.add (new JLabel ("Mode"));
     this.jMode = new JComboBox<>  (Tek2440_GPIB_Settings.BTriggerMode.values ());
     this.jMode.setSelectedItem (null);
     this.jMode.setEditable (false);
-    this.jMode.setEnabled (false);
+    this.jMode.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "B trigger mode",
+      Tek2440_GPIB_Settings.BTriggerMode.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.BTriggerMode>) tek2440::setBTriggerMode,
+      this::isInhibitInstrumentControl));
     leftPanel.add (this.jMode);
-    //
+    
     leftPanel.add (new JLabel ("Source"));
     this.jSource = new JComboBox<> (Tek2440_GPIB_Settings.BTriggerSource.values ());
     this.jSource.setSelectedItem (null);
     this.jSource.setEditable (false);
-    this.jSource.setEnabled (false);
+    this.jSource.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "B trigger source",
+      Tek2440_GPIB_Settings.BTriggerSource.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.BTriggerSource>) tek2440::setBTriggerSource,
+      this::isInhibitInstrumentControl));
     leftPanel.add (this.jSource);
-    //
+    
     leftPanel.add (new JLabel ("Coupling"));
     this.jCoupling = new JComboBox<> (Tek2440_GPIB_Settings.BTriggerCoupling.values ());
     this.jCoupling.setSelectedItem (null);
     this.jCoupling.setEditable (false);
-    this.jCoupling.setEnabled (false);
+    this.jCoupling.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "B trigger coupling",
+      Tek2440_GPIB_Settings.BTriggerCoupling.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.BTriggerCoupling>) tek2440::setBTriggerCoupling,
+      this::isInhibitInstrumentControl));
     leftPanel.add (this.jCoupling);
-    //
+    
     leftPanel.add (new JLabel ("Slope"));
     this.jSlope = new JComboBox<> (Tek2440_GPIB_Settings.Slope.values ());
     this.jSlope.setSelectedItem (null);
     this.jSlope.setEditable (false);
-    this.jSlope.setEnabled (false);
+    this.jSlope.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "B trigger slope",
+      Tek2440_GPIB_Settings.Slope.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.Slope>) tek2440::setBTriggerSlope,
+      this::isInhibitInstrumentControl));
     leftPanel.add (this.jSlope);
-    //
-    leftPanel.add (new JLabel ("Level"));
-    this.jLevel = new JSlider ();
-    this.jLevel.setEnabled (false);
+    
+    leftPanel.add (new JLabel ("Level [V]"));
+    this.jLevel = new JSlider (-200, 200); // XXX Arbitrary!
+    this.jLevel.setToolTipText ("-");
+    this.jLevel.addChangeListener (new JInstrumentSliderChangeListener_1Double (
+      "B trigger level",
+      tek2440::setBTriggerLevel,
+      this::isInhibitInstrumentControl));
     leftPanel.add (this.jLevel);
-    //
+    
     rightPanel.add (new JLabel ("Position"));
     this.jPosition = new JComboBox<> (Tek2440_GPIB_Settings.BTriggerPosition.values ());
     this.jPosition.setSelectedItem (null);
     this.jPosition.setEditable (false);
-    this.jPosition.setEnabled (false);
+    this.jPosition.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "B trigger position",
+      Tek2440_GPIB_Settings.BTriggerPosition.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.BTriggerPosition>) tek2440::setBTriggerPosition,
+      this::isInhibitInstrumentControl));
     rightPanel.add (this.jPosition);
-    //
+    
     rightPanel.add (new JLabel ("Ext Clk"));
     this.jExtClk = new JColorCheckBox.JBoolean (Color.green);
-    this.jExtClk.setEnabled (false);
+    this.jExtClk.addActionListener (new JInstrumentActionListener_1Boolean (
+      "B trigger external clock",
+      this.jExtClk::getDisplayedValue,
+      tek2440::setBTriggerExternalClock,
+      this::isInhibitInstrumentControl));
     rightPanel.add (this.jExtClk);
-    //
+    
     rightPanel.add (new JLabel ());
     rightPanel.add (new JLabel ());
     rightPanel.add (new JLabel ());
     rightPanel.add (new JLabel ());
     rightPanel.add (new JLabel ());
     rightPanel.add (new JLabel ());
-    //
+    
     getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
-    //
+    
   }
 
   public JTek2440_GPIB_BTrigger (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
@@ -238,21 +269,21 @@ public class JTek2440_GPIB_BTrigger
       final Tek2440_GPIB_Settings settings = (Tek2440_GPIB_Settings) instrumentSettings;
       SwingUtilities.invokeLater (() ->
       {
-        JTek2440_GPIB_BTrigger.this.inhibitInstrumentControl = true;
+        JTek2440_GPIB_BTrigger.this.setInhibitInstrumentControl ();
         try
         {
           JTek2440_GPIB_BTrigger.this.jMode.setSelectedItem (settings.getBTriggerMode ());
           JTek2440_GPIB_BTrigger.this.jSource.setSelectedItem (settings.getBTriggerSource ());
           JTek2440_GPIB_BTrigger.this.jCoupling.setSelectedItem (settings.getBTriggerCoupling ());
           JTek2440_GPIB_BTrigger.this.jSlope.setSelectedItem (settings.getBTriggerSlope ());
-          // JTek2440_GPIB_BTrigger.this.jLevel.setValue (XXX);
+          JTek2440_GPIB_BTrigger.this.jLevel.setValue ((int) Math.round (settings.getBTriggerLevel ()));
           JTek2440_GPIB_BTrigger.this.jLevel.setToolTipText (Double.toString (settings.getBTriggerLevel ()));
           JTek2440_GPIB_BTrigger.this.jPosition.setSelectedItem (settings.getBTriggerPosition ());
           JTek2440_GPIB_BTrigger.this.jExtClk.setDisplayedValue (settings.getBTriggerExtClock ());
         }
         finally
         {
-          JTek2440_GPIB_BTrigger.this.inhibitInstrumentControl = false;
+          JTek2440_GPIB_BTrigger.this.resetInhibitInstrumentControl ();
         }
       });
     }

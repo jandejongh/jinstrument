@@ -2439,36 +2439,49 @@ public class Tek2440_GPIB_Settings
   
   public enum ATriggerPosition
   {
-    ATriggerPosition_01,
-    ATriggerPosition_02,
-    ATriggerPosition_03,
-    ATriggerPosition_04,
-    ATriggerPosition_05,
-    ATriggerPosition_06,
-    ATriggerPosition_07,
-    ATriggerPosition_08,
-    ATriggerPosition_09,
-    ATriggerPosition_10,
-    ATriggerPosition_11,
-    ATriggerPosition_12,
-    ATriggerPosition_13,
-    ATriggerPosition_14,
-    ATriggerPosition_15,
-    ATriggerPosition_16,
-    ATriggerPosition_17,
-    ATriggerPosition_18,
-    ATriggerPosition_19,
-    ATriggerPosition_20,
-    ATriggerPosition_21,
-    ATriggerPosition_22,
-    ATriggerPosition_23,
-    ATriggerPosition_24,
-    ATriggerPosition_25,
-    ATriggerPosition_26,
-    ATriggerPosition_27,
-    ATriggerPosition_28,
-    ATriggerPosition_29,
-    ATriggerPosition_30;
+    ATriggerPosition_01 (1),
+    ATriggerPosition_02 (2),
+    ATriggerPosition_03 (3),
+    ATriggerPosition_04 (4),
+    ATriggerPosition_05 (5),
+    ATriggerPosition_06 (6),
+    ATriggerPosition_07 (7),
+    ATriggerPosition_08 (8),
+    ATriggerPosition_09 (9),
+    ATriggerPosition_10 (10),
+    ATriggerPosition_11 (11),
+    ATriggerPosition_12 (12),
+    ATriggerPosition_13 (13),
+    ATriggerPosition_14 (14),
+    ATriggerPosition_15 (15),
+    ATriggerPosition_16 (16),
+    ATriggerPosition_17 (17),
+    ATriggerPosition_18 (18),
+    ATriggerPosition_19 (19),
+    ATriggerPosition_20 (20),
+    ATriggerPosition_21 (21),
+    ATriggerPosition_22 (22),
+    ATriggerPosition_23 (23),
+    ATriggerPosition_24 (24),
+    ATriggerPosition_25 (25),
+    ATriggerPosition_26 (26),
+    ATriggerPosition_27 (27),
+    ATriggerPosition_28 (28),
+    ATriggerPosition_29 (29),
+    ATriggerPosition_30 (30);
+
+    private ATriggerPosition (int intValue)
+    {
+      this.intValue = intValue;
+    }
+    
+    private final int intValue;
+    
+    public final int toInt ()
+    {
+      return this.intValue;
+    }
+    
   }
   
   public enum ATriggerLogSource
@@ -2867,38 +2880,51 @@ public class Tek2440_GPIB_Settings
   // XXX Keep in place until we are sure.
   public enum BTriggerPosition
   {
-    BTriggerPosition_01,
-    BTriggerPosition_02,
-    BTriggerPosition_03,
-    BTriggerPosition_04,
-    BTriggerPosition_05,
-    BTriggerPosition_06,
-    BTriggerPosition_07,
-    BTriggerPosition_08,
-    BTriggerPosition_09,
-    BTriggerPosition_10,
-    BTriggerPosition_11,
-    BTriggerPosition_12,
-    BTriggerPosition_13,
-    BTriggerPosition_14,
-    BTriggerPosition_15,
-    BTriggerPosition_16,
-    BTriggerPosition_17,
-    BTriggerPosition_18,
-    BTriggerPosition_19,
-    BTriggerPosition_20,
-    BTriggerPosition_21,
-    BTriggerPosition_22,
-    BTriggerPosition_23,
-    BTriggerPosition_24,
-    BTriggerPosition_25,
-    BTriggerPosition_26,
-    BTriggerPosition_27,
-    BTriggerPosition_28,
-    BTriggerPosition_29,
-    BTriggerPosition_30;
+    BTriggerPosition_01 (1),
+    BTriggerPosition_02 (2),
+    BTriggerPosition_03 (3),
+    BTriggerPosition_04 (4),
+    BTriggerPosition_05 (5),
+    BTriggerPosition_06 (6),
+    BTriggerPosition_07 (7),
+    BTriggerPosition_08 (8),
+    BTriggerPosition_09 (9),
+    BTriggerPosition_10 (10),
+    BTriggerPosition_11 (11),
+    BTriggerPosition_12 (12),
+    BTriggerPosition_13 (13),
+    BTriggerPosition_14 (14),
+    BTriggerPosition_15 (15),
+    BTriggerPosition_16 (16),
+    BTriggerPosition_17 (17),
+    BTriggerPosition_18 (18),
+    BTriggerPosition_19 (19),
+    BTriggerPosition_20 (20),
+    BTriggerPosition_21 (21),
+    BTriggerPosition_22 (22),
+    BTriggerPosition_23 (23),
+    BTriggerPosition_24 (24),
+    BTriggerPosition_25 (25),
+    BTriggerPosition_26 (26),
+    BTriggerPosition_27 (27),
+    BTriggerPosition_28 (28),
+    BTriggerPosition_29 (29),
+    BTriggerPosition_30 (30);
+
+    private BTriggerPosition (int intValue)
+    {
+      this.intValue = intValue;
+    }
+    
+    private final int intValue;
+    
+    public final int toInt ()
+    {
+      return this.intValue;
+    }
+    
   }
-  
+    
   public static class BTriggerSettings
   {
     
