@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -163,6 +164,13 @@ public class JInstrumentPanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  public final static Color DEFAULT_UPDATE_PENDING_COLOR = Color.red;
+  
+  public final static Color getGuiPreferencesUpdatePendingColor ()
+  {
+    return JInstrumentPanel.DEFAULT_UPDATE_PENDING_COLOR;
+  }
+  
   public final static Color DEFAULT_MANAGEMENT_COLOR = Color.orange;
   
   public final static Color getGuiPreferencesManagementColor ()
@@ -926,16 +934,28 @@ public class JInstrumentPanel
 
     final Provider<Boolean> inhibitSetter;
     
+    final Color preSetColor;
+    
     public JInstrumentSliderChangeListener_1Integer (
       final String settingString,
       final Instrument.InstrumentSetter_1Integer setter,
-      final Provider<Boolean> inhibitSetter)
+      final Provider<Boolean> inhibitSetter,
+      final Color preSetColor)
     {
       if (settingString == null || settingString.trim ().isEmpty () || setter == null)
         throw new IllegalArgumentException ();
       this.settingString = settingString;
       this.setter = setter;
       this.inhibitSetter = inhibitSetter;
+      this.preSetColor = preSetColor;
+    }
+    
+    public JInstrumentSliderChangeListener_1Integer (
+      final String settingString,
+      final Instrument.InstrumentSetter_1Integer setter,
+      final Provider<Boolean> inhibitSetter)
+    {
+      this (settingString, setter, inhibitSetter, null);
     }
     
     @Override
@@ -947,6 +967,8 @@ public class JInstrumentPanel
       {
         if (this.inhibitSetter != null && this.inhibitSetter.apply ())
           return;
+        if (this.preSetColor != null)
+          source.setBackground (this.preSetColor);
         try
         {
           this.setter.set (this.setter.intToArg (source.getValue ()));
@@ -971,16 +993,28 @@ public class JInstrumentPanel
 
     final Provider<Boolean> inhibitSetter;
     
+    final Color preSetColor;
+    
     public JInstrumentSliderChangeListener_1Double (
       final String settingString,
       final Instrument.InstrumentSetter_1Double setter,
-      final Provider<Boolean> inhibitSetter)
+      final Provider<Boolean> inhibitSetter,
+      final Color preSetColor)
     {
       if (settingString == null || settingString.trim ().isEmpty () || setter == null)
         throw new IllegalArgumentException ();
       this.settingString = settingString;
       this.setter = setter;
       this.inhibitSetter = inhibitSetter;
+      this.preSetColor = preSetColor;
+    }
+    
+    public JInstrumentSliderChangeListener_1Double (
+      final String settingString,
+      final Instrument.InstrumentSetter_1Double setter,
+      final Provider<Boolean> inhibitSetter)
+    {
+      this (settingString, setter, inhibitSetter, null);
     }
     
     @Override
@@ -992,6 +1026,8 @@ public class JInstrumentPanel
       {
         if (this.inhibitSetter != null && this.inhibitSetter.apply ())
           return;
+        if (this.preSetColor != null)
+          source.setBackground (this.preSetColor);
         try
         {
           this.setter.set (this.setter.intToArg (source.getValue ()));
@@ -1064,11 +1100,14 @@ public class JInstrumentPanel
 
     final Provider<Boolean> inhibitSetter;
 
+    final Color preSetColor;
+    
     public JInstrumentComboBoxItemListener_Enum (
       final String settingString,
       final Class<E> clazz,
       final Instrument.InstrumentSetter_1Enum setter,
-      final Provider<Boolean> inhibitSetter)
+      final Provider<Boolean> inhibitSetter,
+      final Color preSetColor)
     {
       if (settingString == null || settingString.trim ().isEmpty () || clazz == null || setter == null)
         throw new IllegalArgumentException ();
@@ -1076,6 +1115,16 @@ public class JInstrumentPanel
       this.clazz = clazz;
       this.setter = setter;
       this.inhibitSetter = inhibitSetter;
+      this.preSetColor = preSetColor;
+    }
+    
+    public JInstrumentComboBoxItemListener_Enum (
+      final String settingString,
+      final Class<E> clazz,
+      final Instrument.InstrumentSetter_1Enum setter,
+      final Provider<Boolean> inhibitSetter)
+    {
+      this (settingString, clazz, setter, inhibitSetter, null);
     }
     
     @Override
@@ -1086,6 +1135,8 @@ public class JInstrumentPanel
         final E newValue = (E) ie.getItem ();
         if (this.inhibitSetter != null && this.inhibitSetter.apply ())
           return;
+        if (this.preSetColor != null)
+          ((JComboBox) ie.getItemSelectable ()).setBackground (this.preSetColor);
         try
         {
           this.setter.set (newValue);

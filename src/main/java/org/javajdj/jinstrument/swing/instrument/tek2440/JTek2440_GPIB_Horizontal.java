@@ -39,6 +39,7 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 
 /** A Swing panel for the Horizontal settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -82,17 +83,20 @@ public class JTek2440_GPIB_Horizontal
     this.jMode = new JComboBox<> (Tek2440_GPIB_Settings.HorizontalMode.values ());
     this.jMode.setSelectedItem (null);
     this.jMode.setEditable (false);
+    this.jMode.setBackground (Color.red);
     this.jMode.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
       "horizontal mode",
       Tek2440_GPIB_Settings.HorizontalMode.class,
       (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.HorizontalMode>) tek2440::setHorizontalMode,
-      this::isInhibitInstrumentControl));
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
     add (this.jMode);
     
     add (new JLabel ("A Timebase"));
     this.jChATimebase = new JComboBox<> (Tek2440_GPIB_Settings.SecondsPerDivision.values ());
     this.jChATimebase.setSelectedItem (null);
     this.jChATimebase.setEditable (false);
+    this.jChATimebase.setBackground (Color.red);
     this.jChATimebase.addItemListener (this.jChTimebaseListener);
     add (this.jChATimebase);
     
@@ -100,6 +104,7 @@ public class JTek2440_GPIB_Horizontal
     this.jChBTimebase = new JComboBox<> (Tek2440_GPIB_Settings.SecondsPerDivision.values ());
     this.jChBTimebase.setSelectedItem (null);
     this.jChBTimebase.setEditable (false);
+    this.jChBTimebase.setBackground (Color.red);
     this.jChBTimebase.addItemListener (this.jChTimebaseListener);
     add (this.jChBTimebase);
     
@@ -109,22 +114,26 @@ public class JTek2440_GPIB_Horizontal
     this.jPosition.setMinorTickSpacing (128);
     this.jPosition.setPaintTicks (true);
     this.jPosition.setToolTipText ("-");
+    this.jPosition.setBackground (Color.red);
     this.jPosition.addChangeListener (new JInstrumentSliderChangeListener_1Double (
       "horizontal position",
       tek2440::setHorizontalPosition,
-      this::isInhibitInstrumentControl));
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
     add (this.jPosition);
     
     add (new JLabel ("Hor Ext Expansion"));
     this.jExtExp = new JComboBox (Tek2440_GPIB_Settings.HorizontalExternalExpansionFactor.values ());
     this.jExtExp.setSelectedItem (null);
     this.jExtExp.setEditable (false);
+    this.jExtExp.setBackground (Color.red);
     this.jExtExp.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
       "horizontal external expansion factor",
       Tek2440_GPIB_Settings.HorizontalExternalExpansionFactor.class,
       (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.HorizontalExternalExpansionFactor>)
         tek2440::setHorizontalExternalExpansion,
-      this::isInhibitInstrumentControl));
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
     add (this.jExtExp);
     
     getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
@@ -214,9 +223,15 @@ public class JTek2440_GPIB_Horizontal
         try
         {
           if (ie.getSource () == JTek2440_GPIB_Horizontal.this.jChATimebase)
+          {
+            JTek2440_GPIB_Horizontal.this.jChATimebase.setBackground (JInstrumentPanel.getGuiPreferencesUpdatePendingColor ());
             tek2440.setChannelTimebase (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1, newValue);
+          }
           else if (ie.getSource () == JTek2440_GPIB_Horizontal.this.jChBTimebase)
+          {
+            JTek2440_GPIB_Horizontal.this.jChBTimebase.setBackground (JInstrumentPanel.getGuiPreferencesUpdatePendingColor ());
             tek2440.setChannelTimebase (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2, newValue);
+          }
           else
             LOG.log (Level.SEVERE, "Unexpected event source!");            
         }
@@ -258,12 +273,17 @@ public class JTek2440_GPIB_Horizontal
         try
         {
           JTek2440_GPIB_Horizontal.this.jMode.setSelectedItem (settings.getHorizontalMode ());
+          JTek2440_GPIB_Horizontal.this.jMode.setBackground (JTek2440_GPIB_Horizontal.this.getBackground ());
           JTek2440_GPIB_Horizontal.this.jChATimebase.setSelectedItem (settings.getASecondsPerDivision ());
+          JTek2440_GPIB_Horizontal.this.jChATimebase.setBackground (JTek2440_GPIB_Horizontal.this.getBackground ());
           JTek2440_GPIB_Horizontal.this.jChBTimebase.setSelectedItem (settings.getBSecondsPerDivision ());
+          JTek2440_GPIB_Horizontal.this.jChBTimebase.setBackground (JTek2440_GPIB_Horizontal.this.getBackground ());
           final int roundedXPosition = (int) Math.round (settings.getHorizontalPosition ());
           JTek2440_GPIB_Horizontal.this.jPosition.setValue (roundedXPosition);
           JTek2440_GPIB_Horizontal.this.jPosition.setToolTipText (Integer.toString (roundedXPosition));
+          JTek2440_GPIB_Horizontal.this.jPosition.setBackground (JTek2440_GPIB_Horizontal.this.getBackground ());
           JTek2440_GPIB_Horizontal.this.jExtExp.setSelectedItem (settings.getHorizontalExternalExpansionFactor ());
+          JTek2440_GPIB_Horizontal.this.jExtExp.setBackground (JTek2440_GPIB_Horizontal.this.getBackground ());
         }
         finally
         {
