@@ -1151,6 +1151,14 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_EXTERNAL_CLOCK, externalClock));
   }
   
+  public void setEnableDebug (final boolean enableDebug)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_DEBUG,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_DEBUG, enableDebug));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -2229,6 +2237,15 @@ public class Tek2440_GPIB_Instrument
             (boolean) instrumentCommand.get (
               Tek2440_InstrumentCommand.ICARG_TEK2440_B_TRIGGER_EXTERNAL_CLOCK);
           writeSync ("BTR EXTCL:" + (externalClock ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_ENABLE_DEBUG:
+        {
+          final boolean enableDebug =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_DEBUG);
+          writeSync ("DEB " + (enableDebug ? "ON" : "OFF") + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

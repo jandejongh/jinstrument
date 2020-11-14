@@ -70,22 +70,22 @@ public class JTek2440_GPIB_SRQ
   
   public JTek2440_GPIB_SRQ (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
   {
-    //
+    
     super (digitalStorageOscilloscope, level);
     if (! (digitalStorageOscilloscope instanceof Tek2440_GPIB_Instrument))
       throw new IllegalArgumentException ();
     final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
-    //
+    
     removeAll ();
-    setLayout (new GridLayout (2, 1, 0, 2));
-    //
+    setLayout (new GridLayout (3, 1, 0, 2));
+    
     this.jSrqMaskPanel = new JSrqMaskPanel ();
     this.jSrqMaskPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
         "GPIB Mask Settings"));
     add (this.jSrqMaskPanel);
-    //
+    
     final JPanel gpibGetPanel = new JPanel ();
     gpibGetPanel.setBorder (
       BorderFactory.createTitledBorder (
@@ -101,9 +101,29 @@ public class JTek2440_GPIB_SRQ
     JTextFieldListener.addJTextFieldListener (this.jGetSequence, this.jGetSequenceListener);
     gpibGetPanel.add (JCenter.Y (this.jGetSequence));
     add (gpibGetPanel);
-    //
+    
+    final JPanel gpibDebugPanel = new JPanel ();
+    gpibDebugPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
+        "[GPIB] Debug"));
+    gpibDebugPanel.setLayout (new GridLayout (1, 6));
+    gpibDebugPanel.add (new JLabel ("Enable Debug"));
+    this.jDebug = new JColorCheckBox.JBoolean (Color.green);
+    this.jDebug.addActionListener (new JInstrumentActionListener_1Boolean (
+      "debug",
+      this.jDebug::getDisplayedValue,
+      tek2440::setEnableDebug,
+      JTek2440_GPIB_SRQ.this::isInhibitInstrumentControl));
+    gpibDebugPanel.add (this.jDebug);
+    gpibDebugPanel.add (new JLabel ()); // Aesthetics, really...
+    gpibDebugPanel.add (new JLabel ());
+    gpibDebugPanel.add (new JLabel ());
+    gpibDebugPanel.add (new JLabel ());
+    add (gpibDebugPanel);
+    
     getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
-    //
+    
   }
   
   public JTek2440_GPIB_SRQ (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
@@ -123,7 +143,7 @@ public class JTek2440_GPIB_SRQ
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Tektronix 2440 [GPIB] Service Request Settings";
+      return "Tektronix 2440 [GPIB] Service Request, Group Excute Trigger, and Debug Settings";
     }
 
     @Override
@@ -336,6 +356,15 @@ public class JTek2440_GPIB_SRQ
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // SWING
+  // [GPIB] DEBUG
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final JColorCheckBox.JBoolean jDebug;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // INSTRUMENT LISTENER
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -384,6 +413,8 @@ public class JTek2440_GPIB_SRQ
             settings.getGroupTriggerSRQMode ());
           JTek2440_GPIB_SRQ.this.jGetSequence.setText (
             settings.getGroupTriggerSequence ());
+          JTek2440_GPIB_SRQ.this.jDebug.setDisplayedValue (
+            settings.isDebugEnabled ());
         }
         finally
         {

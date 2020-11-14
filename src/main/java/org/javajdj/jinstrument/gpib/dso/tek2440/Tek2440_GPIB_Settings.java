@@ -4638,6 +4638,11 @@ public class Tek2440_GPIB_Settings
     return this.debugSettings;
   }
   
+  public final boolean isDebugEnabled ()
+  {
+    return getDebugSettings ().debug;
+  }
+  
   private static DebugSettings parseDebugSettings (final String argString)
   {
     if (argString == null)

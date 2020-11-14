@@ -254,4 +254,7 @@ public interface Tek2440_InstrumentCommand
   public final static String IC_TEK2440_B_TRIGGER_EXTERNAL_CLOCK = "commandTek2440BTriggerExternalClock";
   public final static String ICARG_TEK2440_B_TRIGGER_EXTERNAL_CLOCK = "tek2440BTriggerExternalClock";
   
+  public final static String IC_TEK2440_ENABLE_DEBUG = "commandTek2440EnableDebug";
+  public final static String ICARG_TEK2440_ENABLE_DEBUG = "tek2440EnableDebug";
+  
 }
