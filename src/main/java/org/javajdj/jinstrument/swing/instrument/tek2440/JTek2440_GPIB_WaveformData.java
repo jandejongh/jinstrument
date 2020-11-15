@@ -18,14 +18,12 @@ package org.javajdj.jinstrument.swing.instrument.tek2440;
 
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.function.Consumer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
@@ -39,10 +37,9 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR;
-import org.javajdj.jswing.jbyte.JBitsLong;
 import org.javajdj.jswing.jcenter.JCenter;
-import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
 /** A Swing panel for the Waveform Data settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -100,65 +97,111 @@ public class JTek2440_GPIB_WaveformData
                           "</html>");
     add (jDescription);
     
-    final JPanel formatPanel = new JPanel ();
-    formatPanel.setBorder (
+    final JPanel levelCrossingPanel = new JPanel ();
+    levelCrossingPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
-        "Format"));
-    formatPanel.setLayout (new GridLayout (1, 4));
-    formatPanel.add (new JLabel ("Add Formatting [PRGm?]"));
-    this.jSequencerFormat = new JColorCheckBox.JBoolean (Color.green);
-    this.jSequencerFormat.addActionListener (new JInstrumentActionListener_1Boolean (
-      "[sequencer] format [PRGm?]",
-      this.jSequencerFormat::getDisplayedValue,
-      tek2440::setSequencerEnableFormatChars,
-      this::isInhibitInstrumentControl));
-    formatPanel.add (this.jSequencerFormat);
-    formatPanel.add (new JLabel ()); // Aesthetics, really...
-    formatPanel.add (new JLabel ());
-    add (formatPanel);
-
-    final JPanel actionPanel = new JPanel ();
-    actionPanel.setBorder (
-      BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
-        "Action(s)"));
-    actionPanel.setLayout (new GridLayout (1, 1));
-    this.jSequencerActions = new JBitsLong (
-      Color.green,
-      9,
-      Arrays.asList (
-        "Protect      ",
-        "Pause        ",
-        "SRQ          ",
-        "Bell         ",
-        "Print        ",
-        "AutoSetup    ",
-        "SelfTest     ",
-        "SelfCal      ",
-        "Repeat       "),
-      this.jSeqeuncerActionsListener,
-      false);
-    actionPanel.add (JCenter.XY (this.jSequencerActions));
-    add (actionPanel);
+        "Level Crossing"));
+    add (levelCrossingPanel);
     
-    final JPanel maintenancePanel = new JPanel ();
-    maintenancePanel.setBorder (
+    levelCrossingPanel.setLayout (new GridLayout (2, 5));
+    
+    levelCrossingPanel.add (new JLabel ("Level"));
+    this.jLevel = new JSlider (-100, 100); // XXX Limits?
+    this.jLevel.setMajorTickSpacing (50);
+    this.jLevel.setPaintTicks (true);
+    this.jLevel.setPaintLabels (true);
+    this.jLevel.setToolTipText ("-");
+    this.jLevel.setBackground (Color.red);
+    this.jLevel.addChangeListener (new JInstrumentSliderChangeListener_1Integer (
+      "waveform analysis level",
+      tek2440::setWaveformAnalysisLevel,
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
+    levelCrossingPanel .add (this.jLevel);
+    
+    levelCrossingPanel.add (new JLabel ());
+
+    levelCrossingPanel.add (new JLabel ("Hysteresis"));
+    this.jHysteresis = new JSlider (0, 256); // XXX Limits?
+    this.jHysteresis.setMajorTickSpacing (64);
+    this.jHysteresis.setPaintTicks (true);
+    this.jHysteresis.setPaintLabels (true);
+    this.jHysteresis.setToolTipText ("-");
+    this.jHysteresis.setBackground (Color.red);
+    this.jHysteresis.addChangeListener (new JInstrumentSliderChangeListener_1Integer (
+      "waveform analysis hysteresis",
+      tek2440::setWaveformAnalysisHysteresis,
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
+    levelCrossingPanel.add (this.jHysteresis);
+
+    levelCrossingPanel.add (new JLabel ("Direction"));
+    this.jDirection = new JComboBox<> (Tek2440_GPIB_Settings.Direction.values ());
+    this.jDirection.setSelectedItem (null);
+    this.jDirection.setEditable (false);
+    this.jDirection.setBackground (Color.red);
+    this.jDirection.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "waveform analysis direction",
+      Tek2440_GPIB_Settings.Direction.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.Direction>)
+        tek2440::setWaveformAnalysisDirection,
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
+    levelCrossingPanel.add (JCenter.Y (this.jDirection));
+    
+    levelCrossingPanel.add (new JLabel ());
+    levelCrossingPanel.add (new JLabel ());
+    levelCrossingPanel.add (new JLabel ());    
+    
+    final JPanel intervalPanel = new JPanel ();
+    intervalPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
-        "Sequencer Maintenance"));
-    maintenancePanel.setLayout (new GridLayout (1, 4));
-    maintenancePanel.add (new JLabel ("Force"));
-    this.jSequencerForce = new JColorCheckBox.JBoolean (Color.green);
-    this.jSequencerForce.addActionListener (new JInstrumentActionListener_1Boolean (
-      "[sequencer] force",
-      this.jSequencerForce::getDisplayedValue,
-      tek2440::setSequencerForce,
-      this::isInhibitInstrumentControl));
-    maintenancePanel.add (this.jSequencerForce);
-    maintenancePanel.add (new JLabel ()); // Aesthetics, really...
-    maintenancePanel.add (new JLabel ());
-    add (maintenancePanel);
+        "Interval"));
+    add (intervalPanel);
+    
+    intervalPanel.setLayout (new GridLayout (2, 2));
+    
+    intervalPanel.add (new JLabel ("Start"));
+    this.jStart = new JSlider (1, 1024);
+    this.jStart.setMajorTickSpacing (1023);
+    this.jStart.setMinorTickSpacing (512);
+    this.jStart.setPaintTicks (true);
+    this.jStart.setPaintLabels (true);
+    this.jStart.setToolTipText ("-");
+    this.jStart.setBackground (Color.red);
+    this.jStart.addChangeListener (new JInstrumentSliderChangeListener_1Integer (
+      "waveform analysis start position",
+      tek2440::setWaveformAnalysisStartPosition,
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
+    intervalPanel.add (this.jStart);
+
+    intervalPanel.add (new JLabel ("Stop"));
+    this.jStop = new JSlider (1, 1024);
+    this.jStop.setMajorTickSpacing (1023);
+    this.jStop.setMinorTickSpacing (512);
+    this.jStop.setPaintTicks (true);
+    this.jStop.setPaintLabels (true);
+    this.jStop.setToolTipText ("-");
+    this.jStop.setBackground (Color.red);
+    this.jStop.addChangeListener (new JInstrumentSliderChangeListener_1Integer (
+      "waveform analysis stop position",
+      tek2440::setWaveformAnalysisStopPosition,
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
+    intervalPanel.add (this.jStop);
+        
+    final JPanel commandPanel = new JPanel ();
+    add (commandPanel);
+    
+    commandPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
+        "Commands"));
+    
+    commandPanel.setLayout (new GridLayout (1, 1));
     
     getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
     
@@ -227,26 +270,15 @@ public class JTek2440_GPIB_WaveformData
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final JColorCheckBox.JBoolean jSequencerFormat;
+  private final JSlider jLevel;
   
-  private final JBitsLong jSequencerActions;
+  private final JComboBox<Tek2440_GPIB_Settings.Direction> jDirection;
   
-  private final JColorCheckBox.JBoolean jSequencerForce;
+  private final JSlider jHysteresis;
   
-  private final Consumer<Long> jSeqeuncerActionsListener = (final Long newValue) ->
-  {
-    final Tek2440_GPIB_Instrument tek2440 = ((Tek2440_GPIB_Instrument) getDigitalStorageOscilloscope ());
-    try
-    {
-      tek2440.setSequencerActionsFromInt ((int) (long) newValue);
-    }
-    catch (IOException | InterruptedException e)    
-    {
-      LOG.log (Level.INFO, "Caught exception while setting sequencer actions on instrument {1}"
-        + " from JBitsLong to {0}: {2}.",
-        new Object[]{newValue, getInstrument (), Arrays.toString (e.getStackTrace ())});
-    }
-  };
+  private final JSlider jStart;
+  
+  private final JSlider jStop;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -276,12 +308,25 @@ public class JTek2440_GPIB_WaveformData
         JTek2440_GPIB_WaveformData.this.setInhibitInstrumentControl ();
         try
         {
-          JTek2440_GPIB_WaveformData.this.jSequencerFormat.setDisplayedValue (
-            settings.isSequencerFormatCharsEnabled ());
-          JTek2440_GPIB_WaveformData.this.jSequencerActions.setDisplayedValue (
-            settings.getSequencerActionsAsInt ());
-          JTek2440_GPIB_WaveformData.this.jSequencerForce.setDisplayedValue (
-            settings.isSequencerForce ());
+          final int level = settings.getWaveformAnalysisLevel ();
+          final Tek2440_GPIB_Settings.Direction direction = settings.getWaveformAnalysisDirection ();
+          final int hysteresis = settings.getWaveformAnalysisHysteresis ();
+          final int start = settings.getWaveformAnalysisStart ();
+          final int stop = settings.getWaveformAnalysisStop ();
+          JTek2440_GPIB_WaveformData.this.jLevel.setValue (level);
+          JTek2440_GPIB_WaveformData.this.jLevel.setToolTipText (Integer.toString (level));
+          JTek2440_GPIB_WaveformData.this.jLevel.setBackground (JTek2440_GPIB_WaveformData.this.getBackground ());
+          JTek2440_GPIB_WaveformData.this.jDirection.setSelectedItem (direction);
+          JTek2440_GPIB_WaveformData.this.jDirection.setBackground (JTek2440_GPIB_WaveformData.this.getBackground ());
+          JTek2440_GPIB_WaveformData.this.jHysteresis.setValue (hysteresis);
+          JTek2440_GPIB_WaveformData.this.jHysteresis.setToolTipText (Integer.toString (hysteresis));
+          JTek2440_GPIB_WaveformData.this.jHysteresis.setBackground (JTek2440_GPIB_WaveformData.this.getBackground ());
+          JTek2440_GPIB_WaveformData.this.jStart.setValue (start);
+          JTek2440_GPIB_WaveformData.this.jStart.setToolTipText (Integer.toString (start));
+          JTek2440_GPIB_WaveformData.this.jStart.setBackground (JTek2440_GPIB_WaveformData.this.getBackground ());
+          JTek2440_GPIB_WaveformData.this.jStop.setValue (stop);
+          JTek2440_GPIB_WaveformData.this.jStop.setToolTipText (Integer.toString (stop));
+          JTek2440_GPIB_WaveformData.this.jStop.setBackground (JTek2440_GPIB_WaveformData.this.getBackground ());
         }
         finally
         {

@@ -289,4 +289,19 @@ public interface Tek2440_InstrumentCommand
   public final static String IC_TEK2440_LOCK_MODE = "commandTek2440LockMode";
   public final static String ICARG_TEK2440_LOCK_MODE = "tek2440LockMode";
   
+  public final static String IC_TEK2440_WAVEFORM_ANALYSIS_LEVEL = "commandTek2440WaveformAnalysisLevel";
+  public final static String ICARG_TEK2440_WAVEFORM_ANALYSIS_LEVEL = "tek2440WaveformAnalysisLevel";
+  
+  public final static String IC_TEK2440_WAVEFORM_ANALYSIS_DIRECTION = "commandTek2440WaveformAnalysisDirection";
+  public final static String ICARG_TEK2440_WAVEFORM_ANALYSIS_DIRECTION = "tek2440WaveformAnalysisDirection";
+  
+  public final static String IC_TEK2440_WAVEFORM_ANALYSIS_HYSTERESIS = "commandTek2440WaveformAnalysisHysteresis";
+  public final static String ICARG_TEK2440_WAVEFORM_ANALYSIS_HYSTERESIS = "tek2440WaveformAnalysisHysteresis";
+  
+  public final static String IC_TEK2440_WAVEFORM_ANALYSIS_START_POSITION = "commandTek2440WaveformAnalysisStartPosition";
+  public final static String ICARG_TEK2440_WAVEFORM_ANALYSIS_START_POSITION = "tek2440WaveformAnalysisStartPosition";
+  
+  public final static String IC_TEK2440_WAVEFORM_ANALYSIS_STOP_POSITION = "commandTek2440WaveformAnalysisStopPosition";
+  public final static String ICARG_TEK2440_WAVEFORM_ANALYSIS_STOP_POSITION = "tek2440WaveformAnalysisStopPosition";
+  
 }

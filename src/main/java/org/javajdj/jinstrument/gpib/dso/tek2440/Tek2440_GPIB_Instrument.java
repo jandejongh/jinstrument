@@ -1246,6 +1246,46 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_LOCK_MODE, lockMode));
   }
 
+  public void setWaveformAnalysisLevel (final int level)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_WAVEFORM_ANALYSIS_LEVEL,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_LEVEL, level));
+  }
+
+  public void setWaveformAnalysisDirection (final Tek2440_GPIB_Settings.Direction direction)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_WAVEFORM_ANALYSIS_DIRECTION,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_DIRECTION, direction));
+  }
+
+  public void setWaveformAnalysisHysteresis (final int hysteresis)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_WAVEFORM_ANALYSIS_HYSTERESIS,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_HYSTERESIS, hysteresis));
+  }
+
+  public void setWaveformAnalysisStartPosition (final int position)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_WAVEFORM_ANALYSIS_START_POSITION,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_START_POSITION, position));
+  }
+
+  public void setWaveformAnalysisStopPosition (final int position)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_WAVEFORM_ANALYSIS_STOP_POSITION,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_STOP_POSITION, position));
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -2418,6 +2458,56 @@ public class Tek2440_GPIB_Instrument
             case On:  writeSync ("LOC ON\r\n");  break;
             default: throw new IllegalArgumentException ();
           }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_WAVEFORM_ANALYSIS_LEVEL:
+        {
+          final int level =
+            (int) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_LEVEL);
+          writeSync ("LEV " + Integer.toString (level) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_WAVEFORM_ANALYSIS_DIRECTION:
+        {
+          final Tek2440_GPIB_Settings.Direction direction =
+            (Tek2440_GPIB_Settings.Direction) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_DIRECTION);
+          switch (direction)
+          {
+            case Plus:  writeSync ("DIR PLU\r\n");  break;
+            case Minus: writeSync ("DIR MINU\r\n"); break;
+            default:    throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_WAVEFORM_ANALYSIS_HYSTERESIS:
+        {
+          final int hysteresis =
+            (int) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_HYSTERESIS);
+          writeSync ("HYS " + Integer.toString (hysteresis) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_WAVEFORM_ANALYSIS_START_POSITION:
+        {
+          final int position =
+            (int) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_START_POSITION);
+          writeSync ("STAR " + Integer.toString (position) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_WAVEFORM_ANALYSIS_STOP_POSITION:
+        {
+          final int position =
+            (int) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_STOP_POSITION);
+          writeSync ("STO " + Integer.toString (position) + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

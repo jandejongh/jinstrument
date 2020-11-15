@@ -4836,6 +4836,11 @@ public class Tek2440_GPIB_Settings
     return this.directionSettings;
   }
   
+  public final Direction getWaveformAnalysisDirection ()
+  {
+    return getDirectionSettings ().direction;
+  }
+  
   private static DirectionSettings parseDirectionSettings (final String argString)
   {
     if (argString == null)
@@ -5040,6 +5045,11 @@ public class Tek2440_GPIB_Settings
     return this.hysteresisSettings;
   }
   
+  public final int getWaveformAnalysisHysteresis ()
+  {
+    return getHysteresisSettings ().hysteresis;
+  }
+  
   private static HysteresisSettings parseHysteresisSettings (final String argString)
   {
     if (argString == null)
@@ -5081,6 +5091,11 @@ public class Tek2440_GPIB_Settings
   public final LevelSettings getLevelSettings ()
   {
     return this.levelSettings;
+  }
+  
+  public final int getWaveformAnalysisLevel ()
+  {
+    return getLevelSettings ().level;
   }
   
   private static LevelSettings parseLevelSettings (final String argString)
@@ -5336,6 +5351,11 @@ public class Tek2440_GPIB_Settings
     return this.startSettings;
   }
   
+  public final int getWaveformAnalysisStart ()
+  {
+    return getStartSettings ().start;
+  }
+  
   private static StartSettings parseStartSettings (final String argString)
   {
     if (argString == null)
@@ -5377,6 +5397,11 @@ public class Tek2440_GPIB_Settings
   public final StopSettings getStopSettings ()
   {
     return this.stopSettings;
+  }
+  
+  public final int getWaveformAnalysisStop ()
+  {
+    return getStopSettings ().stop;
   }
   
   private static StopSettings parseStopSettings (final String argString)
