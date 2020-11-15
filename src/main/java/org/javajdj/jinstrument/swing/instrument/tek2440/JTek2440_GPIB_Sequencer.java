@@ -46,9 +46,6 @@ import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
 /** A Swing panel for the Sequencer settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
- * <p>
- * Currently empty...
- * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
