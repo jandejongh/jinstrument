@@ -1238,6 +1238,14 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.IC_TEK2440_PRINT));
   }
 
+  public void setLockMode (final Tek2440_GPIB_Settings.LockMode lockMode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_LOCK_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_LOCK_MODE, lockMode));
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -2396,6 +2404,21 @@ public class Tek2440_GPIB_Instrument
         {
           writeSync ("PRI\r\n");
           // newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_LOCK_MODE:
+        {
+          final Tek2440_GPIB_Settings.LockMode lockMode =
+            (Tek2440_GPIB_Settings.LockMode) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_LOCK_MODE);
+          switch (lockMode)
+          {
+            case LLO: writeSync ("LOC LLO\r\n"); break;
+            case Off: writeSync ("LOC OFF\r\n"); break;
+            case On:  writeSync ("LOC ON\r\n");  break;
+            default: throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         default:

@@ -17,7 +17,6 @@
 package org.javajdj.jinstrument.gpib.dso.tek2440;
 
 import java.nio.charset.Charset;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -5106,7 +5105,7 @@ public class Tek2440_GPIB_Settings
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public static enum Lock
+  public static enum LockMode
   {
     LLO,
     Off,
@@ -5116,13 +5115,13 @@ public class Tek2440_GPIB_Settings
   public final static class LockSettings
   {
     
-    private final Lock lock;
+    private final LockMode lockMode;
     
-    public LockSettings (final Lock lock)
+    public LockSettings (final LockMode lockMode)
     {
-      if (lock == null)
+      if (lockMode == null)
         throw new IllegalArgumentException ();
-      this.lock = lock;
+      this.lockMode = lockMode;
     }
     
   }
@@ -5134,18 +5133,23 @@ public class Tek2440_GPIB_Settings
     return this.lockSettings;
   }
   
+  public final LockMode getLockMode ()
+  {
+    return getLockSettings ().lockMode;
+  }
+  
   private static LockSettings parseLockSettings (final String argString)
   {
     if (argString == null)
       throw new IllegalArgumentException ();
-    final Lock lock = parseEnum (argString.trim ().toLowerCase (),
-      new HashMap<String, Lock> ()
+    final LockMode lockMode = parseEnum (argString.trim ().toLowerCase (),
+      new HashMap<String, LockMode> ()
       {{
-        put ("llo", Lock.LLO);
-        put ("off", Lock.Off);
-        put ("on",  Lock.On);
+        put ("llo", LockMode.LLO);
+        put ("off", LockMode.Off);
+        put ("on",  LockMode.On);
       }});
-    return new LockSettings (lock);
+    return new LockSettings (lockMode);
   }
     
   private static LockSettings parseLockSettingsNoPath (final String[] parts)

@@ -286,4 +286,7 @@ public interface Tek2440_InstrumentCommand
   
   public final static String IC_TEK2440_PRINT = "commandTek2440Print";
   
+  public final static String IC_TEK2440_LOCK_MODE = "commandTek2440LockMode";
+  public final static String ICARG_TEK2440_LOCK_MODE = "tek2440LockMode";
+  
 }
