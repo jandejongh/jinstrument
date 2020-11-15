@@ -257,4 +257,13 @@ public interface Tek2440_InstrumentCommand
   public final static String IC_TEK2440_ENABLE_DEBUG = "commandTek2440EnableDebug";
   public final static String ICARG_TEK2440_ENABLE_DEBUG = "tek2440EnableDebug";
   
+  public final static String IC_TEK2440_SEQUENCER_ENABLE_FORMAT_CHARS = "commandTek2440SequencerEnableFormatChars";
+  public final static String ICARG_TEK2440_SEQUENCER_ENABLE_FORMAT_CHARS = "tek2440SequencerEnableFormatChars";
+  
+  public final static String IC_TEK2440_SEQUENCER_FORCE = "commandTek2440SequencerForce";
+  public final static String ICARG_TEK2440_SEQUENCER_FORCE = "tek2440SequencerForce";
+  
+  public final static String IC_TEK2440_SEQUENCER_ACTIONS_FROM_INT = "commandTek2440SequencerActionsFromInt";
+  public final static String ICARG_TEK2440_SEQUENCER_ACTIONS_FROM_INT = "tek2440SequencerActionsFromInt";
+  
 }

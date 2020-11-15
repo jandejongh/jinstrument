@@ -1159,6 +1159,30 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_DEBUG, enableDebug));
   }
   
+  public void setSequencerEnableFormatChars (final boolean sequencerEnableFormatChars)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_SEQUENCER_ENABLE_FORMAT_CHARS,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_SEQUENCER_ENABLE_FORMAT_CHARS, sequencerEnableFormatChars));
+  }
+
+  public void setSequencerForce (final boolean sequencerForce)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_SEQUENCER_FORCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_SEQUENCER_FORCE, sequencerForce));
+  }
+
+  public void setSequencerActionsFromInt (final int actions)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_SEQUENCER_ACTIONS_FROM_INT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_SEQUENCER_ACTIONS_FROM_INT, actions));
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -2246,6 +2270,33 @@ public class Tek2440_GPIB_Instrument
             (boolean) instrumentCommand.get (
               Tek2440_InstrumentCommand.ICARG_TEK2440_ENABLE_DEBUG);
           writeSync ("DEB " + (enableDebug ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_SEQUENCER_ENABLE_FORMAT_CHARS:
+        {
+          final boolean sequencerEnableFormatChars =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_SEQUENCER_ENABLE_FORMAT_CHARS);
+          writeSync ("FORM " + (sequencerEnableFormatChars ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_SEQUENCER_FORCE:
+        {
+          final boolean sequencerForce =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_SEQUENCER_FORCE);
+          writeSync ("SETU FORC:" + (sequencerForce ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_SEQUENCER_ACTIONS_FROM_INT:
+        {
+          final int actions =
+            (int) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_SEQUENCER_ACTIONS_FROM_INT);
+          writeSync ("SETU ACT:" + Integer.toString (actions) + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

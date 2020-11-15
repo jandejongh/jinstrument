@@ -17,6 +17,7 @@
 package org.javajdj.jinstrument.gpib.dso.tek2440;
 
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -4992,6 +4993,11 @@ public class Tek2440_GPIB_Settings
     return this.formatSettings;
   }
   
+  public final boolean isSequencerFormatCharsEnabled ()
+  {
+    return getFormatSettings ().format;
+  }
+  
   private static FormatSettings parseFormatSettings (final String argString)
   {
     if (argString == null)
@@ -5158,6 +5164,7 @@ public class Tek2440_GPIB_Settings
 
   public enum SetupAction
   {
+    
     Repeat (1),
     SelfCal (2),
     SelfTest (4),
@@ -5183,12 +5190,19 @@ public class Tek2440_GPIB_Settings
       throw new IllegalArgumentException ();
     }
     
+    public final int toInt ()
+    {
+      return this.bitField;
+    }
+    
   }
   
   public final static class SetupSettings
   {
     
     private final EnumSet<SetupAction> actions;
+    
+    private final int actionsAsInt;
     
     private final boolean force;
     
@@ -5199,6 +5213,10 @@ public class Tek2440_GPIB_Settings
       if (actions == null || force == null)
         throw new IllegalArgumentException ();
       this.actions = actions;
+      int actionsAsInt = 0;
+      for (final SetupAction action : actions)
+        actionsAsInt += action.toInt ();
+      this.actionsAsInt = actionsAsInt;
       this.force = force;
     }
     
@@ -5209,6 +5227,21 @@ public class Tek2440_GPIB_Settings
   public final SetupSettings getSetupSettings ()
   {
     return this.setupSettings;
+  }
+  
+  public final boolean isSequencerForce ()
+  {
+    return getSetupSettings ().force;
+  }
+  
+  public final EnumSet<SetupAction> getSequencerActions ()
+  {
+    return EnumSet.copyOf (getSetupSettings ().actions);
+  }
+  
+  public final int getSequencerActionsAsInt ()
+  {
+    return getSetupSettings ().actionsAsInt;
   }
   
   private static SetupSettings parseSetupSettings (final String argString)
