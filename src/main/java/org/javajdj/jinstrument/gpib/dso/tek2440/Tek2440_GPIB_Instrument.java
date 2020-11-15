@@ -1183,6 +1183,61 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_SEQUENCER_ACTIONS_FROM_INT, actions));
   }
 
+  public void setPrintDeviceType (final Tek2440_GPIB_Settings.PrintDeviceType type)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_PRINT_DEVICE_TYPE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_DEVICE_TYPE, type));
+  }
+
+  public void setPrintPageSize (final Tek2440_GPIB_Settings.PrintPageSize pageSize)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_PRINT_PAGE_SIZE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_PAGE_SIZE, pageSize));
+  }
+
+  public void setPrintGraticule (final boolean enable)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_PRINT_GRATICULE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_GRATICULE, enable));
+  }
+
+  public void setPrintSettings (final boolean enable)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_PRINT_SETTINGS,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_SETTING, enable));
+  }
+
+  public void setPrintText (final boolean enable)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_PRINT_TEXT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_TEXT, enable));
+  }
+
+  public void setPrintWaveforms (final boolean enable)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_PRINT_WAVEFORMS,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_WAVEFORMS, enable));
+  }
+
+  public void executePrint ()
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_PRINT));
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -1228,8 +1283,7 @@ public class Tek2440_GPIB_Instrument
             case A_Sweep:         writeSync ("HOR MOD:ASW\r\n"); break;
             case B_Sweep:         writeSync ("HOR MOD:BSW\r\n"); break;
             case A_Intensified_B: writeSync ("HOR MOD:AIN\r\n"); break;
-            default:
-              throw new IllegalArgumentException ();
+            default:              throw new IllegalArgumentException ();
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
@@ -1244,14 +1298,9 @@ public class Tek2440_GPIB_Instrument
               Tek2440_InstrumentCommand.ICARG_TEK2440_TIMEBASE);
           switch (channel)
           {
-            case Channel1:
-              writeSync ("HOR ASE:" + secondsPerDivision.getSecondsPerDivision_s ()  + "\r\n");
-              break;
-            case Channel2:
-              writeSync ("HOR BSE:" + secondsPerDivision.getSecondsPerDivision_s ()  + "\r\n");
-              break;
-            default:
-              throw new IllegalArgumentException ();
+            case Channel1: writeSync ("HOR ASE:" + secondsPerDivision.getSecondsPerDivision_s ()  + "\r\n"); break;
+            case Channel2: writeSync ("HOR BSE:" + secondsPerDivision.getSecondsPerDivision_s ()  + "\r\n"); break;
+            default:       throw new IllegalArgumentException ();
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
@@ -1286,14 +1335,9 @@ public class Tek2440_GPIB_Instrument
               Tek2440_InstrumentCommand.ICARG_TEK2440_VOLTS_PER_DIV);
           switch (channel)
           {
-            case Channel1:
-              writeSync ("CH1 VOL:" + voltsPerDivision.getVoltsPerDivision_V () + "\r\n");
-              break;
-            case Channel2:
-              writeSync ("CH2 VOL:" + voltsPerDivision.getVoltsPerDivision_V () + "\r\n");
-              break;
-            default:
-              throw new IllegalArgumentException ();
+            case Channel1: writeSync ("CH1 VOL:" + voltsPerDivision.getVoltsPerDivision_V () + "\r\n"); break;
+            case Channel2: writeSync ("CH2 VOL:" + voltsPerDivision.getVoltsPerDivision_V () + "\r\n"); break;
+            default:       throw new IllegalArgumentException ();
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
@@ -1308,12 +1352,8 @@ public class Tek2440_GPIB_Instrument
               Tek2440_InstrumentCommand.ICARG_TEK2440_CHANNEL_VARIABLE_Y);
           switch (channel)
           {
-            case Channel1:
-              writeSync ("CH1 VAR:" + Double.toString (variableY) + "\r\n");
-              break;
-            case Channel2:
-              writeSync ("CH2 VAR:" + Double.toString (variableY) + "\r\n");
-              break;
+            case Channel1: writeSync ("CH1 VAR:" + Double.toString (variableY) + "\r\n"); break;
+            case Channel2: writeSync ("CH2 VAR:" + Double.toString (variableY) + "\r\n"); break;
             default:
               throw new IllegalArgumentException ();
           }
@@ -1330,14 +1370,9 @@ public class Tek2440_GPIB_Instrument
               Tek2440_InstrumentCommand.ICARG_TEK2440_CHANNEL_ENABLE);
           switch (channel)
           {
-            case Channel1:
-              writeSync ("VMO CH1:" + (channelEnable ? "ON" : "OFF") + "\r\n");
-              break;
-            case Channel2:
-              writeSync ("VMO CH2:" + (channelEnable ? "ON" : "OFF") + "\r\n");
-              break;
-            default:
-              throw new IllegalArgumentException ();
+            case Channel1: writeSync ("VMO CH1:" + (channelEnable ? "ON" : "OFF") + "\r\n"); break;
+            case Channel2: writeSync ("VMO CH2:" + (channelEnable ? "ON" : "OFF") + "\r\n"); break;
+            default:       throw new IllegalArgumentException ();
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
@@ -1390,8 +1425,7 @@ public class Tek2440_GPIB_Instrument
                 case AC:  writeSync ("CH1 COU:AC\r\n");  break;
                 case DC:  writeSync ("CH1 COU:DC\r\n");  break;
                 case GND: writeSync ("CH1 COU:GND\r\n"); break;
-                default:
-                  throw new IllegalArgumentException ();
+                default:  throw new IllegalArgumentException ();
               }
               break;
             case Channel2:
@@ -1400,8 +1434,7 @@ public class Tek2440_GPIB_Instrument
                 case AC:  writeSync ("CH2 COU:AC\r\n");  break;
                 case DC:  writeSync ("CH2 COU:DC\r\n");  break;
                 case GND: writeSync ("CH2 COU:GND\r\n"); break;
-                default:
-                  throw new IllegalArgumentException ();
+                default:  throw new IllegalArgumentException ();
               }
               break;
             default:
@@ -1495,8 +1528,7 @@ public class Tek2440_GPIB_Instrument
             case GRATICULE:        componentString = "GRA:";    break;
             case INTENSIFIED_ZONE: componentString = "INTENS:"; break;
             case READOUT:          componentString = "REA:";    break;
-            default:
-              throw new IllegalArgumentException ();
+            default: throw new IllegalArgumentException ();
           }
           writeSync ("INTENSI " + componentString + Double.toString (intensity) + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
@@ -1540,7 +1572,6 @@ public class Tek2440_GPIB_Instrument
             case 3: writeSync ("REFP REF3:" + Double.toString (refPosition) + "\r\n"); break;
             case 4: writeSync ("REFP REF4:" + Double.toString (refPosition) + "\r\n"); break;
             default: throw new IllegalArgumentException ();
-              
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
@@ -1583,7 +1614,6 @@ public class Tek2440_GPIB_Instrument
             case 3: writeSync ("REFD REF3:EMP\r\n"); break;
             case 4: writeSync ("REFD REF4:EMP\r\n"); break;
             default: throw new IllegalArgumentException ();
-              
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
@@ -1601,7 +1631,6 @@ public class Tek2440_GPIB_Instrument
             case 3: writeSync ("SAVER REF3\r\n"); break;
             case 4: writeSync ("SAVER REF4\r\n"); break;
             default: throw new IllegalArgumentException ();
-              
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
@@ -1621,7 +1650,6 @@ public class Tek2440_GPIB_Instrument
             case 3: writeSync ("REFD REF3:" + (display? "ON" : "OFF") + "\r\n"); break;
             case 4: writeSync ("REFD REF4:" + (display? "ON" : "OFF") + "\r\n"); break;
             default: throw new IllegalArgumentException ();
-              
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
@@ -2298,6 +2326,76 @@ public class Tek2440_GPIB_Instrument
               Tek2440_InstrumentCommand.ICARG_TEK2440_SEQUENCER_ACTIONS_FROM_INT);
           writeSync ("SETU ACT:" + Integer.toString (actions) + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_PRINT_DEVICE_TYPE:
+        {
+          final Tek2440_GPIB_Settings.PrintDeviceType type =
+            (Tek2440_GPIB_Settings.PrintDeviceType) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_DEVICE_TYPE);
+          switch (type)
+          {
+            case ThinkJet: writeSync ("DEVI TYP:THI\r\n"); break;
+            case HPGL:     writeSync ("DEVI TYP:HPG\r\n"); break;
+            default: throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_PRINT_PAGE_SIZE:
+        {
+          final Tek2440_GPIB_Settings.PrintPageSize pageSize =
+            (Tek2440_GPIB_Settings.PrintPageSize) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_PAGE_SIZE);
+          switch (pageSize)
+          {
+            case A4: writeSync ("DEVI PAG:A4\r\n"); break;
+            case US: writeSync ("DEVI PAG:US\r\n"); break;
+            default: throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_PRINT_GRATICULE:
+        {
+          final boolean enable =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_GRATICULE);
+          writeSync ("DEVI GRA:" + (enable ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_PRINT_SETTINGS:
+        {
+          final boolean enable =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_SETTING);
+          writeSync ("DEVI SETTI:" + (enable ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_PRINT_TEXT:
+        {
+          final boolean enable =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_TEXT);
+          writeSync ("DEVI TEX:" + (enable ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_PRINT_WAVEFORMS:
+        {
+          final boolean enable =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_PRINT_WAVEFORMS);
+          writeSync ("DEVI WAV:" + (enable ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_PRINT:
+        {
+          writeSync ("PRI\r\n");
+          // newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         default:

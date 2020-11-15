@@ -266,4 +266,24 @@ public interface Tek2440_InstrumentCommand
   public final static String IC_TEK2440_SEQUENCER_ACTIONS_FROM_INT = "commandTek2440SequencerActionsFromInt";
   public final static String ICARG_TEK2440_SEQUENCER_ACTIONS_FROM_INT = "tek2440SequencerActionsFromInt";
   
+  public final static String IC_TEK2440_PRINT_DEVICE_TYPE = "commandTek2440PrintDeviceType";
+  public final static String ICARG_TEK2440_PRINT_DEVICE_TYPE = "tek2440PrintDeviceType";
+  
+  public final static String IC_TEK2440_PRINT_PAGE_SIZE = "commandTek2440PrintPageSize";
+  public final static String ICARG_TEK2440_PRINT_PAGE_SIZE = "tek2440PrintPageSize";
+  
+  public final static String IC_TEK2440_PRINT_GRATICULE = "commandTek2440PrintGraticule";
+  public final static String ICARG_TEK2440_PRINT_GRATICULE = "tek2440PrintGraticule";
+  
+  public final static String IC_TEK2440_PRINT_SETTINGS = "commandTek2440PrintSettings";
+  public final static String ICARG_TEK2440_PRINT_SETTING = "tek2440PrintSettings";
+  
+  public final static String IC_TEK2440_PRINT_TEXT = "commandTek2440PrintText";
+  public final static String ICARG_TEK2440_PRINT_TEXT = "tek2440PrintText";
+  
+  public final static String IC_TEK2440_PRINT_WAVEFORMS = "commandTek2440PrintWaveforms";
+  public final static String ICARG_TEK2440_PRINT_WAVEFORMS = "tek2440PrintWaveforms";
+  
+  public final static String IC_TEK2440_PRINT = "commandTek2440Print";
+  
 }

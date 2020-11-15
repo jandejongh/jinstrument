@@ -5657,6 +5657,36 @@ public class Tek2440_GPIB_Settings
     return this.printDeviceSettings;
   }
   
+  public final PrintDeviceType getPrintDeviceType ()
+  {
+    return getPrintDeviceSettings ().deviceType;
+  }
+  
+  public final PrintPageSize getPrintDevicePageSize ()
+  {
+    return getPrintDeviceSettings ().pageSize;    
+  }
+  
+  public final boolean isPrintGraticule ()
+  {
+    return getPrintDeviceSettings ().printGraticule;
+  }
+  
+  public final boolean isPrintSettings ()
+  {
+    return getPrintDeviceSettings ().printSettings;
+  }
+  
+  public final boolean isPrintText ()
+  {
+    return getPrintDeviceSettings ().printText;
+  }
+  
+  public final boolean isPrintWaveforms ()
+  {
+    return getPrintDeviceSettings ().printWaveforms;
+  }
+  
   private static PrintDeviceSettings parsePrintDeviceSettings (final String argString)
   {
     if (argString == null)
