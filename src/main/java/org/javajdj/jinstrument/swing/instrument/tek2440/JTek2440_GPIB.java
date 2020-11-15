@@ -417,7 +417,7 @@ public class JTek2440_GPIB
     jCursorButton.setDisplayedValue (true);
     jCursorButton.setHorizontalAlignment (SwingConstants.CENTER);
     this.jCursorDialog = new JOptionPane ().createDialog ("Tek-2440 Cursor Settings");
-    this.jCursorDialog.setSize (800, 600);
+    this.jCursorDialog.setSize (1024, 768);
     this.jCursorDialog.setLocationRelativeTo (this);
     this.jCursorDialog.setContentPane(new JTek2440_GPIB_Cursor (digitalStorageOscilloscope, level + 1));
     jCursorButton.addActionListener ((ae) ->
