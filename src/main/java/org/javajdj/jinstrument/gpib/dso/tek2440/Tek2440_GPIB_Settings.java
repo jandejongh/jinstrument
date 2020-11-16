@@ -6132,6 +6132,106 @@ public class Tek2440_GPIB_Settings
     return this.cursorSettings;
   }
   
+  public final CursorFunction getCursorFunction ()
+  {
+    return getCursorSettings ().cursorFunction;
+  }
+  
+  public final CursorTarget getCursorTarget ()
+  {
+    return getCursorSettings ().target;
+  }
+  
+  public final CursorMode getCursorMode ()
+  {
+    return getCursorSettings ().cursorMode;
+  }
+  
+  public final CursorSelect getCursorSelect ()
+  {
+    return getCursorSettings ().select;
+  }
+  
+  public final CursorUnitVolts getCursorUnitVolts ()
+  {
+    return getCursorSettings ().units.unitVolts;
+  }
+  
+  public final RefVoltsUnit getCursorUnitRefVolts ()
+  {
+    return getCursorSettings ().refVolts.unit;
+  }
+  
+  public final double getCursorValueRefVolts ()
+  {
+    return getCursorSettings ().refVolts.value;
+  }
+  
+  public final CursorUnitTime getCursorUnitTime ()
+  {
+    return getCursorSettings ().units.unitTime;
+  }
+  
+  public final RefTimeUnit getCursorUnitRefTime ()
+  {
+    return getCursorSettings ().refTime.unit;
+  }
+  
+  public final double getCursorValueRefTime ()
+  {
+    return getCursorSettings ().refTime.value;
+  }
+  
+  public final CursorUnitSlope getCursorUnitSlope ()
+  {
+    return getCursorSettings ().units.unitSlope;
+  }
+  
+  public final RefSlopeXUnit getCursorUnitRefSlopeX ()
+  {
+    return getCursorSettings ().refSlope.xUnit;
+  }
+  
+  public final RefSlopeYUnit getCursorUnitRefSlopeY ()
+  {
+    return getCursorSettings ().refSlope.yUnit;
+  }
+  
+  public final double getCursorValueRefSlope ()
+  {
+    return getCursorSettings ().refSlope.value;
+  }
+  
+  public final double getCursorPosition1X ()
+  {
+    return getCursorSettings ().xPositions.xPosition1;
+  }
+  
+  public final double getCursorPosition1Y ()
+  {
+    return getCursorSettings ().yPositions.yPosition1;
+  }
+  
+  public final double getCursorPosition1t ()
+  {
+    return getCursorSettings ().timePositions.timePosition1;
+  }
+  
+  public final double getCursorPosition2X ()
+  {
+    return getCursorSettings ().xPositions.xPosition2;
+  }
+  
+  public final double getCursorPosition2Y ()
+  {
+    return getCursorSettings ().yPositions.yPosition2;
+  }
+  
+  public final double getCursorPosition2t ()
+  {
+    return getCursorSettings ().timePositions.timePosition2;
+  }
+  
   private static CursorSettings parseCursorSettings (final String argString)
   {
     if (argString == null)
@@ -6173,7 +6273,7 @@ public class Tek2440_GPIB_Settings
           cursorFunction = parseEnum (argArgParts[1].trim (),
             new HashMap<String, CursorFunction> ()
             {{
-              put ("of",       CursorFunction.Off);
+              // put ("of",    CursorFunction.Off); // XXX Manual error...
               put ("off",      CursorFunction.Off);
               put ("one/t",    CursorFunction.OnePerTime);
               put ("one/time", CursorFunction.OnePerTime);
@@ -6181,7 +6281,7 @@ public class Tek2440_GPIB_Settings
               put ("slope",    CursorFunction.Slope);
               put ("tim",      CursorFunction.Time);
               put ("time",     CursorFunction.Time);
-              put ("vol",      CursorFunction.Volts); // XXX Manual error...
+              put ("volt",     CursorFunction.Volts); // XXX Manual error...
               put ("volts",    CursorFunction.Volts);
               put ("v.t",      CursorFunction.V_dot_t);
             }});

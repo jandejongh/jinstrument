@@ -304,4 +304,64 @@ public interface Tek2440_InstrumentCommand
   public final static String IC_TEK2440_WAVEFORM_ANALYSIS_STOP_POSITION = "commandTek2440WaveformAnalysisStopPosition";
   public final static String ICARG_TEK2440_WAVEFORM_ANALYSIS_STOP_POSITION = "tek2440WaveformAnalysisStopPosition";
   
+  public final static String IC_TEK2440_CURSOR_FUNCTION = "commandTek2440CursorFunction";
+  public final static String ICARG_TEK2440_CURSOR_FUNCTION = "tek2440CursorFunction";
+  
+  public final static String IC_TEK2440_CURSOR_TARGET = "commandTek2440CursorTarget";
+  public final static String ICARG_TEK2440_CURSOR_TARGET = "tek2440CursorTarget";
+  
+  public final static String IC_TEK2440_CURSOR_MODE = "commandTek2440CursorMode";
+  public final static String ICARG_TEK2440_CURSOR_MODE = "tek2440CursorMode";
+  
+  public final static String IC_TEK2440_CURSOR_SELECT = "commandTek2440CursorSelect";
+  public final static String ICARG_TEK2440_CURSOR_SELECT = "tek2440CursorSelect";
+  
+  public final static String IC_TEK2440_CURSOR_UNIT_VOLTS = "commandTek2440CursorUnitVolts";
+  public final static String ICARG_TEK2440_CURSOR_UNIT_VOLTS = "tek2440CursorUnitVolts";
+  
+  public final static String IC_TEK2440_CURSOR_UNIT_REF_VOLTS = "commandTek2440CursorUnitRefVolts";
+  public final static String ICARG_TEK2440_CURSOR_UNIT_REF_VOLTS = "tek2440CursorUnitRefVolts";
+  
+  public final static String IC_TEK2440_CURSOR_VALUE_REF_VOLTS = "commandTek2440CursorValueRefVolts";
+  public final static String ICARG_TEK2440_CURSOR_VALUE_REF_VOLTS = "tek2440CursorValueRefVolts";
+  
+  public final static String IC_TEK2440_CURSOR_UNIT_TIME = "commandTek2440CursorUnitTime";
+  public final static String ICARG_TEK2440_CURSOR_UNIT_TIME = "tek2440CursorUnitTime";
+  
+  public final static String IC_TEK2440_CURSOR_UNIT_REF_TIME = "commandTek2440CursorUnitRefTime";
+  public final static String ICARG_TEK2440_CURSOR_UNIT_REF_TIME = "tek2440CursorUnitRefTime";
+  
+  public final static String IC_TEK2440_CURSOR_VALUE_REF_TIME = "commandTek2440CursorValueRefTime";
+  public final static String ICARG_TEK2440_CURSOR_VALUE_REF_TIME = "tek2440CursorValueRefTime";
+  
+  public final static String IC_TEK2440_CURSOR_UNIT_SLOPE = "commandTek2440CursorUnitSlope";
+  public final static String ICARG_TEK2440_CURSOR_UNIT_SLOPE = "tek2440CursorUnitSlope";
+  
+  public final static String IC_TEK2440_CURSOR_UNIT_REF_SLOPE_X = "commandTek2440CursorUnitRefSlopeX";
+  public final static String ICARG_TEK2440_CURSOR_UNIT_REF_SLOPE_X = "tek2440CursorUnitRefSlopeX";
+  
+  public final static String IC_TEK2440_CURSOR_UNIT_REF_SLOPE_Y = "commandTek2440CursorUnitRefSlopeY";
+  public final static String ICARG_TEK2440_CURSOR_UNIT_REF_SLOPE_Y = "tek2440CursorUnitRefSlopeY";
+  
+  public final static String IC_TEK2440_CURSOR_VALUE_REF_SLOPE = "commandTek2440CursorValueRefSlope";
+  public final static String ICARG_TEK2440_CURSOR_VALUE_REF_SLOPE = "tek2440CursorValueRefSlope";
+  
+  public final static String IC_TEK2440_CURSOR_POSITION_ONE_X = "commandTek2440CursorPosition1X";
+  public final static String ICARG_TEK2440_CURSOR_POSITION_ONE_X = "tek2440CursorPosition1X";
+  
+  public final static String IC_TEK2440_CURSOR_POSITION_ONE_Y = "commandTek2440CursorPosition1Y";
+  public final static String ICARG_TEK2440_CURSOR_POSITION_ONE_Y = "tek2440CursorPosition1Y";
+  
+  public final static String IC_TEK2440_CURSOR_POSITION_ONE_T = "commandTek2440CursorPosition1t";
+  public final static String ICARG_TEK2440_CURSOR_POSITION_ONE_T = "tek2440CursorPosition1t";
+  
+  public final static String IC_TEK2440_CURSOR_POSITION_TWO_X = "commandTek2440CursorPosition2X";
+  public final static String ICARG_TEK2440_CURSOR_POSITION_TWO_X = "tek2440CursorPosition2X";
+  
+  public final static String IC_TEK2440_CURSOR_POSITION_TWO_Y = "commandTek2440CursorPosition2Y";
+  public final static String ICARG_TEK2440_CURSOR_POSITION_TWO_Y = "tek2440CursorPosition2Y";
+  
+  public final static String IC_TEK2440_CURSOR_POSITION_TWO_T = "commandTek2440CursorPosition2t";
+  public final static String ICARG_TEK2440_CURSOR_POSITION_TWO_T = "tek2440CursorPosition2t";
+  
 }

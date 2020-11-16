@@ -1286,6 +1286,166 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_STOP_POSITION, position));
   }
 
+  public void setCursorFunction (final Tek2440_GPIB_Settings.CursorFunction function)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_FUNCTION,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_FUNCTION, function));
+  }
+
+  public void setCursorTarget (final Tek2440_GPIB_Settings.CursorTarget target)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_TARGET,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_TARGET, target));
+  }
+
+  public void setCursorMode (final Tek2440_GPIB_Settings.CursorMode mode)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_MODE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_MODE, mode));
+  }
+
+  public void setCursorSelect (final Tek2440_GPIB_Settings.CursorSelect select)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_SELECT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_SELECT, select));
+  }
+
+  public void setCursorUnitVolts (final Tek2440_GPIB_Settings.CursorUnitVolts unit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_VOLTS,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_VOLTS, unit));
+  }
+  
+  public void setCursorUnitRefVolts (final Tek2440_GPIB_Settings.RefVoltsUnit unit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_REF_VOLTS,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_REF_VOLTS, unit));
+  }
+  
+  public void setCursorValueRefVolts (final double value)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_VALUE_REF_VOLTS,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_VALUE_REF_VOLTS, value));
+  }
+  
+  public void setCursorUnitTime (final Tek2440_GPIB_Settings.CursorUnitTime unit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_TIME,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_TIME, unit));
+  }
+  
+  public void setCursorUnitRefTime (final Tek2440_GPIB_Settings.RefTimeUnit unit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_REF_TIME,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_REF_TIME, unit));
+  }
+  
+  public void setCursorValueRefTime (final double value)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_VALUE_REF_TIME,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_VALUE_REF_TIME, value));
+  }
+  
+  public void setCursorUnitSlope (final Tek2440_GPIB_Settings.CursorUnitSlope unit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_SLOPE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_SLOPE, unit));
+  }
+  
+  public void setCursorUnitRefSlopeX (final Tek2440_GPIB_Settings.RefSlopeXUnit unit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_REF_SLOPE_X,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_REF_SLOPE_X, unit));
+  }
+  
+  public void setCursorUnitRefSlopeY (final Tek2440_GPIB_Settings.RefSlopeYUnit unit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_REF_SLOPE_Y,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_REF_SLOPE_Y, unit));
+  }
+  
+  public void setCursorValueRefSlope (final double value)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_VALUE_REF_SLOPE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_VALUE_REF_SLOPE, value));
+  }
+  
+  public void setCursorPosition1X (final double x)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_ONE_X,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_ONE_X, x));
+  }
+  
+  public void setCursorPosition1Y (final double y)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_ONE_Y,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_ONE_Y, y));
+  }
+  
+  public void setCursorPosition1t (final double t)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_ONE_T,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_ONE_T, t));
+  }
+  
+  public void setCursorPosition2X (final double x)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_TWO_X,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_TWO_X, x));
+  }
+  
+  public void setCursorPosition2Y (final double y)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_TWO_Y,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_TWO_Y, y));
+  }
+  
+  public void setCursorPosition2t (final double t)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_TWO_T,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_TWO_T, t));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -2508,6 +2668,263 @@ public class Tek2440_GPIB_Instrument
             (int) instrumentCommand.get (
               Tek2440_InstrumentCommand.ICARG_TEK2440_WAVEFORM_ANALYSIS_STOP_POSITION);
           writeSync ("STO " + Integer.toString (position) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_FUNCTION:
+        {
+          final Tek2440_GPIB_Settings.CursorFunction function =
+            (Tek2440_GPIB_Settings.CursorFunction) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_FUNCTION);
+          switch (function)
+          {
+            case Off:        writeSync ("CURS FUN:OFF\r\n");   break; // XXX Manual ERROR!
+            case OnePerTime: writeSync ("CURS FUN:ONE/T\r\n"); break;
+            case Slope:      writeSync ("CURS FUN:SLO\r\n");   break;
+            case Time:       writeSync ("CURS FUN:TIM\r\n");   break;
+            case Volts:      writeSync ("CURS FUN:VOLT\r\n");  break; // XXX Manual ERROR!
+            case V_dot_t:    writeSync ("CURS FUN:V.T\r\n");   break;
+            default:         throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_TARGET:
+        {
+          final Tek2440_GPIB_Settings.CursorTarget target =
+            (Tek2440_GPIB_Settings.CursorTarget) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_TARGET);
+          switch (target)
+          {
+            case Ch1:     writeSync ("CURS TAR:CH1\r\n");   break;
+            case Ch2:     writeSync ("CURS TAR:CH2\r\n");   break;
+            case Add:     writeSync ("CURS TAR:ADD\r\n");   break;
+            case Mult:    writeSync ("CURS TAR:MUL\r\n");   break;
+            case Ch1Del:  writeSync ("CURS TAR:CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("CURS TAR:CH2D\r\n");  break;
+            case AddDel:  writeSync ("CURS TAR:ADDD\r\n");  break;
+            case MultDel: writeSync ("CURS TAR:MULTD\r\n"); break;
+            case Ref1:    writeSync ("CURS TAR:REF1\r\n");  break;
+            case Ref2:    writeSync ("CURS TAR:REF2\r\n");  break;
+            case Ref3:    writeSync ("CURS TAR:REF3\r\n");  break;
+            case Ref4:    writeSync ("CURS TAR:REF4\r\n");  break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_MODE:
+        {
+          final Tek2440_GPIB_Settings.CursorMode mode =
+            (Tek2440_GPIB_Settings.CursorMode) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_MODE);
+          switch (mode)
+          {
+            case Absolute: writeSync ("CURS MOD:ABSO\r\n"); break;
+            case Delta:    writeSync ("CURS MOD:DELT\r\n"); break;
+            default:       throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_SELECT:
+        {
+          final Tek2440_GPIB_Settings.CursorSelect select =
+            (Tek2440_GPIB_Settings.CursorSelect) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_SELECT);
+          switch (select)
+          {
+            case One: writeSync ("CURS SEL:ONE\r\n"); break;
+            case Two: writeSync ("CURS SEL:TWO\r\n"); break;
+            default:  throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_VOLTS:
+        {
+          final Tek2440_GPIB_Settings.CursorUnitVolts unit =
+            (Tek2440_GPIB_Settings.CursorUnitVolts) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_VOLTS);
+          switch (unit)
+          {
+            case Base:    writeSync ("CURS UNI:VOL:BAS\r\n");  break;
+            case Percent: writeSync ("CURS UNI:VOL:PERC\r\n"); break;
+            case dB:      writeSync ("CURS UNI:VOL:DB\r\n");   break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_REF_VOLTS:
+        {
+          final Tek2440_GPIB_Settings.RefVoltsUnit unit =
+            (Tek2440_GPIB_Settings.RefVoltsUnit) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_REF_VOLTS);
+          switch (unit)
+          {
+            case Divisions:    writeSync ("CURS REFV:UNI:DIV\r\n"); break;
+            case Volts:        writeSync ("CURS REFV:UNI:V\r\n"); break;
+            case VoltsSquared: writeSync ("CURS REFV:UNI:VV\r\n"); break;
+            default:           throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_VALUE_REF_VOLTS:
+        {
+          final double value =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_VALUE_REF_VOLTS);
+          writeSync ("CURS REFV:VAL:" + Double.toString (value) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_TIME:
+        {
+          final Tek2440_GPIB_Settings.CursorUnitTime unit =
+            (Tek2440_GPIB_Settings.CursorUnitTime) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_TIME);
+          switch (unit)
+          {
+            case Base:    writeSync ("CURS UNI:TIM:BAS\r\n");  break;
+            case Percent: writeSync ("CURS UNI:TIM:PERC\r\n"); break;
+            case Degrees: writeSync ("CURS UNI:TIM:DEG\r\n");  break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_REF_TIME:
+        {
+          final Tek2440_GPIB_Settings.RefTimeUnit unit =
+            (Tek2440_GPIB_Settings.RefTimeUnit) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_REF_TIME);
+          switch (unit)
+          {
+            case Seconds:    writeSync ("CURS REFT:UNI:SEC\r\n"); break;
+            case ClockTicks: writeSync ("CURS REFT:UNI:CLK\r\n"); break;
+            default:         throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_VALUE_REF_TIME:
+        {
+          final double value =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_VALUE_REF_TIME);
+          writeSync ("CURS REFT:VAL:" + Double.toString (value) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_SLOPE:
+        {
+          final Tek2440_GPIB_Settings.CursorUnitSlope unit =
+            (Tek2440_GPIB_Settings.CursorUnitSlope) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_SLOPE);
+          switch (unit)
+          {
+            case Base:    writeSync ("CURS UNI:SLO:BAS\r\n");  break;
+            case Percent: writeSync ("CURS UNI:SLO:PERC\r\n"); break;
+            case dB:      writeSync ("CURS UNI:SLO:DB\r\n");   break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_REF_SLOPE_X:
+        {
+          final Tek2440_GPIB_Settings.RefSlopeXUnit unit =
+            (Tek2440_GPIB_Settings.RefSlopeXUnit) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_REF_SLOPE_X);
+          switch (unit)
+          {
+            case Divisions:    writeSync ("CURS REFS:XUN:DIV\r\n"); break;
+            case Seconds:      writeSync ("CURS REFS:XUN:SEC\r\n"); break;
+            case Volts:        writeSync ("CURS REFS:XUN:V\r\n");   break;
+            case VoltsSquared: writeSync ("CURS REFS:XUN:VV\r\n");  break;
+            case ClockTicks:   writeSync ("CURS REFS:XUN:CLK\r\n"); break;
+            default:           throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_UNIT_REF_SLOPE_Y:
+        {
+          final Tek2440_GPIB_Settings.RefSlopeYUnit unit =
+            (Tek2440_GPIB_Settings.RefSlopeYUnit) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_UNIT_REF_SLOPE_Y);
+          switch (unit)
+          {
+            case Divisions:    writeSync ("CURS REFS:YUN:DIV\r\n"); break;
+            case Volts:        writeSync ("CURS REFS:YUN:V\r\n");   break;
+            case VoltsSquared: writeSync ("CURS REFS:YUN:VV\r\n");  break;
+            default:           throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_VALUE_REF_SLOPE:
+        {
+          final double value =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_VALUE_REF_SLOPE);
+          writeSync ("CURS REFS:VAL:" + Double.toString (value) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_ONE_X:
+        {
+          final double x =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_ONE_X);
+          writeSync ("CURS XPO:ONE:" + Double.toString (x) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_ONE_Y:
+        {
+          final double y =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_ONE_Y);
+          writeSync ("CURS YPO:ONE:" + Double.toString (y) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_ONE_T:
+        {
+          final double t =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_ONE_T);
+          writeSync ("CURS TPO:ONE:" + Double.toString (t) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_TWO_X:
+        {
+          final double x =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_TWO_X);
+          writeSync ("CURS XPO:TWO:" + Double.toString (x) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_TWO_Y:
+        {
+          final double y =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_TWO_Y);
+          writeSync ("CURS YPO:TWO:" + Double.toString (y) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_CURSOR_POSITION_TWO_T:
+        {
+          final double t =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_TWO_T);
+          writeSync ("CURS TPO:TWO:" + Double.toString (t) + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

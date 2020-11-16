@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -835,11 +836,11 @@ public class JInstrumentPanel
     implements ActionListener
   {
 
-    final String actionString;
+    private final String actionString;
     
-    final Instrument.InstrumentAction action;
+    private final Instrument.InstrumentAction action;
     
-    final Provider<Boolean> inhibitAction;
+    private final Provider<Boolean> inhibitAction;
     
     public JInstrumentActionListener_0 (
       final String actionString,
@@ -882,13 +883,13 @@ public class JInstrumentPanel
     implements ActionListener
   {
 
-    final String settingString;
+    private final String settingString;
     
-    final Provider<Boolean> getter;
+    private final Provider<Boolean> getter;
     
-    final Instrument.InstrumentSetter_1Boolean setter;
+    private final Instrument.InstrumentSetter_1Boolean setter;
     
-    final Provider<Boolean> inhibitSetter;
+    private final Provider<Boolean> inhibitSetter;
     
     public JInstrumentActionListener_1Boolean (
       final String settingString,
@@ -928,13 +929,13 @@ public class JInstrumentPanel
     implements ChangeListener
   {
 
-    final String settingString;
+    private final String settingString;
     
-    final Instrument.InstrumentSetter_1Integer setter;
+    private final Instrument.InstrumentSetter_1Integer setter;
 
-    final Provider<Boolean> inhibitSetter;
+    private final Provider<Boolean> inhibitSetter;
     
-    final Color preSetColor;
+    private final Color preSetColor;
     
     public JInstrumentSliderChangeListener_1Integer (
       final String settingString,
@@ -987,13 +988,13 @@ public class JInstrumentPanel
     implements ChangeListener
   {
 
-    final String settingString;
+    private final String settingString;
     
-    final Instrument.InstrumentSetter_1Double setter;
+    private final Instrument.InstrumentSetter_1Double setter;
 
-    final Provider<Boolean> inhibitSetter;
+    private final Provider<Boolean> inhibitSetter;
     
-    final Color preSetColor;
+    private final Color preSetColor;
     
     public JInstrumentSliderChangeListener_1Double (
       final String settingString,
@@ -1047,33 +1048,52 @@ public class JInstrumentPanel
     implements FocusListener, ActionListener
   {
 
-    final String settingString;
+    private final JTextField jTextField;
     
-    final Provider<String> getter;
+    private final String settingString;
     
-    final Instrument.InstrumentSetter_1String setter;
+    private final Provider<String> getter;
+    
+    private final Instrument.InstrumentSetter_1String setter;
 
-    final Provider<Boolean> inhibitSetter;
+    private final Provider<Boolean> inhibitSetter;
     
+    private final Color preSetColor;
+
+    public JInstrumentTextFieldListener_1String (
+      final JTextField jTextField,
+      final String settingString,
+      final Provider<String> getter,
+      final Instrument.InstrumentSetter_1String setter,
+      final Provider<Boolean> inhibitSetter,
+      final Color preSetColor)
+    {
+      if (settingString == null || settingString.trim ().isEmpty () || setter == null)
+        throw new IllegalArgumentException ();
+      this.jTextField = jTextField;
+      this.settingString = settingString;
+      this.getter = getter;
+      this.setter = setter;
+      this.inhibitSetter = inhibitSetter;
+      this.preSetColor = preSetColor;
+    }
+
     public JInstrumentTextFieldListener_1String (
       final String settingString,
       final Provider<String> getter,
       final Instrument.InstrumentSetter_1String setter,
       final Provider<Boolean> inhibitSetter)
     {
-      if (settingString == null || settingString.trim ().isEmpty () || setter == null)
-        throw new IllegalArgumentException ();
-      this.settingString = settingString;
-      this.getter = getter;
-      this.setter = setter;
-      this.inhibitSetter = inhibitSetter;
+      this (null, settingString, getter, setter, inhibitSetter, null);
     }
-
+    
     @Override
     public void actionPerformed ()
     {
       if (this.inhibitSetter != null && this.inhibitSetter.apply ())
         return;
+      if (this.jTextField != null && this.preSetColor != null)
+        this.jTextField.setBackground (this.preSetColor);
       final String newValue = this.getter.apply ();
       try
       {
@@ -1088,19 +1108,171 @@ public class JInstrumentPanel
     
   }
   
+  public class JInstrumentTextFieldListener_1Int
+    extends JTextFieldListener
+    implements FocusListener, ActionListener
+  {
+
+    private final JTextField jTextField;
+    
+    private final String settingString;
+    
+    private final Provider<String> getter;
+    
+    private final Instrument.InstrumentSetter_1Integer setter;
+
+    private final Provider<Boolean> inhibitSetter;
+    
+    private final Color preSetColor;
+
+    private final boolean reportParseErrorsInDialog;
+    
+    public JInstrumentTextFieldListener_1Int (
+      final JTextField jTextField,
+      final String settingString,
+      final Provider<String> getter,
+      final Instrument.InstrumentSetter_1Integer setter,
+      final Provider<Boolean> inhibitSetter,
+      final Color preSetColor,
+      final boolean reportParseErrorsInDialog)
+    {
+      if (settingString == null || settingString.trim ().isEmpty () || setter == null)
+        throw new IllegalArgumentException ();
+      this.jTextField = jTextField;
+      this.settingString = settingString;
+      this.getter = getter;
+      this.setter = setter;
+      this.inhibitSetter = inhibitSetter;
+      this.preSetColor = preSetColor;
+      this.reportParseErrorsInDialog = reportParseErrorsInDialog;
+    }
+
+    public JInstrumentTextFieldListener_1Int (
+      final String settingString,
+      final Provider<String> getter,
+      final Instrument.InstrumentSetter_1Integer setter,
+      final Provider<Boolean> inhibitSetter,
+      final boolean reportParseErrorsInDialog)
+    {
+      this (null, settingString, getter, setter, inhibitSetter, null, reportParseErrorsInDialog);
+    }
+
+    @Override
+    public void actionPerformed ()
+    {
+      if (this.inhibitSetter != null && this.inhibitSetter.apply ())
+        return;
+      if (this.jTextField != null && this.preSetColor != null)
+        this.jTextField.setBackground (this.preSetColor);
+      final String newValue = this.getter.apply ();
+      try
+      {
+        this.setter.set (Integer.parseInt (newValue));
+      }
+      catch (NumberFormatException e)
+      {
+        LOG.log (Level.INFO, "Not an int: {0}.", newValue);
+        if (this.reportParseErrorsInDialog)
+          JOptionPane.showMessageDialog (null, "Not an int: " + newValue + "!", "Parse Error", JOptionPane.ERROR_MESSAGE);
+      }
+      catch (IOException | InterruptedException e)
+      {
+        LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " to {0} on instrument {1}: {2}.",
+          new Object[]{newValue, getInstrument (), Arrays.toString (e.getStackTrace ())});
+      }
+    }
+    
+  }
+  
+  public class JInstrumentTextFieldListener_1Double
+    extends JTextFieldListener
+    implements FocusListener, ActionListener
+  {
+
+    private final JTextField jTextField;
+    
+    private final String settingString;
+    
+    private final Provider<String> getter;
+    
+    private final Instrument.InstrumentSetter_1Double setter;
+
+    private final Provider<Boolean> inhibitSetter;
+    
+    private final Color preSetColor;
+
+    private final boolean reportParseErrorsInDialog;
+    
+    public JInstrumentTextFieldListener_1Double (
+      final JTextField jTextField,
+      final String settingString,
+      final Provider<String> getter,
+      final Instrument.InstrumentSetter_1Double setter,
+      final Provider<Boolean> inhibitSetter,
+      final Color preSetColor,
+      final boolean reportParseErrorsInDialog)
+    {
+      if (settingString == null || settingString.trim ().isEmpty () || setter == null)
+        throw new IllegalArgumentException ();
+      this.jTextField = jTextField;
+      this.settingString = settingString;
+      this.getter = getter;
+      this.setter = setter;
+      this.inhibitSetter = inhibitSetter;
+      this.preSetColor = preSetColor;
+      this.reportParseErrorsInDialog = reportParseErrorsInDialog;
+    }
+
+    public JInstrumentTextFieldListener_1Double (
+      final String settingString,
+      final Provider<String> getter,
+      final Instrument.InstrumentSetter_1Double setter,
+      final Provider<Boolean> inhibitSetter,
+      final boolean reportParseErrorsInDialog)
+    {
+      this (null, settingString, getter, setter, inhibitSetter, null, reportParseErrorsInDialog);
+    }
+
+    @Override
+    public void actionPerformed ()
+    {
+      if (this.inhibitSetter != null && this.inhibitSetter.apply ())
+        return;
+      if (this.jTextField != null && this.preSetColor != null)
+        this.jTextField.setBackground (this.preSetColor);
+      final String newValue = this.getter.apply ();
+      try
+      {
+        this.setter.set (Double.parseDouble (newValue));
+      }
+      catch (NumberFormatException e)
+      {
+        LOG.log (Level.INFO, "Not a double: {0}.", newValue);
+        if (this.reportParseErrorsInDialog)
+          JOptionPane.showMessageDialog (null, "Not a double: " + newValue + "!", "Parse Error", JOptionPane.ERROR_MESSAGE);
+      }
+      catch (IOException | InterruptedException e)
+      {
+        LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " to {0} on instrument {1}: {2}.",
+          new Object[]{newValue, getInstrument (), Arrays.toString (e.getStackTrace ())});
+      }
+    }
+    
+  }
+  
   public class JInstrumentComboBoxItemListener_Enum<E extends Enum<E>>
     implements ItemListener
   {
 
-    final String settingString;
+    private final String settingString;
     
-    final Class<E> clazz;
+    private final Class<E> clazz;
     
-    final Instrument.InstrumentSetter_1Enum<E> setter;
+    private final Instrument.InstrumentSetter_1Enum<E> setter;
 
-    final Provider<Boolean> inhibitSetter;
+    private final Provider<Boolean> inhibitSetter;
 
-    final Color preSetColor;
+    private final Color preSetColor;
     
     public JInstrumentComboBoxItemListener_Enum (
       final String settingString,
