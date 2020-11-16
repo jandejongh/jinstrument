@@ -641,19 +641,19 @@ public class JTek2440_GPIB_Cursor
           JTek2440_GPIB_Cursor.this.jPositionTime1.setValue ((int) Math.round (positionTime1));
           JTek2440_GPIB_Cursor.this.jPositionTime1.setToolTipText (Double.toString (positionTime1));
           JTek2440_GPIB_Cursor.this.jPositionTime1.setBackground (JTek2440_GPIB_Cursor.this.getBackground ());
-          JTek2440_GPIB_Cursor.this.jPositionY1.setValue (100 * (int) Math.round (positionY1));
+          JTek2440_GPIB_Cursor.this.jPositionY1.setValue ((int) Math.round (100 * positionY1));
           JTek2440_GPIB_Cursor.this.jPositionY1.setToolTipText (Double.toString (positionY1));
           JTek2440_GPIB_Cursor.this.jPositionY1.setBackground (JTek2440_GPIB_Cursor.this.getBackground ());
-          JTek2440_GPIB_Cursor.this.jPositionX1.setValue ((int) Math.round (positionX1));
+          JTek2440_GPIB_Cursor.this.jPositionX1.setValue ((int) Math.round (100 * positionX1));
           JTek2440_GPIB_Cursor.this.jPositionX1.setToolTipText (Double.toString (positionX1));
           JTek2440_GPIB_Cursor.this.jPositionX1.setBackground (JTek2440_GPIB_Cursor.this.getBackground ());
           JTek2440_GPIB_Cursor.this.jPositionTime2.setValue ((int) Math.round (positionTime2));
           JTek2440_GPIB_Cursor.this.jPositionTime2.setToolTipText (Double.toString (positionTime2));
           JTek2440_GPIB_Cursor.this.jPositionTime2.setBackground (JTek2440_GPIB_Cursor.this.getBackground ());
-          JTek2440_GPIB_Cursor.this.jPositionY2.setValue (100 * (int) Math.round (positionY2));
+          JTek2440_GPIB_Cursor.this.jPositionY2.setValue ((int) Math.round (100 * positionY2));
           JTek2440_GPIB_Cursor.this.jPositionY2.setToolTipText (Double.toString (positionY2));
           JTek2440_GPIB_Cursor.this.jPositionY2.setBackground (JTek2440_GPIB_Cursor.this.getBackground ());
-          JTek2440_GPIB_Cursor.this.jPositionX2.setValue ((int) Math.round (positionX2));
+          JTek2440_GPIB_Cursor.this.jPositionX2.setValue ((int) Math.round (100 * positionX2));
           JTek2440_GPIB_Cursor.this.jPositionX2.setToolTipText (Double.toString (positionX2));
           JTek2440_GPIB_Cursor.this.jPositionX2.setBackground (JTek2440_GPIB_Cursor.this.getBackground ());
           
