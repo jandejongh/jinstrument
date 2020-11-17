@@ -154,7 +154,6 @@ public class JTek2440_GPIB_Ref
     
     this.jRefDisplay1 = new JColorCheckBox.JBoolean (Color.green);
     this.jRefDisplay1.setDisplayedValue (false);
-    // this.jRefDisplay1.setEnabled (false);
     this.jRefDisplay1.addActionListener (new JInstrumentActionListener_1Boolean (
       "display reference (waveform) 1",
       this.jRefDisplay1::getDisplayedValue,
@@ -164,7 +163,6 @@ public class JTek2440_GPIB_Ref
     
     this.jRefDisplay2 = new JColorCheckBox.JBoolean (Color.green);
     this.jRefDisplay2.setDisplayedValue (false);
-    // this.jRefDisplay2.setEnabled (false);
     this.jRefDisplay2.addActionListener (new JInstrumentActionListener_1Boolean (
       "display reference (waveform) 2",
       this.jRefDisplay2::getDisplayedValue,
@@ -174,7 +172,6 @@ public class JTek2440_GPIB_Ref
     
     this.jRefDisplay3 = new JColorCheckBox.JBoolean (Color.green);
     this.jRefDisplay3.setDisplayedValue (false);
-    // this.jRefDisplay3.setEnabled (false);
     this.jRefDisplay3.addActionListener (new JInstrumentActionListener_1Boolean (
       "display reference (waveform) 3",
       this.jRefDisplay3::getDisplayedValue,
@@ -184,7 +181,6 @@ public class JTek2440_GPIB_Ref
     
     this.jRefDisplay4 = new JColorCheckBox.JBoolean (Color.green);
     this.jRefDisplay4.setDisplayedValue (false);
-    // this.jRefDisplay4.setEnabled (false);
     this.jRefDisplay4.addActionListener (new JInstrumentActionListener_1Boolean (
       "display reference (waveform) 4",
       this.jRefDisplay4::getDisplayedValue,
@@ -196,7 +192,6 @@ public class JTek2440_GPIB_Ref
     
     this.jRefClear1 = new JColorCheckBox.JBoolean (getBackground ().darker ());
     this.jRefClear1.setDisplayedValue (true);
-    // this.jRefClear1.setEnabled (false);
     this.jRefClear1.addActionListener (new JInstrumentActionListener_0 (
       "clear reference (waveform) 1",
       tek2440::clearReference1));
@@ -204,7 +199,6 @@ public class JTek2440_GPIB_Ref
     
     this.jRefClear2 = new JColorCheckBox.JBoolean (getBackground ().darker ());
     this.jRefClear2.setDisplayedValue (true);
-    // this.jRefClear2.setEnabled (false);
     this.jRefClear2.addActionListener (new JInstrumentActionListener_0 (
       "clear reference (waveform) 2",
       tek2440::clearReference2));
@@ -212,7 +206,6 @@ public class JTek2440_GPIB_Ref
     
     this.jRefClear3 = new JColorCheckBox.JBoolean (getBackground ().darker ());
     this.jRefClear3.setDisplayedValue (true);
-    this.jRefClear3.setEnabled (false);
     this.jRefClear3.addActionListener (new JInstrumentActionListener_0 (
       "clear reference (waveform) 3",
       tek2440::clearReference3));
@@ -220,7 +213,6 @@ public class JTek2440_GPIB_Ref
     
     this.jRefClear4 = new JColorCheckBox.JBoolean (getBackground ().darker ());
     this.jRefClear4.setDisplayedValue (true);
-    this.jRefClear4.setEnabled (false);
     this.jRefClear4.addActionListener (new JInstrumentActionListener_0 (
       "clear reference (waveform) 4",
       tek2440::clearReference4));
