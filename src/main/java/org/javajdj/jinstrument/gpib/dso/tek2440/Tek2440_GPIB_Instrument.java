@@ -1446,6 +1446,230 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_TWO_T, t));
   }
   
+  public void setMeasurementMethod (final Tek2440_GPIB_Settings.MeasurementMethod method)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_METHOD,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_METHOD, method));
+  }
+  
+  public void setMeasurementWindowing (final boolean windowing)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_WINDOWING,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_WINDOWING, windowing));
+  }
+  
+  public void setMeasurementDisplay (final boolean dislay)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DISPLAY,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISPLAY, dislay));
+  }
+  
+  public void setMeasurementDisplayMarkers (final boolean dislay)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DISPLAY_MARKERS,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISPLAY_MARKERS, dislay));
+  }
+  
+  public void setMeasurementChannel1Type (final Tek2440_GPIB_Settings.MeasurementType type)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL1_TYPE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL1_TYPE, type));
+  }
+  
+  public void setMeasurementChannel1Source (final Tek2440_GPIB_Settings.MeasurementSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL1_SOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL1_SOURCE, source));
+  }
+  
+  public void setMeasurementChannel1DSource (final Tek2440_GPIB_Settings.MeasurementSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL1_DSOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL1_DSOURCE, source));
+  }
+  
+  public void setMeasurementChannel2Type (final Tek2440_GPIB_Settings.MeasurementType type)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL2_TYPE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL2_TYPE, type));
+  }
+  
+  public void setMeasurementChannel2Source (final Tek2440_GPIB_Settings.MeasurementSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL2_SOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL2_SOURCE, source));
+  }
+  
+  public void setMeasurementChannel2DSource (final Tek2440_GPIB_Settings.MeasurementSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL2_DSOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL2_DSOURCE, source));
+  }
+  
+  public void setMeasurementChannel3Type (final Tek2440_GPIB_Settings.MeasurementType type)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL3_TYPE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL3_TYPE, type));
+  }
+  
+  public void setMeasurementChannel3Source (final Tek2440_GPIB_Settings.MeasurementSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL3_SOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL3_SOURCE, source));
+  }
+  
+  public void setMeasurementChannel3DSource (final Tek2440_GPIB_Settings.MeasurementSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL3_DSOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL3_DSOURCE, source));
+  }
+  
+  public void setMeasurementChannel4Type (final Tek2440_GPIB_Settings.MeasurementType type)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL4_TYPE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL4_TYPE, type));
+  }
+  
+  public void setMeasurementChannel4Source (final Tek2440_GPIB_Settings.MeasurementSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL4_SOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL4_SOURCE, source));
+  }
+  
+  public void setMeasurementChannel4DSource (final Tek2440_GPIB_Settings.MeasurementSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL4_DSOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL4_DSOURCE, source));
+  }
+  
+  public void setMeasurementProximalUnit (final Tek2440_GPIB_Settings.ProximalUnit unit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_PROXIMAL_UNIT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_PROXIMAL_UNIT, unit));
+  }
+  
+  public void setMeasurementProximalVoltsLevel (final double level)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_PROXIMAL_VOLTS_LEVEL,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_PROXIMAL_VOLTS_LEVEL, level));
+  }
+  
+  public void setMeasurementProximalPercentsLevel (final double level)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_PROXIMAL_PERCENTS_LEVEL,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_PROXIMAL_PERCENTS_LEVEL, level));
+  }
+  
+  public void setMeasurementMesialUnit (final Tek2440_GPIB_Settings.MesialUnit unit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_MESIAL_UNIT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_MESIAL_UNIT, unit));
+  }
+  
+  public void setMeasurementMesialVoltsLevel (final double level)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_MESIAL_VOLTS_LEVEL,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_MESIAL_VOLTS_LEVEL, level));
+  }
+  
+  public void setMeasurementMesialPercentsLevel (final double level)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_MESIAL_PERCENTS_LEVEL,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_MESIAL_PERCENTS_LEVEL, level));
+  }
+  
+  public void setMeasurementDMesialUnit (final Tek2440_GPIB_Settings.DMesialUnit unit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DMESIAL_UNIT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DMESIAL_UNIT, unit));
+  }
+  
+  public void setMeasurementDMesialVoltsLevel (final double level)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DMESIAL_VOLTS_LEVEL,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DMESIAL_VOLTS_LEVEL, level));
+  }
+  
+  public void setMeasurementDMesialPercentsLevel (final double level)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DMESIAL_PERCENTS_LEVEL,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DMESIAL_PERCENTS_LEVEL, level));
+  }
+  
+  public void setMeasurementDistalUnit (final Tek2440_GPIB_Settings.DistalUnit unit)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DISTAL_UNIT,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISTAL_UNIT, unit));
+  }
+  
+  public void setMeasurementDistalVoltsLevel (final double level)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DISTAL_VOLTS_LEVEL,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISTAL_VOLTS_LEVEL, level));
+  }
+  
+  public void setMeasurementDistalPercentsLevel (final double level)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DISTAL_PERCENTS_LEVEL,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISTAL_PERCENTS_LEVEL, level));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -2925,6 +3149,504 @@ public class Tek2440_GPIB_Instrument
             (double) instrumentCommand.get (
               Tek2440_InstrumentCommand.ICARG_TEK2440_CURSOR_POSITION_TWO_T);
           writeSync ("CURS TPO:TWO:" + Double.toString (t) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_METHOD:
+        {
+          final Tek2440_GPIB_Settings.MeasurementMethod method =
+            (Tek2440_GPIB_Settings.MeasurementMethod) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_METHOD);
+          switch (method)
+          {
+            case Cursor:    writeSync ("MEAS MET:CURS\r\n"); break;
+            case Histogram: writeSync ("MEAS MET:HIS\r\n");  break;
+            case MinMax:    writeSync ("MEAS MET:MINM\r\n"); break;
+            default:        throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_WINDOWING:
+        {
+          final boolean windowing =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_WINDOWING);
+          writeSync ("MEAS WIN:" + (windowing ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DISPLAY:
+        {
+          final boolean display =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISPLAY);
+          writeSync ("MEAS DISP:" + (display ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DISPLAY_MARKERS:
+        {
+          final boolean display =
+            (boolean) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISPLAY_MARKERS);
+          writeSync ("MEAS MAR:" + (display ? "ON" : "OFF") + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL1_TYPE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementType type =
+            (Tek2440_GPIB_Settings.MeasurementType) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL1_TYPE);
+          switch (type)
+          {
+            case Area:       writeSync ("MEAS ONE:TYP:ARE\r\n");  break;
+            case Base:       writeSync ("MEAS ONE:TYP:BAS\r\n");  break;
+            case DMesial:    writeSync ("MEAS ONE:TYP:DME\r\n");  break;
+            case Delay:      writeSync ("MEAS ONE:TYP:DELA\r\n"); break;
+            case Distal:     writeSync ("MEAS ONE:TYP:DIST\r\n"); break;
+            case DutyCycle:  writeSync ("MEAS ONE:TYP:DUT\r\n");  break;
+            case Fall:       writeSync ("MEAS ONE:TYP:FAL\r\n");  break;
+            case Frequency:  writeSync ("MEAS ONE:TYP:FRE\r\n");  break;
+            case Maximum:    writeSync ("MEAS ONE:TYP:MAX\r\n");  break;
+            case Mean:       writeSync ("MEAS ONE:TYP:MEAN\r\n"); break;
+            case Mesial:     writeSync ("MEAS ONE:TYP:MESI\r\n"); break;
+            case Mid:        writeSync ("MEAS ONE:TYP:MID\r\n");  break;
+            case Minimum:    writeSync ("MEAS ONE:TYP:MINI\r\n"); break;
+            case Overshoot:  writeSync ("MEAS ONE:TYP:OVE\r\n");  break;
+            case Peak2Peak:  writeSync ("MEAS ONE:TYP:PK2\r\n");  break;
+            case Period:     writeSync ("MEAS ONE:TYP:PERI\r\n"); break;
+            case Proximal:   writeSync ("MEAS ONE:TYP:PROX\r\n"); break;
+            case RMS:        writeSync ("MEAS ONE:TYP:RMS\r\n");  break;
+            case Rise:       writeSync ("MEAS ONE:TYP:RIS\r\n");  break;
+            case Top:        writeSync ("MEAS ONE:TYP:TOP\r\n");  break;
+            case Undershoot: writeSync ("MEAS ONE:TYP:UND\r\n");  break;
+            case Width:      writeSync ("MEAS ONE:TYP:WID\r\n");  break;
+            default:         throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL1_SOURCE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementSource source =
+            (Tek2440_GPIB_Settings.MeasurementSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL1_SOURCE);
+          switch (source)
+          {
+            case Ch1:     writeSync ("MEAS ONE:SOU:CH1\r\n");   break;
+            case Ch2:     writeSync ("MEAS ONE:SOU:CH2\r\n");   break;
+            case Add:     writeSync ("MEAS ONE:SOU:ADD\r\n");   break;
+            case Mult:    writeSync ("MEAS ONE:SOU:MUL\r\n");   break;
+            case Ch1Del:  writeSync ("MEAS ONE:SOU:CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("MEAS ONE:SOU:CH2D\r\n");  break;
+            case AddDel:  writeSync ("MEAS ONE:SOU:ADDD\r\n");  break;
+            case MultDel: writeSync ("MEAS ONE:SOU:MULTD\r\n"); break;
+            case Ref1:    writeSync ("MEAS ONE:SOU:REF1\r\n");  break;
+            case Ref2:    writeSync ("MEAS ONE:SOU:REF2\r\n");  break;
+            case Ref3:    writeSync ("MEAS ONE:SOU:REF3\r\n");  break;
+            case Ref4:    writeSync ("MEAS ONE:SOU:REF4\r\n");  break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL1_DSOURCE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementSource source =
+            (Tek2440_GPIB_Settings.MeasurementSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL1_DSOURCE);
+          switch (source)
+          {
+            case Ch1:     writeSync ("MEAS ONE:DSO:CH1\r\n");   break;
+            case Ch2:     writeSync ("MEAS ONE:DSO:CH2\r\n");   break;
+            case Add:     writeSync ("MEAS ONE:DSO:ADD\r\n");   break;
+            case Mult:    writeSync ("MEAS ONE:DSO:MUL\r\n");   break;
+            case Ch1Del:  writeSync ("MEAS ONE:DSO:CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("MEAS ONE:DSO:CH2D\r\n");  break;
+            case AddDel:  writeSync ("MEAS ONE:DSO:ADDD\r\n");  break;
+            case MultDel: writeSync ("MEAS ONE:DSO:MULTD\r\n"); break;
+            case Ref1:    writeSync ("MEAS ONE:DSO:REF1\r\n");  break;
+            case Ref2:    writeSync ("MEAS ONE:DSO:REF2\r\n");  break;
+            case Ref3:    writeSync ("MEAS ONE:DSO:REF3\r\n");  break;
+            case Ref4:    writeSync ("MEAS ONE:DSO:REF4\r\n");  break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL2_TYPE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementType type =
+            (Tek2440_GPIB_Settings.MeasurementType) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL2_TYPE);
+          switch (type)
+          {
+            case Area:       writeSync ("MEAS TWO:TYP:ARE\r\n");  break;
+            case Base:       writeSync ("MEAS TWO:TYP:BAS\r\n");  break;
+            case DMesial:    writeSync ("MEAS TWO:TYP:DME\r\n");  break;
+            case Delay:      writeSync ("MEAS TWO:TYP:DELA\r\n"); break;
+            case Distal:     writeSync ("MEAS TWO:TYP:DIST\r\n"); break;
+            case DutyCycle:  writeSync ("MEAS TWO:TYP:DUT\r\n");  break;
+            case Fall:       writeSync ("MEAS TWO:TYP:FAL\r\n");  break;
+            case Frequency:  writeSync ("MEAS TWO:TYP:FRE\r\n");  break;
+            case Maximum:    writeSync ("MEAS TWO:TYP:MAX\r\n");  break;
+            case Mean:       writeSync ("MEAS TWO:TYP:MEAN\r\n"); break;
+            case Mesial:     writeSync ("MEAS TWO:TYP:MESI\r\n"); break;
+            case Mid:        writeSync ("MEAS TWO:TYP:MID\r\n");  break;
+            case Minimum:    writeSync ("MEAS TWO:TYP:MINI\r\n"); break;
+            case Overshoot:  writeSync ("MEAS TWO:TYP:OVE\r\n");  break;
+            case Peak2Peak:  writeSync ("MEAS TWO:TYP:PK2\r\n");  break;
+            case Period:     writeSync ("MEAS TWO:TYP:PERI\r\n"); break;
+            case Proximal:   writeSync ("MEAS TWO:TYP:PROX\r\n"); break;
+            case RMS:        writeSync ("MEAS TWO:TYP:RMS\r\n");  break;
+            case Rise:       writeSync ("MEAS TWO:TYP:RIS\r\n");  break;
+            case Top:        writeSync ("MEAS TWO:TYP:TOP\r\n");  break;
+            case Undershoot: writeSync ("MEAS TWO:TYP:UND\r\n");  break;
+            case Width:      writeSync ("MEAS TWO:TYP:WID\r\n");  break;
+            default:         throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL2_SOURCE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementSource source =
+            (Tek2440_GPIB_Settings.MeasurementSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL2_SOURCE);
+          switch (source)
+          {
+            case Ch1:     writeSync ("MEAS TWO:SOU:CH1\r\n");   break;
+            case Ch2:     writeSync ("MEAS TWO:SOU:CH2\r\n");   break;
+            case Add:     writeSync ("MEAS TWO:SOU:ADD\r\n");   break;
+            case Mult:    writeSync ("MEAS TWO:SOU:MUL\r\n");   break;
+            case Ch1Del:  writeSync ("MEAS TWO:SOU:CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("MEAS TWO:SOU:CH2D\r\n");  break;
+            case AddDel:  writeSync ("MEAS TWO:SOU:ADDD\r\n");  break;
+            case MultDel: writeSync ("MEAS TWO:SOU:MULTD\r\n"); break;
+            case Ref1:    writeSync ("MEAS TWO:SOU:REF1\r\n");  break;
+            case Ref2:    writeSync ("MEAS TWO:SOU:REF2\r\n");  break;
+            case Ref3:    writeSync ("MEAS TWO:SOU:REF3\r\n");  break;
+            case Ref4:    writeSync ("MEAS TWO:SOU:REF4\r\n");  break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL2_DSOURCE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementSource source =
+            (Tek2440_GPIB_Settings.MeasurementSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL2_DSOURCE);
+          switch (source)
+          {
+            case Ch1:     writeSync ("MEAS TWO:DSO:CH1\r\n");   break;
+            case Ch2:     writeSync ("MEAS TWO:DSO:CH2\r\n");   break;
+            case Add:     writeSync ("MEAS TWO:DSO:ADD\r\n");   break;
+            case Mult:    writeSync ("MEAS TWO:DSO:MUL\r\n");   break;
+            case Ch1Del:  writeSync ("MEAS TWO:DSO:CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("MEAS TWO:DSO:CH2D\r\n");  break;
+            case AddDel:  writeSync ("MEAS TWO:DSO:ADDD\r\n");  break;
+            case MultDel: writeSync ("MEAS TWO:DSO:MULTD\r\n"); break;
+            case Ref1:    writeSync ("MEAS TWO:DSO:REF1\r\n");  break;
+            case Ref2:    writeSync ("MEAS TWO:DSO:REF2\r\n");  break;
+            case Ref3:    writeSync ("MEAS TWO:DSO:REF3\r\n");  break;
+            case Ref4:    writeSync ("MEAS TWO:DSO:REF4\r\n");  break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL3_TYPE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementType type =
+            (Tek2440_GPIB_Settings.MeasurementType) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL3_TYPE);
+          switch (type)
+          {
+            case Area:       writeSync ("MEAS THR:TYP:ARE\r\n");  break;
+            case Base:       writeSync ("MEAS THR:TYP:BAS\r\n");  break;
+            case DMesial:    writeSync ("MEAS THR:TYP:DME\r\n");  break;
+            case Delay:      writeSync ("MEAS THR:TYP:DELA\r\n"); break;
+            case Distal:     writeSync ("MEAS THR:TYP:DIST\r\n"); break;
+            case DutyCycle:  writeSync ("MEAS THR:TYP:DUT\r\n");  break;
+            case Fall:       writeSync ("MEAS THR:TYP:FAL\r\n");  break;
+            case Frequency:  writeSync ("MEAS THR:TYP:FRE\r\n");  break;
+            case Maximum:    writeSync ("MEAS THR:TYP:MAX\r\n");  break;
+            case Mean:       writeSync ("MEAS THR:TYP:MEAN\r\n"); break;
+            case Mesial:     writeSync ("MEAS THR:TYP:MESI\r\n"); break;
+            case Mid:        writeSync ("MEAS THR:TYP:MID\r\n");  break;
+            case Minimum:    writeSync ("MEAS THR:TYP:MINI\r\n"); break;
+            case Overshoot:  writeSync ("MEAS THR:TYP:OVE\r\n");  break;
+            case Peak2Peak:  writeSync ("MEAS THR:TYP:PK2\r\n");  break;
+            case Period:     writeSync ("MEAS THR:TYP:PERI\r\n"); break;
+            case Proximal:   writeSync ("MEAS THR:TYP:PROX\r\n"); break;
+            case RMS:        writeSync ("MEAS THR:TYP:RMS\r\n");  break;
+            case Rise:       writeSync ("MEAS THR:TYP:RIS\r\n");  break;
+            case Top:        writeSync ("MEAS THR:TYP:TOP\r\n");  break;
+            case Undershoot: writeSync ("MEAS THR:TYP:UND\r\n");  break;
+            case Width:      writeSync ("MEAS THR:TYP:WID\r\n");  break;
+            default:         throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL3_SOURCE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementSource source =
+            (Tek2440_GPIB_Settings.MeasurementSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL3_SOURCE);
+          switch (source)
+          {
+            case Ch1:     writeSync ("MEAS THR:SOU:CH1\r\n");   break;
+            case Ch2:     writeSync ("MEAS THR:SOU:CH2\r\n");   break;
+            case Add:     writeSync ("MEAS THR:SOU:ADD\r\n");   break;
+            case Mult:    writeSync ("MEAS THR:SOU:MUL\r\n");   break;
+            case Ch1Del:  writeSync ("MEAS THR:SOU:CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("MEAS THR:SOU:CH2D\r\n");  break;
+            case AddDel:  writeSync ("MEAS THR:SOU:ADDD\r\n");  break;
+            case MultDel: writeSync ("MEAS THR:SOU:MULTD\r\n"); break;
+            case Ref1:    writeSync ("MEAS THR:SOU:REF1\r\n");  break;
+            case Ref2:    writeSync ("MEAS THR:SOU:REF2\r\n");  break;
+            case Ref3:    writeSync ("MEAS THR:SOU:REF3\r\n");  break;
+            case Ref4:    writeSync ("MEAS THR:SOU:REF4\r\n");  break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL3_DSOURCE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementSource source =
+            (Tek2440_GPIB_Settings.MeasurementSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL3_DSOURCE);
+          switch (source)
+          {
+            case Ch1:     writeSync ("MEAS THR:DSO:CH1\r\n");   break;
+            case Ch2:     writeSync ("MEAS THR:DSO:CH2\r\n");   break;
+            case Add:     writeSync ("MEAS THR:DSO:ADD\r\n");   break;
+            case Mult:    writeSync ("MEAS THR:DSO:MUL\r\n");   break;
+            case Ch1Del:  writeSync ("MEAS THR:DSO:CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("MEAS THR:DSO:CH2D\r\n");  break;
+            case AddDel:  writeSync ("MEAS THR:DSO:ADDD\r\n");  break;
+            case MultDel: writeSync ("MEAS THR:DSO:MULTD\r\n"); break;
+            case Ref1:    writeSync ("MEAS THR:DSO:REF1\r\n");  break;
+            case Ref2:    writeSync ("MEAS THR:DSO:REF2\r\n");  break;
+            case Ref3:    writeSync ("MEAS THR:DSO:REF3\r\n");  break;
+            case Ref4:    writeSync ("MEAS THR:DSO:REF4\r\n");  break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL4_TYPE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementType type =
+            (Tek2440_GPIB_Settings.MeasurementType) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL4_TYPE);
+          switch (type)
+          {
+            case Area:       writeSync ("MEAS FOU:TYP:ARE\r\n");  break;
+            case Base:       writeSync ("MEAS FOU:TYP:BAS\r\n");  break;
+            case DMesial:    writeSync ("MEAS FOU:TYP:DME\r\n");  break;
+            case Delay:      writeSync ("MEAS FOU:TYP:DELA\r\n"); break;
+            case Distal:     writeSync ("MEAS FOU:TYP:DIST\r\n"); break;
+            case DutyCycle:  writeSync ("MEAS FOU:TYP:DUT\r\n");  break;
+            case Fall:       writeSync ("MEAS FOU:TYP:FAL\r\n");  break;
+            case Frequency:  writeSync ("MEAS FOU:TYP:FRE\r\n");  break;
+            case Maximum:    writeSync ("MEAS FOU:TYP:MAX\r\n");  break;
+            case Mean:       writeSync ("MEAS FOU:TYP:MEAN\r\n"); break;
+            case Mesial:     writeSync ("MEAS FOU:TYP:MESI\r\n"); break;
+            case Mid:        writeSync ("MEAS FOU:TYP:MID\r\n");  break;
+            case Minimum:    writeSync ("MEAS FOU:TYP:MINI\r\n"); break;
+            case Overshoot:  writeSync ("MEAS FOU:TYP:OVE\r\n");  break;
+            case Peak2Peak:  writeSync ("MEAS FOU:TYP:PK2\r\n");  break;
+            case Period:     writeSync ("MEAS FOU:TYP:PERI\r\n"); break;
+            case Proximal:   writeSync ("MEAS FOU:TYP:PROX\r\n"); break;
+            case RMS:        writeSync ("MEAS FOU:TYP:RMS\r\n");  break;
+            case Rise:       writeSync ("MEAS FOU:TYP:RIS\r\n");  break;
+            case Top:        writeSync ("MEAS FOU:TYP:TOP\r\n");  break;
+            case Undershoot: writeSync ("MEAS FOU:TYP:UND\r\n");  break;
+            case Width:      writeSync ("MEAS FOU:TYP:WID\r\n");  break;
+            default:         throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL4_SOURCE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementSource source =
+            (Tek2440_GPIB_Settings.MeasurementSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL4_SOURCE);
+          switch (source)
+          {
+            case Ch1:     writeSync ("MEAS FOU:SOU:CH1\r\n");   break;
+            case Ch2:     writeSync ("MEAS FOU:SOU:CH2\r\n");   break;
+            case Add:     writeSync ("MEAS FOU:SOU:ADD\r\n");   break;
+            case Mult:    writeSync ("MEAS FOU:SOU:MUL\r\n");   break;
+            case Ch1Del:  writeSync ("MEAS FOU:SOU:CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("MEAS FOU:SOU:CH2D\r\n");  break;
+            case AddDel:  writeSync ("MEAS FOU:SOU:ADDD\r\n");  break;
+            case MultDel: writeSync ("MEAS FOU:SOU:MULTD\r\n"); break;
+            case Ref1:    writeSync ("MEAS FOU:SOU:REF1\r\n");  break;
+            case Ref2:    writeSync ("MEAS FOU:SOU:REF2\r\n");  break;
+            case Ref3:    writeSync ("MEAS FOU:SOU:REF3\r\n");  break;
+            case Ref4:    writeSync ("MEAS FOU:SOU:REF4\r\n");  break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_CHANNEL4_DSOURCE:
+        {
+          final Tek2440_GPIB_Settings.MeasurementSource source =
+            (Tek2440_GPIB_Settings.MeasurementSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_CHANNEL4_DSOURCE);
+          switch (source)
+          {
+            case Ch1:     writeSync ("MEAS FOU:DSO:CH1\r\n");   break;
+            case Ch2:     writeSync ("MEAS FOU:DSO:CH2\r\n");   break;
+            case Add:     writeSync ("MEAS FOU:DSO:ADD\r\n");   break;
+            case Mult:    writeSync ("MEAS FOU:DSO:MUL\r\n");   break;
+            case Ch1Del:  writeSync ("MEAS FOU:DSO:CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("MEAS FOU:DSO:CH2D\r\n");  break;
+            case AddDel:  writeSync ("MEAS FOU:DSO:ADDD\r\n");  break;
+            case MultDel: writeSync ("MEAS FOU:DSO:MULTD\r\n"); break;
+            case Ref1:    writeSync ("MEAS FOU:DSO:REF1\r\n");  break;
+            case Ref2:    writeSync ("MEAS FOU:DSO:REF2\r\n");  break;
+            case Ref3:    writeSync ("MEAS FOU:DSO:REF3\r\n");  break;
+            case Ref4:    writeSync ("MEAS FOU:DSO:REF4\r\n");  break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_PROXIMAL_UNIT:
+        {
+          final Tek2440_GPIB_Settings.ProximalUnit unit =
+            (Tek2440_GPIB_Settings.ProximalUnit) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_PROXIMAL_UNIT);
+          switch (unit)
+          {
+            case Volts:     writeSync ("MEAS PROX:UNI:VOL\r\n");  break;
+            case Percents:  writeSync ("MEAS PROX:UNI:PERC\r\n"); break;
+            default:        throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_PROXIMAL_VOLTS_LEVEL:
+        {
+          final double level =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_PROXIMAL_VOLTS_LEVEL);
+          writeSync ("MEAS PROX:VLE:" + Double.toString (level) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_PROXIMAL_PERCENTS_LEVEL:
+        {
+          final double level =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_PROXIMAL_PERCENTS_LEVEL);
+          writeSync ("MEAS PROX:PLE:" + Double.toString (level) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_MESIAL_UNIT:
+        {
+          final Tek2440_GPIB_Settings.MesialUnit unit =
+            (Tek2440_GPIB_Settings.MesialUnit) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_MESIAL_UNIT);
+          switch (unit)
+          {
+            case Volts:     writeSync ("MEAS MESI:UNI:VOL\r\n");  break;
+            case Percents:  writeSync ("MEAS MESI:UNI:PERC\r\n"); break;
+            default:        throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_MESIAL_VOLTS_LEVEL:
+        {
+          final double level =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_MESIAL_VOLTS_LEVEL);
+          writeSync ("MEAS MESI:VLE:" + Double.toString (level) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_MESIAL_PERCENTS_LEVEL:
+        {
+          final double level =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_MESIAL_PERCENTS_LEVEL);
+          writeSync ("MEAS MESI:PLE:" + Double.toString (level) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DMESIAL_UNIT:
+        {
+          final Tek2440_GPIB_Settings.DMesialUnit unit =
+            (Tek2440_GPIB_Settings.DMesialUnit) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DMESIAL_UNIT);
+          switch (unit)
+          {
+            case Volts:     writeSync ("MEAS DME:UNI:VOL\r\n");  break;
+            case Percents:  writeSync ("MEAS DME:UNI:PERC\r\n"); break;
+            default:        throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DMESIAL_VOLTS_LEVEL:
+        {
+          final double level =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DMESIAL_VOLTS_LEVEL);
+          writeSync ("MEAS DME:VLE:" + Double.toString (level) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DMESIAL_PERCENTS_LEVEL:
+        {
+          final double level =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DMESIAL_PERCENTS_LEVEL);
+          writeSync ("MEAS DME:PLE:" + Double.toString (level) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DISTAL_UNIT:
+        {
+          final Tek2440_GPIB_Settings.DistalUnit unit =
+            (Tek2440_GPIB_Settings.DistalUnit) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISTAL_UNIT);
+          switch (unit)
+          {
+            case Volts:     writeSync ("MEAS DIST:UNI:VOL\r\n");  break;
+            case Percents:  writeSync ("MEAS DIST:UNI:PERC\r\n"); break;
+            default:        throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DISTAL_VOLTS_LEVEL:
+        {
+          final double level =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISTAL_VOLTS_LEVEL);
+          writeSync ("MEAS DIST:VLE:" + Double.toString (level) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_MEASUREMENT_DISTAL_PERCENTS_LEVEL:
+        {
+          final double level =
+            (double) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISTAL_PERCENTS_LEVEL);
+          writeSync ("MEAS DIST:PLE:" + Double.toString (level) + "\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }

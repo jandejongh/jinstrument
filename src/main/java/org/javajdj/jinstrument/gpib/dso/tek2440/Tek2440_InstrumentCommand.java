@@ -364,4 +364,88 @@ public interface Tek2440_InstrumentCommand
   public final static String IC_TEK2440_CURSOR_POSITION_TWO_T = "commandTek2440CursorPosition2t";
   public final static String ICARG_TEK2440_CURSOR_POSITION_TWO_T = "tek2440CursorPosition2t";
   
+  public final static String IC_TEK2440_MEASUREMENT_METHOD = "commandTek2440MeasurementMethod";
+  public final static String ICARG_TEK2440_MEASUREMENT_METHOD = "tek2440MeasurementMethod";
+  
+  public final static String IC_TEK2440_MEASUREMENT_WINDOWING = "commandTek2440MeasurementWindowing";
+  public final static String ICARG_TEK2440_MEASUREMENT_WINDOWING = "tek2440MeasurementWindowing";
+  
+  public final static String IC_TEK2440_MEASUREMENT_DISPLAY = "commandTek2440MeasurementDisplay";
+  public final static String ICARG_TEK2440_MEASUREMENT_DISPLAY = "tek2440MeasurementDisplay";
+  
+  public final static String IC_TEK2440_MEASUREMENT_DISPLAY_MARKERS = "commandTek2440MeasurementDisplayMarkers";
+  public final static String ICARG_TEK2440_MEASUREMENT_DISPLAY_MARKERS = "tek2440MeasurementDisplayMarkers";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL1_TYPE = "commandTek2440MeasurementChannel1Type";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL1_TYPE = "tek2440MeasurementChannel1Type";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL1_SOURCE = "commandTek2440MeasurementChannel1Source";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL1_SOURCE = "tek2440MeasurementChannel1Source";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL1_DSOURCE = "commandTek2440MeasurementChannel1DSource";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL1_DSOURCE = "tek2440MeasurementChannel1DSource";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL2_TYPE = "commandTek2440MeasurementChannel2Type";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL2_TYPE = "tek2440MeasurementChannel2Type";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL2_SOURCE = "commandTek2440MeasurementChannel2Source";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL2_SOURCE = "tek2440MeasurementChannel2Source";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL2_DSOURCE = "commandTek2440MeasurementChannel2DSource";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL2_DSOURCE = "tek2440MeasurementChannel2DSource";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL3_TYPE = "commandTek2440MeasurementChannel3Type";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL3_TYPE = "tek2440MeasurementChannel3Type";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL3_SOURCE = "commandTek2440MeasurementChannel3Source";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL3_SOURCE = "tek2440MeasurementChannel3Source";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL3_DSOURCE = "commandTek2440MeasurementChannel3DSource";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL3_DSOURCE = "tek2440MeasurementChannel3DSource";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL4_TYPE = "commandTek2440MeasurementChannel4Type";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL4_TYPE = "tek2440MeasurementChannel4Type";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL4_SOURCE = "commandTek2440MeasurementChannel4Source";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL4_SOURCE = "tek2440MeasurementChannel4Source";
+  
+  public final static String IC_TEK2440_MEASUREMENT_CHANNEL4_DSOURCE = "commandTek2440MeasurementChannel4DSource";
+  public final static String ICARG_TEK2440_MEASUREMENT_CHANNEL4_DSOURCE = "tek2440MeasurementChannel4DSource";
+  
+  public final static String IC_TEK2440_MEASUREMENT_PROXIMAL_UNIT = "commandTek2440MeasurementProximalUnit";
+  public final static String ICARG_TEK2440_MEASUREMENT_PROXIMAL_UNIT = "tek2440MeasurementProximalUnit";
+  
+  public final static String IC_TEK2440_MEASUREMENT_PROXIMAL_VOLTS_LEVEL = "commandTek2440MeasurementProximalVoltsLevel";
+  public final static String ICARG_TEK2440_MEASUREMENT_PROXIMAL_VOLTS_LEVEL = "tek2440MeasurementProximalVoltsLevel";
+  
+  public final static String IC_TEK2440_MEASUREMENT_PROXIMAL_PERCENTS_LEVEL = "commandTek2440MeasurementProximalPercentsLevel";
+  public final static String ICARG_TEK2440_MEASUREMENT_PROXIMAL_PERCENTS_LEVEL = "tek2440MeasurementProximalPercentsLevel";
+  
+  public final static String IC_TEK2440_MEASUREMENT_MESIAL_UNIT = "commandTek2440MeasurementMesialUnit";
+  public final static String ICARG_TEK2440_MEASUREMENT_MESIAL_UNIT = "tek2440MeasurementMesialUnit";
+  
+  public final static String IC_TEK2440_MEASUREMENT_MESIAL_VOLTS_LEVEL = "commandTek2440MeasurementMesialVoltsLevel";
+  public final static String ICARG_TEK2440_MEASUREMENT_MESIAL_VOLTS_LEVEL = "tek2440MeasurementMesialVoltsLevel";
+  
+  public final static String IC_TEK2440_MEASUREMENT_MESIAL_PERCENTS_LEVEL = "commandTek2440MeasurementMesialPercentsLevel";
+  public final static String ICARG_TEK2440_MEASUREMENT_MESIAL_PERCENTS_LEVEL = "tek2440MeasurementMesialPercentsLevel";
+  
+  public final static String IC_TEK2440_MEASUREMENT_DMESIAL_UNIT = "commandTek2440MeasurementDMesialUnit";
+  public final static String ICARG_TEK2440_MEASUREMENT_DMESIAL_UNIT = "tek2440MeasurementDMesialUnit";
+  
+  public final static String IC_TEK2440_MEASUREMENT_DMESIAL_VOLTS_LEVEL = "commandTek2440MeasurementDMesialVoltsLevel";
+  public final static String ICARG_TEK2440_MEASUREMENT_DMESIAL_VOLTS_LEVEL = "tek2440MeasurementDMesialVoltsLevel";
+  
+  public final static String IC_TEK2440_MEASUREMENT_DMESIAL_PERCENTS_LEVEL = "commandTek2440MeasurementDMesialPercentsLevel";
+  public final static String ICARG_TEK2440_MEASUREMENT_DMESIAL_PERCENTS_LEVEL = "tek2440MeasurementDMesialPercentsLevel";
+  
+  public final static String IC_TEK2440_MEASUREMENT_DISTAL_UNIT = "commandTek2440MeasurementDistalUnit";
+  public final static String ICARG_TEK2440_MEASUREMENT_DISTAL_UNIT = "tek2440MeasurementDistalUnit";
+  
+  public final static String IC_TEK2440_MEASUREMENT_DISTAL_VOLTS_LEVEL = "commandTek2440MeasurementDistalVoltsLevel";
+  public final static String ICARG_TEK2440_MEASUREMENT_DISTAL_VOLTS_LEVEL = "tek2440MeasurementDistalVoltsLevel";
+  
+  public final static String IC_TEK2440_MEASUREMENT_DISTAL_PERCENTS_LEVEL = "commandTek2440MeasurementDistalPercentsLevel";
+  public final static String ICARG_TEK2440_MEASUREMENT_DISTAL_PERCENTS_LEVEL = "tek2440MeasurementDistalPercentsLevel";
+  
 }

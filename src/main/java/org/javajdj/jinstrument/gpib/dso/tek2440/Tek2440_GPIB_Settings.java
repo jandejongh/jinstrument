@@ -7090,6 +7090,146 @@ public class Tek2440_GPIB_Settings
     return this.measurementSettings;
   }
   
+  public final MeasurementMethod getMeasurementMethod ()
+  {
+    return getMeasurementSettings ().method;
+  }
+  
+  public final boolean isMeasurementWindowing ()
+  {
+    return getMeasurementSettings ().windowing;
+  }
+  
+  public final boolean isMeasurementDisplay ()
+  {
+    return getMeasurementSettings ().display;
+  }
+  
+  public final boolean isMeasurementDisplayThresholdCrossingMarks ()
+  {
+    return getMeasurementSettings ().displayThresholdCrossingMarks;
+  }
+  
+  public final MeasurementType getMeasurementChannel1Type ()
+  {
+    return getMeasurementSettings ().channel1.measurementType;
+  }
+  
+  public final MeasurementSource getMeasurementChannel1Source ()
+  {
+    return getMeasurementSettings ().channel1.source;
+  }
+  
+  public final MeasurementSource getMeasurementChannel1DelayedSource ()
+  {
+    return getMeasurementSettings ().channel1.delayedSource;
+  }
+  
+  public final MeasurementType getMeasurementChannel2Type ()
+  {
+    return getMeasurementSettings ().channel2.measurementType;
+  }
+  
+  public final MeasurementSource getMeasurementChannel2Source ()
+  {
+    return getMeasurementSettings ().channel2.source;
+  }
+  
+  public final MeasurementSource getMeasurementChannel2DelayedSource ()
+  {
+    return getMeasurementSettings ().channel2.delayedSource;
+  }
+  
+  public final MeasurementType getMeasurementChannel3Type ()
+  {
+    return getMeasurementSettings ().channel3.measurementType;
+  }
+  
+  public final MeasurementSource getMeasurementChannel3Source ()
+  {
+    return getMeasurementSettings ().channel3.source;
+  }
+  
+  public final MeasurementSource getMeasurementChannel3DelayedSource ()
+  {
+    return getMeasurementSettings ().channel3.delayedSource;
+  }
+  
+  public final MeasurementType getMeasurementChannel4Type ()
+  {
+    return getMeasurementSettings ().channel4.measurementType;
+  }
+  
+  public final MeasurementSource getMeasurementChannel4Source ()
+  {
+    return getMeasurementSettings ().channel4.source;
+  }
+  
+  public final MeasurementSource getMeasurementChannel4DelayedSource ()
+  {
+    return getMeasurementSettings ().channel4.delayedSource;
+  }
+  
+  public final ProximalUnit getMeasurementProximalUnit ()
+  {
+    return getMeasurementSettings ().proximalSettings.unit;
+  }
+  
+  public final double getMeasurementProximalVoltsLevel ()
+  {
+    return getMeasurementSettings ().proximalSettings.voltsLevel;
+  }
+  
+  public final double getMeasurementProximalPercentsLevel ()
+  {
+    return getMeasurementSettings ().proximalSettings.percentLevel;
+  }
+  
+  public final MesialUnit getMeasurementMesialUnit ()
+  {
+    return getMeasurementSettings ().mesialSettings.unit;
+  }
+  
+  public final double getMeasurementMesialVoltsLevel ()
+  {
+    return getMeasurementSettings ().mesialSettings.voltsLevel;
+  }
+  
+  public final double getMeasurementMesialPercentsLevel ()
+  {
+    return getMeasurementSettings ().mesialSettings.percentLevel;
+  }
+  
+  public final DMesialUnit getMeasurementDMesialUnit ()
+  {
+    return getMeasurementSettings ().dMesialSettings.unit;
+  }
+  
+  public final double getMeasurementDMesialVoltsLevel ()
+  {
+    return getMeasurementSettings ().dMesialSettings.voltsLevel;
+  }
+  
+  public final double getMeasurementDMesialPercentsLevel ()
+  {
+    return getMeasurementSettings ().dMesialSettings.percentLevel;
+  }
+  
+  public final DistalUnit getMeasurementDistalUnit ()
+  {
+    return getMeasurementSettings ().distalSettings.unit;
+  }
+  
+  public final double getMeasurementDistalVoltsLevel ()
+  {
+    return getMeasurementSettings ().distalSettings.voltsLevel;
+  }
+  
+  public final double getMeasurementDistalPercentsLevel ()
+  {
+    return getMeasurementSettings ().distalSettings.percentLevel;
+  }
+  
   private static MeasurementSettings parseMeasurementSettings (final String argString)
   {
     if (argString == null)

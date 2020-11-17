@@ -396,7 +396,7 @@ public class JTek2440_GPIB
     jMeasurementButton.setDisplayedValue (true);
     jMeasurementButton.setHorizontalAlignment (SwingConstants.CENTER);
     this.jMeasurementDialog = new JOptionPane ().createDialog ("Tek-2440 Measurement Settings");
-    this.jMeasurementDialog.setSize (800, 600);
+    this.jMeasurementDialog.setSize (1024, 768);
     this.jMeasurementDialog.setLocationRelativeTo (this);
     this.jMeasurementDialog.setContentPane(new JTek2440_GPIB_Measurement (digitalStorageOscilloscope, level + 1));
     jMeasurementButton.addActionListener ((ae) ->
