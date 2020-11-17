@@ -38,6 +38,7 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
@@ -109,8 +110,14 @@ public class JTek2440_GPIB_Data
     dataFormatPanel.add (new JLabel ("Encoding"));
     this.jDataEncoding = new JComboBox<> (Tek2440_GPIB_Settings.DataEncoding.values ());
     this.jDataEncoding.setSelectedItem (null);
-    this.jDataEncoding.setEnabled (false);
-    this.jDataEncoding.setBackground (Color.red);
+    this.jDataEncoding.setEditable (false);
+    this.jDataEncoding.setBackground (JInstrumentPanel.getGuiPreferencesUpdatePendingColor ());
+    this.jDataEncoding.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "data encoding",
+      Tek2440_GPIB_Settings.DataEncoding.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.DataEncoding>) tek2440::setDataEncoding,
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
     dataFormatPanel.add (new ComboBoxPanel (this.jDataEncoding));
 
     dataFormatPanel.add (new JLabel ("Use Path [in Query Responses]"));
@@ -143,21 +150,40 @@ public class JTek2440_GPIB_Data
     dataTransferPanel.add (new JLabel ("Source"));
     this.jDataSource = new JComboBox<> (Tek2440_GPIB_Settings.DataSource.values ());
     this.jDataSource.setSelectedItem (null);
-    this.jDataSource.setEnabled (false);
-    this.jDataSource.setBackground (Color.red);
+    this.jDataSource.setEditable (false);
+    this.jDataSource.setBackground (JInstrumentPanel.getGuiPreferencesUpdatePendingColor ());
+    this.jDataSource.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "data source",
+      Tek2440_GPIB_Settings.DataSource.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.DataSource>) tek2440::setDataSource,
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
     dataTransferPanel.add (new ComboBoxPanel (this.jDataSource));
     
     dataTransferPanel.add (new JLabel ("DSource"));
     this.jDataDSource = new JComboBox<> (Tek2440_GPIB_Settings.DataSource.values ());
     this.jDataDSource.setSelectedItem (null);
-    this.jDataDSource.setEnabled (false);
-    this.jDataDSource.setBackground (Color.red);
+    this.jDataDSource.setEditable (false);
+    this.jDataDSource.setBackground (JInstrumentPanel.getGuiPreferencesUpdatePendingColor ());
+    this.jDataDSource.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "data dSource",
+      Tek2440_GPIB_Settings.DataSource.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.DataSource>) tek2440::setDataDSource,
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
     dataTransferPanel.add (new ComboBoxPanel (this.jDataDSource));
     
     dataTransferPanel.add (new JLabel ("Target"));
     this.jDataTarget = new JComboBox<> (Tek2440_GPIB_Settings.DataTarget.values ());
     this.jDataTarget.setSelectedItem (null);
-    this.jDataTarget.setEnabled (false);
+    this.jDataTarget.setEditable (false);
+    this.jDataTarget.setBackground (JInstrumentPanel.getGuiPreferencesUpdatePendingColor ());
+    this.jDataTarget.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "data target",
+      Tek2440_GPIB_Settings.DataTarget.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.DataTarget>) tek2440::setDataTarget,
+      this::isInhibitInstrumentControl,
+      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
     dataTransferPanel.add (new ComboBoxPanel (this.jDataTarget));
     
     getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
@@ -291,12 +317,23 @@ public class JTek2440_GPIB_Data
         setInhibitInstrumentControl ();
         try
         {
+          
           JTek2440_GPIB_Data.this.jDataEncoding.setSelectedItem (settings.getDataEncoding ());
+          JTek2440_GPIB_Data.this.jDataEncoding.setBackground (JTek2440_GPIB_Data.this.getBackground ());
+          
           JTek2440_GPIB_Data.this.jPath.setDisplayedValue (settings.getUsePath ());
+          
           JTek2440_GPIB_Data.this.jLongResponse.setDisplayedValue (settings.getUseLongResponse ());
+          
           JTek2440_GPIB_Data.this.jDataSource.setSelectedItem (settings.getDataSource ());
+          JTek2440_GPIB_Data.this.jDataSource.setBackground (JTek2440_GPIB_Data.this.getBackground ());
+          
           JTek2440_GPIB_Data.this.jDataDSource.setSelectedItem (settings.getDataDSource ());
+          JTek2440_GPIB_Data.this.jDataDSource.setBackground (JTek2440_GPIB_Data.this.getBackground ());
+          
           JTek2440_GPIB_Data.this.jDataTarget.setSelectedItem (settings.getDataTarget ());
+          JTek2440_GPIB_Data.this.jDataTarget.setBackground (JTek2440_GPIB_Data.this.getBackground ());
+          
         }
         finally
         {

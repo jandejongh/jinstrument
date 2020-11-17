@@ -6281,7 +6281,7 @@ public class Tek2440_GPIB_Settings
               put ("slope",    CursorFunction.Slope);
               put ("tim",      CursorFunction.Time);
               put ("time",     CursorFunction.Time);
-              put ("volt",     CursorFunction.Volts); // XXX Manual error...
+              put ("vol",      CursorFunction.Volts); // XXX Manual error...
               put ("volts",    CursorFunction.Volts);
               put ("v.t",      CursorFunction.V_dot_t);
             }});

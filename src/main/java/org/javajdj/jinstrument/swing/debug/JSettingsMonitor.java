@@ -25,8 +25,11 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -194,13 +197,6 @@ public class JSettingsMonitor
   private void addBytes (final byte[] bytes)
   {
     final ByteRecord[] byteRecords;
-//    if (bytes != null)
-//    {
-//      System.err.println ("NEW BYTES:");
-//      for (int i = 0; i < bytes.length; i++)
-//        System.err.print (Integer.toHexString (bytes[i] & 0xff) + " ");
-//      System.err.println ();
-//    }
     synchronized (JSettingsMonitor.this.bytesLock)
     {
       if (bytes == null && this.prevBytes == null)
@@ -717,7 +713,22 @@ public class JSettingsMonitor
         || debugId != InstrumentListener.INSTRUMENT_DEBUG_ID_SETTINGS_BYTES_1
         || debugObject1 == null)
         return;
-      final byte[] settingsBytes = (byte[]) debugObject1;
+      final byte[] origBytes = (byte[]) debugObject1;
+      // We always pass the object with the first '%' character as first element,
+      // stripping some header stuff if needed.
+      // NOTE that the '%' is included in the array passed!
+      final String headerString = new String (origBytes, 0, 10, Charset.forName ("US-ASCII"));
+      final String[] headerParts = headerString.split ("%");
+      if (headerParts.length < 2)
+      {
+        LOG.log (Level.WARNING, "Received illegally constructed debug object.");
+        return;
+      }
+      final byte[] settingsBytes;
+      if (headerParts[0].isEmpty ())
+        settingsBytes = origBytes;
+      else
+        settingsBytes = Arrays.copyOfRange (origBytes, headerParts[0].length (), origBytes.length);
       SwingUtilities.invokeLater (() ->
       {
         JSettingsMonitor.this.inhibitInstrumentControl = true;

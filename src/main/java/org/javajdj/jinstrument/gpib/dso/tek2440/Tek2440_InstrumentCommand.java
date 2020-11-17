@@ -448,4 +448,16 @@ public interface Tek2440_InstrumentCommand
   public final static String IC_TEK2440_MEASUREMENT_DISTAL_PERCENTS_LEVEL = "commandTek2440MeasurementDistalPercentsLevel";
   public final static String ICARG_TEK2440_MEASUREMENT_DISTAL_PERCENTS_LEVEL = "tek2440MeasurementDistalPercentsLevel";
   
+  public final static String IC_TEK2440_DATA_ENCODING = "commandTek2440DataEncoding";
+  public final static String ICARG_TEK2440_DATA_ENCODING = "tek2440DataEncoding";
+  
+  public final static String IC_TEK2440_DATA_SOURCE = "commandTek2440DataSource";
+  public final static String ICARG_TEK2440_DATA_SOURCE = "tek2440DataSource";
+  
+  public final static String IC_TEK2440_DATA_DSOURCE = "commandTek2440DataDSource";
+  public final static String ICARG_TEK2440_DATA_DSOURCE = "tek2440DataDSource";
+  
+  public final static String IC_TEK2440_DATA_TARGET = "commandTek2440DataTarget";
+  public final static String ICARG_TEK2440_DATA_TARGET = "tek2440DataTarget";
+  
 }

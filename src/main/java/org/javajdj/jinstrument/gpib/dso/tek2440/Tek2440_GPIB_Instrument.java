@@ -1670,6 +1670,38 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISTAL_PERCENTS_LEVEL, level));
   }
   
+  public void setDataEncoding (final Tek2440_GPIB_Settings.DataEncoding encoding)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_DATA_ENCODING,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_DATA_ENCODING, encoding));
+  }
+  
+  public void setDataSource (final Tek2440_GPIB_Settings.DataSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_DATA_SOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_DATA_SOURCE, source));
+  }
+  
+  public void setDataDSource (final Tek2440_GPIB_Settings.DataSource source)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_DATA_DSOURCE,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_DATA_DSOURCE, source));
+  }
+  
+  public void setDataTarget (final Tek2440_GPIB_Settings.DataTarget target)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      Tek2440_InstrumentCommand.IC_TEK2440_DATA_TARGET,
+      Tek2440_InstrumentCommand.ICARG_TEK2440_DATA_TARGET, target));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -3647,6 +3679,87 @@ public class Tek2440_GPIB_Instrument
             (double) instrumentCommand.get (
               Tek2440_InstrumentCommand.ICARG_TEK2440_MEASUREMENT_DISTAL_PERCENTS_LEVEL);
           writeSync ("MEAS DIST:PLE:" + Double.toString (level) + "\r\n");
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_DATA_ENCODING:
+        {
+          final Tek2440_GPIB_Settings.DataEncoding encoding =
+            (Tek2440_GPIB_Settings.DataEncoding) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_DATA_ENCODING);
+          switch (encoding)
+          {
+            case ASCII:     writeSync ("DAT ENC:ASC\r\n"); break;
+            case RIBinary:  writeSync ("DAT ENC:RIB\r\n"); break;
+            case RPBinary:  writeSync ("DAT ENC:RPB\r\n"); break;
+            case RIPartial: writeSync ("DAT ENC:RIP\r\n"); break;
+            case RPPartial: writeSync ("DAT ENC:RPP\r\n"); break;
+            default:        throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_DATA_SOURCE:
+        {
+          final Tek2440_GPIB_Settings.DataSource source =
+            (Tek2440_GPIB_Settings.DataSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_DATA_SOURCE);
+          switch (source)
+          {
+            case Ch1:     writeSync ("DAT SOU:CH1\r\n");   break;
+            case Ch2:     writeSync ("DAT SOU:CH2\r\n");   break;
+            case Add:     writeSync ("DAT SOU:ADD\r\n");   break;
+            case Mult:    writeSync ("DAT SOU:MUL\r\n");   break;
+            case Ref1:    writeSync ("DAT SOU:REF1\r\n");  break;
+            case Ref2:    writeSync ("DAT SOU:REF2\r\n");  break;
+            case Ref3:    writeSync ("DAT SOU:REF3\r\n");  break;
+            case Ref4:    writeSync ("DAT SOU:REF4\r\n");  break;
+            case Ch1Del:  writeSync ("DAT SOU:CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("DAT SOU:CH2D\r\n");  break;
+            case AddDel:  writeSync ("DAT SOU:ADDD\r\n");  break;
+            case MultDel: writeSync ("DAT SOU:MULTD\r\n"); break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_DATA_DSOURCE:
+        {
+          final Tek2440_GPIB_Settings.DataSource source =
+            (Tek2440_GPIB_Settings.DataSource) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_DATA_DSOURCE);
+          switch (source)
+          {
+            case Ch1:     writeSync ("DAT DSOU:CH1\r\n");   break;
+            case Ch2:     writeSync ("DAT DSOU:CH2\r\n");   break;
+            case Add:     writeSync ("DAT DSOU:ADD\r\n");   break;
+            case Mult:    writeSync ("DAT DSOU:MUL\r\n");   break;
+            case Ref1:    writeSync ("DAT DSOU:REF1\r\n");  break;
+            case Ref2:    writeSync ("DAT DSOU:REF2\r\n");  break;
+            case Ref3:    writeSync ("DAT DSOU:REF3\r\n");  break;
+            case Ref4:    writeSync ("DAT DSOU:REF4\r\n");  break;
+            case Ch1Del:  writeSync ("DAT DSOU:CH1D\r\n");  break;
+            case Ch2Del:  writeSync ("DAT DSOU:CH2D\r\n");  break;
+            case AddDel:  writeSync ("DAT DSOU:ADDD\r\n");  break;
+            case MultDel: writeSync ("DAT DSOU:MULTD\r\n"); break;
+            default:      throw new IllegalArgumentException ();
+          }
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;
+        }
+        case Tek2440_InstrumentCommand.IC_TEK2440_DATA_TARGET:
+        {
+          final Tek2440_GPIB_Settings.DataTarget target =
+            (Tek2440_GPIB_Settings.DataTarget) instrumentCommand.get (
+              Tek2440_InstrumentCommand.ICARG_TEK2440_DATA_TARGET);
+          switch (target)
+          {
+            case Ref1: writeSync ("DAT TAR:REF1\r\n");  break;
+            case Ref2: writeSync ("DAT TAR:REF2\r\n");  break;
+            case Ref3: writeSync ("DAT TAR:REF3\r\n");  break;
+            case Ref4: writeSync ("DAT TAR:REF4\r\n");  break;
+            default:   throw new IllegalArgumentException ();
+          }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
