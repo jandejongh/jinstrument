@@ -19,10 +19,13 @@ package org.javajdj.jinstrument.swing.default_view;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
 import org.javajdj.jinstrument.DigitalStorageOscilloscopeTrace;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentChannel;
 import org.javajdj.jinstrument.InstrumentListener;
 import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentSettings;
@@ -62,9 +65,13 @@ public class JDefaultDigitalStorageOscilloscopeTraceDisplay
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JDefaultDigitalStorageOscilloscopeTraceDisplay (final DigitalStorageOscilloscope digitalStorageOscilloscope, final int level)
+  public JDefaultDigitalStorageOscilloscopeTraceDisplay (
+    final DigitalStorageOscilloscope digitalStorageOscilloscope,
+    final int level,
+    final Function<InstrumentChannel, Boolean> isChannelEnabled)
   {
     super (digitalStorageOscilloscope, level);
+    this.isChannelEnabled = isChannelEnabled;
     setLayout (new GridLayout (1, 1));
     setOpaque (true);
     setBackground (Color.black);
@@ -73,7 +80,15 @@ public class JDefaultDigitalStorageOscilloscopeTraceDisplay
     getInstrument ().addInstrumentListener (this.instrumentListener);
   }
 
-  public JDefaultDigitalStorageOscilloscopeTraceDisplay (final DigitalStorageOscilloscope digitalStorageOscilloscope)
+  public JDefaultDigitalStorageOscilloscopeTraceDisplay (
+    final DigitalStorageOscilloscope digitalStorageOscilloscope,
+    final int level)
+  {
+    this (digitalStorageOscilloscope, level, null);
+  }
+  
+  public JDefaultDigitalStorageOscilloscopeTraceDisplay (
+    final DigitalStorageOscilloscope digitalStorageOscilloscope)
   {
     this (digitalStorageOscilloscope, 0);
   }
@@ -127,17 +142,35 @@ public class JDefaultDigitalStorageOscilloscopeTraceDisplay
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // IS CHANNEL ENABLED
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Function<InstrumentChannel, Boolean> isChannelEnabled;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // SET TRACE [ON JTrace]
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   public final void setTrace (final DigitalStorageOscilloscopeTrace trace)
   {
-    this.jTrace.setMinX (trace.getInstrumentChannel (), trace.getMinXHint ());
-    this.jTrace.setMaxX (trace.getInstrumentChannel (), trace.getMaxXHint ());
-    this.jTrace.setMinY (trace.getInstrumentChannel (), trace.getMinYHint ());
-    this.jTrace.setMaxY (trace.getInstrumentChannel (), trace.getMaxYHint ());
-    this.jTrace.setTrace (trace.getInstrumentChannel (), trace.getReadingValue ());
+    final InstrumentChannel channel = trace.getInstrumentChannel ();
+    if (this.isChannelEnabled != null
+      // Be careful below as the Function is perfectly allowed to return null: I don't know/care...
+      && Objects.equals (this.isChannelEnabled.apply (channel), Boolean.FALSE))
+    {
+      this.jTrace.setTrace (channel, null);    
+    }
+    else
+    {
+      this.jTrace.setMinX (channel, trace.getMinXHint ());
+      this.jTrace.setMaxX (channel, trace.getMaxXHint ());
+      this.jTrace.setMinY (channel, trace.getMinYHint ());
+      this.jTrace.setMaxY (channel, trace.getMaxYHint ());
+      this.jTrace.setTrace (channel, trace.getReadingValue ());
+    }
     // For future use...
     // SwingUtilities.invokeLater (() -> repaint ());
   }

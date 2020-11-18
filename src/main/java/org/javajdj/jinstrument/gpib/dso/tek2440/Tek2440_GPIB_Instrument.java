@@ -313,23 +313,50 @@ public class Tek2440_GPIB_Instrument
     if (getCurrentInstrumentSettings () == null)
       initializeInstrumentSync ();
     final Tek2440_GPIB_Settings settings = (Tek2440_GPIB_Settings) getCurrentInstrumentSettings ();
-    if (settings.isVModeChannel1 ())
+    // XXX Smells like an EnumMap<DataSource...> here...
+    final boolean acqCh1 = settings.isVModeChannel1 ();
+    final boolean acqCh2 = settings.isVModeChannel2 ();
+    final boolean acqAdd = settings.isVModeAdd ();
+    final boolean acqMult = settings.isVModeMult ();
+    if (acqCh1)
     {
       final byte[] data;
-      // XXX This changes the settings??
       data = writeAndReadEOISync ("DAT SOU:CH1;CURVE?\n");
-      final Tek2440_GPIB_Trace reading = new Tek2440_GPIB_Trace (settings, Tek2440Channel.Channel1, data);
-      if (! settings.isVModeChannel2 ())
+      final Tek2440_GPIB_Trace reading = new Tek2440_GPIB_Trace (settings, Tek2440_GPIB_Settings.DataSource.Ch1, data);
+      if (! (acqCh2 || acqAdd || acqMult))
         return reading;
       else
         readingReadFromInstrument (reading);
     }
-    if (settings.isVModeChannel2 ())
+    if (acqCh2)
     {
       final byte[] data;
       data = writeAndReadEOISync ("DAT SOU:CH2;CURVE?\n");
-      final Tek2440_GPIB_Trace reading = new Tek2440_GPIB_Trace (settings, Tek2440Channel.Channel2, data);
-      return reading;
+      final Tek2440_GPIB_Trace reading = new Tek2440_GPIB_Trace (settings, Tek2440_GPIB_Settings.DataSource.Ch2, data);
+      if (! (acqAdd || acqMult))
+        return reading;
+      else
+        readingReadFromInstrument (reading);
+    }
+    if (acqAdd)
+    {
+      final byte[] data;
+      data = writeAndReadEOISync ("DAT SOU:ADD;CURVE?\n");
+      final Tek2440_GPIB_Trace reading = new Tek2440_GPIB_Trace (settings, Tek2440_GPIB_Settings.DataSource.Add, data);
+      if (! (acqMult))
+        return reading;
+      else
+        readingReadFromInstrument (reading);
+    }
+    if (acqMult)
+    {
+      final byte[] data;
+      data = writeAndReadEOISync ("DAT SOU:MUL;CURVE?\n");
+      final Tek2440_GPIB_Trace reading = new Tek2440_GPIB_Trace (settings, Tek2440_GPIB_Settings.DataSource.Mult, data);
+      if (! (false))
+        return reading;
+      else
+        readingReadFromInstrument (reading);      
     }
     return null;
   }

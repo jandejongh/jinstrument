@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.DefaultDigitalStorageOscilloscopeSettings;
 import org.javajdj.jinstrument.DigitalStorageOscilloscopeSettings;
+import org.javajdj.jinstrument.InstrumentChannel;
 import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.Unit;
 
@@ -1366,6 +1367,31 @@ public class Tek2440_GPIB_Settings
     }
   }
   
+  public final VoltsPerDivision getVoltsPerDivision (final DataSource channel)
+  {
+    if (channel == null)
+      throw new IllegalArgumentException ();
+    switch (channel)
+    {
+      case Ch1: return getAVoltsPerDivision ();
+      case Ch2: return getBVoltsPerDivision ();
+      case Add:
+      case Mult:
+      case Ch1Del:
+      case Ch2Del:
+      case AddDel:
+      case MultDel:
+      case Ref1:
+      case Ref2:
+      case Ref3:
+      case Ref4:
+        LOG.log (Level.WARNING, "I really have no clue here; help!!");
+        return getAVoltsPerDivision ();
+      default:
+        throw new IllegalArgumentException ();
+    }
+  }
+  
   public final VoltsPerDivision getAVoltsPerDivision ()
   {
     return getChannelSettings (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1).voltsPerDivision;
@@ -1555,6 +1581,7 @@ public class Tek2440_GPIB_Settings
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   public static enum DataSource
+    implements InstrumentChannel // So can be used as an InstrumentChannel for transferring traces.
   {
     Ch1,
     Ch2,

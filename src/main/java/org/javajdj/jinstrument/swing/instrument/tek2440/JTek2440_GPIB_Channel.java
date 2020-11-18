@@ -25,6 +25,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
@@ -79,7 +80,8 @@ public class JTek2440_GPIB_Channel
     final Color channelColor,
     final String title,
     final int level,
-    final Color panelColor)
+    final Color panelColor,
+    final Consumer<Boolean> channelEnableDisableListener)
   {
     
     super (digitalStorageOscilloscope, title, level, panelColor);
@@ -93,6 +95,8 @@ public class JTek2440_GPIB_Channel
     
     if (channelColor == null)
       throw new IllegalArgumentException ();
+    
+    this.channelEnableDisableListener = channelEnableDisableListener;
     
     removeAll ();
     setLayout (new GridLayout (6,2));
@@ -163,12 +167,23 @@ public class JTek2440_GPIB_Channel
   }
 
   public JTek2440_GPIB_Channel (
+    final DigitalStorageOscilloscope digitalStorageOscilloscope,
+    final Tek2440_GPIB_Instrument.Tek2440Channel channel,
+    final Color channelColor,
+    final String title,
+    final int level,
+    final Color panelColor)
+  {
+    this (digitalStorageOscilloscope, channel, channelColor, title, level, panelColor, null);
+  }
+  
+  public JTek2440_GPIB_Channel (
     final Tek2440_GPIB_Instrument digitalStorageOscilloscope,
     final Tek2440_GPIB_Instrument.Tek2440Channel channel,
     final Color channelColor,
     final int level)
   {
-    this (digitalStorageOscilloscope, channel, channelColor, null, level, null);
+    this (digitalStorageOscilloscope, channel, channelColor, null, level, null, null);
   }
   
   public JTek2440_GPIB_Channel (
@@ -176,24 +191,30 @@ public class JTek2440_GPIB_Channel
     final Tek2440_GPIB_Instrument.Tek2440Channel channel,
     final Color channelColor)
   {
-    this (digitalStorageOscilloscope, channel, channelColor, 0);
+    this (digitalStorageOscilloscope, channel, channelColor, null, 0, null, null);
   }
   
   public JTek2440_GPIB_Channel (
     final Tek2440_GPIB_Instrument digitalStorageOscilloscope,
     final Tek2440_GPIB_Instrument.Tek2440Channel channel)
   {
-    this (digitalStorageOscilloscope, channel, defaultColorForChannel (channel), 0);
+    this (digitalStorageOscilloscope, channel, defaultColorForChannel (channel), null, 0, null, null);
   }
   
-  public static JTek2440_GPIB_Channel defaultForChannel1 (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
+  public static JTek2440_GPIB_Channel defaultForChannel1 (
+    final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
   {
-    return new JTek2440_GPIB_Channel (digitalStorageOscilloscope, Tek2440_GPIB_Instrument.Tek2440Channel.Channel1);
+    return new JTek2440_GPIB_Channel (
+      digitalStorageOscilloscope,
+      Tek2440_GPIB_Instrument.Tek2440Channel.Channel1);
   }
   
-  public static JTek2440_GPIB_Channel defaultForChannel2 (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
+  public static JTek2440_GPIB_Channel defaultForChannel2 (
+    final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
   {
-    return new JTek2440_GPIB_Channel (digitalStorageOscilloscope, Tek2440_GPIB_Instrument.Tek2440Channel.Channel2);
+    return new JTek2440_GPIB_Channel (
+      digitalStorageOscilloscope,
+      Tek2440_GPIB_Instrument.Tek2440Channel.Channel2);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,6 +244,14 @@ public class JTek2440_GPIB_Channel
       default: throw new IllegalArgumentException ();
     }
   }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // CHANNEL ENABLE/DISABLE STATUS LISTENER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final Consumer<Boolean> channelEnableDisableListener;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -313,6 +342,8 @@ public class JTek2440_GPIB_Channel
   {
     final Boolean currentValue = JTek2440_GPIB_Channel.this.jEnabled.getDisplayedValue ();
     final boolean newValue = currentValue == null || (! currentValue);
+    if (JTek2440_GPIB_Channel.this.channelEnableDisableListener != null)
+      JTek2440_GPIB_Channel.this.channelEnableDisableListener.accept (newValue);
     try
     {
       final Tek2440_GPIB_Instrument tek = (Tek2440_GPIB_Instrument) getDigitalStorageOscilloscope ();

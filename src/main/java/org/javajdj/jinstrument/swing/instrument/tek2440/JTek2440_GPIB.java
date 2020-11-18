@@ -85,10 +85,14 @@ public class JTek2440_GPIB
     getTracePanel ().getJTrace ().setXDivisions (Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS);
     getTracePanel ().getJTrace ().setYDivisions (Tek2440_GPIB_Instrument.TEK2440_Y_DIVISIONS);
     // Next lines ensure that color scheme is consistent across the channels.
-    getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1, null);
-    getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2, null);
+    getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Ch1, null);
+    getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Ch2, null);
+    getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Add, null);
+    getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Mult, null);
     this.channel1Color = JTrace.DEFAULT_COLORS[0];
-    this.channel2Color = JTrace.DEFAULT_COLORS[1];        
+    this.channel2Color = JTrace.DEFAULT_COLORS[1];
+    this.addColor      = JTrace.DEFAULT_COLORS[2];
+    this.multColor     = JTrace.DEFAULT_COLORS[3];
     add (getTracePanel (), BorderLayout.CENTER);
     
     this.northPanel = new JPanel ();    
@@ -259,7 +263,12 @@ public class JTek2440_GPIB
       channel1Color,
       "Channel 1",
       level + 1,
-      DEFAULT_AMPLITUDE_COLOR);
+      DEFAULT_AMPLITUDE_COLOR,
+      (final Boolean channelEnabled) ->
+      {
+        if (! channelEnabled)
+          getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Ch1, null);
+      });
     eastNorthPanel.add (jCh1Panel);
     
     final JPanel jCh2Panel = new JTek2440_GPIB_Channel (
@@ -268,7 +277,12 @@ public class JTek2440_GPIB
       channel2Color,
       "Channel 2",
       level + 1,
-      DEFAULT_AMPLITUDE_COLOR);
+      DEFAULT_AMPLITUDE_COLOR,
+      (final Boolean channelEnabled) ->
+      {
+        if (! channelEnabled)
+          getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Ch2, null);
+      });
     eastNorthPanel.add (jCh2Panel);
     
     this.eastPanel.add (eastNorthPanel);
@@ -307,11 +321,16 @@ public class JTek2440_GPIB
     centerPanel.add (this.jVModeDisplay);
     
     centerPanel.add (new JLabel ("Add"));
-    this.jAdd = new JColorCheckBox.JBoolean (Color.green);
+    this.jAdd = new JColorCheckBox.JBoolean (this.addColor);
     this.jAdd.addActionListener (new JInstrumentActionListener_1Boolean (
       "display addition (of channels 1 and 2)",
       this.jAdd::getDisplayedValue,
-      tek2440::setAddEnable,
+      (b) ->
+      {
+        // Remove the trace immediately from the Trace panel.
+        if (! b) getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Add, null);
+        tek2440.setAddEnable (b);
+      },
       this::isInhibitInstrumentControl));
     centerPanel.add (this.jAdd);
     
@@ -329,11 +348,16 @@ public class JTek2440_GPIB
     centerPanel.add (jDelayButton);
     
     centerPanel.add (new JLabel ("Mul"));
-    this.jMul = new JColorCheckBox.JBoolean (Color.green);
+    this.jMul = new JColorCheckBox.JBoolean (this.multColor);
     this.jMul.addActionListener (new JInstrumentActionListener_1Boolean (
       "display multiplication (of channels 1 and 2)",
       this.jMul::getDisplayedValue,
-      tek2440::setMultEnable,
+      (b) ->
+      {
+        // Remove the trace immediately from the Trace panel.
+        if (! b) getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Mult, null);
+        tek2440.setMultEnable (b);
+      },
       this::isInhibitInstrumentControl));
     centerPanel.add (this.jMul);
     
@@ -538,13 +562,17 @@ public class JTek2440_GPIB
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SWING
-  // CHANNEL COLORS
+  // [DATA SOURCE] CHANNEL COLORS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   private final Color channel1Color;
   
   private final Color channel2Color;
+  
+  private final Color addColor;
+  
+  private final Color multColor;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -652,6 +680,14 @@ public class JTek2440_GPIB
       if (! (instrumentSettings instanceof Tek2440_GPIB_Settings))
         throw new IllegalArgumentException ();
       final Tek2440_GPIB_Settings settings = (Tek2440_GPIB_Settings) instrumentSettings;
+      if (! settings.isVModeChannel1 ())
+        getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Ch1, null);
+      if (! settings.isVModeChannel2 ())
+        getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Ch2, null);
+      if (! settings.isVModeAdd ())
+        getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Add, null);
+      if (! settings.isVModeMult ())
+        getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Mult, null);
       SwingUtilities.invokeLater (() ->
       {
         JTek2440_GPIB.this.setInhibitInstrumentControl ();

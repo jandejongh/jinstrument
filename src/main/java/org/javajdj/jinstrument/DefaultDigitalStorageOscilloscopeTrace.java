@@ -48,7 +48,17 @@ public class DefaultDigitalStorageOscilloscopeTrace
     final boolean uncalibrated,
     final boolean uncorrected)
   {
-    super (settings, instrumentChannel, samples, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
+    super (
+      settings,
+      instrumentChannel,
+      samples,
+      unit,
+      resolution,
+      error,
+      errorMessage,
+      overflow,
+      uncalibrated,
+      uncorrected);
     if (instrumentChannel == null)
       throw new IllegalArgumentException ();
     this.instrumentChannel = instrumentChannel;

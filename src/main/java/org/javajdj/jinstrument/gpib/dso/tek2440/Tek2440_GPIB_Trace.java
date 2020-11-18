@@ -43,68 +43,34 @@ public class Tek2440_GPIB_Trace
   
   public Tek2440_GPIB_Trace (
     final Tek2440_GPIB_Settings settings,
-    final Tek2440_GPIB_Instrument.Tek2440Channel channel,
+    final Tek2440_GPIB_Settings.DataSource channel,
     final byte[] bytes)
   {
     super (settings,
       channel,
-      toSamples (settings, bytes),
-      toMinXHint (settings, bytes),
-      toMaxXHint (settings, bytes),
-      toMinYHint (settings, bytes),
-      toMaxYHint (settings, bytes),
-      toUnit (settings, bytes),
-      toResolution (settings, bytes), 
-      toError (settings, bytes),
-      toErrorMessage (settings, bytes),
-      toOverflow (settings, bytes),
-      toUncalibrated (settings, bytes),
-      toUncorrected (settings, bytes));
+      toSamples (settings, channel, bytes),
+      toMinXHint (settings, channel, bytes),
+      toMaxXHint (settings, channel, bytes),
+      toMinYHint (settings, channel, bytes),
+      toMaxYHint (settings, channel, bytes),
+      toUnit (settings, channel, bytes),
+      toResolution (settings, channel, bytes), 
+      toError (settings, channel, bytes),
+      toErrorMessage (settings, channel, bytes),
+      toOverflow (settings, channel, bytes),
+      toUncalibrated (settings, channel, bytes),
+      toUncorrected (settings, channel, bytes));
     this.bytes = bytes;
   }
   
-  public Tek2440_GPIB_Trace (final Tek2440_GPIB_Settings settings, final byte[] bytes)
-  {
-    this (settings, toChannel (settings, bytes), bytes);
-  }
+  private final static int HEADER_SAMPLE_LENGTH = 10;
   
-  private static Tek2440_GPIB_Instrument.Tek2440Channel toChannel (
+  private static double[] toSamples (
     final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
     final byte[] bytes)
   {
-    if (settings == null || bytes == null)
-      throw new IllegalArgumentException ();
-    final Tek2440_GPIB_Instrument.Tek2440Channel channel;
-    switch (settings.getDataSource ())
-    {
-      case Ch1:
-        channel = Tek2440_GPIB_Instrument.Tek2440Channel.Channel1;
-        break;
-      case Ch2:
-        channel = Tek2440_GPIB_Instrument.Tek2440Channel.Channel2;
-        break;
-      case Add:
-      case Mult:
-      case Ch1Del:
-      case Ch2Del:
-      case AddDel:
-      case MultDel:
-      case Ref1:
-      case Ref2:
-      case Ref3:
-      case Ref4:
-        throw new UnsupportedOperationException ();
-      default:
-        throw new RuntimeException ();
-    }
-    return channel;    
-  }
-  
-  private static int HEADER_SAMPLE_LENGTH = 10;
-  
-  private static double[] toSamples (final Tek2440_GPIB_Settings settings, final byte[] bytes)
-  {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
     if (bytes.length < HEADER_SAMPLE_LENGTH) // For now; we need a header sample to be more accurate.
       throw new IllegalArgumentException ();
@@ -124,40 +90,18 @@ public class Tek2440_GPIB_Trace
     if (! (bytes[pastPercentSign] == 0x04 && bytes[pastPercentSign + 1] == 0x01))
       throw new IllegalArgumentException ();
     final int header = pastPercentSign + 2;
-    return toSamples (settings, bytes, header);
+    return toSamples (settings, channel, bytes, header);
   }
 
   private static double[] toSamples (
     final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
     final byte[] bytes,
     final int header)
   {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
     final double[] samples = new double[TEK_2440_SAMPLE_LENGTH];
-    final Tek2440_GPIB_Instrument.Tek2440Channel channel;
-    switch (settings.getDataSource ())
-    {
-      case Ch1:
-        channel = Tek2440_GPIB_Instrument.Tek2440Channel.Channel1;
-        break;
-      case Ch2:
-        channel = Tek2440_GPIB_Instrument.Tek2440Channel.Channel2;
-        break;
-      case Add:
-      case Mult:
-      case Ch1Del:
-      case Ch2Del:
-      case AddDel:
-      case MultDel:
-      case Ref1:
-      case Ref2:
-      case Ref3:
-      case Ref4:
-        throw new UnsupportedOperationException ();
-      default:
-        throw new RuntimeException ();
-    }
     final Tek2440_GPIB_Settings.VoltsPerDivision voltsPerDiv = settings.getVoltsPerDivision (channel);
     final double voltsPerDiv_V = voltsPerDiv.getVoltsPerDivision_V ();
     for (int i=0; i < TEK_2440_SAMPLE_LENGTH; i++)
@@ -186,98 +130,158 @@ public class Tek2440_GPIB_Trace
     return samples;
   }
 
-  private static double toMinXHint (final Tek2440_GPIB_Settings settings, final byte[] bytes)
+  private static double toMinXHint (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
   {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
-    return 0;
-  }
-  
-  private static double toMaxXHint (final Tek2440_GPIB_Settings settings, final byte[] bytes)
-  {
-    if (settings == null || bytes == null)
-      throw new IllegalArgumentException ();
-    switch (toChannel (settings, bytes))
+    switch (channel)
     {
-      case Channel1:
-        return settings.getASecondsPerDivision ().getSecondsPerDivision_s () * Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS;
-      case Channel2:
-        return settings.getBSecondsPerDivision ().getSecondsPerDivision_s () * Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS;
+      case Ch1:
+      case Ch2:
+      case Add:
+      case Mult:
+      case Ch1Del:
+      case Ch2Del:
+      case AddDel:
+      case MultDel:
+        return 0;
+      case Ref1:
+      case Ref2:
+      case Ref3:
+      case Ref4:
+        throw new UnsupportedOperationException ();
       default:
         throw new UnsupportedOperationException ();
     }
   }
   
-  private static double toMinYHint (final Tek2440_GPIB_Settings settings, final byte[] bytes)
+  private static double toMaxXHint (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
   {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
-    final Tek2440_GPIB_Settings.VoltsPerDivision voltsPerDiv = settings.getVoltsPerDivision (toChannel (settings, bytes));
-    final double voltsPerDiv_V = voltsPerDiv.getVoltsPerDivision_V ();
-    return - voltsPerDiv_V * Tek2440_GPIB_Instrument.TEK2440_Y_DIVISIONS / 2.0;
-    
+    switch (channel)
+    {
+      case Ch1:
+      case Ch2:
+      case Add:
+      case Mult:
+      case Ch1Del:
+      case Ch2Del:
+      case AddDel:
+      case MultDel:
+        return settings.getASecondsPerDivision ().getSecondsPerDivision_s () * Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS;
+      case Ref1:
+      case Ref2:
+      case Ref3:
+      case Ref4:
+        throw new UnsupportedOperationException ();
+      default:
+        throw new UnsupportedOperationException ();
+    }
   }
   
-  private static double toMaxYHint (final Tek2440_GPIB_Settings settings, final byte[] bytes)
+  private static double toMinYHint (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
   {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
-    final Tek2440_GPIB_Settings.VoltsPerDivision voltsPerDiv = settings.getVoltsPerDivision (toChannel (settings, bytes));
+    final Tek2440_GPIB_Settings.VoltsPerDivision voltsPerDiv = settings.getVoltsPerDivision (channel);
     final double voltsPerDiv_V = voltsPerDiv.getVoltsPerDivision_V ();
-    return voltsPerDiv_V * Tek2440_GPIB_Instrument.TEK2440_Y_DIVISIONS / 2.0;    
+    return - voltsPerDiv_V * Tek2440_GPIB_Instrument.TEK2440_Y_DIVISIONS / 2.0;    
   }
   
-  private static Unit toUnit (final Tek2440_GPIB_Settings settings, final byte[] bytes)
+  private static double toMaxYHint (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
   {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
+      throw new IllegalArgumentException ();
+    final Tek2440_GPIB_Settings.VoltsPerDivision voltsPerDiv = settings.getVoltsPerDivision (channel);
+    final double voltsPerDiv_V = voltsPerDiv.getVoltsPerDivision_V ();
+    return voltsPerDiv_V * Tek2440_GPIB_Instrument.TEK2440_Y_DIVISIONS / 2.0;
+  }
+  
+  private static Unit toUnit (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
+  {
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
     // XXX Always???
     return Unit.UNIT_V;
   }
   
-  private static Resolution toResolution (final Tek2440_GPIB_Settings settings, final byte[] bytes)
+  private static Resolution toResolution (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
   {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
     // XXX Check??
     return Resolution.DIGITS_2;
   }
   
-  private static boolean toError (final Tek2440_GPIB_Settings settings, final byte[] bytes)
+  private static boolean toError (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
   {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
     // XXX
     return true;
   }
   
-  private static String toErrorMessage (final Tek2440_GPIB_Settings settings, final byte[] bytes)
+  private static String toErrorMessage (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
   {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
     // XXX
     return "Unsupported";
   }
   
-  private static boolean toOverflow (final Tek2440_GPIB_Settings settings, final byte[] bytes)
+  private static boolean toOverflow (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
   {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
     // XXX
     return true;
   }
   
-  private static boolean toUncalibrated (final Tek2440_GPIB_Settings settings, final byte[] bytes)
+  private static boolean toUncalibrated (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
   {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
     // XXX
     return true;    
   }
   
-  private static boolean toUncorrected (final Tek2440_GPIB_Settings settings, final byte[] bytes)
+  private static boolean toUncorrected (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
   {
-    if (settings == null || bytes == null)
+    if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
     // XXX
     return true;    

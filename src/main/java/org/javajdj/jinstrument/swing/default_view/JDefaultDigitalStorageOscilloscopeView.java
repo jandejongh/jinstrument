@@ -18,10 +18,12 @@ package org.javajdj.jinstrument.swing.default_view;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentChannel;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
@@ -52,7 +54,10 @@ public class JDefaultDigitalStorageOscilloscopeView
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JDefaultDigitalStorageOscilloscopeView (final DigitalStorageOscilloscope digitalStorageOscilloscope, final int level)
+  public JDefaultDigitalStorageOscilloscopeView (
+    final DigitalStorageOscilloscope digitalStorageOscilloscope,
+    final int level,
+    final Function<InstrumentChannel, Boolean> isChannelEnabled)
   {
     super (digitalStorageOscilloscope, level);
     setOpaque (true);
@@ -66,7 +71,10 @@ public class JDefaultDigitalStorageOscilloscopeView
     this.smallInstrumentManagementPanel = new JTinyCDIStatusAndControl (
       JDefaultDigitalStorageOscilloscopeView.this.getInstrument (),
       JDefaultDigitalStorageOscilloscopeView.this.getLevel () + 1);
-    this.tracePanel = new JDefaultDigitalStorageOscilloscopeTraceDisplay (digitalStorageOscilloscope, level + 1);
+    this.tracePanel = new JDefaultDigitalStorageOscilloscopeTraceDisplay (
+      digitalStorageOscilloscope,
+      level + 1,
+      isChannelEnabled);
     JInstrumentPanel.setPanelBorder (this.tracePanel,
       level + 1,
       Color.pink,
@@ -74,6 +82,13 @@ public class JDefaultDigitalStorageOscilloscopeView
     add (this.tracePanel);
     add (new JPanel ());
     add (new JPanel ());
+  }
+  
+  public JDefaultDigitalStorageOscilloscopeView (
+    final DigitalStorageOscilloscope digitalStorageOscilloscope,
+    final int level)
+  {
+    this (digitalStorageOscilloscope, level, null);
   }
   
   public JDefaultDigitalStorageOscilloscopeView (final DigitalStorageOscilloscope digitalStorageOscilloscope)
