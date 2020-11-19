@@ -63,47 +63,91 @@ public class JTek2440_GPIB_ExtGain
     final DigitalStorageOscilloscope digitalStorageOscilloscope,
     final String title,
     final int level,
-    final Color panelColor)
+    final Color panelColor,
+    final Integer input)
   {
 
     super (digitalStorageOscilloscope, title, level, panelColor);
+    
     if (! (digitalStorageOscilloscope instanceof Tek2440_GPIB_Instrument))
       throw new IllegalArgumentException ();
     final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
 
+    if (input != null && input != 1 && input != 2)
+      throw new IllegalArgumentException ();
+    this.input = input;
+    
+    if (this.input == null || this.input == 1)
+    {
+      this.jExtGain1 = new JComboBox<>  (Tek2440_GPIB_Settings.ExtGain.values ());
+      this.jExtGain1.setSelectedItem (null);
+      this.jExtGain1.setEditable (false);
+      this.jExtGain1.setBackground (getGuiPreferencesUpdatePendingColor ());
+      this.jExtGain1.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+        "ext 1 [input] gain",
+        Tek2440_GPIB_Settings.ExtGain.class,
+        (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ExtGain>) tek2440::setExtGain1,
+        JTek2440_GPIB_ExtGain.this::isInhibitInstrumentControl,
+        getGuiPreferencesUpdatePendingColor ()));
+    }
+    else
+      this.jExtGain1 = null;
+    
+    if (this.input == null || this.input == 2)
+    {
+      this.jExtGain2 = new JComboBox<> (Tek2440_GPIB_Settings.ExtGain.values ());
+      this.jExtGain2.setSelectedItem (null);
+      this.jExtGain2.setEditable (false);
+      this.jExtGain2.setBackground (getGuiPreferencesUpdatePendingColor ());
+      this.jExtGain2.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+        "ext 2 [input] gain",
+        Tek2440_GPIB_Settings.ExtGain.class,
+        (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ExtGain>) tek2440::setExtGain2,
+        JTek2440_GPIB_ExtGain.this::isInhibitInstrumentControl,
+        getGuiPreferencesUpdatePendingColor ()));
+    }
+    else
+      this.jExtGain2 = null;
+    
     removeAll ();
-    setLayout (new GridLayout (2, 2, 0, 4));
-
-    add (new JLabel ("Ext 1"));
-    this.jExtGain1 = new JComboBox<>  (Tek2440_GPIB_Settings.ExtGain.values ());
-    this.jExtGain1.setSelectedItem (null);
-    this.jExtGain1.setEditable (false);
-    this.jExtGain1.setBackground (getGuiPreferencesUpdatePendingColor ());
-    this.jExtGain1.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
-      "ext 1 [input] gain",
-      Tek2440_GPIB_Settings.ExtGain.class,
-      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ExtGain>) tek2440::setExtGain1,
-      JTek2440_GPIB_ExtGain.this::isInhibitInstrumentControl,
-      getGuiPreferencesUpdatePendingColor ()));
-    add (JCenter.Y (this.jExtGain1));
-
-    add (new JLabel ("Ext 2"));
-    this.jExtGain2 = new JComboBox<> (Tek2440_GPIB_Settings.ExtGain.values ());
-    this.jExtGain2.setSelectedItem (null);
-    this.jExtGain2.setEditable (false);
-    this.jExtGain2.setBackground (getGuiPreferencesUpdatePendingColor ());
-    this.jExtGain2.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
-      "ext 2 [input] gain",
-      Tek2440_GPIB_Settings.ExtGain.class,
-      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ExtGain>) tek2440::setExtGain2,
-      JTek2440_GPIB_ExtGain.this::isInhibitInstrumentControl,
-      getGuiPreferencesUpdatePendingColor ()));
-    add (JCenter.Y (this.jExtGain2));
+    
+    if (this.input == null)
+    {
+      setLayout (new GridLayout (2, 2, 0, 1));
+      add (new JLabel ("Ext 1"));
+      add (JCenter.Y (this.jExtGain1));
+      add (new JLabel ("Ext 2"));
+      add (JCenter.Y (this.jExtGain2));
+    }
+    else
+    {
+      setLayout (new GridLayout (1, 1));
+      switch (this.input)
+      {
+        case 1:
+          add (JCenter.XY (this.jExtGain1));
+          break;
+        case 2:
+          add (JCenter.XY (this.jExtGain2));
+          break;
+        default:
+          throw new RuntimeException ();
+      }
+    }
 
     getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
 
   }
 
+  public JTek2440_GPIB_ExtGain (
+    final DigitalStorageOscilloscope digitalStorageOscilloscope,
+    final String title,
+    final int level,
+    final Color panelColor)
+  {
+    this (digitalStorageOscilloscope, title, level, panelColor, null);
+  }
+  
   public JTek2440_GPIB_ExtGain (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
   {
     this (digitalStorageOscilloscope, null, level, null);
@@ -163,6 +207,14 @@ public class JTek2440_GPIB_ExtGain
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // INPUT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  final Integer input;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // SWING
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,13 +251,16 @@ public class JTek2440_GPIB_ExtGain
         JTek2440_GPIB_ExtGain.this.setInhibitInstrumentControl ();
         try
         {
-          
-          JTek2440_GPIB_ExtGain.this.jExtGain1.setSelectedItem (settings.getExtGain1 ());
-          JTek2440_GPIB_ExtGain.this.jExtGain1.setBackground (JTek2440_GPIB_ExtGain.this.getBackground ());
-          
-          JTek2440_GPIB_ExtGain.this.jExtGain2.setSelectedItem (settings.getExtGain2 ());
-          JTek2440_GPIB_ExtGain.this.jExtGain2.setBackground (JTek2440_GPIB_ExtGain.this.getBackground ());
-          
+          if (JTek2440_GPIB_ExtGain.this.jExtGain1 != null)
+          {
+            JTek2440_GPIB_ExtGain.this.jExtGain1.setSelectedItem (settings.getExtGain1 ());
+            JTek2440_GPIB_ExtGain.this.jExtGain1.setBackground (JTek2440_GPIB_ExtGain.this.getBackground ());
+          } 
+          if (JTek2440_GPIB_ExtGain.this.jExtGain2 != null)
+          {
+            JTek2440_GPIB_ExtGain.this.jExtGain2.setSelectedItem (settings.getExtGain2 ());
+            JTek2440_GPIB_ExtGain.this.jExtGain2.setBackground (JTek2440_GPIB_ExtGain.this.getBackground ());
+          }
         }
         finally
         {
