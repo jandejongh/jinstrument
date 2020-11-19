@@ -17,14 +17,10 @@
 package org.javajdj.jinstrument.swing.instrument.tek2440;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
 import org.javajdj.jinstrument.Instrument;
@@ -37,6 +33,7 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
+import org.javajdj.jswing.jcenter.JCenter;
 
 /** A Swing panel for the Ext (Inputs) Gain settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -81,23 +78,27 @@ public class JTek2440_GPIB_ExtGain
     this.jExtGain1 = new JComboBox<>  (Tek2440_GPIB_Settings.ExtGain.values ());
     this.jExtGain1.setSelectedItem (null);
     this.jExtGain1.setEditable (false);
+    this.jExtGain1.setBackground (getGuiPreferencesUpdatePendingColor ());
     this.jExtGain1.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
       "ext 1 [input] gain",
       Tek2440_GPIB_Settings.ExtGain.class,
       (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ExtGain>) tek2440::setExtGain1,
-      JTek2440_GPIB_ExtGain.this::isInhibitInstrumentControl));
-    add (new JCenteredComboBox (this.jExtGain1));
+      JTek2440_GPIB_ExtGain.this::isInhibitInstrumentControl,
+      getGuiPreferencesUpdatePendingColor ()));
+    add (JCenter.Y (this.jExtGain1));
 
     add (new JLabel ("Ext 2"));
     this.jExtGain2 = new JComboBox<> (Tek2440_GPIB_Settings.ExtGain.values ());
     this.jExtGain2.setSelectedItem (null);
     this.jExtGain2.setEditable (false);
+    this.jExtGain2.setBackground (getGuiPreferencesUpdatePendingColor ());
     this.jExtGain2.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
       "ext 2 [input] gain",
       Tek2440_GPIB_Settings.ExtGain.class,
       (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.ExtGain>) tek2440::setExtGain2,
-      JTek2440_GPIB_ExtGain.this::isInhibitInstrumentControl));
-    add (new JCenteredComboBox (this.jExtGain2));
+      JTek2440_GPIB_ExtGain.this::isInhibitInstrumentControl,
+      getGuiPreferencesUpdatePendingColor ()));
+    add (JCenter.Y (this.jExtGain2));
 
     getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
 
@@ -170,27 +171,6 @@ public class JTek2440_GPIB_ExtGain
   
   private final JComboBox<Tek2440_GPIB_Settings.ExtGain> jExtGain2;
   
-  private final static class JCenteredComboBox<E>
-    extends JPanel
-  {
-
-    public JCenteredComboBox (final JComboBox<E> jComboBox)
-    {
-      super ();
-      setLayout (new BoxLayout (this, BoxLayout.X_AXIS));
-      final JPanel column = new JPanel ();
-      // add (Box.createHorizontalGlue ());
-      add (column);
-      add (Box.createHorizontalGlue ());      
-      column.setLayout (new BoxLayout (column, BoxLayout.Y_AXIS));
-      column.add (Box.createVerticalGlue ());
-      jComboBox.setPreferredSize (new Dimension (40, 12));
-      column.add (jComboBox);
-      column.add (Box.createVerticalGlue ());
-    }
-
-  }
-  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // INSTRUMENT LISTENER
@@ -219,8 +199,13 @@ public class JTek2440_GPIB_ExtGain
         JTek2440_GPIB_ExtGain.this.setInhibitInstrumentControl ();
         try
         {
+          
           JTek2440_GPIB_ExtGain.this.jExtGain1.setSelectedItem (settings.getExtGain1 ());
+          JTek2440_GPIB_ExtGain.this.jExtGain1.setBackground (JTek2440_GPIB_ExtGain.this.getBackground ());
+          
           JTek2440_GPIB_ExtGain.this.jExtGain2.setSelectedItem (settings.getExtGain2 ());
+          JTek2440_GPIB_ExtGain.this.jExtGain2.setBackground (JTek2440_GPIB_ExtGain.this.getBackground ());
+          
         }
         finally
         {
