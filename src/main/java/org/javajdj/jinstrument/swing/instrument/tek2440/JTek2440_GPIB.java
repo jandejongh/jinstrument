@@ -43,6 +43,7 @@ import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Status;
 import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalStorageOscilloscopeView;
 import org.javajdj.jswing.jbyte.JByte;
+import org.javajdj.jswing.jcenter.JCenter;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jtrace.JTrace;
 
@@ -249,6 +250,90 @@ public class JTek2440_GPIB
     jSequencerPanel.add (jSequencerButton, BorderLayout.CENTER);
     this.northPanel.add (jSequencerPanel);
     
+    final JPanel jPrintDevicePanel = new JPanel ();
+    jPrintDevicePanel.setLayout (new BorderLayout ());
+    jPrintDevicePanel.setPreferredSize (new Dimension (80, 80));
+    jPrintDevicePanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Print"));
+    final JColorCheckBox jPrintDeviceButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jPrintDeviceButton.setDisplayedValue (true);
+    jPrintDeviceButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jPrintDeviceDialog = new JOptionPane ().createDialog ("Tek-2440 Print Device Settings");
+    this.jPrintDeviceDialog.setSize (800, 600);
+    this.jPrintDeviceDialog.setLocationRelativeTo (this);
+    this.jPrintDeviceDialog.setContentPane(new JTek2440_GPIB_PrintDevice (digitalStorageOscilloscope, level + 1));
+    jPrintDeviceButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB.this.jPrintDeviceDialog.setVisible (true);
+    });
+    jPrintDevicePanel.add (jPrintDeviceButton, BorderLayout.CENTER);
+    northPanel.add (jPrintDevicePanel);
+    
+    final JPanel jMeasurementPanel = new JPanel ();
+    jMeasurementPanel.setLayout (new BorderLayout ());
+    jMeasurementPanel.setPreferredSize (new Dimension (80, 80));
+    jMeasurementPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Measure"));
+    final JColorCheckBox jMeasurementButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jMeasurementButton.setDisplayedValue (true);
+    jMeasurementButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jMeasurementDialog = new JOptionPane ().createDialog ("Tek-2440 Measurement Settings");
+    this.jMeasurementDialog.setSize (1024, 768);
+    this.jMeasurementDialog.setLocationRelativeTo (this);
+    this.jMeasurementDialog.setContentPane(new JTek2440_GPIB_Measurement (digitalStorageOscilloscope, level + 1));
+    jMeasurementButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB.this.jMeasurementDialog.setVisible (true);
+    });
+    jMeasurementPanel.add (jMeasurementButton, BorderLayout.CENTER);
+    northPanel.add (jMeasurementPanel);
+    
+    final JPanel jCursorPanel = new JPanel ();
+    jCursorPanel.setLayout (new BorderLayout ());
+    jCursorPanel.setPreferredSize (new Dimension (80, 80));
+    jCursorPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Cursor"));
+    final JColorCheckBox jCursorButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jCursorButton.setDisplayedValue (true);
+    jCursorButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jCursorDialog = new JOptionPane ().createDialog ("Tek-2440 Cursor Settings");
+    this.jCursorDialog.setSize (1024, 768);
+    this.jCursorDialog.setLocationRelativeTo (this);
+    this.jCursorDialog.setContentPane(new JTek2440_GPIB_Cursor (digitalStorageOscilloscope, level + 1));
+    jCursorButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB.this.jCursorDialog.setVisible (true);
+    });
+    jCursorPanel.add (jCursorButton, BorderLayout.CENTER);
+    northPanel.add (jCursorPanel);
+
+    final JPanel jWaveformDataPanel = new JPanel ();
+    jWaveformDataPanel.setLayout (new BorderLayout ());
+    jWaveformDataPanel.setPreferredSize (new Dimension (80, 80));
+    jWaveformDataPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Wave An"));
+    final JColorCheckBox jWaveformDataButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jWaveformDataButton.setDisplayedValue (true);
+    jWaveformDataButton.setHorizontalAlignment (SwingConstants.CENTER);
+    this.jWaveformDataDialog = new JOptionPane ().createDialog ("Tek-2440 Waveform Data Settings");
+    this.jWaveformDataDialog.setSize (800, 600);
+    this.jWaveformDataDialog.setLocationRelativeTo (this);
+    this.jWaveformDataDialog.setContentPane(new JTek2440_GPIB_WaveformData (digitalStorageOscilloscope, level + 1));
+    jWaveformDataButton.addActionListener ((ae) ->
+    {
+      JTek2440_GPIB.this.jWaveformDataDialog.setVisible (true);
+    });
+    jWaveformDataPanel.add (jWaveformDataButton, BorderLayout.CENTER);
+    northPanel.add (jWaveformDataPanel);
+    
     add (northPanel, BorderLayout.NORTH);
     
     this.eastPanel = new JPanel ();
@@ -288,39 +373,21 @@ public class JTek2440_GPIB
     this.eastPanel.add (eastNorthPanel);
     
     final JPanel eastSouthPanel = new JPanel ();
-    eastSouthPanel.setLayout (new GridLayout (2, 1));
     this.eastPanel.add (eastSouthPanel);
     
-    final JPanel centerPanel = new JPanel ();
-    centerPanel.setBorder (
+    eastSouthPanel.setLayout (new GridLayout (4, 1));
+    
+    final JPanel eastSouthNorthPanel = new JPanel ();
+    eastSouthPanel.add (eastSouthNorthPanel);
+    
+    eastSouthNorthPanel.setLayout (new GridLayout (1, 2));
+    
+    final JPanel addPanel = new JPanel ();
+    addPanel.setBorder (
       BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
-        "Generic"));
-    centerPanel.setLayout (new GridLayout (3, 4, 4, 2));
-    
-    centerPanel.add (new JLabel ("Bandwidth"));
-    this.jBandwithLimit = new JComboBox<> (Tek2440_GPIB_Settings.BandwidthLimit.values ());
-    this.jBandwithLimit.setEditable (false);
-    this.jBandwithLimit.setSelectedItem (null);
-    this.jBandwithLimit.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
-      "bandwidth limit",
-      Tek2440_GPIB_Settings.BandwidthLimit.class,
-      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.BandwidthLimit>) tek2440::setBandwidthLimit,
-      JTek2440_GPIB.this::isInhibitInstrumentControl));
-    centerPanel.add (this.jBandwithLimit);
-    
-    centerPanel.add (new JLabel ("Display Mode"));
-    this.jVModeDisplay = new JComboBox<> (Tek2440_GPIB_Settings.VModeDisplay.values ());
-    this.jVModeDisplay.setSelectedItem (null);
-    this.jVModeDisplay.setEditable (false);
-    this.jVModeDisplay.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
-      "vertical (display) mode",
-      Tek2440_GPIB_Settings.VModeDisplay.class,
-      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.VModeDisplay>) tek2440::setVerticalDisplayMode,
-      this::isInhibitInstrumentControl));
-    centerPanel.add (this.jVModeDisplay);
-    
-    centerPanel.add (new JLabel ("Add"));
+        BorderFactory.createLineBorder (DEFAULT_AMPLITUDE_COLOR, 2),
+        "Add"));
+    addPanel.setLayout (new GridLayout (1, 1));
     this.jAdd = new JColorCheckBox.JBoolean (this.addColor);
     this.jAdd.addActionListener (new JInstrumentActionListener_1Boolean (
       "display addition (of channels 1 and 2)",
@@ -332,22 +399,15 @@ public class JTek2440_GPIB
         tek2440.setAddEnable (b);
       },
       this::isInhibitInstrumentControl));
-    centerPanel.add (this.jAdd);
+    addPanel.add (JCenter.XY (this.jAdd));
+    eastSouthNorthPanel.add (addPanel);
     
-    centerPanel.add (new JLabel ("Delay"));
-    final JColorCheckBox jDelayButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
-    jDelayButton.setDisplayedValue (true);
-    this.jDelayDialog = new JOptionPane ().createDialog ("Tek-2440 Delay Settings");
-    this.jDelayDialog.setSize (800, 600);
-    this.jDelayDialog.setLocationRelativeTo (this);
-    this.jDelayDialog.setContentPane (new JTek2440_GPIB_Delay (digitalStorageOscilloscope, level + 1));
-    jDelayButton.addActionListener ((ae) ->
-    {
-      JTek2440_GPIB.this.jDelayDialog.setVisible (true);
-    });
-    centerPanel.add (jDelayButton);
-    
-    centerPanel.add (new JLabel ("Mul"));
+    final JPanel multPanel = new JPanel ();
+    multPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_AMPLITUDE_COLOR, 2),
+        "Mult"));
+    multPanel.setLayout (new GridLayout (1, 1));
     this.jMul = new JColorCheckBox.JBoolean (this.multColor);
     this.jMul.addActionListener (new JInstrumentActionListener_1Boolean (
       "display multiplication (of channels 1 and 2)",
@@ -359,118 +419,88 @@ public class JTek2440_GPIB
         tek2440.setMultEnable (b);
       },
       this::isInhibitInstrumentControl));
-    centerPanel.add (this.jMul);
+    multPanel.add (JCenter.XY (this.jMul));
+    eastSouthNorthPanel.add (multPanel);
     
-    centerPanel.add (new JLabel ());
-    centerPanel.add (new JLabel ());
+    final JPanel bandwidthPanel = new JPanel ();
+    bandwidthPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_FREQUENCY_COLOR, 2),
+        "Bandwidth"));
+    bandwidthPanel.setLayout (new GridLayout (1, 1));
+    this.jBandwithLimit = new JComboBox<> (Tek2440_GPIB_Settings.BandwidthLimit.values ());
+    this.jBandwithLimit.setEditable (false);
+    this.jBandwithLimit.setSelectedItem (null);
+    this.jBandwithLimit.setBackground (getGuiPreferencesUpdatePendingColor ());
+    this.jBandwithLimit.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "bandwidth limit",
+      Tek2440_GPIB_Settings.BandwidthLimit.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.BandwidthLimit>) tek2440::setBandwidthLimit,
+      JTek2440_GPIB.this::isInhibitInstrumentControl,
+      getGuiPreferencesUpdatePendingColor ()));
+    bandwidthPanel.add (JCenter.XY (this.jBandwithLimit));
+    eastSouthPanel.add (bandwidthPanel);
     
-    eastSouthPanel.add (centerPanel);
-    
+    final JPanel vModeDisplayPanel = new JPanel ();
+    vModeDisplayPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
+        "Vertical Mode"));
+    vModeDisplayPanel.setLayout (new GridLayout (1, 1));
+    this.jVModeDisplay = new JComboBox<> (Tek2440_GPIB_Settings.VModeDisplay.values ());
+    this.jVModeDisplay.setSelectedItem (null);
+    this.jVModeDisplay.setEditable (false);
+    this.jVModeDisplay.setBackground (getGuiPreferencesUpdatePendingColor ());
+    this.jVModeDisplay.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+      "vertical (display) mode",
+      Tek2440_GPIB_Settings.VModeDisplay.class,
+      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.VModeDisplay>) tek2440::setVerticalDisplayMode,
+      this::isInhibitInstrumentControl,
+      getGuiPreferencesUpdatePendingColor ()));
+    vModeDisplayPanel.add (JCenter.XY (this.jVModeDisplay));
+    eastSouthPanel.add (vModeDisplayPanel);
+
     final JPanel eastSouthSouthPanel = new JPanel ();
     eastSouthPanel.add (eastSouthSouthPanel);
     
-    eastSouthSouthPanel.setLayout (new GridLayout (1, 2));
-    
-    final JPanel extGainPanel = new JTek2440_GPIB_ExtGain (
+    eastSouthSouthPanel.setLayout (new GridLayout (1, 3));
+
+    final JPanel ext1GainPanel = new JTek2440_GPIB_ExtGain (
       digitalStorageOscilloscope,
-      "Ext Gain",
+      "Ext 1 Gain",
       level + 1,
-      DEFAULT_TRIGGER_COLOR);
+      DEFAULT_TRIGGER_COLOR,
+      1);
+    eastSouthSouthPanel.add (ext1GainPanel);
     
-    eastSouthSouthPanel.add (extGainPanel);
+    final JPanel ext2GainPanel = new JTek2440_GPIB_ExtGain (
+      digitalStorageOscilloscope,
+      "Ext 2 Gain",
+      level + 1,
+      DEFAULT_TRIGGER_COLOR,
+      2);
+    eastSouthSouthPanel.add (ext2GainPanel);
     
     final JLabel eastSouthSouthWestPanel = new JLabel ();
-//    eastSouthSouthWestPanel.setBorder (
-//      BorderFactory.createTitledBorder (
-//        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
-//        "Misc"));
+    eastSouthSouthWestPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_TIME_COLOR),
+        "Delay"));
     eastSouthSouthPanel.add (eastSouthSouthWestPanel);
     
-    eastSouthSouthWestPanel.setLayout (new GridLayout (2, 2));
+    eastSouthSouthWestPanel.setLayout (new GridLayout (1, 1));
     
-    final JPanel jPrintDevicePanel = new JPanel ();
-    jPrintDevicePanel.setLayout (new BorderLayout ());
-    jPrintDevicePanel.setPreferredSize (new Dimension (80, 80));
-    jPrintDevicePanel.setBorder (
-      BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
-        "Print"));
-    final JColorCheckBox jPrintDeviceButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
-    jPrintDeviceButton.setDisplayedValue (true);
-    jPrintDeviceButton.setHorizontalAlignment (SwingConstants.CENTER);
-    this.jPrintDeviceDialog = new JOptionPane ().createDialog ("Tek-2440 Print Device Settings");
-    this.jPrintDeviceDialog.setSize (800, 600);
-    this.jPrintDeviceDialog.setLocationRelativeTo (this);
-    this.jPrintDeviceDialog.setContentPane(new JTek2440_GPIB_PrintDevice (digitalStorageOscilloscope, level + 1));
-    jPrintDeviceButton.addActionListener ((ae) ->
+    final JColorCheckBox jDelayButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
+    jDelayButton.setDisplayedValue (true);
+    this.jDelayDialog = new JOptionPane ().createDialog ("Tek-2440 Delay Settings");
+    this.jDelayDialog.setSize (800, 600);
+    this.jDelayDialog.setLocationRelativeTo (this);
+    this.jDelayDialog.setContentPane (new JTek2440_GPIB_Delay (digitalStorageOscilloscope, level + 1));
+    jDelayButton.addActionListener ((ae) ->
     {
-      JTek2440_GPIB.this.jPrintDeviceDialog.setVisible (true);
+      JTek2440_GPIB.this.jDelayDialog.setVisible (true);
     });
-    jPrintDevicePanel.add (jPrintDeviceButton, BorderLayout.CENTER);
-    eastSouthSouthWestPanel.add (jPrintDevicePanel);
-    
-    final JPanel jMeasurementPanel = new JPanel ();
-    jMeasurementPanel.setLayout (new BorderLayout ());
-    jMeasurementPanel.setPreferredSize (new Dimension (80, 80));
-    jMeasurementPanel.setBorder (
-      BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
-        "Measure"));
-    final JColorCheckBox jMeasurementButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
-    jMeasurementButton.setDisplayedValue (true);
-    jMeasurementButton.setHorizontalAlignment (SwingConstants.CENTER);
-    this.jMeasurementDialog = new JOptionPane ().createDialog ("Tek-2440 Measurement Settings");
-    this.jMeasurementDialog.setSize (1024, 768);
-    this.jMeasurementDialog.setLocationRelativeTo (this);
-    this.jMeasurementDialog.setContentPane(new JTek2440_GPIB_Measurement (digitalStorageOscilloscope, level + 1));
-    jMeasurementButton.addActionListener ((ae) ->
-    {
-      JTek2440_GPIB.this.jMeasurementDialog.setVisible (true);
-    });
-    jMeasurementPanel.add (jMeasurementButton, BorderLayout.CENTER);
-    eastSouthSouthWestPanel.add (jMeasurementPanel);
-    
-    final JPanel jCursorPanel = new JPanel ();
-    jCursorPanel.setLayout (new BorderLayout ());
-    jCursorPanel.setPreferredSize (new Dimension (80, 80));
-    jCursorPanel.setBorder (
-      BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
-        "Cursor"));
-    final JColorCheckBox jCursorButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
-    jCursorButton.setDisplayedValue (true);
-    jCursorButton.setHorizontalAlignment (SwingConstants.CENTER);
-    this.jCursorDialog = new JOptionPane ().createDialog ("Tek-2440 Cursor Settings");
-    this.jCursorDialog.setSize (1024, 768);
-    this.jCursorDialog.setLocationRelativeTo (this);
-    this.jCursorDialog.setContentPane(new JTek2440_GPIB_Cursor (digitalStorageOscilloscope, level + 1));
-    jCursorButton.addActionListener ((ae) ->
-    {
-      JTek2440_GPIB.this.jCursorDialog.setVisible (true);
-    });
-    jCursorPanel.add (jCursorButton, BorderLayout.CENTER);
-    eastSouthSouthWestPanel.add (jCursorPanel);
-    
-    final JPanel jWaveformDataPanel = new JPanel ();
-    jWaveformDataPanel.setLayout (new BorderLayout ());
-    jWaveformDataPanel.setPreferredSize (new Dimension (80, 80));
-    jWaveformDataPanel.setBorder (
-      BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
-        "Wave Data"));
-    final JColorCheckBox jWaveformDataButton = new JColorCheckBox.JBoolean (getBackground ().darker ());
-    jWaveformDataButton.setDisplayedValue (true);
-    jWaveformDataButton.setHorizontalAlignment (SwingConstants.CENTER);
-    this.jWaveformDataDialog = new JOptionPane ().createDialog ("Tek-2440 Waveform Data Settings");
-    this.jWaveformDataDialog.setSize (800, 600);
-    this.jWaveformDataDialog.setLocationRelativeTo (this);
-    this.jWaveformDataDialog.setContentPane(new JTek2440_GPIB_WaveformData (digitalStorageOscilloscope, level + 1));
-    jWaveformDataButton.addActionListener ((ae) ->
-    {
-      JTek2440_GPIB.this.jWaveformDataDialog.setVisible (true);
-    });
-    jWaveformDataPanel.add (jWaveformDataButton, BorderLayout.CENTER);
-    eastSouthSouthWestPanel.add (jWaveformDataPanel);
+    eastSouthSouthWestPanel.add (JCenter.XY (jDelayButton));
     
     add (this.eastPanel, BorderLayout.EAST);
     
@@ -693,14 +723,22 @@ public class JTek2440_GPIB
         JTek2440_GPIB.this.setInhibitInstrumentControl ();
         try
         {
+          
           if (! settings.isVModeChannel1 ())
             getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1, null);
           if (! settings.isVModeChannel2 ())
             getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2, null);
-          JTek2440_GPIB.this.jBandwithLimit.setSelectedItem (settings.getBandwidthLimit ());
+          
           JTek2440_GPIB.this.jAdd.setDisplayedValue (settings.isVModeAdd ());
+          
           JTek2440_GPIB.this.jMul.setDisplayedValue (settings.isVModeMult ());
-          JTek2440_GPIB.this.jVModeDisplay.setSelectedItem (settings.getVModeDisplay ());          
+
+          JTek2440_GPIB.this.jBandwithLimit.setSelectedItem (settings.getBandwidthLimit ());
+          JTek2440_GPIB.this.jBandwithLimit.setBackground (JTek2440_GPIB.this.getBackground ());
+          
+          JTek2440_GPIB.this.jVModeDisplay.setSelectedItem (settings.getVModeDisplay ());
+          JTek2440_GPIB.this.jVModeDisplay.setBackground (JTek2440_GPIB.this.getBackground ());
+          
         }
         finally
         {
