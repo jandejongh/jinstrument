@@ -308,23 +308,28 @@ public class JSettingsMonitor
     
     private final JLabel jCurrentTotal;
     
+    private final JButton jFirst;
+    
     private final JButton jPrevious;
     
     private final JButton jNext;
+    
+    private final JButton jLast;
     
     public EastPanel ()
     {
       setLayout (new GridLayout (20, 1));
       add (new JLabel ());
       add (new JLabel ());
-      add (new JLabel ());
-      add (new JLabel ());
-      add (new JLabel ());
-      add (new JLabel ());
       this.jCurrentTotal = new JLabel ("-/0");
       this.jCurrentTotal.setHorizontalAlignment (SwingConstants.CENTER);
       add (this.jCurrentTotal);
       add (new JLabel ());
+      add (new JLabel ());
+      this.jFirst = new JButton ("First");
+      this.jFirst.setHorizontalAlignment (SwingConstants.CENTER);
+      this.jFirst.addActionListener ((ActionEvent ae) -> JSettingsMonitor.this.jByteArrayCompare.first ());
+      add (this.jFirst);
       add (new JLabel ());
       add (new JLabel ());
       this.jNext = new JButton ("Next");
@@ -337,6 +342,11 @@ public class JSettingsMonitor
       this.jPrevious.addActionListener ((ActionEvent ae) -> JSettingsMonitor.this.jByteArrayCompare.previous ());
       add (this.jPrevious);
       add (new JLabel ());
+      add (new JLabel ());
+      this.jLast = new JButton ("Last");
+      this.jLast.setHorizontalAlignment (SwingConstants.CENTER);
+      this.jLast.addActionListener ((ActionEvent ae) -> JSettingsMonitor.this.jByteArrayCompare.last ());
+      add (this.jLast);
       add (new JLabel ());
       add (new JLabel ());
       add (new JLabel ());
@@ -476,6 +486,26 @@ public class JSettingsMonitor
       }
     }
     
+    public void first ()
+    {
+      final boolean needsRepaint;
+      synchronized (this.byteRecordsListLock)
+      {
+        if (total () <= 1)
+          return;
+        if (this.current != 0)
+        {
+          this.current = 0;
+          JSettingsMonitor.this.eastPanel.jCurrentTotal.setText ((current () + 1) + "/" + total ());
+          needsRepaint = true;
+        }
+        else
+          needsRepaint = false;
+      }
+      if (needsRepaint)
+        SwingUtilities.invokeLater (() -> repaint ());
+    }
+    
     public void next ()
     {
       final boolean needsRepaint;
@@ -506,6 +536,26 @@ public class JSettingsMonitor
         JSettingsMonitor.this.eastPanel.jCurrentTotal.setText ((current () + 1) + "/" + total ());
       }
       SwingUtilities.invokeLater (() -> repaint ());      
+    }
+    
+    public void last ()
+    {
+      final boolean needsRepaint;
+      synchronized (this.byteRecordsListLock)
+      {
+        if (total () <= 1)
+          return;
+        if (this.current < total () - 1)
+        {
+          this.current = total () - 1;
+          JSettingsMonitor.this.eastPanel.jCurrentTotal.setText ((current () + 1) + "/" + total ());
+          needsRepaint = true;
+        }
+        else
+          needsRepaint = false;
+      }
+      if (needsRepaint)
+        SwingUtilities.invokeLater (() -> repaint ());
     }
     
     public void clear ()
