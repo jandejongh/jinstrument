@@ -399,9 +399,9 @@ public class JSettingsMonitor
         SwingUtilities.invokeLater (() -> repaint ());
     }
     
-    public final static int CELL_WIDTH = 10;
+    public final static int CELL_WIDTH = 16;
   
-    public final static int CELL_HEIGHT = 10;
+    public final static int CELL_HEIGHT = 16;
   
     public final static int CELLS_PER_ROW = 64;
     
@@ -579,7 +579,7 @@ public class JSettingsMonitor
       {
         final int x = this.mouseX;
         final int y = this.mouseY;
-        if (x < xOffset || x > width - xOffset || y < yOffset || y > height - xOffset)
+        if (x < xOffset || x > width - xOffset || y < yOffset || y > height - yOffset)
         {
           JSettingsMonitor.this.westPanel.jIndex.setText ("i=-");
           JSettingsMonitor.this.westPanel.jOldValue.setText ("old=-");
