@@ -24,6 +24,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -33,10 +35,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.javajdj.jinstrument.DefaultInstrumentListener;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentListener;
+import org.javajdj.jinstrument.InstrumentSettings;
+import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jtextfieldlistener.JTextFieldListener;
 
 /** A Swing (base) component for interacting with an {@link Instrument}.
@@ -820,7 +827,7 @@ public class JInstrumentPanel
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SWING
-  // JSlider LISTENERS
+  // [STANDARD] LISTENERS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -885,11 +892,49 @@ public class JInstrumentPanel
 
     private final String settingString;
     
-    private final Provider<Boolean> getter;
+    private final Provider<Boolean> componentGetter;
     
-    private final Instrument.InstrumentSetter_1Boolean setter;
+    private final Instrument.InstrumentSetter_1Boolean instrumentSetter;
     
     private final Provider<Boolean> inhibitSetter;
+    
+    private final Consumer<Boolean> trueFalsePreListener;
+    
+    private final boolean showPendingUpdate;
+    
+    public JInstrumentActionListener_1Boolean (
+      final String settingString,
+      final Provider<Boolean> componentGetter,
+      final Instrument.InstrumentSetter_1Boolean instrumentSetter,
+      final Provider<Boolean> inhibitSetter,
+      final Consumer<Boolean> trueFalsePreListener,
+      final boolean showPendingUpdate)
+    {
+      if (settingString == null || settingString.trim ().isEmpty () || componentGetter == null || instrumentSetter == null)
+        throw new IllegalArgumentException ();
+      this.settingString = settingString;
+      this.componentGetter = componentGetter;
+      this.instrumentSetter = instrumentSetter;
+      this.inhibitSetter = inhibitSetter;
+      this.trueFalsePreListener = trueFalsePreListener;
+      this.showPendingUpdate = true;
+    }
+    
+    public JInstrumentActionListener_1Boolean (
+      final String settingString,
+      final Provider<Boolean> componentGetter,
+      final Instrument.InstrumentSetter_1Boolean instrumentSetter,
+      final Provider<Boolean> inhibitSetter,
+      final Consumer<Boolean> trueFalsePreListener)
+    {
+      this (
+        settingString,
+        componentGetter,
+        instrumentSetter,
+        inhibitSetter,
+        trueFalsePreListener,
+        false);
+    }
     
     public JInstrumentActionListener_1Boolean (
       final String settingString,
@@ -897,12 +942,7 @@ public class JInstrumentPanel
       final Instrument.InstrumentSetter_1Boolean setter,
       final Provider<Boolean> inhibitSetter)
     {
-      if (settingString == null || settingString.trim ().isEmpty () || getter == null || setter == null)
-        throw new IllegalArgumentException ();
-      this.settingString = settingString;
-      this.getter = getter;
-      this.setter = setter;
-      this.inhibitSetter = inhibitSetter;
+      this (settingString, getter, setter, inhibitSetter, null);
     }
     
     @Override
@@ -910,16 +950,76 @@ public class JInstrumentPanel
     {
       if (this.inhibitSetter != null && this.inhibitSetter.apply ())
         return;
-      final Boolean currentValue = this.getter.apply ();
+      final Boolean currentValue = this.componentGetter.apply ();
       final boolean newValue = currentValue == null || (! currentValue);
+      if (this.trueFalsePreListener != null)
+        this.trueFalsePreListener.accept (newValue);
+      if (this.showPendingUpdate && ae.getSource () instanceof JColorCheckBox.JBoolean)
+        ((JColorCheckBox) ae.getSource ()).setDisplayedValue (null);
       try
       {
-        this.setter.set (newValue);
+        this.instrumentSetter.set (newValue);
       }
       catch (IOException | InterruptedException e)
       {
         LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " to {0} on instrument {1}: {2}.",
           new Object[]{newValue, getInstrument (), Arrays.toString (e.getStackTrace ())});
+      }
+    }
+    
+  }
+  
+  public class JInstrumentSliderChangeListener_1Number<N extends Number>
+    implements ChangeListener
+  {
+
+    private final String settingString;
+    
+    private final Instrument.InstrumentSetter_1Number setter;
+
+    private final Provider<Boolean> inhibitSetter;
+    
+    private final Color preSetColor;
+    
+    private final Function<Integer, N> intToN;
+    
+    public JInstrumentSliderChangeListener_1Number (
+      final String settingString,
+      final Instrument.InstrumentSetter_1Number setter,
+      final Provider<Boolean> inhibitSetter,
+      final Color preSetColor,
+      final Function<Integer,N> intToN)
+    {
+      if (settingString == null || settingString.trim ().isEmpty () || setter == null || intToN == null)
+        throw new IllegalArgumentException ();
+      this.settingString = settingString;
+      this.setter = setter;
+      this.inhibitSetter = inhibitSetter;
+      this.preSetColor = preSetColor;
+      this.intToN = intToN;
+    }
+    
+    @Override
+    public void stateChanged (final ChangeEvent ce)
+    {
+      final JSlider source = (JSlider) ce.getSource ();
+      source.setToolTipText (Integer.toString (source.getValue ()));
+      if (! source.getValueIsAdjusting ())
+      {
+        if (this.inhibitSetter != null && this.inhibitSetter.apply ())
+          return;
+        if (this.preSetColor != null)
+          source.setBackground (this.preSetColor);
+        final N newN = JInstrumentSliderChangeListener_1Number.this.intToN.apply (source.getValue ());
+        try
+        {
+          this.setter.set (newN);
+        }
+        catch (IOException | InterruptedException e)
+        {
+          LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from slider to {0} [int: {1}]: {2}.",
+            new Object[]{newN, source.getValue (), Arrays.toString (e.getStackTrace ())});
+        }
       }
     }
     
@@ -931,7 +1031,7 @@ public class JInstrumentPanel
 
     private final String settingString;
     
-    private final Instrument.InstrumentSetter_1Integer setter;
+    private final Instrument.InstrumentSetter_1int setter;
 
     private final Provider<Boolean> inhibitSetter;
     
@@ -939,7 +1039,7 @@ public class JInstrumentPanel
     
     public JInstrumentSliderChangeListener_1Integer (
       final String settingString,
-      final Instrument.InstrumentSetter_1Integer setter,
+      final Instrument.InstrumentSetter_1int setter,
       final Provider<Boolean> inhibitSetter,
       final Color preSetColor)
     {
@@ -953,7 +1053,7 @@ public class JInstrumentPanel
     
     public JInstrumentSliderChangeListener_1Integer (
       final String settingString,
-      final Instrument.InstrumentSetter_1Integer setter,
+      final Instrument.InstrumentSetter_1int setter,
       final Provider<Boolean> inhibitSetter)
     {
       this (settingString, setter, inhibitSetter, null);
@@ -990,7 +1090,7 @@ public class JInstrumentPanel
 
     private final String settingString;
     
-    private final Instrument.InstrumentSetter_1Double setter;
+    private final Instrument.InstrumentSetter_1double setter;
 
     private final Provider<Boolean> inhibitSetter;
     
@@ -998,7 +1098,7 @@ public class JInstrumentPanel
     
     public JInstrumentSliderChangeListener_1Double (
       final String settingString,
-      final Instrument.InstrumentSetter_1Double setter,
+      final Instrument.InstrumentSetter_1double setter,
       final Provider<Boolean> inhibitSetter,
       final Color preSetColor)
     {
@@ -1012,7 +1112,7 @@ public class JInstrumentPanel
     
     public JInstrumentSliderChangeListener_1Double (
       final String settingString,
-      final Instrument.InstrumentSetter_1Double setter,
+      final Instrument.InstrumentSetter_1double setter,
       final Provider<Boolean> inhibitSetter)
     {
       this (settingString, setter, inhibitSetter, null);
@@ -1119,7 +1219,7 @@ public class JInstrumentPanel
     
     private final Provider<String> getter;
     
-    private final Instrument.InstrumentSetter_1Integer setter;
+    private final Instrument.InstrumentSetter_1int setter;
 
     private final Provider<Boolean> inhibitSetter;
     
@@ -1131,7 +1231,7 @@ public class JInstrumentPanel
       final JTextField jTextField,
       final String settingString,
       final Provider<String> getter,
-      final Instrument.InstrumentSetter_1Integer setter,
+      final Instrument.InstrumentSetter_1int setter,
       final Provider<Boolean> inhibitSetter,
       final Color preSetColor,
       final boolean reportParseErrorsInDialog)
@@ -1150,7 +1250,7 @@ public class JInstrumentPanel
     public JInstrumentTextFieldListener_1Int (
       final String settingString,
       final Provider<String> getter,
-      final Instrument.InstrumentSetter_1Integer setter,
+      final Instrument.InstrumentSetter_1int setter,
       final Provider<Boolean> inhibitSetter,
       final boolean reportParseErrorsInDialog)
     {
@@ -1195,7 +1295,7 @@ public class JInstrumentPanel
     
     private final Provider<String> getter;
     
-    private final Instrument.InstrumentSetter_1Double setter;
+    private final Instrument.InstrumentSetter_1double setter;
 
     private final Provider<Boolean> inhibitSetter;
     
@@ -1207,7 +1307,7 @@ public class JInstrumentPanel
       final JTextField jTextField,
       final String settingString,
       final Provider<String> getter,
-      final Instrument.InstrumentSetter_1Double setter,
+      final Instrument.InstrumentSetter_1double setter,
       final Provider<Boolean> inhibitSetter,
       final Color preSetColor,
       final boolean reportParseErrorsInDialog)
@@ -1226,7 +1326,7 @@ public class JInstrumentPanel
     public JInstrumentTextFieldListener_1Double (
       final String settingString,
       final Provider<String> getter,
-      final Instrument.InstrumentSetter_1Double setter,
+      final Instrument.InstrumentSetter_1double setter,
       final Provider<Boolean> inhibitSetter,
       final boolean reportParseErrorsInDialog)
     {
@@ -1319,6 +1419,348 @@ public class JInstrumentPanel
             new Object[]{ie.getItem (), Arrays.toString (e.getStackTrace ())});
         }
       }
+    }
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  // [STANDARD] COMPONENTS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public class JBoolean_JBoolean
+    extends JColorCheckBox.JBoolean
+  {
+
+    final Function<InstrumentSettings, Boolean> instrumentGetter;
+    
+    public JBoolean_JBoolean (
+      final String settingString,
+      final Function<InstrumentSettings, Boolean> instrumentGetter,
+      final Instrument.InstrumentSetter_1Boolean instrumentSetter,
+      final Color falseColor,
+      final Color trueColor,
+      final Consumer<Boolean> trueFalsePreListener,
+      final boolean showPendingUpdates)
+    {
+      super ((t) ->
+              {
+                if (t == null) return getGuiPreferencesUpdatePendingColor ();
+                else if (t) return trueColor;
+                else return falseColor;
+              });
+      setDisplayedValue (null);
+      this.instrumentGetter = instrumentGetter;
+      if (instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      addActionListener (new JInstrumentActionListener_1Boolean (
+        settingString,
+        this::getDisplayedValue,
+        instrumentSetter,
+        JInstrumentPanel.this::isInhibitInstrumentControl,
+        trueFalsePreListener,
+        showPendingUpdates));      
+    }
+
+    public JBoolean_JBoolean (
+      final String settingString,
+      final Function<InstrumentSettings, Boolean> instrumentGetter,
+      final Instrument.InstrumentSetter_1Boolean instrumentSetter,
+      final Color trueColor,
+      final Consumer<Boolean> trueFalsePreListener,
+      final boolean showPendingUpdates)
+    {
+      this (
+        settingString,
+        instrumentGetter,
+        instrumentSetter,
+        JInstrumentPanel.this.getBackground (),
+        trueColor,
+        trueFalsePreListener,
+        showPendingUpdates);
+    }
+
+    public JBoolean_JBoolean (
+      final String settingString,
+      final Function<InstrumentSettings, Boolean> instrumentGetter,
+      final Instrument.InstrumentSetter_1Boolean instrumentSetter,
+      final Color falseColor,
+      final Color trueColor,
+      final boolean showPendingUpdates)
+    {
+      this (
+        settingString,
+        instrumentGetter,
+        instrumentSetter,
+        falseColor,
+        trueColor,
+        null,
+        showPendingUpdates);
+    }
+      
+    public JBoolean_JBoolean (
+      final String settingString,
+      final Function<InstrumentSettings, Boolean> instrumentGetter,
+      final Instrument.InstrumentSetter_1Boolean instrumentSetter,
+      final Color trueColor,
+      final boolean showPendingUpdates)
+    {
+      this (
+        settingString,
+        instrumentGetter,
+        instrumentSetter,
+        JInstrumentPanel.this.getBackground (),
+        trueColor,
+        null,
+        showPendingUpdates);
+    }
+      
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (JBoolean_JBoolean.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final Boolean newValue = JBoolean_JBoolean.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            JBoolean_JBoolean.this.setDisplayedValue (newValue);
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public class JEnum_JComboBox<E extends Enum<E>>
+    extends JComboBox<E>
+  {
+
+    private final Function<InstrumentSettings, E> instrumentGetter;
+    
+    private final boolean showPendingUpdates;
+    
+    public JEnum_JComboBox (
+      final Class<E> clazz,
+      final String settingString,
+      final Function<InstrumentSettings, E> instrumentGetter,
+      final Instrument.InstrumentSetter_1Enum<E> instrumentSetter,
+      final boolean showPendingUpdates)      
+    {
+      super (clazz.getEnumConstants ());
+      setSelectedItem (null);
+      setEditable (false);
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+      this.instrumentGetter = instrumentGetter;
+      if (instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
+        settingString,
+        clazz,
+        instrumentSetter,
+        JInstrumentPanel.this::isInhibitInstrumentControl,
+        getGuiPreferencesUpdatePendingColor ()));
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (JEnum_JComboBox.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final E newValue = JEnum_JComboBox.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            JEnum_JComboBox.this.setSelectedItem (newValue);
+            if (JEnum_JComboBox.this.showPendingUpdates)
+              JEnum_JComboBox.this.setBackground (JInstrumentPanel.this.getBackground ());
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public abstract class JNumber_JSlider<N extends Number>
+    extends JSlider
+  {
+
+    private final Function<InstrumentSettings, N> instrumentGetter;
+    
+    private final Function<N, Integer> nToInt;
+    
+    private final boolean showPendingUpdates;
+    
+    public JNumber_JSlider (
+      final int orientation,
+      final N minValue,
+      final N maxValue,
+      final N intialValue,
+      final String settingString,
+      final Function<InstrumentSettings, N> instrumentGetter,
+      final Instrument.InstrumentSetter_1Number instrumentSetter,
+      final Function<Integer,N> intToN,
+      final Function<N, Integer> nToInt,
+      final boolean showPendingUpdates)
+    {
+      super (orientation, nToInt.apply (minValue), nToInt.apply (maxValue), nToInt.apply (intialValue));
+      if (nToInt == null)
+        throw new IllegalArgumentException ();
+      setToolTipText ("-");
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+      this.instrumentGetter = instrumentGetter;
+      this.nToInt = nToInt;
+      if (instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      addChangeListener (new JInstrumentSliderChangeListener_1Number (
+        settingString,
+        instrumentSetter,
+        JInstrumentPanel.this::isInhibitInstrumentControl,
+        this.showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null,
+        intToN));
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (JNumber_JSlider.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final N newValue = JNumber_JSlider.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            JNumber_JSlider.this.setValue (JNumber_JSlider.this.nToInt.apply (newValue));
+            JNumber_JSlider.this.setToolTipText (newValue.toString ());
+            if (JNumber_JSlider.this.showPendingUpdates)
+              JNumber_JSlider.this.setBackground (JInstrumentPanel.this.getBackground ());
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public class JInteger_JSlider
+    extends JNumber_JSlider<Integer>
+  {
+
+    public JInteger_JSlider (
+      final int orientation,
+      final int minValue,
+      final int maxValue,
+      final int intialValue,
+      final String settingString,
+      final Function<InstrumentSettings, Integer> instrumentGetter,
+      final Instrument.InstrumentSetter_1Integer instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super (
+        orientation,
+        minValue,
+        maxValue,
+        intialValue,
+        settingString,
+        instrumentGetter,
+        instrumentSetter,
+        Function.identity (),
+        Function.identity (),
+        showPendingUpdates);
+    }
+    
+  }
+  
+  public class JDouble_JSlider
+    extends JNumber_JSlider<Double>
+  {
+
+    public JDouble_JSlider (
+      final int orientation,
+      final Double minValue,
+      final Double maxValue,
+      final Double intialValue,
+      final String settingString,
+      final Function<InstrumentSettings, Double> instrumentGetter,
+      final Instrument.InstrumentSetter_1double instrumentSetter,
+      final Function<Integer, Double> i2d,
+      final Function<Double, Integer> d2i,
+      final boolean showPendingUpdates)
+    {
+      super (
+        orientation,
+        minValue,
+        maxValue,
+        intialValue,
+        settingString,
+        instrumentGetter,
+        instrumentSetter,
+        i2d,
+        d2i,
+        showPendingUpdates);
+    }
+    
+    public JDouble_JSlider (
+      final int orientation,
+      final Double minValue,
+      final Double maxValue,
+      final Double intialValue,
+      final String settingString,
+      final Function<InstrumentSettings, Double> instrumentGetter,
+      final Instrument.InstrumentSetter_1double instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super (
+        orientation,
+        minValue,
+        maxValue,
+        intialValue,
+        settingString,
+        instrumentGetter,
+        instrumentSetter,
+        (i) -> Double.valueOf (i),
+        (d) -> (int) Math.round (d),
+        showPendingUpdates);
     }
     
   }
