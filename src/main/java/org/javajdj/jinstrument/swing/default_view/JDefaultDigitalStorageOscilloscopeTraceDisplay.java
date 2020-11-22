@@ -32,16 +32,16 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
-import org.javajdj.jswing.jtrace.JTrace;
+import org.javajdj.jswing.jtrace.JTraceDisplay;
 
-/** Panel showing the (latest) {@link DigitalStorageOscilloscopeTrace}(s) from a {@link DigitalStorageOscilloscopeTrace}.
+/** *  Panel showing the (latest) {@link DigitalStorageOscilloscopeTrace}(s) from a {@link DigitalStorageOscilloscopeTrace}.
  *
  * <p>
- * This class is (merely) a wrapper around a {@link JTrace} instance,
+ * This class is (merely) a wrapper around a {@link JTraceDisplay} instance,
  * acting as a bridge between {@link DigitalStorageOscilloscopeTrace}
- * and {@link JTrace}. It listens for instrument reading from the
+ * and {@link JTraceDisplay}. It listens for instrument reading from the
  * instrument passed at construction time, and translates them
- * into {@link JTrace} traces.
+ * into {@link JTraceDisplay} traces.
  * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
@@ -75,7 +75,7 @@ public class JDefaultDigitalStorageOscilloscopeTraceDisplay
     setLayout (new GridLayout (1, 1));
     setOpaque (true);
     setBackground (Color.black);
-    this.jTrace = new JTrace<> ();
+    this.jTrace = new JTraceDisplay<> ();
     add (this.jTrace);
     getInstrument ().addInstrumentListener (this.instrumentListener);
   }
@@ -181,9 +181,9 @@ public class JDefaultDigitalStorageOscilloscopeTraceDisplay
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final JTrace jTrace;
+  private final JTraceDisplay jTrace;
   
-  public final JTrace getJTrace ()
+  public final JTraceDisplay getJTrace ()
   {
     return this.jTrace;
   }
