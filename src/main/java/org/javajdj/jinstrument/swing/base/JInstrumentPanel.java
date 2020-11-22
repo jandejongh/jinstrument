@@ -1430,6 +1430,23 @@ public class JInstrumentPanel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  public class JVoid_JColorCheckBox
+    extends JColorCheckBox<Void>
+  {
+
+    public JVoid_JColorCheckBox (
+      final String actionString,
+      final Instrument.InstrumentAction action,
+      final Color color)
+    {
+      super ((Void d) -> color);
+      addActionListener (new JInstrumentActionListener_0 (
+        actionString,
+        action));
+    }
+    
+  }
+  
   public class JBoolean_JBoolean
     extends JColorCheckBox.JBoolean
   {

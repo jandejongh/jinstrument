@@ -151,7 +151,7 @@ public class JTek2440_GPIB
       "Auto Setup",
       level + 2,
       DEFAULT_MANAGEMENT_COLOR);
-    jAutoSetupPanel.setPreferredSize (new Dimension (200, 80));
+    jAutoSetupPanel.setPreferredSize (new Dimension (280, 80));
     northPanel.add (jAutoSetupPanel);
     
     northPanel.add (new JDialogButton (

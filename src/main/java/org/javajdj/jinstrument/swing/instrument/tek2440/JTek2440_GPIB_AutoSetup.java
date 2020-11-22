@@ -19,21 +19,18 @@ package org.javajdj.jinstrument.swing.instrument.tek2440;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
+import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
 import org.javajdj.jinstrument.Instrument;
-import org.javajdj.jinstrument.InstrumentListener;
-import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentSettings;
-import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
-import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
+import org.javajdj.jswing.jcenter.JCenter;
 
 /** A Swing panel for the AutoSetup of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -72,40 +69,44 @@ public class JTek2440_GPIB_AutoSetup
     final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
     
     removeAll ();
-    setLayout (new GridLayout (3, 2, 2, 2));
+    setLayout (new GridLayout (1, 3));
     
-    add (new JLabel ("Mode"));
-    this.jMode = new JComboBox<>  (Tek2440_GPIB_Settings.AutoSetupMode.values ());
-    this.jMode.setSelectedItem (null);
-    this.jMode.setEditable (false);
-    this.jMode.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
-      "auto setup mode",
+    final JPanel leftPanel = new JPanel ();
+    add (leftPanel);
+    
+    final JPanel centerPanel = new JPanel ();
+    add (centerPanel);
+    
+    final JPanel rightPanel = new JInstrumentPanel ("Execute", level + 1, Color.blue);
+    add (rightPanel);
+    
+    leftPanel.setLayout (new GridLayout (2, 1));
+    
+    leftPanel.add (new JLabel ("Mode"));
+    leftPanel.add (new JLabel ("Resolution"));
+    
+    centerPanel.setLayout (new GridLayout (2, 1));
+    
+    centerPanel.add (JCenter.Y (new JEnum_JComboBox<> (
       Tek2440_GPIB_Settings.AutoSetupMode.class,
-      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.AutoSetupMode>) tek2440::setAutoSetupMode,
-      this::isInhibitInstrumentControl));
-    add (this.jMode);
-    
-    add (new JLabel ("Resolution"));
-    this.jResolution = new JComboBox<> (Tek2440_GPIB_Settings.AutoSetupResolution.values ());
-    this.jResolution.setSelectedItem (null);
-    this.jResolution.setEditable (false);
-    this.jResolution.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
-      "auto setup resolution",
+      "auto setup mode",
+      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getAutoSetupMode (),
+      tek2440::setAutoSetupMode,
+      true)));
+        
+    centerPanel.add (JCenter.Y (new JEnum_JComboBox<> (
       Tek2440_GPIB_Settings.AutoSetupResolution.class,
-      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.AutoSetupResolution>) tek2440::setAutoSetupResolution,
-      this::isInhibitInstrumentControl));
-    add (this.jResolution);
+      "auto setup resolution",
+      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getAutoSetupResolution (),
+      tek2440::setAutoSetupResolution,
+      true)));
     
-    add (new JLabel ("Execute"));
-    this.jAutoSetup = new JColorCheckBox.JBoolean (Color.blue);
-    // this.jAutoSetup.setEnabled (false);
-    this.jAutoSetup.setDisplayedValue (true);
-    this.jAutoSetup.addActionListener (new JInstrumentActionListener_0 (
+    rightPanel.setLayout (new GridLayout (1, 1));
+    
+    rightPanel.add (JCenter.XY (new JVoid_JColorCheckBox (
       "auto setup",
-      tek2440::autoSetup));
-    add (this.jAutoSetup);
-    
-    getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
+      tek2440::autoSetup,
+      Color.blue)));
     
   }
 
@@ -165,64 +166,6 @@ public class JTek2440_GPIB_AutoSetup
   {
     return getInstrumentViewUrl ();
   }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private final JComboBox<Tek2440_GPIB_Settings.AutoSetupMode> jMode;
-  
-  private final JComboBox<Tek2440_GPIB_Settings.AutoSetupResolution> jResolution;
-  
-  private final JColorCheckBox.JBoolean jAutoSetup;
-    
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT LISTENER
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final InstrumentListener instrumentListener = new InstrumentListener ()
-  {
-    
-    @Override
-    public void newInstrumentStatus (final Instrument instrument, final InstrumentStatus instrumentStatus)
-    {
-      // EMPTY
-    }
-    
-    @Override
-    public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
-    {
-      if (instrument != JTek2440_GPIB_AutoSetup.this.getDigitalStorageOscilloscope () || instrumentSettings == null)
-        throw new IllegalArgumentException ();
-      if (! (instrumentSettings instanceof Tek2440_GPIB_Settings))
-        throw new IllegalArgumentException ();
-      final Tek2440_GPIB_Settings settings = (Tek2440_GPIB_Settings) instrumentSettings;
-      SwingUtilities.invokeLater (() ->
-      {
-        JTek2440_GPIB_AutoSetup.this.inhibitInstrumentControl = true;
-        try
-        {
-          JTek2440_GPIB_AutoSetup.this.jMode.setSelectedItem (settings.getAutoSetupMode ());
-          JTek2440_GPIB_AutoSetup.this.jResolution.setSelectedItem (settings.getAutoSetupResolution ());
-        }
-        finally
-        {
-          JTek2440_GPIB_AutoSetup.this.inhibitInstrumentControl = false;
-        }
-      });
-    }
-
-    @Override
-    public void newInstrumentReading (final Instrument instrument, final InstrumentReading instrumentReading)
-    {
-      // EMPTY
-    }
-    
-  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
