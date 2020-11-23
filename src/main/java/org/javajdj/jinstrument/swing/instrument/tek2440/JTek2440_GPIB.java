@@ -44,7 +44,7 @@ import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalStorageOscillos
 import org.javajdj.jswing.jbyte.JByte;
 import org.javajdj.jswing.jcenter.JCenter;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
-import org.javajdj.jswing.jtrace.JTraceDisplay;
+import org.javajdj.jswing.jtrace.legacy.JTraceLegacy;
 
 /** A Swing panel for (complete) control and status of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -89,10 +89,10 @@ public class JTek2440_GPIB
     getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Ch2, null);
     getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Add, null);
     getTracePanel ().getJTrace ().setTrace (Tek2440_GPIB_Settings.DataSource.Mult, null);
-    final Color channel1Color = JTraceDisplay.DEFAULT_COLORS[0];
-    final Color channel2Color = JTraceDisplay.DEFAULT_COLORS[1];
-    final Color addColor      = JTraceDisplay.DEFAULT_COLORS[2];
-    final Color multColor     = JTraceDisplay.DEFAULT_COLORS[3];
+    final Color channel1Color = JTraceLegacy.DEFAULT_COLORS[0];
+    final Color channel2Color = JTraceLegacy.DEFAULT_COLORS[1];
+    final Color addColor      = JTraceLegacy.DEFAULT_COLORS[2];
+    final Color multColor     = JTraceLegacy.DEFAULT_COLORS[3];
     add (getTracePanel (), BorderLayout.CENTER);
     
     final JPanel northPanel = new JPanel ();
