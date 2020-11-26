@@ -32,7 +32,7 @@ import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import org.javajdj.jswing.jcenter.JCenter;
-import org.javajdj.jswing.jtrace.legacy.JTraceLegacy;
+import org.javajdj.jswing.jtrace.JTrace;
 
 /** A Swing panel for the Horizontal settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -220,9 +220,9 @@ public class JTek2440_GPIB_Channel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public final static Color DEFAULT_COLOR_CHANNEL_1 = JTraceLegacy.DEFAULT_COLORS[0];
+  public final static Color DEFAULT_COLOR_CHANNEL_1 = JTrace.DEFAULT_COLORS[0];
   
-  public final static Color DEFAULT_COLOR_CHANNEL_2 = JTraceLegacy.DEFAULT_COLORS[1];
+  public final static Color DEFAULT_COLOR_CHANNEL_2 = JTrace.DEFAULT_COLORS[1];
   
   public static Color defaultColorForChannel (final Tek2440_GPIB_Instrument.Tek2440Channel channel)
   {
