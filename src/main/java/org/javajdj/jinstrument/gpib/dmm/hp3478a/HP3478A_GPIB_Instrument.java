@@ -34,7 +34,7 @@ import org.javajdj.jinstrument.InstrumentCommand;
 import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
-import org.javajdj.jinstrument.Unit;
+import org.javajdj.junits.Unit;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
@@ -42,7 +42,7 @@ import org.javajdj.jinstrument.gpib.dmm.AbstractGpibDigitalMultiMeter;
 import org.javajdj.jinstrument.DefaultDigitalMultiMeterReading;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.DigitalMultiMeterSettings;
-import org.javajdj.jinstrument.Resolution;
+import org.javajdj.junits.Resolution;
 import org.javajdj.jinstrument.controller.gpib.ReadlineTerminationMode;
 
 /** Implementation of {@link Instrument} and {@link DigitalMultiMeter} for the HP-3478A.

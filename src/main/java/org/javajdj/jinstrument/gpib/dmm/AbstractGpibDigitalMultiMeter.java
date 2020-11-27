@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.DefaultInstrumentCommand;
 import org.javajdj.jinstrument.InstrumentCommand;
-import org.javajdj.jinstrument.Resolution;
+import org.javajdj.junits.Resolution;
 import org.javajdj.jinstrument.gpib.AbstractGpibInstrument;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jservice.Service;

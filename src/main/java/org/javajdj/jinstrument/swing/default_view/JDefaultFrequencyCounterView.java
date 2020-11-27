@@ -44,7 +44,7 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
-import org.javajdj.jinstrument.Unit;
+import org.javajdj.junits.Unit;
 import org.javajdj.jinstrument.swing.base.JFrequencyCounterPanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.setPanelBorder;

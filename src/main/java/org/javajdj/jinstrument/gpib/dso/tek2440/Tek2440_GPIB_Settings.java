@@ -27,7 +27,7 @@ import org.javajdj.jinstrument.DefaultDigitalStorageOscilloscopeSettings;
 import org.javajdj.jinstrument.DigitalStorageOscilloscopeSettings;
 import org.javajdj.jinstrument.InstrumentChannel;
 import org.javajdj.jinstrument.InstrumentSettings;
-import org.javajdj.jinstrument.Unit;
+import org.javajdj.junits.Unit;
 
 /** Implementation of {@link InstrumentSettings}
  *  and {@link DigitalStorageOscilloscopeSettings} for the Tektronix-2440.

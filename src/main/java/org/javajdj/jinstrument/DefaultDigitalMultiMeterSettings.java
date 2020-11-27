@@ -16,6 +16,8 @@
  */
 package org.javajdj.jinstrument;
 
+import org.javajdj.junits.Resolution;
+import org.javajdj.junits.Unit;
 import java.util.Arrays;
 import java.util.logging.Logger;
 

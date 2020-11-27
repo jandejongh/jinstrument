@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.InstrumentSettings;
-import org.javajdj.jinstrument.Unit;
+import org.javajdj.junits.Unit;
 import org.javajdj.jinstrument.DefaultDigitalMultiMeterSettings;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.DigitalMultiMeterSettings;
-import org.javajdj.jinstrument.Resolution;
+import org.javajdj.junits.Resolution;
 
 /** Implementation of {@link InstrumentSettings} and {@link DigitalMultiMeterSettings} for the HP-3478A.
  *

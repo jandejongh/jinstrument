@@ -36,7 +36,7 @@ import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.FrequencyCounter;
-import org.javajdj.jinstrument.Resolution;
+import org.javajdj.junits.Resolution;
 import org.javajdj.jinstrument.gpib.fc.AbstractGpibFrequencyCounter;
 
 /** Implementation of {@link Instrument} and {@link FrequencyCounter} for the HP-5316A.

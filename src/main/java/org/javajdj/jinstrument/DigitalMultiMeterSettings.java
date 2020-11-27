@@ -16,6 +16,8 @@
  */
 package org.javajdj.jinstrument;
 
+import org.javajdj.junits.Resolution;
+
 /** Extension of {@link InstrumentSettings} for single-channel multi-meters.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}

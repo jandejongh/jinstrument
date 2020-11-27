@@ -20,8 +20,8 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import org.javajdj.jinstrument.DefaultDigitalStorageOscilloscopeTrace;
 import org.javajdj.jinstrument.DigitalStorageOscilloscopeTrace;
-import org.javajdj.jinstrument.Resolution;
-import org.javajdj.jinstrument.Unit;
+import org.javajdj.junits.Resolution;
+import org.javajdj.junits.Unit;
 import org.javajdj.jinstrument.util.Util;
 
 /** Implementation of {@link DigitalStorageOscilloscopeTrace} for the Tektronix-2440.

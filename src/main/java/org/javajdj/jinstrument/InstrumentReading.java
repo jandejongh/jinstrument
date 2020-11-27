@@ -16,6 +16,8 @@
  */
 package org.javajdj.jinstrument;
 
+import org.javajdj.junits.Resolution;
+import org.javajdj.junits.Unit;
 import java.time.Instant;
 
 /** A reading from an {@link Instrument}.

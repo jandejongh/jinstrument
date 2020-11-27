@@ -19,7 +19,7 @@ package org.javajdj.jinstrument.gpib.fc.hp5316a;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.InstrumentSettings;
-import org.javajdj.jinstrument.Unit;
+import org.javajdj.junits.Unit;
 import org.javajdj.jinstrument.DefaultFrequencyCounterSettings;
 import org.javajdj.jinstrument.FrequencyCounterSettings;
 

@@ -16,6 +16,9 @@
  */
 package org.javajdj.jinstrument;
 
+import org.javajdj.junits.Resolution;
+import org.javajdj.junits.Unit;
+
 /** Default implementation of a {@link DigitalStorageOscilloscopeTrace}.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}

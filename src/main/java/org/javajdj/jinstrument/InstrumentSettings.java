@@ -16,6 +16,8 @@
  */
 package org.javajdj.jinstrument;
 
+import org.javajdj.junits.Unit;
+
 /** The settings of an {@link Instrument}.
  *
  * <p>

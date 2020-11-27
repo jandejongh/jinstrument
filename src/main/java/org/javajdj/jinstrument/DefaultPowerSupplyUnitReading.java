@@ -16,6 +16,7 @@
  */
 package org.javajdj.jinstrument;
 
+import org.javajdj.junits.Resolution;
 import java.util.logging.Logger;
 
 /** Default implementation of {@link PowerSupplyUnitReading}.

@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 import org.javajdj.jinstrument.DefaultSpectrumAnalyzerSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.SpectrumAnalyzerSettings;
-import org.javajdj.jinstrument.Unit;
+import org.javajdj.junits.Unit;
 
 /** Implementation of {@link InstrumentStatus} for the HP-70000 MMS.
  *

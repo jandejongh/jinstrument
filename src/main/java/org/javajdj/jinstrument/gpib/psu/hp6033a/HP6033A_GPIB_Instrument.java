@@ -37,7 +37,7 @@ import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
 import org.javajdj.jinstrument.PowerSupplyUnit;
 import org.javajdj.jinstrument.PowerSupplyUnitSettings;
-import org.javajdj.jinstrument.Resolution;
+import org.javajdj.junits.Resolution;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
 import org.javajdj.jinstrument.gpib.psu.AbstractGpibPowerSupplyUnit;

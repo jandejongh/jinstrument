@@ -30,13 +30,13 @@ import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentType;
-import org.javajdj.jinstrument.Resolution;
+import org.javajdj.junits.Resolution;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.gpib.sa.AbstractGpibSpectrumAnalyzer;
 import org.javajdj.jinstrument.SpectrumAnalyzer;
 import org.javajdj.jinstrument.SpectrumAnalyzerSettings;
-import org.javajdj.jinstrument.Unit;
+import org.javajdj.junits.Unit;
 import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
 
 /** Implementation of {@link Instrument} and {@link SpectrumAnalyzer} for the HP-70000 MMS.
