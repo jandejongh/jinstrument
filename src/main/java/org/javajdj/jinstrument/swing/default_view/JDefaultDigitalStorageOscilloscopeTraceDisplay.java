@@ -33,6 +33,7 @@ import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jswing.jtrace.JTrace;
+import org.javajdj.jswing.jtrace.TraceData;
 
 /** Panel showing the (latest) {@link DigitalStorageOscilloscopeTrace}(s) from a {@link DigitalStorageOscilloscopeTrace}.
  *
@@ -161,15 +162,14 @@ public class JDefaultDigitalStorageOscilloscopeTraceDisplay
       // Be careful below as the Function is perfectly allowed to return null: I don't know/care...
       && Objects.equals (this.isChannelEnabled.apply (channel), Boolean.FALSE))
     {
-      this.jTrace.setTrace (channel, null);    
+      this.jTrace.setTraceData (channel, null);    
     }
     else
     {
-      this.jTrace.setMinX (channel, trace.getMinXHint ());
-      this.jTrace.setMaxX (channel, trace.getMaxXHint ());
-      this.jTrace.setMinY (channel, trace.getMinYHint ());
-      this.jTrace.setMaxY (channel, trace.getMaxYHint ());
-      this.jTrace.setTrace (channel, trace.getReadingValue ());
+      this.jTrace.setTraceData (channel,
+        TraceData.Yn (trace.getReadingValue ())
+        .withXRange (trace.getMinXHint (), trace.getMaxXHint ())
+        .withYRange (trace.getMinYHint (), trace.getMaxYHint ()));
     }
     // For future use...
     // SwingUtilities.invokeLater (() -> repaint ());
