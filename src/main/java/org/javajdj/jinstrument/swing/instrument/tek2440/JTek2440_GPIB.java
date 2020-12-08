@@ -89,10 +89,10 @@ public class JTek2440_GPIB
     getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch2, null);
     getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Add, null);
     getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Mult, null);
-    final Color channel1Color = JTrace.DEFAULT_COLORS[0];
-    final Color channel2Color = JTrace.DEFAULT_COLORS[1];
-    final Color addColor      = JTrace.DEFAULT_COLORS[2];
-    final Color multColor     = JTrace.DEFAULT_COLORS[3];
+    final Color channel1Color = JTrace.DEFAULT_TRACE_COLORS[0];
+    final Color channel2Color = JTrace.DEFAULT_TRACE_COLORS[1];
+    final Color addColor      = JTrace.DEFAULT_TRACE_COLORS[2];
+    final Color multColor     = JTrace.DEFAULT_TRACE_COLORS[3];
     add (getTracePanel (), BorderLayout.CENTER);
     
     final JPanel northPanel = new JPanel ();
