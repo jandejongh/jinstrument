@@ -167,7 +167,7 @@ public class JDefaultDigitalStorageOscilloscopeTraceDisplay
     else
     {
       this.jTrace.setTraceData (channel,
-        TraceData.Yn (trace.getReadingValue ())
+        TraceData.createYn (trace.getReadingValue ())
         .withXRange (trace.getMinXHint (), trace.getMaxXHint ())
         .withYRange (trace.getMinYHint (), trace.getMaxYHint ()));
     }
