@@ -220,9 +220,9 @@ public class JTek2440_GPIB_Channel
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public final static Color DEFAULT_COLOR_CHANNEL_1 = JTrace.DEFAULT_COLORS[0];
+  public final static Color DEFAULT_COLOR_CHANNEL_1 = JTrace.DEFAULT_TRACE_COLORS[0];
   
-  public final static Color DEFAULT_COLOR_CHANNEL_2 = JTrace.DEFAULT_COLORS[1];
+  public final static Color DEFAULT_COLOR_CHANNEL_2 = JTrace.DEFAULT_TRACE_COLORS[1];
   
   public static Color defaultColorForChannel (final Tek2440_GPIB_Instrument.Tek2440Channel channel)
   {
