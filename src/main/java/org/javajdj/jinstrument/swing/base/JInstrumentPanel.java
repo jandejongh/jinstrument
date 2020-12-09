@@ -17,6 +17,8 @@
 package org.javajdj.jinstrument.swing.base;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
@@ -31,6 +33,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -834,9 +837,64 @@ public class JInstrumentPanel
   // XXX Is this really unavailable in Java 8?
   
   @FunctionalInterface
+  public interface Action
+  {
+    void apply ();
+  }
+  
+  // XXX Is this really unavailable in Java 8?
+  
+  @FunctionalInterface
   public interface Provider<T>
   {
     T apply ();
+  }
+  
+  public class JActionButtonListener
+    implements ActionListener
+  {
+    
+    private final Action action;
+    
+    private final Provider<Boolean> inhibitAction;
+    
+    public JActionButtonListener (
+      final Action action,
+      final Provider<Boolean> inhibitAction)
+    {
+      this.action = action;
+      this.inhibitAction = inhibitAction;
+    }
+    
+    public JActionButtonListener (
+      final Action action)
+    {
+      this (action, null);
+    }
+    
+    public JActionButtonListener (
+      final JDialog jDialog,
+      final Provider<Boolean> inhibitAction)
+    {
+      this (() -> { if (jDialog != null) jDialog.setVisible (true); },
+      inhibitAction);
+    }
+    
+    public JActionButtonListener (
+      final JDialog jDialog)
+    {
+      this (jDialog, null);
+    }
+    
+    @Override
+    public void actionPerformed (final ActionEvent ae)
+    {
+      if (this.inhibitAction != null && this.inhibitAction.apply ())
+        return;
+      if (this.action != null)
+        this.action.apply ();
+    }
+    
   }
   
   public class JInstrumentActionListener_0
@@ -1429,6 +1487,72 @@ public class JInstrumentPanel
   // [STANDARD] COMPONENTS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public class JDialogPopupButton
+    extends JColorCheckBox<Void>
+  {
+    
+    public JDialogPopupButton (
+      final Color buttonColor,
+      final JDialog jDialog,
+      final Provider<Boolean> inhibitAction)
+    {
+      super ((Void d) -> buttonColor);
+      addActionListener (new JActionButtonListener (jDialog, inhibitAction));
+    }
+    
+    public JDialogPopupButton (
+      final Color buttonColor,
+      final JDialog jDialog)
+    {
+      super ((Void d) -> buttonColor);
+      addActionListener (new JActionButtonListener (jDialog));
+    }
+    
+    public JDialogPopupButton (
+      final Color buttonColor,
+      final JComponent atComponent,
+      final String dialogTitle,
+      final Dimension dialogDimension,
+      final JComponent contentPane,
+      final Provider<Boolean> inhibitAction)
+    {
+      this (buttonColor, createModalDialog (atComponent, dialogTitle, dialogDimension, contentPane), inhibitAction);
+    }
+    
+    public JDialogPopupButton (
+      final Color buttonColor,
+      final JComponent atComponent,
+      final String dialogTitle,
+      final Dimension dialogDimension,
+      final JComponent contentPane)
+    {
+      this (buttonColor, createModalDialog (atComponent, dialogTitle, dialogDimension, contentPane));
+    }
+    
+  }
+  
+  private static JDialog createModalDialog (
+      final JComponent atComponent,
+      final String dialogTitle,
+      final Dimension dialogDimension,
+      final JComponent contentPane)
+  {
+    final JDialog jDialog = (new JOptionPane ()).createDialog (dialogTitle);
+    if (dialogTitle != null)
+      jDialog.setTitle (dialogTitle);
+    if (dialogDimension != null)
+    {
+      jDialog.setPreferredSize (dialogDimension);
+      jDialog.setMinimumSize (dialogDimension);
+      jDialog.setMaximumSize (dialogDimension);
+    }
+    if (contentPane != null)
+      jDialog.setContentPane (contentPane);
+    jDialog.pack ();
+    jDialog.setLocationRelativeTo (atComponent);
+    return jDialog;
+  }
   
   public class JVoid_JColorCheckBox
     extends JColorCheckBox<Void>
