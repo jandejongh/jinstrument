@@ -82,6 +82,14 @@ public class JTek2440_GPIB
     setLayout (new BorderLayout ());
     
     getTracePanel ().setBorder (null);
+    // Improve the appearance of the JTrace instance.
+    // XXX This probably is unnecessary in later versions of jswing/jtrace.
+    getTracePanel ().getJTrace ().setXMargin (4);
+    getTracePanel ().getJTrace ().setYMargin (4);
+    getTracePanel ().getJTrace ().setSidePanelWidth (JTrace.SidePanelWidth.TEN);
+    getTracePanel ().getJTrace ().setSidePanelColor (Color.black);
+    getTracePanel ().getJTrace ().setMarginStubColor (Color.black);
+    // Fix the number of division to match those of the Tek-2440.
     getTracePanel ().getJTrace ().setXDivisions (Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS);
     getTracePanel ().getJTrace ().setYDivisions (Tek2440_GPIB_Instrument.TEK2440_Y_DIVISIONS);
     // Next lines ensure that color scheme is consistent across the channels.
