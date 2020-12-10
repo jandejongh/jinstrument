@@ -3035,6 +3035,11 @@ public class Tek2440_GPIB_Settings
     return getBTriggerSettings ().position;
   }
   
+  public final boolean isBTriggerExtClock ()
+  {
+    return getBTriggerSettings ().extClk;
+  }
+  
   public final boolean getBTriggerExtClock ()
   {
     return getBTriggerSettings ().extClk;
