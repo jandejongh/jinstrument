@@ -353,10 +353,7 @@ public class Tek2440_GPIB_Instrument
       final byte[] data;
       data = writeAndReadEOISync ("DAT SOU:MUL;CURVE?\n");
       final Tek2440_GPIB_Trace reading = new Tek2440_GPIB_Trace (settings, Tek2440_GPIB_Settings.DataSource.Mult, data);
-      if (! (false))
-        return reading;
-      else
-        readingReadFromInstrument (reading);      
+      return reading;
     }
     return null;
   }
