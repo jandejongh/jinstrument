@@ -78,7 +78,7 @@ public class JTek2440_GPIB_ATrigger
     rightPanel.setLayout (new GridLayout (5, 1, 0, 10));
     add (rightPanel);
 
-    leftPanel.add (new JLabel ("Mode"));    
+    leftPanel.add (new JLabel ("Mode"));
     leftPanel.add (new JEnum_JComboBox<> (
       Tek2440_GPIB_Settings.ATriggerMode.class,
       "A trigger mode",
