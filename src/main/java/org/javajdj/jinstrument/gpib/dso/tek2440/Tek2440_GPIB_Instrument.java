@@ -433,6 +433,20 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_TIMEBASE, secondsPerDivision));
   }
   
+  public void setTimebaseA (
+    final Tek2440_GPIB_Settings.SecondsPerDivision secondsPerDivision)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setChannelTimebase (Tek2440Channel.Channel1, secondsPerDivision);
+  }
+  
+  public void setTimebaseB (
+    final Tek2440_GPIB_Settings.SecondsPerDivision secondsPerDivision)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setChannelTimebase (Tek2440Channel.Channel2, secondsPerDivision);
+  }
+  
   public void setHorizontalPosition (
     final double position)
     throws IOException, InterruptedException, UnsupportedOperationException
