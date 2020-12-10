@@ -18,7 +18,6 @@ package org.javajdj.jinstrument.swing.base;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
@@ -1765,6 +1764,8 @@ public class JInstrumentPanel
       final N minValue,
       final N maxValue,
       final N intialValue,
+      final N majorTickSpacing,
+      final N minorTickSpacing,
       final String settingString,
       final Function<InstrumentSettings, N> instrumentGetter,
       final Instrument.InstrumentSetter_1Number instrumentSetter,
@@ -1781,6 +1782,12 @@ public class JInstrumentPanel
         setBackground (getGuiPreferencesUpdatePendingColor ());
       this.instrumentGetter = instrumentGetter;
       this.nToInt = nToInt;
+      if (majorTickSpacing != null)
+        setMajorTickSpacing (nToInt.apply (majorTickSpacing));
+      if (minorTickSpacing != null)
+        setMinorTickSpacing (nToInt.apply (minorTickSpacing));
+      if (majorTickSpacing != null || minorTickSpacing != null)
+        setPaintTicks (true);
       if (instrumentGetter != null)
         getInstrument ().addInstrumentListener (this.instrumentListener);
       addChangeListener (new JInstrumentSliderChangeListener_1Number (
@@ -1832,6 +1839,8 @@ public class JInstrumentPanel
       final int minValue,
       final int maxValue,
       final int intialValue,
+      final Integer majorTickSpacing,
+      final Integer minorTickSpacing,
       final String settingString,
       final Function<InstrumentSettings, Integer> instrumentGetter,
       final Instrument.InstrumentSetter_1Integer instrumentSetter,
@@ -1842,11 +1851,36 @@ public class JInstrumentPanel
         minValue,
         maxValue,
         intialValue,
+        majorTickSpacing,
+        minorTickSpacing,
         settingString,
         instrumentGetter,
         instrumentSetter,
         Function.identity (),
         Function.identity (),
+        showPendingUpdates);
+    }
+    
+    public JInteger_JSlider (
+      final int orientation,
+      final int minValue,
+      final int maxValue,
+      final int intialValue,
+      final String settingString,
+      final Function<InstrumentSettings, Integer> instrumentGetter,
+      final Instrument.InstrumentSetter_1Integer instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      this (
+        orientation,
+        minValue,
+        maxValue,
+        intialValue,
+        null,
+        null,
+        settingString,
+        instrumentGetter,
+        instrumentSetter,
         showPendingUpdates);
     }
     
@@ -1861,6 +1895,8 @@ public class JInstrumentPanel
       final Double minValue,
       final Double maxValue,
       final Double intialValue,
+      final Double majorTickSpacing,
+      final Double minorTickSpacing,
       final String settingString,
       final Function<InstrumentSettings, Double> instrumentGetter,
       final Instrument.InstrumentSetter_1double instrumentSetter,
@@ -1873,6 +1909,8 @@ public class JInstrumentPanel
         minValue,
         maxValue,
         intialValue,
+        majorTickSpacing,
+        minorTickSpacing,
         settingString,
         instrumentGetter,
         instrumentSetter,
@@ -1889,13 +1927,69 @@ public class JInstrumentPanel
       final String settingString,
       final Function<InstrumentSettings, Double> instrumentGetter,
       final Instrument.InstrumentSetter_1double instrumentSetter,
+      final Function<Integer, Double> i2d,
+      final Function<Double, Integer> d2i,
       final boolean showPendingUpdates)
     {
-      super (
+      this (
         orientation,
         minValue,
         maxValue,
         intialValue,
+        null,
+        null,
+        settingString,
+        instrumentGetter,
+        instrumentSetter,
+        i2d,
+        d2i,
+        showPendingUpdates);
+    }
+    
+    public JDouble_JSlider (
+      final int orientation,
+      final Double minValue,
+      final Double maxValue,
+      final Double intialValue,
+      final Double majorTickSpacing,
+      final Double minorTickSpacing,
+      final String settingString,
+      final Function<InstrumentSettings, Double> instrumentGetter,
+      final Instrument.InstrumentSetter_1double instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      this (
+        orientation,
+        minValue,
+        maxValue,
+        intialValue,
+        majorTickSpacing,
+        minorTickSpacing,
+        settingString,
+        instrumentGetter,
+        instrumentSetter,
+        (i) -> Double.valueOf (i),
+        (d) -> (int) Math.round (d),
+        showPendingUpdates);
+    }
+    
+    public JDouble_JSlider (
+      final int orientation,
+      final Double minValue,
+      final Double maxValue,
+      final Double intialValue,
+      final String settingString,
+      final Function<InstrumentSettings, Double> instrumentGetter,
+      final Instrument.InstrumentSetter_1double instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      this (
+        orientation,
+        minValue,
+        maxValue,
+        intialValue,
+        null,
+        null,
         settingString,
         instrumentGetter,
         instrumentSetter,
