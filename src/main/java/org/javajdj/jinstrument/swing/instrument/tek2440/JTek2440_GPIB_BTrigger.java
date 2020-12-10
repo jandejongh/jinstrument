@@ -30,6 +30,7 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
+import org.javajdj.jswing.jcenter.JCenter;
 
 /** A Swing panel for the BTrigger settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -129,12 +130,12 @@ public class JTek2440_GPIB_BTrigger
       true));
     
     rightPanel.add (new JLabel ("Ext Clk"));
-    rightPanel.add (new JBoolean_JBoolean (
+    rightPanel.add (JCenter.Y (new JBoolean_JBoolean (
       "B trigger external clock",
       (settings) -> ((Tek2440_GPIB_Settings) settings).isBTriggerExtClock (),
       tek2440::setBTriggerExternalClock,
       Color.green,
-      true));
+      true)));
     
     rightPanel.add (new JLabel ());
     rightPanel.add (new JLabel ());
