@@ -157,7 +157,7 @@ public class JTek2440_GPIB_Ref
     this.jRefDisplay1.addActionListener (new JInstrumentActionListener_1Boolean (
       "display reference (waveform) 1",
       this.jRefDisplay1::getDisplayedValue,
-      tek2440::displayReference1,
+      tek2440::setDisplayReference1,
       JTek2440_GPIB_Ref.this::isInhibitInstrumentControl));
     northPanel.add (this.jRefDisplay1);
     
@@ -166,7 +166,7 @@ public class JTek2440_GPIB_Ref
     this.jRefDisplay2.addActionListener (new JInstrumentActionListener_1Boolean (
       "display reference (waveform) 2",
       this.jRefDisplay2::getDisplayedValue,
-      tek2440::displayReference2,
+      tek2440::setDisplayReference2,
       JTek2440_GPIB_Ref.this::isInhibitInstrumentControl));
     northPanel.add (this.jRefDisplay2);
     
@@ -175,7 +175,7 @@ public class JTek2440_GPIB_Ref
     this.jRefDisplay3.addActionListener (new JInstrumentActionListener_1Boolean (
       "display reference (waveform) 3",
       this.jRefDisplay3::getDisplayedValue,
-      tek2440::displayReference3,
+      tek2440::setDisplayReference3,
       JTek2440_GPIB_Ref.this::isInhibitInstrumentControl));
     northPanel.add (this.jRefDisplay3);
     
@@ -184,7 +184,7 @@ public class JTek2440_GPIB_Ref
     this.jRefDisplay4.addActionListener (new JInstrumentActionListener_1Boolean (
       "display reference (waveform) 4",
       this.jRefDisplay4::getDisplayedValue,
-      tek2440::displayReference4,
+      tek2440::setDisplayReference4,
       JTek2440_GPIB_Ref.this::isInhibitInstrumentControl));
     northPanel.add (this.jRefDisplay4);
         
