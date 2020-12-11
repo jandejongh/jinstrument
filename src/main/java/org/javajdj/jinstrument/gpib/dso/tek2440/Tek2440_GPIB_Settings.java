@@ -2170,6 +2170,12 @@ public class Tek2440_GPIB_Settings
     {
       return this.intValue;
     }
+    
+    @Override
+    public final String toString ()
+    {
+      return Integer.toString (this.intValue);
+    }
 
   }
   
@@ -2197,6 +2203,12 @@ public class Tek2440_GPIB_Settings
     public final int getIntValue ()
     {
       return this.intValue;
+    }
+
+    @Override
+    public final String toString ()
+    {
+      return Integer.toString (this.intValue);
     }
 
   }
