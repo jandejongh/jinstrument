@@ -21,25 +21,16 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.Instrument;
-import org.javajdj.jinstrument.InstrumentListener;
-import org.javajdj.jinstrument.InstrumentReading;
-import org.javajdj.jinstrument.InstrumentSettings;
-import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
-import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jswing.jcenter.JCenter;
-import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
 /** A Swing panel for several (all) display settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -69,6 +60,7 @@ public class JTek2440_GPIB_Display
   {
     
     super (digitalStorageOscilloscope, level);
+    
     if (! (digitalStorageOscilloscope instanceof Tek2440_GPIB_Instrument))
       throw new IllegalArgumentException ();
     final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
@@ -78,95 +70,170 @@ public class JTek2440_GPIB_Display
     setBorder (BorderFactory.createEmptyBorder (10, 10, 10, 10));
     
     final JPanel northPanel = new JPanel ();
-    northPanel.setLayout (new GridLayout (1, 2, 10, 10));
-    final JPanel northWestPanel = new JPanel ();
-    northPanel.add (northWestPanel);
-    final JPanel northEastPanel = new JPanel ();
-    northPanel.add (northEastPanel);
     add (northPanel);
     
+    final JPanel southPanel = new JPanel ();
+    add (southPanel);
+    southPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
+        "Display Intensities"));
+    
+    // northPanel
+    
+    northPanel.setLayout (new GridLayout (1, 2, 10, 10));
+    
+    final JPanel northWestPanel = new JPanel ();
+    northPanel.add (northWestPanel);
     northWestPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
         "Display Selections"));
     
-    northWestPanel.setLayout (new GridLayout (6, 1));
-    
-    this.jReadout = new SelectionPanel ("Readout");
-    this.jReadout.jBoolean.addActionListener (new JInstrumentActionListener_1Boolean (
-      "display readout",
-      this.jReadout.jBoolean::getDisplayedValue,
-      tek2440::setDisplayReadout,
-      JTek2440_GPIB_Display.this::isInhibitInstrumentControl));
-    northWestPanel.add (this.jReadout);
-    
-    this.jVectors = new SelectionPanel ("Vectors");
-    this.jVectors.jBoolean.addActionListener (new JInstrumentActionListener_1Boolean (
-      "display vectors",
-      this.jVectors.jBoolean::getDisplayedValue,
-      tek2440::setDisplayVectors,
-      JTek2440_GPIB_Display.this::isInhibitInstrumentControl));
-    northWestPanel.add (this.jVectors);
-    
-    this.jRef1 = new SelectionPanel ("Ref 1");
-    this.jRef1.jBoolean.addActionListener (new JInstrumentActionListener_1Boolean (
-      "display reference (waveform) 1",
-      this.jRef1.jBoolean::getDisplayedValue,
-      tek2440::displayReference1,
-      JTek2440_GPIB_Display.this::isInhibitInstrumentControl));
-    northWestPanel.add (this.jRef1);
-
-    this.jRef2 = new SelectionPanel ("Ref 2");
-    this.jRef2.jBoolean.addActionListener (new JInstrumentActionListener_1Boolean (
-      "display reference (waveform) 2",
-      this.jRef2.jBoolean::getDisplayedValue,
-      tek2440::displayReference2,
-      JTek2440_GPIB_Display.this::isInhibitInstrumentControl));
-    northWestPanel.add (this.jRef2);
-
-    this.jRef3 = new SelectionPanel ("Ref 3");
-    this.jRef3.jBoolean.addActionListener (new JInstrumentActionListener_1Boolean (
-      "display reference (waveform) 3",
-      this.jRef3.jBoolean::getDisplayedValue,
-      tek2440::displayReference3,
-      JTek2440_GPIB_Display.this::isInhibitInstrumentControl));
-    northWestPanel.add (this.jRef3);
-
-    this.jRef4 = new SelectionPanel ("Ref 4");
-    this.jRef4.jBoolean.addActionListener (new JInstrumentActionListener_1Boolean (
-      "display reference (waveform) 4",
-      this.jRef4.jBoolean::getDisplayedValue,
-      tek2440::displayReference4,
-      JTek2440_GPIB_Display.this::isInhibitInstrumentControl));
-    northWestPanel.add (this.jRef4);
-
+    final JPanel northEastPanel = new JPanel ();
+    northPanel.add (northEastPanel);
     northEastPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
         "Instrument Front Panel Lock"));
     
+    //
+    // northWestPanel
+    //
+    
+    northWestPanel.setLayout (new GridLayout (6, 2));
+    
+    northWestPanel.add (new JLabel ("Readout"));
+    northWestPanel.add (new JBoolean_JBoolean (
+      "display readout",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isDisplayReadout (),
+      tek2440::setDisplayReadout,
+      Color.green,
+      true));
+    
+    northWestPanel.add (new JLabel ("Vectors"));
+    northWestPanel.add (new JBoolean_JBoolean (
+      "display vectors",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isDisplayVectors (),
+      tek2440::setDisplayVectors,
+      Color.green,
+      true));
+    
+    northWestPanel.add (new JLabel ("Ref 1"));
+    northWestPanel.add (new JBoolean_JBoolean (
+      "display reference (waveform) 1",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isDisplayRef1 (),
+      tek2440::setDisplayReference1,
+      Color.green,
+      true));
+    
+    northWestPanel.add (new JLabel ("Ref 2"));
+    northWestPanel.add (new JBoolean_JBoolean (
+      "display reference (waveform) 2",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isDisplayRef2 (),
+      tek2440::setDisplayReference2,
+      Color.green,
+      true));
+    
+    northWestPanel.add (new JLabel ("Ref 3"));
+    northWestPanel.add (new JBoolean_JBoolean (
+      "display reference (waveform) 3",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isDisplayRef3 (),
+      tek2440::setDisplayReference3,
+      Color.green,
+      true));
+    
+    northWestPanel.add (new JLabel ("Ref 4"));
+    northWestPanel.add (new JBoolean_JBoolean (
+      "display reference (waveform) 4",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isDisplayRef4 (),
+      tek2440::setDisplayReference4,
+      Color.green,
+      true));
+    
+    //
+    // northEastPanel
+    //
+    
     northEastPanel.setLayout (new GridLayout (1, 1));
     
-    this.jLockMode = new JComboBox<> (Tek2440_GPIB_Settings.LockMode.values ());
-    this.jLockMode.setSelectedItem (null);
-    this.jLockMode.setEditable (false);
-    this.jLockMode.setBackground (Color.red);
-    this.jLockMode.addItemListener (new JInstrumentComboBoxItemListener_Enum<> (
-      "[instrument] front-panel lock mode",
+    northEastPanel.add (JCenter.XY (new JEnum_JComboBox<> (
       Tek2440_GPIB_Settings.LockMode.class,
-      (Instrument.InstrumentSetter_1Enum<Tek2440_GPIB_Settings.LockMode>) tek2440::setLockMode,
-      this::isInhibitInstrumentControl,
-      JInstrumentPanel.getGuiPreferencesUpdatePendingColor ()));
-    northEastPanel.add (JCenter.XY (this.jLockMode));
+      "[instrument] front-panel lock mode",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getLockMode (),
+      tek2440::setLockMode,
+      true)));
     
-    this.jDisplayIntensityPanel = new JDisplayIntensityPanel ();
-    this.jDisplayIntensityPanel.setBorder (
-      BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
-        "Display Intensities"));
-    add (this.jDisplayIntensityPanel);
+    //
+    // southPanel [sliderPanel + labelPanel]
+    //
     
-    getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
+    southPanel.setLayout (new BorderLayout ());
+      
+    final JPanel sliderPanel = new JPanel ();
+    sliderPanel.setBorder (BorderFactory.createEmptyBorder (10, 0, 0, 0));
+    southPanel.add (sliderPanel, BorderLayout.CENTER);
+    
+    final JPanel labelPanel = new JPanel ();
+    labelPanel.setBorder (BorderFactory.createEmptyBorder (10, 0, 10, 0));
+    southPanel.add (labelPanel, BorderLayout.SOUTH);
+    
+    sliderPanel.setLayout (new GridLayout (1, 4));
+      
+    sliderPanel.add (new JDouble_JSlider (
+      SwingConstants.VERTICAL,
+      0.0,
+      100.0, // XXX Actually, 0-100 with 0.25 resolution...
+      0.0,
+      50.0,
+      10.0,
+      "display intensity",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getDisplayIntensity (),
+      tek2440::setDisplayIntensity_Display,
+      true).withPaintLabels ());
+      
+    sliderPanel.add (new JDouble_JSlider (
+      SwingConstants.VERTICAL,
+      0.0,
+      100.0, // XXX Actually, 0-100 with 0.25 resolution...
+      0.0,
+      50.0,
+      10.0,
+      "graticule intensity",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getGraticuleIntensity (),
+      tek2440::setDisplayIntensity_Graticule,
+      true).withPaintLabels ());
+      
+    sliderPanel.add (new JDouble_JSlider (
+      SwingConstants.VERTICAL,
+      0.0,
+      100.0, // XXX Actually, 0-100 with 0.25 resolution...
+      0.0,
+      50.0,
+      10.0,
+      "intensified-zone intensity",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getIntensifiedZoneIntensity (),
+      tek2440::setDisplayIntensity_IntensifiedZone,
+      true).withPaintLabels ());
+      
+    sliderPanel.add (new JDouble_JSlider (
+      SwingConstants.VERTICAL,
+      0.0,
+      100.0, // XXX Actually, 0-100 with 0.25 resolution...
+      0.0,
+      50.0,
+      10.0,
+      "readout intensity",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getReadoutIntensity (),
+      tek2440::setDisplayIntensity_Readout,
+      true).withPaintLabels ());
+      
+    labelPanel.setLayout (new GridLayout (1, 4));
+
+    labelPanel.add (JCenter.XY (new JLabel ("Display      ")));    
+    labelPanel.add (JCenter.XY (new JLabel ("Graticule    ")));
+    labelPanel.add (JCenter.XY (new JLabel ("Intens Zone  ")));
+    labelPanel.add (JCenter.XY (new JLabel ("Readout      ")));
     
   }
   
@@ -221,228 +288,6 @@ public class JTek2440_GPIB_Display
   {
     return getInstrumentViewUrl ();
   }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  // SELECTION PANEL
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private class SelectionPanel
-    extends JPanel
-  {
-    
-    private final JColorCheckBox.JBoolean jBoolean;
-
-    public SelectionPanel (final String key)
-    {
-      setLayout (new GridLayout (1, 2));
-      add (new JLabel (key));
-      this.jBoolean = new JColorCheckBox.JBoolean (Color.green);
-      add (this.jBoolean);
-    }
-    
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  // DISPLAY SELECTION SETTINGS
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private final SelectionPanel jReadout;
-  
-  private final SelectionPanel jVectors;
-  
-  private final SelectionPanel jRef1;
-  
-  private final SelectionPanel jRef2;
-  
-  private final SelectionPanel jRef3;
-  
-  private final SelectionPanel jRef4;
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  // INSTRUMENT FRONT-PANEL LOCK SETTINGS
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private final JComboBox<Tek2440_GPIB_Settings.LockMode> jLockMode;
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  // DISPLAY INTENSITY PANEL
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private final class JDisplayIntensityPanel
-    extends JPanel
-  {
-
-    private final JSlider jDisplayIntensity;
-    
-    private final JSlider jGraticuleIntensity;
-    
-    private final JSlider jIntensifiedZoneIntensity;
-    
-    private final JSlider jReadoutIntensity;
-    
-    public JDisplayIntensityPanel ()
-    {
-      super ();
-      final Tek2440_GPIB_Instrument tek = (Tek2440_GPIB_Instrument) JTek2440_GPIB_Display.this.getDigitalStorageOscilloscope ();
-      setOpaque (true);
-      setLayout (new BorderLayout ());
-      final JPanel sliderPanel = new JPanel ();
-      sliderPanel.setBorder (BorderFactory.createEmptyBorder (10, 0, 0, 0));
-      sliderPanel.setLayout (new GridLayout (1, 4));
-      // XXX Actually, 0-100 with 0.25 resolution...
-      this.jDisplayIntensity = new JSlider (JSlider.VERTICAL, 0, 100, 0);
-      this.jDisplayIntensity.setMajorTickSpacing (50);
-      this.jDisplayIntensity.setMinorTickSpacing (10);
-      this.jDisplayIntensity.setPaintTicks (true);
-      this.jDisplayIntensity.setPaintLabels (true);
-      this.jDisplayIntensity.setToolTipText ("-");
-      this.jDisplayIntensity.addChangeListener (new JInstrumentSliderChangeListener_1Double (
-        "display intensity",
-        tek::setDisplayIntensity_Display,
-        () -> JTek2440_GPIB_Display.this.inhibitInstrumentControl));
-      sliderPanel.add (this.jDisplayIntensity);
-      this.jGraticuleIntensity = new JSlider (JSlider.VERTICAL, 0, 100, 0);
-      this.jGraticuleIntensity.setMajorTickSpacing (50);
-      this.jGraticuleIntensity.setMinorTickSpacing (10);
-      this.jGraticuleIntensity.setPaintTicks (true);
-      this.jGraticuleIntensity.setPaintLabels (true);
-      this.jGraticuleIntensity.setToolTipText ("-");
-      this.jGraticuleIntensity.addChangeListener (new JInstrumentSliderChangeListener_1Double (
-        "graticule intensity",
-        tek::setDisplayIntensity_Graticule,
-        () -> JTek2440_GPIB_Display.this.inhibitInstrumentControl));
-      sliderPanel.add (this.jGraticuleIntensity);
-      this.jIntensifiedZoneIntensity = new JSlider (JSlider.VERTICAL, 0, 100, 0);
-      this.jIntensifiedZoneIntensity.setMajorTickSpacing (50);
-      this.jIntensifiedZoneIntensity.setMinorTickSpacing (10);
-      this.jIntensifiedZoneIntensity.setPaintTicks (true);
-      this.jIntensifiedZoneIntensity.setPaintLabels (true);
-      this.jIntensifiedZoneIntensity.setToolTipText ("-");
-      this.jIntensifiedZoneIntensity.addChangeListener (new JInstrumentSliderChangeListener_1Double (
-        "intensified-zone intensity",
-        tek::setDisplayIntensity_IntensifiedZone,
-        () -> JTek2440_GPIB_Display.this.inhibitInstrumentControl));
-      sliderPanel.add (this.jIntensifiedZoneIntensity);
-      this.jReadoutIntensity = new JSlider (JSlider.VERTICAL, 0, 100, 0);
-      this.jReadoutIntensity.setMajorTickSpacing (50);
-      this.jReadoutIntensity.setMinorTickSpacing (10);
-      this.jReadoutIntensity.setPaintTicks (true);
-      this.jReadoutIntensity.setPaintLabels (true);
-      this.jReadoutIntensity.setToolTipText ("-");
-      this.jReadoutIntensity.addChangeListener (new JInstrumentSliderChangeListener_1Double (
-        "readout intensity",
-        tek::setDisplayIntensity_Readout,
-        () -> JTek2440_GPIB_Display.this.inhibitInstrumentControl));
-      sliderPanel.add (this.jReadoutIntensity);
-      add (sliderPanel, BorderLayout.CENTER);
-      final JPanel labelPanel = new JPanel ();
-      labelPanel.setLayout (new GridLayout (1, 4));
-      labelPanel.setBorder (BorderFactory.createEmptyBorder (10, 0, 10, 0));
-      final JLabel displayLabel = new JLabel ("Display      ");
-      displayLabel.setHorizontalAlignment (SwingConstants.CENTER);
-      labelPanel.add (displayLabel);
-      final JLabel graticuleLabel = new JLabel ("Graticule    ");
-      graticuleLabel.setHorizontalAlignment (SwingConstants.CENTER);
-      labelPanel.add (graticuleLabel);
-      final JLabel intensifiedZoneLabel = new JLabel ("Intens Zone  ");
-      intensifiedZoneLabel.setHorizontalAlignment (SwingConstants.CENTER);
-      labelPanel.add (intensifiedZoneLabel);
-      final JLabel readoutLabel = new JLabel ("Readout       ");
-      readoutLabel.setHorizontalAlignment (SwingConstants.CENTER);
-      labelPanel.add (readoutLabel);
-      add (labelPanel, BorderLayout.SOUTH);
-    }
-        
-  }
-  
-  private final JDisplayIntensityPanel jDisplayIntensityPanel;
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT LISTENER
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final InstrumentListener instrumentListener = new InstrumentListener ()
-  {
-    
-    @Override
-    public void newInstrumentStatus (final Instrument instrument, final InstrumentStatus instrumentStatus)
-    {
-      // EMPTY
-    }
-    
-    @Override
-    public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
-    {
-      if (instrument != JTek2440_GPIB_Display.this.getDigitalStorageOscilloscope () || instrumentSettings == null)
-        throw new IllegalArgumentException ();
-      if (! (instrumentSettings instanceof Tek2440_GPIB_Settings))
-        throw new IllegalArgumentException ();
-      final Tek2440_GPIB_Settings settings = (Tek2440_GPIB_Settings) instrumentSettings;
-      SwingUtilities.invokeLater (() ->
-      {
-        JTek2440_GPIB_Display.this.setInhibitInstrumentControl ();
-        try
-        {
-          final boolean readout = settings.isDisplayReadout ();
-          JTek2440_GPIB_Display.this.jReadout.jBoolean.setDisplayedValue (readout);
-          final boolean vectors = settings.isDisplayVectors ();
-          JTek2440_GPIB_Display.this.jVectors.jBoolean.setDisplayedValue (vectors);
-          final boolean ref1 = settings.isDisplayRef1 ();
-          JTek2440_GPIB_Display.this.jRef1.jBoolean.setDisplayedValue (ref1);
-          final boolean ref2 = settings.isDisplayRef2 ();
-          JTek2440_GPIB_Display.this.jRef2.jBoolean.setDisplayedValue (ref2);
-          final boolean ref3 = settings.isDisplayRef3 ();
-          JTek2440_GPIB_Display.this.jRef3.jBoolean.setDisplayedValue (ref3);
-          final boolean ref4 = settings.isDisplayRef4 ();
-          JTek2440_GPIB_Display.this.jRef4.jBoolean.setDisplayedValue (ref4);
-          final Tek2440_GPIB_Settings.LockMode lockMode = settings.getLockMode ();
-          JTek2440_GPIB_Display.this.jLockMode.setSelectedItem (lockMode);
-          JTek2440_GPIB_Display.this.jLockMode.setBackground (JTek2440_GPIB_Display.this.getBackground ());
-          final int displayIntensity = (int) Math.round (settings.getDisplayIntensity ());
-          JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jDisplayIntensity.setValue (displayIntensity);
-          JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jDisplayIntensity.setToolTipText (
-            Integer.toString (displayIntensity));
-          final int graticuleIntensity = (int) Math.round (settings.getGraticuleIntensity ());
-          JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jGraticuleIntensity.setValue (graticuleIntensity);
-          JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jGraticuleIntensity.setToolTipText (
-            Integer.toString (graticuleIntensity));
-          final int intensifiedZoneIntensity = (int) Math.round (settings.getIntensifiedZoneIntensity ());
-          JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jIntensifiedZoneIntensity.setValue (intensifiedZoneIntensity);
-          JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jIntensifiedZoneIntensity.setToolTipText (
-            Integer.toString (intensifiedZoneIntensity));
-          final int readoutIntensity = (int) Math.round (settings.getReadoutIntensity ());
-          JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jReadoutIntensity.setValue (readoutIntensity);
-          JTek2440_GPIB_Display.this.jDisplayIntensityPanel.jReadoutIntensity.setToolTipText (
-            Integer.toString (readoutIntensity));
-        }
-        finally
-        {
-          JTek2440_GPIB_Display.this.resetInhibitInstrumentControl ();
-        }
-      });
-    }
-
-    @Override
-    public void newInstrumentReading (final Instrument instrument, final InstrumentReading instrumentReading)
-    {
-      // EMPTY
-    }
-    
-  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
