@@ -731,7 +731,7 @@ public class Tek2440_GPIB_Instrument
     writeReference (4);
   }
   
-  public void displayReference (final int referenceNumber, final boolean display)
+  public void setDisplayReference (final int referenceNumber, final boolean display)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
     addCommand (new DefaultInstrumentCommand (
@@ -740,28 +740,28 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_REFERENCE_DISPLAY, display));
   }
   
-  public void displayReference1 (final boolean display)
+  public void setDisplayReference1 (final boolean display)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
-    displayReference (1, display);
+    setDisplayReference (1, display);
   }
   
-  public void displayReference2 (final boolean display)
+  public void setDisplayReference2 (final boolean display)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
-    displayReference (2, display);
+    setDisplayReference (2, display);
   }
   
-  public void displayReference3 (final boolean display)
+  public void setDisplayReference3 (final boolean display)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
-    displayReference (3, display);
+    setDisplayReference (3, display);
   }
   
-  public void displayReference4 (final boolean display)
+  public void setDisplayReference4 (final boolean display)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
-    displayReference (4, display);
+    setDisplayReference (4, display);
   }
   
   public void setUseLongResponse (final boolean useLongResponse)
