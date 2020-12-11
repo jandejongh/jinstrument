@@ -1884,6 +1884,12 @@ public class JInstrumentPanel
         showPendingUpdates);
     }
     
+    public final JInteger_JSlider withPaintLabels ()
+    {
+      setPaintLabels (true);
+      return this;
+    }
+    
   }
   
   public class JDouble_JSlider
@@ -1996,6 +2002,12 @@ public class JInstrumentPanel
         (i) -> Double.valueOf (i),
         (d) -> (int) Math.round (d),
         showPendingUpdates);
+    }
+    
+    public final JDouble_JSlider withPaintLabels ()
+    {
+      setPaintLabels (true);
+      return this;
     }
     
   }
