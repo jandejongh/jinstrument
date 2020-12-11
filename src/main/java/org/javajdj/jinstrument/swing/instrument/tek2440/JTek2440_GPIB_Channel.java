@@ -143,14 +143,13 @@ public class JTek2440_GPIB_Channel
       -10.0,
       +10.0,
       0.0,
+      10.0,
+      1.0,
       "Y position for channel " + channel,
       (settings) -> ((Tek2440_GPIB_Settings) settings).getPosition (channel),
       (position) -> tek2440.setChannelPosition (channel, position),
       true);
-    jPosition.setPreferredSize (new Dimension (100, 40));
-    jPosition.setMajorTickSpacing (10);
-    jPosition.setMinorTickSpacing (1);
-    jPosition.setPaintTicks (true);
+     jPosition.setPreferredSize (new Dimension (100, 40));
     add (JCenter.Y (jPosition));
     
   }
