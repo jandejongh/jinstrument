@@ -983,6 +983,14 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_GROUP_EXECUTE_TRIGGER_MODE_USER_SEQUENCE, userSequenceString));
   }
   
+  public void setGroupExecuteTriggerUserSequence (final String userSequence)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    if (userSequence == null || userSequence.trim ().isEmpty ())
+      throw new IllegalArgumentException ();
+    setGroupExecuteTriggerMode (Tek2440_GPIB_Settings.GroupTriggerSRQMode.ExecuteSequence, userSequence);
+  }
+  
   public void setAutoSetupMode (final Tek2440_GPIB_Settings.AutoSetupMode mode)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
