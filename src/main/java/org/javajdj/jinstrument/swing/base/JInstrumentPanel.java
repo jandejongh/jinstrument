@@ -1595,13 +1595,16 @@ public class JInstrumentPanel
       this.instrumentGetter = instrumentGetter;
       if (this.instrumentGetter != null)
         getInstrument ().addInstrumentListener (this.instrumentListener);
-      addActionListener (new JInstrumentActionListener_1Boolean (
-        settingString,
-        this::getDisplayedValue,
-        instrumentSetter,
-        JInstrumentPanel.this::isInhibitInstrumentControl,
-        trueFalsePreListener,
-        showPendingUpdates));      
+      if (instrumentSetter != null)
+        addActionListener (new JInstrumentActionListener_1Boolean (
+          settingString,
+          this::getDisplayedValue,
+          instrumentSetter,
+          JInstrumentPanel.this::isInhibitInstrumentControl,
+          trueFalsePreListener,
+          showPendingUpdates));
+      else
+        setEnabled (false);
     }
 
     public JBoolean_JBoolean (
@@ -1655,6 +1658,35 @@ public class JInstrumentPanel
         trueColor,
         null,
         showPendingUpdates);
+    }
+      
+    public JBoolean_JBoolean (
+      final Function<InstrumentSettings, Boolean> instrumentGetter,
+      final Color falseColor,
+      final Color trueColor)
+    {
+      this (
+        null,
+        instrumentGetter,
+        null,
+        falseColor,
+        trueColor,
+        null,
+        false);
+    }
+      
+    public JBoolean_JBoolean (
+      final Function<InstrumentSettings, Boolean> instrumentGetter,
+      final Color trueColor)
+    {
+      this (
+        null,
+        instrumentGetter,
+        null,
+        JInstrumentPanel.this.getBackground (),
+        trueColor,
+        null,
+        false);
     }
       
     private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
