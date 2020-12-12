@@ -18,31 +18,20 @@ package org.javajdj.jinstrument.swing.instrument.tek2440;
 
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.Instrument;
-import org.javajdj.jinstrument.InstrumentListener;
-import org.javajdj.jinstrument.InstrumentReading;
-import org.javajdj.jinstrument.InstrumentSettings;
-import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import org.javajdj.jswing.jcenter.JCenter;
-import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
-import org.javajdj.jswing.jtextfieldlistener.JTextFieldListener;
 
 /** A Swing panel for GPIB SRQ (Service Request) settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -79,50 +68,155 @@ public class JTek2440_GPIB_SRQ
     removeAll ();
     setLayout (new GridLayout (3, 1, 0, 2));
     
-    this.jSrqMaskPanel = new JSrqMaskPanel ();
-    this.jSrqMaskPanel.setBorder (
+    final JPanel northPanel = new JPanel ();
+    northPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
         "GPIB Mask Settings"));
-    add (this.jSrqMaskPanel);
+    add (northPanel);
     
-    final JPanel gpibGetPanel = new JPanel ();
-    gpibGetPanel.setBorder (
+    final JPanel centerPanel = new JPanel ();
+    centerPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
         "Group Execute Trigger"));
-    gpibGetPanel.setLayout (new GridLayout (2,2));
-    gpibGetPanel.add (new JLabel ("Mode"));
-    this.jGetMode = new JComboBox<> (Tek2440_GPIB_Settings.GroupTriggerSRQMode.values ());
-    this.jGetMode.addItemListener (this.jGetModeItemListener);
-    gpibGetPanel.add (JCenter.Y (this.jGetMode));
-    gpibGetPanel.add (new JLabel ("Sequence"));
-    this.jGetSequence = new JTextField (16);
-    JTextFieldListener.addJTextFieldListener (this.jGetSequence, this.jGetSequenceListener);
-    gpibGetPanel.add (JCenter.Y (this.jGetSequence));
-    add (gpibGetPanel);
+    add (centerPanel);
     
-    final JPanel gpibDebugPanel = new JPanel ();
-    gpibDebugPanel.setBorder (
+    final JPanel southPanel = new JPanel ();
+    southPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
         "[GPIB] Debug"));
-    gpibDebugPanel.setLayout (new GridLayout (1, 6));
-    gpibDebugPanel.add (new JLabel ("Enable Debug"));
-    this.jDebug = new JColorCheckBox.JBoolean (Color.green);
-    this.jDebug.addActionListener (new JInstrumentActionListener_1Boolean (
-      "debug",
-      this.jDebug::getDisplayedValue,
-      tek2440::setEnableDebug,
-      JTek2440_GPIB_SRQ.this::isInhibitInstrumentControl));
-    gpibDebugPanel.add (this.jDebug);
-    gpibDebugPanel.add (new JLabel ()); // Aesthetics, really...
-    gpibDebugPanel.add (new JLabel ());
-    gpibDebugPanel.add (new JLabel ());
-    gpibDebugPanel.add (new JLabel ());
-    add (gpibDebugPanel);
+    add (southPanel);
     
-    getDigitalStorageOscilloscope ().addInstrumentListener (this.instrumentListener);
+    //
+    // northPanel
+    //
+    
+    northPanel.setLayout (new GridLayout (9,2));
+
+    northPanel.add (new JLabel ("Internal Error"));
+    northPanel.add (new JBoolean_JBoolean (
+      "enable srq on internal error",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isInternalErrorSrqEnabled (),
+      tek2440::setEnableSrqInternalError,
+      Color.green,
+      true));
+    
+    northPanel.add (new JLabel ("Command Error"));
+    northPanel.add (new JBoolean_JBoolean (
+      "enable srq on command error",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isCommandErrorSrqEnabled (),
+      tek2440::setEnableSrqCommandError,
+      Color.green,
+      true));
+    
+    northPanel.add (new JLabel ("Execution Error"));
+    northPanel.add (new JBoolean_JBoolean (
+      "enable srq on execution error",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isExecutionErrorSrqEnabled (),
+      tek2440::setEnableSrqExecutionError,
+      Color.green,
+      true));
+    
+    northPanel.add (new JLabel ("Execution Warning"));
+    northPanel.add (new JBoolean_JBoolean (
+      "enable srq on execution warning",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isExecutionWarningSrqEnabled (),
+      tek2440::setEnableSrqExecutionWarning,
+      Color.green,
+      true));
+    
+    northPanel.add (new JLabel ("Command Completion"));
+    northPanel.add (new JBoolean_JBoolean (
+      "enable srq on command completion",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isCommandCompletionSrqEnabled (),
+      tek2440::setEnableSrqCommandCompletion,
+      Color.green,
+      true));
+    
+    northPanel.add (new JLabel ("Event"));
+    northPanel.add (new JBoolean_JBoolean (
+      "enable srq on event",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isEventSrqEnabled (),
+      tek2440::setEnableSrqOnEvent,
+      Color.green,
+      true));
+    
+    northPanel.add (new JLabel ("Device Dependent"));
+    northPanel.add (new JBoolean_JBoolean (
+      "enable srq device dependent",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isDeviceDependentSrqEnabled (),
+      tek2440::setEnableSrqDeviceDependent,
+      Color.green,
+      true));
+    
+    northPanel.add (new JLabel ("User Button"));
+    northPanel.add (new JBoolean_JBoolean (
+      "enable srq on user button",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isUserButtonSrqEnabled (),
+      tek2440::setEnableSrqOnUserButton,
+      Color.green,
+      true));
+    
+    northPanel.add (new JLabel ("Probe Identify Button"));
+    northPanel.add (new JBoolean_JBoolean (
+      "enable srq on probe identify button",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isProbeIdentifyButtonSrqEnabled (),
+      tek2440::setEnableSrqOnProbeIdentifyButton,
+      Color.green,
+      true));
+    
+    //
+    // centerPanel
+    //
+    
+    centerPanel.setLayout (new GridLayout (2,2));
+    
+    final JTextField jGetSequence = new JString_JTextField (
+      16,
+      "GET user sequence",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getGroupTriggerSequence (),
+      tek2440::setGroupExecuteTriggerUserSequence,
+      true);
+    
+    final JComboBox<Tek2440_GPIB_Settings.GroupTriggerSRQMode> jGetMode = new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.GroupTriggerSRQMode.class,
+      "GET mode",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getGroupTriggerSRQMode (),
+      (Tek2440_GPIB_Settings.GroupTriggerSRQMode groupTriggerMode) ->
+      {
+        if (groupTriggerMode != Tek2440_GPIB_Settings.GroupTriggerSRQMode.ExecuteSequence)
+          tek2440.setGroupExecuteTriggerMode (groupTriggerMode, null);
+        else
+        {
+          final String userSequenceFromTextField = jGetSequence.getText ();
+          if (userSequenceFromTextField == null || userSequenceFromTextField.trim ().isEmpty ())
+            JOptionPane.showMessageDialog (null, "No valid user sequence!", "Error", JOptionPane.ERROR_MESSAGE);
+          else
+            tek2440.setGroupExecuteTriggerMode (groupTriggerMode, userSequenceFromTextField);
+        }
+      },
+      true);
+    
+    centerPanel.add (new JLabel ("Mode"));
+    centerPanel.add (JCenter.Y (jGetMode));
+    
+    centerPanel.add (new JLabel ("Sequence"));
+    centerPanel.add (JCenter.Y (jGetSequence));
+    
+    //
+    // southPanel
+    //
+    
+    southPanel.setLayout (new GridLayout (1, 1));
+
+    southPanel.add (JCenter.XY (new JBoolean_JBoolean (
+      "GPIB debug",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isDebugEnabled (),
+      tek2440::setEnableDebug,
+      Color.green,
+      true)));
     
   }
   
@@ -177,259 +271,6 @@ public class JTek2440_GPIB_SRQ
   {
     return getInstrumentViewUrl ();
   }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  // SRQ MASK PANEL
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private final class JSrqMaskPanel
-    extends JPanel
-  {
-
-    private final JColorCheckBox.JBoolean jSrqInternalError;
-    private final JColorCheckBox.JBoolean jSrqCommandError;
-    private final JColorCheckBox.JBoolean jSrqExecutionError;
-    private final JColorCheckBox.JBoolean jSrqExecutionWarning;
-    private final JColorCheckBox.JBoolean jSrqCommandCompletion;
-    private final JColorCheckBox.JBoolean jSrqEvent;
-    private final JColorCheckBox.JBoolean jSrqDeviceDependent;
-    private final JColorCheckBox.JBoolean jSrqUserButton;
-    private final JColorCheckBox.JBoolean jSrqProbeIdentifyButton;
-    
-    public JSrqMaskPanel ()
-    {
-      super ();
-      final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) JTek2440_GPIB_SRQ.this.getDigitalStorageOscilloscope ();
-      setOpaque (true);
-      setLayout (new GridLayout (9,2));
-      add (new JLabel ("Internal Error"));
-      this.jSrqInternalError = new JColorCheckBox.JBoolean (Color.green);
-      this.jSrqInternalError.addActionListener (new JInstrumentActionListener_1Boolean (
-        "enable srq on internal error",
-        this.jSrqInternalError::getDisplayedValue,
-        tek2440::setEnableSrqInternalError,
-        JTek2440_GPIB_SRQ.this::isInhibitInstrumentControl));
-      add (this.jSrqInternalError);
-      add (new JLabel ("Command Error"));
-      this.jSrqCommandError = new JColorCheckBox.JBoolean (Color.green);
-      this.jSrqCommandError.addActionListener (new JInstrumentActionListener_1Boolean (
-        "enable srq on command error",
-        this.jSrqCommandError::getDisplayedValue,
-        tek2440::setEnableSrqCommandError,
-        JTek2440_GPIB_SRQ.this::isInhibitInstrumentControl));
-      add (this.jSrqCommandError);
-      add (new JLabel ("Execution Error"));
-      this.jSrqExecutionError = new JColorCheckBox.JBoolean (Color.green);
-      this.jSrqExecutionError.addActionListener (new JInstrumentActionListener_1Boolean (
-        "enable srq on execution error",
-        this.jSrqExecutionError::getDisplayedValue,
-        tek2440::setEnableSrqExecutionError,
-        JTek2440_GPIB_SRQ.this::isInhibitInstrumentControl));
-      add (this.jSrqExecutionError);
-      add (new JLabel ("Execution Warning"));
-      this.jSrqExecutionWarning = new JColorCheckBox.JBoolean (Color.green);
-      this.jSrqExecutionWarning.addActionListener (new JInstrumentActionListener_1Boolean (
-        "enable srq on execution warning",
-        this.jSrqExecutionWarning::getDisplayedValue,
-        tek2440::setEnableSrqExecutionWarning,
-        JTek2440_GPIB_SRQ.this::isInhibitInstrumentControl));
-      add (this.jSrqExecutionWarning);
-      add (new JLabel ("Command Completion"));
-      this.jSrqCommandCompletion = new JColorCheckBox.JBoolean (Color.green);
-      this.jSrqCommandCompletion.addActionListener (new JInstrumentActionListener_1Boolean (
-        "enable srq on command completion",
-        this.jSrqCommandCompletion::getDisplayedValue,
-        tek2440::setEnableSrqCommandCompletion,
-        JTek2440_GPIB_SRQ.this::isInhibitInstrumentControl));
-      add (this.jSrqCommandCompletion);
-      add (new JLabel ("Event"));
-      this.jSrqEvent = new JColorCheckBox.JBoolean (Color.green);
-      this.jSrqEvent.addActionListener (new JInstrumentActionListener_1Boolean (
-        "enable srq on event",
-        this.jSrqEvent::getDisplayedValue,
-        tek2440::setEnableSrqOnEvent,
-        JTek2440_GPIB_SRQ.this::isInhibitInstrumentControl));
-      add (this.jSrqEvent);
-      add (new JLabel ("Device Dependent"));
-      this.jSrqDeviceDependent = new JColorCheckBox.JBoolean (Color.green);
-      this.jSrqDeviceDependent.addActionListener (new JInstrumentActionListener_1Boolean (
-        "enable srq device dependent",
-        this.jSrqDeviceDependent::getDisplayedValue,
-        tek2440::setEnableSrqDeviceDependent,
-        JTek2440_GPIB_SRQ.this::isInhibitInstrumentControl));
-      add (this.jSrqDeviceDependent);
-      add (new JLabel ("User Button"));
-      this.jSrqUserButton = new JColorCheckBox.JBoolean (Color.green);
-      this.jSrqUserButton.addActionListener (new JInstrumentActionListener_1Boolean (
-        "enable srq on user button",
-        this.jSrqUserButton::getDisplayedValue,
-        tek2440::setEnableSrqOnUserButton,
-        JTek2440_GPIB_SRQ.this::isInhibitInstrumentControl));
-      add (this.jSrqUserButton);
-      add (new JLabel ("Probe Identify Button"));
-      this.jSrqProbeIdentifyButton = new JColorCheckBox.JBoolean (Color.green);
-      this.jSrqProbeIdentifyButton.addActionListener (new JInstrumentActionListener_1Boolean (
-        "enable srq on probe identify button",
-        this.jSrqProbeIdentifyButton::getDisplayedValue,
-        tek2440::setEnableSrqOnProbeIdentifyButton,
-        JTek2440_GPIB_SRQ.this::isInhibitInstrumentControl));
-      add (this.jSrqProbeIdentifyButton);
-    }
-        
-  }
-  
-  private final JSrqMaskPanel jSrqMaskPanel;
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  // GET [GROUP EXECUTE TRIGGER]
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private final JComboBox<Tek2440_GPIB_Settings.GroupTriggerSRQMode> jGetMode;
-  
-  private final JTextField jGetSequence;
-  
-  private final ItemListener jGetModeItemListener = (ItemEvent ie) ->
-  {
-    if (ie.getStateChange () == ItemEvent.SELECTED)
-    {
-      final Tek2440_GPIB_Settings.GroupTriggerSRQMode newValue = (Tek2440_GPIB_Settings.GroupTriggerSRQMode) ie.getItem ();
-      final String userSequence = JTek2440_GPIB_SRQ.this.jGetSequence.getText ().trim ();
-      final Tek2440_GPIB_Instrument tek2440 = ((Tek2440_GPIB_Instrument) getDigitalStorageOscilloscope ());
-      if (! JTek2440_GPIB_SRQ.this.isInhibitInstrumentControl ())
-        try
-        {
-          if (newValue == Tek2440_GPIB_Settings.GroupTriggerSRQMode.ExecuteSequence && userSequence.isEmpty ())
-            tek2440.setGroupExecuteTriggerMode (Tek2440_GPIB_Settings.GroupTriggerSRQMode.Off, null);
-          else
-            tek2440.setGroupExecuteTriggerMode (newValue,
-              (newValue == Tek2440_GPIB_Settings.GroupTriggerSRQMode.ExecuteSequence)
-                ? userSequence
-                : null);
-        }
-        catch (IOException | InterruptedException e)
-        {
-          LOG.log (Level.WARNING, "Caught exception while setting GET mode on instrument"
-            + " from combo box to {0} (user sequence: {1}): {2}.",
-            new Object[]{newValue, userSequence, Arrays.toString (e.getStackTrace ())});
-        }
-    }
-  };
-  
-  private final JTextFieldListener jGetSequenceListener = new JTextFieldListener ()
-  {
-
-    @Override
-    public void actionPerformed ()
-    {
-      final Tek2440_GPIB_Settings.GroupTriggerSRQMode mode =
-        (Tek2440_GPIB_Settings.GroupTriggerSRQMode) JTek2440_GPIB_SRQ.this.jGetMode.getSelectedItem ();
-      final String newValue = JTek2440_GPIB_SRQ.this.jGetSequence.getText ();
-      final Tek2440_GPIB_Instrument tek2440 = ((Tek2440_GPIB_Instrument) getDigitalStorageOscilloscope ());
-      if (! JTek2440_GPIB_SRQ.this.isInhibitInstrumentControl ())
-        try
-        {
-          if (mode == Tek2440_GPIB_Settings.GroupTriggerSRQMode.ExecuteSequence)
-          {
-            if (newValue == null || newValue.trim ().isEmpty ())
-              tek2440.setGroupExecuteTriggerMode (Tek2440_GPIB_Settings.GroupTriggerSRQMode.Off, null);
-            else
-              tek2440.setGroupExecuteTriggerMode (Tek2440_GPIB_Settings.GroupTriggerSRQMode.ExecuteSequence, newValue);
-          }
-          else if (newValue != null && ! newValue.trim ().isEmpty ())
-            tek2440.setGroupExecuteTriggerMode (Tek2440_GPIB_Settings.GroupTriggerSRQMode.ExecuteSequence, newValue);
-        }
-        catch (IOException | InterruptedException e)
-        {
-          LOG.log (Level.INFO, "Caught exception while setting GET user sequence on instrument"
-            + " from text field to {0} (mode: {1}): {2}.",
-            new Object[]{newValue, mode, getInstrument (), Arrays.toString (e.getStackTrace ())});
-        }
-    }
-    
-  };
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  // [GPIB] DEBUG
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private final JColorCheckBox.JBoolean jDebug;
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT LISTENER
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final InstrumentListener instrumentListener = new InstrumentListener ()
-  {
-    
-    @Override
-    public void newInstrumentStatus (final Instrument instrument, final InstrumentStatus instrumentStatus)
-    {
-      // EMPTY
-    }
-    
-    @Override
-    public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
-    {
-      if (instrument != JTek2440_GPIB_SRQ.this.getDigitalStorageOscilloscope () || instrumentSettings == null)
-        throw new IllegalArgumentException ();
-      if (! (instrumentSettings instanceof Tek2440_GPIB_Settings))
-        throw new IllegalArgumentException ();
-      final Tek2440_GPIB_Settings settings = (Tek2440_GPIB_Settings) instrumentSettings;
-      SwingUtilities.invokeLater (() ->
-      {
-        JTek2440_GPIB_SRQ.this.setInhibitInstrumentControl ();
-        try
-        {
-          JTek2440_GPIB_SRQ.this.jSrqMaskPanel.jSrqInternalError.setDisplayedValue (
-            settings.isInternalErrorSrqEnabled ());
-          JTek2440_GPIB_SRQ.this.jSrqMaskPanel.jSrqCommandError.setDisplayedValue (
-            settings.isCommandErrorSrqEnabled ());
-          JTek2440_GPIB_SRQ.this.jSrqMaskPanel.jSrqExecutionError.setDisplayedValue (
-            settings.isExecutionErrorSrqEnabled ());
-          JTek2440_GPIB_SRQ.this.jSrqMaskPanel.jSrqExecutionWarning.setDisplayedValue (
-            settings.isExecutionWarningSrqEnabled ());
-          JTek2440_GPIB_SRQ.this.jSrqMaskPanel.jSrqCommandCompletion.setDisplayedValue (
-            settings.isCommandCompletionSrqEnabled ());
-          JTek2440_GPIB_SRQ.this.jSrqMaskPanel.jSrqEvent.setDisplayedValue (
-            settings.isEventSrqEnabled ());
-          JTek2440_GPIB_SRQ.this.jSrqMaskPanel.jSrqDeviceDependent.setDisplayedValue (
-            settings.isDeviceDependentSrqEnabled ());
-          JTek2440_GPIB_SRQ.this.jSrqMaskPanel.jSrqUserButton.setDisplayedValue (
-            settings.isUserButtonSrqEnabled ());
-          JTek2440_GPIB_SRQ.this.jSrqMaskPanel.jSrqProbeIdentifyButton.setDisplayedValue (
-            settings.isProbeIdentifyButtonSrqEnabled ());
-          JTek2440_GPIB_SRQ.this.jGetMode.setSelectedItem (
-            settings.getGroupTriggerSRQMode ());
-          JTek2440_GPIB_SRQ.this.jGetSequence.setText (
-            settings.getGroupTriggerSequence ());
-          JTek2440_GPIB_SRQ.this.jDebug.setDisplayedValue (
-            settings.isDebugEnabled ());
-        }
-        finally
-        {
-          JTek2440_GPIB_SRQ.this.resetInhibitInstrumentControl ();
-        }
-      });
-    }
-
-    @Override
-    public void newInstrumentReading (final Instrument instrument, final InstrumentReading instrumentReading)
-    {
-      // EMPTY
-    }
-    
-  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
