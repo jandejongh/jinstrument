@@ -1229,12 +1229,24 @@ public class JInstrumentPanel
     {
       if (settingString == null || settingString.trim ().isEmpty () || setter == null)
         throw new IllegalArgumentException ();
+      if (jTextField == null && getter == null)
+        throw new IllegalArgumentException ();
       this.jTextField = jTextField;
       this.settingString = settingString;
       this.getter = getter;
       this.setter = setter;
       this.inhibitSetter = inhibitSetter;
       this.preSetColor = preSetColor;
+    }
+
+    public JInstrumentTextFieldListener_1String (
+      final JTextField jTextField,
+      final String settingString,
+      final Instrument.InstrumentSetter_1String setter,
+      final Provider<Boolean> inhibitSetter,
+      final Color preSetColor)
+    {
+      this (jTextField, settingString, null, setter, inhibitSetter, preSetColor);
     }
 
     public JInstrumentTextFieldListener_1String (
@@ -1253,7 +1265,7 @@ public class JInstrumentPanel
         return;
       if (this.jTextField != null && this.preSetColor != null)
         this.jTextField.setBackground (this.preSetColor);
-      final String newValue = this.getter.apply ();
+      final String newValue = this.getter != null ? this.getter.apply () : this.jTextField.getText ();
       try
       {
         this.setter.set (newValue);
@@ -1297,6 +1309,8 @@ public class JInstrumentPanel
     {
       if (settingString == null || settingString.trim ().isEmpty () || setter == null)
         throw new IllegalArgumentException ();
+      if (jTextField == null && getter == null)
+        throw new IllegalArgumentException ();
       this.jTextField = jTextField;
       this.settingString = settingString;
       this.getter = getter;
@@ -1307,13 +1321,38 @@ public class JInstrumentPanel
     }
 
     public JInstrumentTextFieldListener_1Int (
+      final JTextField jTextField,
+      final String settingString,
+      final Instrument.InstrumentSetter_1int setter,
+      final Provider<Boolean> inhibitSetter,
+      final Color preSetColor,
+      final boolean reportParseErrorsInDialog)
+    {
+      this (
+        jTextField,
+        settingString,
+        null,
+        setter,
+        inhibitSetter,
+        preSetColor,
+        reportParseErrorsInDialog);
+    }
+
+    public JInstrumentTextFieldListener_1Int (
       final String settingString,
       final Provider<String> getter,
       final Instrument.InstrumentSetter_1int setter,
       final Provider<Boolean> inhibitSetter,
       final boolean reportParseErrorsInDialog)
     {
-      this (null, settingString, getter, setter, inhibitSetter, null, reportParseErrorsInDialog);
+      this (
+        null,
+        settingString,
+        getter,
+        setter,
+        inhibitSetter,
+        null,
+        reportParseErrorsInDialog);
     }
 
     @Override
@@ -1323,7 +1362,7 @@ public class JInstrumentPanel
         return;
       if (this.jTextField != null && this.preSetColor != null)
         this.jTextField.setBackground (this.preSetColor);
-      final String newValue = this.getter.apply ();
+      final String newValue = this.getter != null ? this.getter.apply () : this.jTextField.getText ();
       try
       {
         this.setter.set (Integer.parseInt (newValue));
@@ -1373,6 +1412,8 @@ public class JInstrumentPanel
     {
       if (settingString == null || settingString.trim ().isEmpty () || setter == null)
         throw new IllegalArgumentException ();
+      if (jTextField == null && getter == null)
+        throw new IllegalArgumentException ();
       this.jTextField = jTextField;
       this.settingString = settingString;
       this.getter = getter;
@@ -1383,13 +1424,38 @@ public class JInstrumentPanel
     }
 
     public JInstrumentTextFieldListener_1Double (
+      final JTextField jTextField,
+      final String settingString,
+      final Instrument.InstrumentSetter_1double setter,
+      final Provider<Boolean> inhibitSetter,
+      final Color preSetColor,
+      final boolean reportParseErrorsInDialog)
+    {
+      this (
+        jTextField,
+        settingString,
+        null,
+        setter,
+        inhibitSetter,
+        preSetColor,
+        reportParseErrorsInDialog);
+    }
+
+    public JInstrumentTextFieldListener_1Double (
       final String settingString,
       final Provider<String> getter,
       final Instrument.InstrumentSetter_1double setter,
       final Provider<Boolean> inhibitSetter,
       final boolean reportParseErrorsInDialog)
     {
-      this (null, settingString, getter, setter, inhibitSetter, null, reportParseErrorsInDialog);
+      this (
+        null,
+        settingString,
+        getter,
+        setter,
+        inhibitSetter,
+        null,
+        reportParseErrorsInDialog);
     }
 
     @Override
@@ -1399,7 +1465,7 @@ public class JInstrumentPanel
         return;
       if (this.jTextField != null && this.preSetColor != null)
         this.jTextField.setBackground (this.preSetColor);
-      final String newValue = this.getter.apply ();
+      final String newValue = this.getter != null ? this.getter.apply () : this.jTextField.getText ();
       try
       {
         this.setter.set (Double.parseDouble (newValue));
@@ -2253,6 +2319,142 @@ public class JInstrumentPanel
             JString_JTextField.this.setText (newValue);
             if (JString_JTextField.this.showPendingUpdates)
               JString_JTextField.this.setBackground (JInstrumentPanel.this.getBackground ());
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public class Jint_JTextField
+    extends JTextField
+  {
+
+    private final Function<InstrumentSettings, Integer> instrumentGetter;
+    
+    private final boolean showPendingUpdates;
+    
+    public Jint_JTextField (
+      final Integer initialValue,
+      final Integer columns,
+      final String settingString,
+      final Function<InstrumentSettings, Integer> instrumentGetter,
+      final Instrument.InstrumentSetter_1int instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super ();
+      this.instrumentGetter = instrumentGetter;
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+      if (initialValue != null)
+        setText (Integer.toString (initialValue));
+      if (columns != null)
+        setColumns (columns);
+      if (this.instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      if (instrumentSetter != null)
+        addActionListener (new JInstrumentTextFieldListener_1Int (
+          this,
+          settingString,
+          instrumentSetter,
+          JInstrumentPanel.this::isInhibitInstrumentControl,
+          showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null,
+          true));
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (Jint_JTextField.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final int newValue = Jint_JTextField.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            Jint_JTextField.this.setText (Integer.toString (newValue));
+            if (Jint_JTextField.this.showPendingUpdates)
+              Jint_JTextField.this.setBackground (JInstrumentPanel.this.getBackground ());
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public class Jdouble_JTextField
+    extends JTextField
+  {
+
+    private final Function<InstrumentSettings, Double> instrumentGetter;
+    
+    private final boolean showPendingUpdates;
+    
+    public Jdouble_JTextField (
+      final Double initialValue,
+      final Integer columns,
+      final String settingString,
+      final Function<InstrumentSettings, Double> instrumentGetter,
+      final Instrument.InstrumentSetter_1double instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super ();
+      this.instrumentGetter = instrumentGetter;
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+      if (initialValue != null)
+        setText (Double.toString (initialValue));
+      if (columns != null)
+        setColumns (columns);
+      if (this.instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      if (instrumentSetter != null)
+        addActionListener (new JInstrumentTextFieldListener_1Double (
+          this,
+          settingString,
+          instrumentSetter,
+          JInstrumentPanel.this::isInhibitInstrumentControl,
+          showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null,
+          true));
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (Jdouble_JTextField.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final double newValue = Jdouble_JTextField.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            Jdouble_JTextField.this.setText (Double.toString (newValue));
+            if (Jdouble_JTextField.this.showPendingUpdates)
+              Jdouble_JTextField.this.setBackground (JInstrumentPanel.this.getBackground ());
           }
           finally
           {
