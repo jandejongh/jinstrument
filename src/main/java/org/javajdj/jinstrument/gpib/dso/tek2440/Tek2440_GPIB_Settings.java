@@ -3749,6 +3749,11 @@ public class Tek2440_GPIB_Settings
     return getLongSettings ().longResponse;
   }
   
+  public final boolean isUseLongResponse ()
+  {
+    return getLongSettings ().longResponse;
+  }
+  
   private static LongSettings parseLongSettings (final String argString)
   {
     if (argString == null)
