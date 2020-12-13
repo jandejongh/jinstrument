@@ -3797,6 +3797,11 @@ public class Tek2440_GPIB_Settings
     return getPathSettings ().path;
   }
   
+  public final boolean isUsePath ()
+  {
+    return getPathSettings ().path;
+  }
+  
   private static PathSettings parsePathSettings (final String argString)
   {
     if (argString == null)
