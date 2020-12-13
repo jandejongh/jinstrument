@@ -1229,6 +1229,12 @@ public class Tek2440_GPIB_Instrument
       Tek2440_InstrumentCommand.ICARG_TEK2440_SEQUENCER_ACTIONS_FROM_INT, actions));
   }
 
+  public void setSequencerActionsFromLong (final long actions)
+    throws IOException, InterruptedException, UnsupportedOperationException
+  {
+    setSequencerActionsFromInt ((int) actions);
+  }
+
   public void setPrintDeviceType (final Tek2440_GPIB_Settings.PrintDeviceType type)
     throws IOException, InterruptedException, UnsupportedOperationException
   {
