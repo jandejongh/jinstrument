@@ -190,7 +190,7 @@ public class JTek2440_GPIB
       tek2440,
       "Ref",
       new Dimension (80, 80),
-      "Tek-2440 Service Reference (Waveform Memory) Settings",
+      "Tek-2440 Reference (Waveform Memory) Settings",
       new Dimension (800, 600),
       new JTek2440_GPIB_Ref (digitalStorageOscilloscope, level + 1)));
     
