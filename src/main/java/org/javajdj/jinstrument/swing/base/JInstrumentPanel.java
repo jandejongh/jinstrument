@@ -1049,7 +1049,7 @@ public class JInstrumentPanel
       final Color preSetColor,
       final Function<Integer,N> intToN)
     {
-      if (settingString == null || settingString.trim ().isEmpty () || setter == null || intToN == null)
+      if (settingString == null || settingString.trim ().isEmpty () || intToN == null)
         throw new IllegalArgumentException ();
       this.settingString = settingString;
       this.setter = setter;
@@ -1062,7 +1062,7 @@ public class JInstrumentPanel
     public void stateChanged (final ChangeEvent ce)
     {
       final JSlider source = (JSlider) ce.getSource ();
-      source.setToolTipText (Integer.toString (source.getValue ()));
+      source.setToolTipText (this.intToN.apply (source.getValue ()).toString ()); // XXX Relies on Number.toString...
       if (! source.getValueIsAdjusting ())
       {
         if (this.inhibitSetter != null && this.inhibitSetter.apply ())
@@ -1070,14 +1070,17 @@ public class JInstrumentPanel
         if (this.preSetColor != null)
           source.setBackground (this.preSetColor);
         final N newN = JInstrumentSliderChangeListener_1Number.this.intToN.apply (source.getValue ());
-        try
+        if (this.setter != null)
         {
-          this.setter.set (newN);
-        }
-        catch (IOException | InterruptedException e)
-        {
-          LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from slider to {0} [int: {1}]: {2}.",
-            new Object[]{newN, source.getValue (), Arrays.toString (e.getStackTrace ())});
+          try
+          {
+            this.setter.set (newN);
+          }
+          catch (IOException | InterruptedException e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from slider to {0} [int: {1}]: {2}.",
+              new Object[]{newN, source.getValue (), Arrays.toString (e.getStackTrace ())});
+          }
         }
       }
     }
@@ -1907,13 +1910,15 @@ public class JInstrumentPanel
     
     private final Function<N, Integer> nToInt;
     
+    private final Function<Integer, N> intToN;
+    
     private final boolean showPendingUpdates;
     
     public JNumber_JSlider (
       final int orientation,
       final N minValue,
       final N maxValue,
-      final N intialValue,
+      final N initialValue,
       final N majorTickSpacing,
       final N minorTickSpacing,
       final String settingString,
@@ -1923,21 +1928,27 @@ public class JInstrumentPanel
       final Function<N, Integer> nToInt,
       final boolean showPendingUpdates)
     {
-      super (orientation, nToInt.apply (minValue), nToInt.apply (maxValue), nToInt.apply (intialValue));
-      if (nToInt == null)
+      super (nToInt.apply (minValue), nToInt.apply (maxValue));
+      if (settingString == null || nToInt == null || intToN == null)
         throw new IllegalArgumentException ();
+      setOrientation (orientation);
       setToolTipText ("-");
       this.showPendingUpdates = showPendingUpdates;
       if (this.showPendingUpdates)
         setBackground (getGuiPreferencesUpdatePendingColor ());
       this.instrumentGetter = instrumentGetter;
       this.nToInt = nToInt;
+      this.intToN = intToN;
+      if (initialValue != null)
+        setValue (this.nToInt.apply (initialValue));
       if (majorTickSpacing != null)
-        setMajorTickSpacing (nToInt.apply (majorTickSpacing));
+        setMajorTickSpacing (this.nToInt.apply (majorTickSpacing));
       if (minorTickSpacing != null)
-        setMinorTickSpacing (nToInt.apply (minorTickSpacing));
+        setMinorTickSpacing (this.nToInt.apply (minorTickSpacing));
       if (majorTickSpacing != null || minorTickSpacing != null)
+      {
         setPaintTicks (true);
+      }
       if (this.instrumentGetter != null)
         getInstrument ().addInstrumentListener (this.instrumentListener);
       addChangeListener (new JInstrumentSliderChangeListener_1Number (
@@ -1977,6 +1988,14 @@ public class JInstrumentPanel
       }
 
     };
+    
+    public JNumber_JSlider withPaintLabels ()
+    {
+      setPaintLabels (true);
+      // XXX
+      // DO NOT USE WHEN THE VALUES NEEDS TRANSFORMING [E.G., WITH DOUBLES].
+      return this;
+    }
     
   }
   
@@ -2034,7 +2053,8 @@ public class JInstrumentPanel
         showPendingUpdates);
     }
     
-    public final JInteger_JSlider withPaintLabels ()
+    @Override
+    public JInteger_JSlider withPaintLabels ()
     {
       setPaintLabels (true);
       return this;
@@ -2154,6 +2174,7 @@ public class JInstrumentPanel
         showPendingUpdates);
     }
     
+    @Override
     public final JDouble_JSlider withPaintLabels ()
     {
       setPaintLabels (true);
