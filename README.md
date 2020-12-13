@@ -1,14 +1,35 @@
 # jinstrument
-Java Swing application for (GPIB) reading and controlling (old-school) lab instruments like spectrum analyzers, signal generator, digital multimeters, etc.
+Java Swing application for (GPIB) reading and controlling (old-school) lab instruments
+like spectrum analyzers, signal generator, digital multimeters, etc.
 
 ## Build Type
 Maven, but you'll need to manually install dependency artefacts (all available from Maven Central or from my github).
 
 ## Installation
-Either through Maven, or by simply picking up a release's jinstrument-X.Y-jar-with-dependencies.jar file. A working example ~/.jinstrument/instrumentRegistry.json (holding persistent definitions of devices, instruments and views) is there as well.
+Either through Maven, or by simply picking up a release's jinstrument-X.Y-jar-with-dependencies.jar file.
+A working example ~/.jinstrument/instrumentRegistry.json (holding persistent definitions of devices, instruments and views)
+is there as well.
 
 ## License
 Apache v2.0.
+
+## Status [20201213 - v0.7-SNAPSHOT]
+
+Worked exclusively on Tek-2440 implementation.
+Pretty much completed support for all settings (r/w) and a GUI for that.
+Also added support to the jswing package for "general-purpose" displaying of traces.
+Switched (for the most part) to using JInstrument-wide standard Swing components.
+
+### v0.7 release (minimum) requirements:
+- Read all trace formats and all trace sources, including XY, and display them in the GUI.
+- Read marker values and attach them to the trace data, settings or to another structure.
+- Read waveform analysis data and attach them to the trace data.
+- Show CURSOR values in GUI.
+- Show waveform analysis data in GUI.
+- Horizontal position setting through dragging.
+- Selected markers (ro) in GUI: GND-level, average, trigger points.
+- A conceptual overview of the Tek-2440 operations (channels, acquisition, delay, reference waveforms, etc.);
+- Think of / design a ready-to-go Tek-2440 specific package.
 
 ## Status [20201103 - v0.7-SNAPSHOT]
 
