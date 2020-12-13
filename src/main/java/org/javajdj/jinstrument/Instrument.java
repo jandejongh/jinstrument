@@ -109,6 +109,42 @@ public interface Instrument
   }
   
   @FunctionalInterface
+  interface InstrumentSetter_1Long
+    extends InstrumentSetter_1Number<Long>
+  {
+    
+    @Override
+    void set (Long arg) throws IOException, InterruptedException;
+    
+    default long byteToArg   (final byte   b) { return (long) b; }
+    default long shortToArg  (final short  s) { return (long) s; }
+    default long intToArg    (final int    i) { return (long) i; }
+    default long longToArg   (final long   l) { return (long) l; }
+    default long floatToArg  (final float  f) { return (long) Math.round (f); }
+    default long doubleToArg (final double d) { return (long) Math.round (d); }
+    
+  }
+  
+  @FunctionalInterface
+  interface InstrumentSetter_1long
+    extends InstrumentSetter_1Number<Long>
+  {
+    
+    void set (long arg) throws IOException, InterruptedException;
+    
+    @Override
+    default void set (final Long arg)  throws IOException, InterruptedException { set ((long) arg); }
+    
+    default long byteToArg   (final byte   b) { return (long) b; }
+    default long shortToArg  (final short  s) { return (long) s; }
+    default long intToArg    (final int    i) { return (long) i; }
+    default long longToArg   (final long   l) { return (long) l; }
+    default long floatToArg  (final float  f) { return (long) Math.round (f); }
+    default long doubleToArg (final double d) { return (long) Math.round (d); }
+    
+  }
+  
+  @FunctionalInterface
   interface InstrumentSetter_1Double
     extends InstrumentSetter_1Number<Double>
   {
