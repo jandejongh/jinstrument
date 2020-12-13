@@ -5329,6 +5329,11 @@ public class Tek2440_GPIB_Settings
     return getSetupSettings ().actionsAsInt;
   }
   
+  public final long getSequencerActionsAsLong ()
+  {
+    return (long) getSetupSettings ().actionsAsInt;
+  }
+  
   private static SetupSettings parseSetupSettings (final String argString)
   {
     if (argString == null)
