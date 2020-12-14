@@ -111,13 +111,19 @@ public class Tek2440_GPIB_Trace
           // XXX
           throw new UnsupportedOperationException ();
         case RPBinary:
+        {
           // Resolution: 1/25th of a division.
-          samples[i] = voltsPerDiv_V * ((0xff & bytes[header + i]) - 128) / 25.0;
+          final double YLevelsPerDiv = Tek2440_GPIB_Instrument.TEK2440_DIGITIZING_LEVELS_PER_DIVISION;
+          samples[i] = voltsPerDiv_V * ((0xff & bytes[header + i]) - 128) / YLevelsPerDiv;
           break;
+        }
         case RIBinary:
+        {
           // Resolution: 1/25th of a division.
-          samples[i] = voltsPerDiv_V * bytes[header + i] / 25.0;
+          final double YLevelsPerDiv = Tek2440_GPIB_Instrument.TEK2440_DIGITIZING_LEVELS_PER_DIVISION;
+          samples[i] = voltsPerDiv_V * bytes[header + i] / YLevelsPerDiv;
           break;
+        }
         case RPPartial:
           // XXX
           throw new UnsupportedOperationException ();

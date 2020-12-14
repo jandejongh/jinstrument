@@ -403,13 +403,101 @@ public class Tek2440_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // Tek2440_GPIB_Instrument
+  // CONSTANTS
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  /** The fixed number (10) of X divisions on the instrument's display.
+   * 
+   */
   public final static int TEK2440_X_DIVISIONS = 10;
   
+  /** The fixed number (8) of Y divisions on the instrument's display.
+   * 
+   */
   public final static int TEK2440_Y_DIVISIONS = 8;
   
+  /** The (presumably fixed) number (50) of samples per division.
+   * 
+   * <p>
+   * Source: 2440 Programmers Reference Guide, page A-58, WFMpre/XINcr description.
+   * 
+   */
+  public final static int TEK2440_SAMPLES_PER_DIVISION = 50;
+  
+  /** The (presumably fixed) number (500 in our implementation; 512 on the instrument) of samples
+   *  in a single display on the instrument.
+   * 
+   * <p>
+   * Equal to {@link #TEK2440_X_DIVISIONS} {@code *} {@link #TEK2440_SAMPLES_PER_DIVISION} ({@code = 500}).
+   * 
+   * <p>
+   * The result is still somewhat under discussion, but believed to be correct.
+   * The Tek-2440 Service Manual on page 3-4 states that the Tek-2440 will display 512 out of the 1024 data points (samples),
+   * but we believe that 12 of them are beyond the left/right graticule (i.e., showing 10.24 division instead of 10).
+   * Since our display software only supports an integral number of X divisions, which we fix to
+   * {@link #TEK2440_X_DIVISIONS} (i.c., 10), we use 500 instead of 512.
+   * 
+   * <p>
+   * The position of the display "window" over the waveforms is determined by the "Horizontal Position" settings;
+   * see {@link Tek2440_GPIB_Settings#getHorizontalPosition}.
+   * 
+   * @see #TEK2440_X_DIVISIONS
+   * @see #TEK2440_SAMPLES_PER_DIVISION
+   * 
+   * @see Tek2440_GPIB_Settings#getHorizontalPosition
+   * 
+   */
+  public final static int TEK2440_SAMPLES_PER_DISPLAY = TEK2440_X_DIVISIONS * TEK2440_SAMPLES_PER_DIVISION;
+
+  /** The number (1024) of samples in a (full) waveform.
+   * 
+   * <p>
+   * Beware that the Tek-2440 supports <i>partial</i> waveform transfers.
+   * Still, the waveform is (presumably) always {@link #TEK2440_SAMPLES_PER_WAVEFORM} (1024) samples in length.
+   * 
+   * <p>
+   * Because the samples per waveform (1024) is almost twice as large as the samples shown on the display (500),
+   * different portions of a single waveform can be shown on the display.
+   * 
+   * @see #TEK2440_SAMPLES_PER_DISPLAY
+   * 
+   */
+  public final static int TEK2440_SAMPLES_PER_WAVEFORM = 1024;
+  
+  /** The fixed number (25) of digitizing levels per Y division.
+   * 
+   */
+  public final static int TEK2440_DIGITIZING_LEVELS_PER_DIVISION = 25;
+  
+  /** The fixed number (400) of digitizing level on the instrument's display.
+   * 
+   * <p>
+   * Equal to {@link #TEK2440_Y_DIVISIONS} {@code *} {@link #TEK2440_DIGITIZING_LEVELS_PER_DIVISION} ({@code = 400}).
+   * 
+   * <p>
+   * Note that we assume an integral of Y divisions here (as mandated by our display software).
+   * As with the X dimension, the Tek-2440 probably shows values beyond the top (+4) or bottom (-4) graticule levels.
+   * (XXX This is still to be confirmed.)
+   * 
+   * <p>
+   * XXX We also need to assess the impact of Y position setting (e.g., on Channel 1) on the generated waveform.
+   * In other words, we still need to answer the question whether the Y position setting is taken into account in
+   * the waveform data, or whether it is dealt with when the trace is displayed.
+   * 
+   * @see #TEK2440_Y_DIVISIONS
+   * @see #TEK2440_DIGITIZING_LEVELS_PER_DIVISION
+   * 
+   */
+  public final static int TEK2440_DIGITIZING_LEVELS_PER_DISPLAY = TEK2440_Y_DIVISIONS * TEK2440_DIGITIZING_LEVELS_PER_DIVISION;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // Tek2440_GPIB_Instrument
+  // COMMANDS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   public void setHorizontalMode (
     final Tek2440_GPIB_Settings.HorizontalMode mode)
     throws IOException, InterruptedException, UnsupportedOperationException
@@ -2457,7 +2545,14 @@ public class Tek2440_GPIB_Instrument
             case Run:             writeSync ("DT RUN\r\n");                          break;
             case SodRun:          writeSync ("DT SODRUN\r\n");                       break;
             case Step:            writeSync ("DT STE\r\n");                          break;
-            case ExecuteSequence: writeSync ("DT " + userSequence.trim () + "\r\n"); break;
+            case ExecuteSequence:
+            {
+              // Stupid test to silence compiler/NetBeans...
+              if (userSequence == null)
+                throw new RuntimeException ();
+              writeSync ("DT " + userSequence.trim () + "\r\n");
+              break;
+            }
             default:
               throw new IllegalArgumentException ();
           }
