@@ -432,7 +432,6 @@ public class Tek2440_GPIB_Instrument
    * Equal to {@link #TEK2440_X_DIVISIONS} {@code *} {@link #TEK2440_SAMPLES_PER_DIVISION} ({@code = 500}).
    * 
    * <p>
-   * The result is still somewhat under discussion, but believed to be correct.
    * The Tek-2440 Service Manual on page 3-4 states that the Tek-2440 will display 512 out of the 1024 data points (samples),
    * but we believe that 12 of them are beyond the left/right graticule (i.e., showing 10.24 division instead of 10).
    * Since our display software only supports an integral number of X divisions, which we fix to
@@ -477,13 +476,15 @@ public class Tek2440_GPIB_Instrument
    * 
    * <p>
    * Note that we assume an integral of Y divisions here (as mandated by our display software).
-   * As with the X dimension, the Tek-2440 probably shows values beyond the top (+4) or bottom (-4) graticule levels.
-   * (XXX This is still to be confirmed.)
+   * As with the X dimension, the Tek-2440 shows values beyond the top (+4) or bottom (-4) graticule levels.
+   * (Confirmed 20201215.)
    * 
    * <p>
-   * XXX We also need to assess the impact of Y position setting (e.g., on Channel 1) on the generated waveform.
-   * In other words, we still need to answer the question whether the Y position setting is taken into account in
-   * the waveform data, or whether it is dealt with when the trace is displayed.
+   * Note that the Y position setting is taken into account in the channel's preamp section (as expected, actually).
+   * In other words, changing the Y position affects the DC offset in the preamp applied to the signal <i>before</i>
+   * it hits the acquisition system.
+   * This implies that the Y position does <i>not</i> need to be taken into account when decoding the trace data.
+   * (Confirmed 20201215.)
    * 
    * @see #TEK2440_Y_DIVISIONS
    * @see #TEK2440_DIGITIZING_LEVELS_PER_DIVISION

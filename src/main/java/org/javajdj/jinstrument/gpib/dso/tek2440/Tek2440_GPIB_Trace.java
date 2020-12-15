@@ -41,6 +41,16 @@ public class Tek2440_GPIB_Trace
   
   public final static int TEK_2440_SAMPLE_LENGTH = 1024;
   
+  /** Creates the trace from data received in response to a "CURVE?" command.
+   * 
+   * @param settings The current instrument settings.
+   * @param channel  The channel to which the curve data applies; overrides the applicable data in {@code settings}.
+   * @param bytes    The (raw) data received from the instrument.
+   * 
+   * @throws IllegalArgumentException If any of the arguments is {@code null} or the {@code bytes} array has an illegal
+   *                                  (or unrecognized) structure.
+   * 
+   */
   public Tek2440_GPIB_Trace (
     final Tek2440_GPIB_Settings settings,
     final Tek2440_GPIB_Settings.DataSource channel,
@@ -113,6 +123,7 @@ public class Tek2440_GPIB_Trace
         case RPBinary:
         {
           // Resolution: 1/25th of a division.
+          // Implementation tested and proved correctly 20201215.
           final double YLevelsPerDiv = Tek2440_GPIB_Instrument.TEK2440_DIGITIZING_LEVELS_PER_DIVISION;
           samples[i] = voltsPerDiv_V * ((0xff & bytes[header + i]) - 128) / YLevelsPerDiv;
           break;
@@ -120,6 +131,7 @@ public class Tek2440_GPIB_Trace
         case RIBinary:
         {
           // Resolution: 1/25th of a division.
+          // Implementation tested and proved correctly 20201215.
           final double YLevelsPerDiv = Tek2440_GPIB_Instrument.TEK2440_DIGITIZING_LEVELS_PER_DIVISION;
           samples[i] = voltsPerDiv_V * bytes[header + i] / YLevelsPerDiv;
           break;
@@ -199,6 +211,7 @@ public class Tek2440_GPIB_Trace
   {
     if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
+    // Implementation tested and proved correctly 20201215.
     final Tek2440_GPIB_Settings.VoltsPerDivision voltsPerDiv = settings.getVoltsPerDivision (channel);
     final double voltsPerDiv_V = voltsPerDiv.getVoltsPerDivision_V ();
     return - voltsPerDiv_V * Tek2440_GPIB_Instrument.TEK2440_Y_DIVISIONS / 2.0;    
@@ -211,6 +224,7 @@ public class Tek2440_GPIB_Trace
   {
     if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
+    // Implementation tested and proved correctly 20201215.
     final Tek2440_GPIB_Settings.VoltsPerDivision voltsPerDiv = settings.getVoltsPerDivision (channel);
     final double voltsPerDiv_V = voltsPerDiv.getVoltsPerDivision_V ();
     return voltsPerDiv_V * Tek2440_GPIB_Instrument.TEK2440_Y_DIVISIONS / 2.0;
