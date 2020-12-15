@@ -464,6 +464,21 @@ public class Tek2440_GPIB_Instrument
    */
   public final static int TEK2440_SAMPLES_PER_WAVEFORM = 1024;
   
+  /** The number (10.24) of X divisions in a (full) waveform.
+   * 
+   * <p>
+   * Equal to {@link #TEK2440_SAMPLES_PER_WAVEFORM} {@code /} {@link #TEK2440_SAMPLES_PER_DIVISION} ({@code = 10.24}).
+   * 
+   * <p>
+   * Beware that the Tek-2440 supports <i>partial</i> waveform transfers.
+   * 
+   * @see #TEK2440_SAMPLES_PER_WAVEFORM
+   * @see #TEK2440_SAMPLES_PER_DIVISION
+   * 
+   */
+  public final static double TEK2440_X_DIVISIONS_PER_WAVEFORM =
+    ((double) TEK2440_SAMPLES_PER_WAVEFORM) / TEK2440_SAMPLES_PER_DIVISION;
+  
   /** The fixed number (25) of digitizing levels per Y division.
    * 
    */
