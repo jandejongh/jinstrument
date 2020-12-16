@@ -28,6 +28,7 @@ extends InstrumentTrace
   @Override
   DigitalStorageOscilloscopeSettings getInstrumentSettings ();
   
+  @Override
   InstrumentChannel getInstrumentChannel ();
   
   double getMinXHint ();
