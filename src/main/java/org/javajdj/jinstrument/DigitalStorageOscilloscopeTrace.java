@@ -31,6 +31,10 @@ extends InstrumentTrace
   @Override
   InstrumentChannel getInstrumentChannel ();
   
+  double getMinNHint ();
+  
+  double getMaxNHint ();
+  
   double getMinXHint ();
   
   double getMaxXHint ();
