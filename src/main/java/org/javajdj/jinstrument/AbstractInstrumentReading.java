@@ -86,7 +86,18 @@ public abstract class AbstractInstrumentReading<R>
     final boolean uncalibrated,
     final boolean uncorrected)
   {
-    this (instrumentSettings, instrumentChannel, null, readingValue, unit, resolution, error, errorMessage, overflow, uncalibrated, uncorrected);
+    this (
+      instrumentSettings,
+      instrumentChannel,
+      null,
+      readingValue,
+      unit,
+      resolution,
+      error,
+      errorMessage,
+      overflow,
+      uncalibrated,
+      uncorrected);
   }
   
   protected AbstractInstrumentReading (
@@ -96,7 +107,18 @@ public abstract class AbstractInstrumentReading<R>
     final Unit unit,
     final Resolution resolution)
   {
-    this (instrumentSettings, instrumentChannel, null, readingValue, unit, resolution, false, null, false, false, false);
+    this (
+      instrumentSettings,
+      instrumentChannel,
+      null,
+      readingValue,
+      unit,
+      resolution,
+      false,
+      null,
+      false,
+      false,
+      false);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
