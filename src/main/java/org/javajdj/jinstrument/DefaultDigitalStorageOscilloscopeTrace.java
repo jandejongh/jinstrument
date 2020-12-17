@@ -39,6 +39,8 @@ public class DefaultDigitalStorageOscilloscopeTrace
     final DigitalStorageOscilloscopeSettings settings,
     final InstrumentChannel instrumentChannel,
     final double[] samples,
+    final double minNHint,
+    final double maxNHint,
     final double minXHint,
     final double maxXHint,
     final double minYHint,
@@ -65,10 +67,47 @@ public class DefaultDigitalStorageOscilloscopeTrace
     if (instrumentChannel == null)
       throw new IllegalArgumentException ();
     this.instrumentChannel = instrumentChannel;
+    this.minNHint = minNHint;
+    this.maxNHint = maxNHint;
     this.minXHint = minXHint;
     this.maxXHint = maxXHint;
     this.minYHint = minYHint;
     this.maxYHint = maxYHint;
+  }
+  
+  public DefaultDigitalStorageOscilloscopeTrace (
+    final DigitalStorageOscilloscopeSettings settings,
+    final InstrumentChannel instrumentChannel,
+    final double[] samples,
+    final double minXHint,
+    final double maxXHint,
+    final double minYHint,
+    final double maxYHint,
+    final Unit unit,
+    final Resolution resolution,
+    final boolean error,
+    final String errorMessage,
+    final boolean overflow,
+    final boolean uncalibrated,
+    final boolean uncorrected)
+  {
+    this (
+      settings,
+      instrumentChannel,
+      samples,
+      0,
+      samples != null ? samples.length : 0,
+      minXHint,
+      maxXHint,
+      minYHint,
+      maxYHint,
+      unit,
+      resolution,
+      error,
+      errorMessage,
+      overflow,
+      uncalibrated,
+      uncorrected);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,12 +147,22 @@ public class DefaultDigitalStorageOscilloscopeTrace
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  /** Returns the trace length in terms of number of samples.
+   * 
+   * @return The trace length in terms of number of samples.
+   * 
+   */
   @Override
   public final int getTraceLength ()
   {
     return getReadingValue ().length;
   }
 
+  /** Returns the trace as a {@code double} array.
+   * 
+   * @return The trace as a {@code double} array.
+   * 
+   */
   @Override
   public final double[] getReadingValue ()
   {
@@ -127,8 +176,29 @@ public class DefaultDigitalStorageOscilloscopeTrace
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  private final double minNHint;
+  
+  @Override
+  public final double getMinNHint ()
+  {
+    return this.minNHint;
+  }
+
+  private final double maxNHint;
+  
+  @Override
+  public final double getMaxNHint ()
+  {
+    return this.maxNHint;
+  }
+
   private final double minXHint;
   
+  /** Returns a (strong) hint for the (minimum) X value corresponding to the {@code n = 0} index value.
+   * 
+   * @return A (strong) hint for the (minimum) X value corresponding to the {@code n = 0} index value.
+   * 
+   */
   @Override
   public final double getMinXHint ()
   {
@@ -137,6 +207,14 @@ public class DefaultDigitalStorageOscilloscopeTrace
 
   private final double maxXHint;
   
+  /** Returns a (strong) hint for the (maximum) X value corresponding to the {@link #getTraceLength} index value.
+   * 
+   * <p>
+   * XXX Check this; shouldn't this be {@code getTraceLength - 1}?.
+   * 
+   * @return A (strong) hint for the (maximum) X value corresponding to the {@code n = 0} index value.
+   * 
+   */
   @Override
   public final double getMaxXHint ()
   {
