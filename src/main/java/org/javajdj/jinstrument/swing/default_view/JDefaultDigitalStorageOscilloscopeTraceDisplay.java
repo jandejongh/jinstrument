@@ -166,8 +166,10 @@ public class JDefaultDigitalStorageOscilloscopeTraceDisplay
     }
     else
     {
+      // XXX Really, this is not something to do an "generic DSO level"!!
       this.jTrace.setTraceData (channel,
         TraceData.createYn (trace.getReadingValue ())
+        .withNRange (trace.getMinNHint (), trace.getMaxNHint ())
         .withXRange (trace.getMinXHint (), trace.getMaxXHint ())
         .withYRange (trace.getMinYHint (), trace.getMaxYHint ()));
     }
