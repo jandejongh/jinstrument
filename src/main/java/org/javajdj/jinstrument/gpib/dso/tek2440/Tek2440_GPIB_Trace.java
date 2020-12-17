@@ -26,6 +26,9 @@ import org.javajdj.jinstrument.util.Util;
 
 /** Implementation of {@link DigitalStorageOscilloscopeTrace} for the Tektronix-2440.
  *
+ * <p>
+ * XXX Note: This really only cover like the Yn (Yt) cases like for Ch1, Ch2, Add, Mult.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
@@ -59,6 +62,8 @@ public class Tek2440_GPIB_Trace
     super (settings,
       channel,
       toSamples (settings, channel, bytes),
+      toMinNHint (settings, channel, bytes),
+      toMaxNHint (settings, channel, bytes),
       toMinXHint (settings, channel, bytes),
       toMaxXHint (settings, channel, bytes),
       toMinYHint (settings, channel, bytes),
@@ -148,6 +153,42 @@ public class Tek2440_GPIB_Trace
     return samples;
   }
 
+  private static double toMinNHint (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
+  {
+    if (settings == null || channel == null || bytes == null)
+      throw new IllegalArgumentException ();
+    // The number of samples in the waveform; index of 0 inclusive to N exclusive.
+    final double N = (double) Tek2440_GPIB_Instrument.TEK2440_SAMPLES_PER_WAVEFORM;
+    // The "index" in the trace data that is centered on the display of the Tek-2440 (and, by default, on our own display).
+    // This index is made to correspond to zero in the (returned) X range.
+    final double n_c = settings.getHorizontalPosition ();
+    // The number of samples per display (as a double).
+    final double Nd = Tek2440_GPIB_Instrument.TEK2440_SAMPLES_PER_DISPLAY;
+    final double n_min = n_c - Nd / 2;
+    return n_min;
+  }
+  
+  private static double toMaxNHint (
+    final Tek2440_GPIB_Settings settings,
+    final Tek2440_GPIB_Settings.DataSource channel,
+    final byte[] bytes)
+  {
+    if (settings == null || channel == null || bytes == null)
+      throw new IllegalArgumentException ();
+    // The number of samples in the waveform; index of 0 inclusive to N exclusive.
+    final double N = (double) Tek2440_GPIB_Instrument.TEK2440_SAMPLES_PER_WAVEFORM;
+    // The "index" in the trace data that is centered on the display of the Tek-2440 (and, by default, on our own display).
+    // This index is made to correspond to zero in the (returned) X range.
+    final double n_c = settings.getHorizontalPosition ();
+    // The number of samples per display (as a double).
+    final double Nd = Tek2440_GPIB_Instrument.TEK2440_SAMPLES_PER_DISPLAY;
+    final double n_max = n_c + Nd / 2;
+    return n_max;
+  }
+  
   private static double toMinXHint (
     final Tek2440_GPIB_Settings settings,
     final Tek2440_GPIB_Settings.DataSource channel,
@@ -155,17 +196,44 @@ public class Tek2440_GPIB_Trace
   {
     if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
+    // The total number of X divisions the waveform data stretches.
+    final double divX = Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS_PER_WAVEFORM;
+    // The number of samples in the waveform; index of 0 inclusive to N exclusive.
+    final double N = (double) Tek2440_GPIB_Instrument.TEK2440_SAMPLES_PER_WAVEFORM;
+    // The "index" in the trace data that is centered on the display of the Tek-2440 (and, by default, on our own display).
+    // This index is made to correspond to zero in the (returned) X range.
+    final double n_c = settings.getHorizontalPosition ();
+    // The relative ([-1, 1]) X position of the minimum (first) index value of the trace data.
+    final double minX_rel = - n_c / N;
+    // The relative ([-1, 1]) X position of the maximum (last) index value of the trace data.
+    final double maxX_rel = (N - n_c) / N;
     switch (channel)
     {
       case Ch1:
+      {
+        // XXX Ch1 always on A?
+        // The X span in seconds.
+        final double Xs_s = settings.getASecondsPerDivision ().getSecondsPerDivision_s () * divX;
+        final double minX = minX_rel * Xs_s;
+        return minX;
+      }
       case Ch2:
+      {
+        // XXX Ch2 always on B?
+        // The X span in seconds.
+        final double Xs_s = settings.getBSecondsPerDivision ().getSecondsPerDivision_s () * divX;
+        final double minX = minX_rel * Xs_s;
+        return minX;
+      }
       case Add:
       case Mult:
+        // Actually, unsupported...
+        return 0;
       case Ch1Del:
       case Ch2Del:
       case AddDel:
       case MultDel:
-        return 0;
+        throw new UnsupportedOperationException ();
       case Ref1:
       case Ref2:
       case Ref3:
@@ -183,17 +251,44 @@ public class Tek2440_GPIB_Trace
   {
     if (settings == null || channel == null || bytes == null)
       throw new IllegalArgumentException ();
+    // The total number of X divisions the waveform data stretches.
+    final double divX = Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS_PER_WAVEFORM;
+    // The number of samples in the waveform; index of 0 inclusive to N exclusive.
+    final double N = (double) Tek2440_GPIB_Instrument.TEK2440_SAMPLES_PER_WAVEFORM;
+    // The "index" in the trace data that is centered on the display of the Tek-2440 (and, by default, on our own display).
+    // This index is made to correspond to zero in the (returned) X range.
+    final double n_c = settings.getHorizontalPosition ();
+    // The relative ([-1, 1]) X position of the minimum (first) index value of the trace data.
+    final double minX_rel = - n_c / N;
+    // The relative ([-1, 1]) X position of the maximum (last) index value of the trace data.
+    final double maxX_rel = (N - n_c) / N;
     switch (channel)
     {
       case Ch1:
+      {
+        // XXX Ch1 always on A?
+        // The X span in seconds.
+        final double Xs_s = settings.getASecondsPerDivision ().getSecondsPerDivision_s () * divX;
+        final double maxX = maxX_rel * Xs_s;
+        return maxX;
+      }
       case Ch2:
+      {
+        // XXX Ch2 always on B?
+        // The X span in seconds.
+        final double Xs_s = settings.getBSecondsPerDivision ().getSecondsPerDivision_s () * divX;
+        final double maxX = maxX_rel * Xs_s;
+        return maxX;
+      }
       case Add:
       case Mult:
+        // Actually, unsupported...
+        return settings.getASecondsPerDivision ().getSecondsPerDivision_s () * Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS;
       case Ch1Del:
       case Ch2Del:
       case AddDel:
       case MultDel:
-        return settings.getASecondsPerDivision ().getSecondsPerDivision_s () * Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS;
+        throw new UnsupportedOperationException ();
       case Ref1:
       case Ref2:
       case Ref3:
