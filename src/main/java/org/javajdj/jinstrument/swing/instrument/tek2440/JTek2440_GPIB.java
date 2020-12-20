@@ -23,6 +23,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
@@ -30,6 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentChannel;
 import org.javajdj.jinstrument.InstrumentListener;
 import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentSettings;
@@ -45,6 +48,9 @@ import org.javajdj.jswing.jbyte.JByte;
 import org.javajdj.jswing.jcenter.JCenter;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jtrace.JTrace;
+import org.javajdj.jswing.jtrace.TraceDB;
+import org.javajdj.jswing.jtrace.TraceData;
+import org.javajdj.jswing.jtrace.TraceMarker;
 
 /** A Swing panel for (complete) control and status of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
@@ -81,27 +87,27 @@ public class JTek2440_GPIB
     removeAll ();
     setLayout (new BorderLayout ());
     
-    getTracePanel ().setBorder (null);
     // Improve the appearance of the JTrace instance.
     // XXX This probably is unnecessary in later versions of jswing/jtrace.
-    getTracePanel ().getJTrace ().setXMargin (4);
-    getTracePanel ().getJTrace ().setYMargin (4);
-    getTracePanel ().getJTrace ().setSidePanelWidth (JTrace.SidePanelWidth.TEN);
-    getTracePanel ().getJTrace ().setSidePanelColor (Color.black);
-    getTracePanel ().getJTrace ().setMarginStubColor (Color.black);
+    getJTrace ().setBorder (null);
+    getJTrace ().setXMargin (4);
+    getJTrace ().setYMargin (4);
+    getJTrace ().setSidePanelWidth (JTrace.SidePanelWidth.TEN);
+    getJTrace ().setSidePanelColor (Color.black);
+    getJTrace ().setMarginStubColor (Color.black);
     // Fix the number of division to match those of the Tek-2440.
-    getTracePanel ().getJTrace ().setXDivisions (Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS);
-    getTracePanel ().getJTrace ().setYDivisions (Tek2440_GPIB_Instrument.TEK2440_Y_DIVISIONS);
+    getJTrace ().setXDivisions (Tek2440_GPIB_Instrument.TEK2440_X_DIVISIONS);
+    getJTrace ().setYDivisions (Tek2440_GPIB_Instrument.TEK2440_Y_DIVISIONS);
     // Next lines ensure that color scheme is consistent across the channels.
-    getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch1, null);
-    getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch2, null);
-    getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Add, null);
-    getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Mult, null);
+    getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch1, null);
+    getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch2, null);
+    getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Add, null);
+    getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Mult, null);
     final Color channel1Color = JTrace.DEFAULT_TRACE_COLORS[0];
     final Color channel2Color = JTrace.DEFAULT_TRACE_COLORS[1];
     final Color addColor      = JTrace.DEFAULT_TRACE_COLORS[2];
     final Color multColor     = JTrace.DEFAULT_TRACE_COLORS[3];
-    add (getTracePanel (), BorderLayout.CENTER);
+    add (getJTrace (), BorderLayout.CENTER);
     
     final JPanel northPanel = new JPanel ();
     add (northPanel, BorderLayout.NORTH);
@@ -254,7 +260,7 @@ public class JTek2440_GPIB
       (final Boolean channelEnabled) ->
       {
         if (! channelEnabled)
-          getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch1, null);
+          getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch1, null);
       }));
     
     eastNorthPanel.add (new JTek2440_GPIB_Channel (
@@ -267,7 +273,7 @@ public class JTek2440_GPIB
       (final Boolean channelEnabled) ->
       {
         if (! channelEnabled)
-          getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch2, null);
+          getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch2, null);
       }));
     
     eastSouthNorthPanel.setLayout (new GridLayout (1, 2));
@@ -286,7 +292,7 @@ public class JTek2440_GPIB
       (b) ->
       {
         // Remove the trace immediately from the Trace panel.
-        if (! b) getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Add, null);
+        if (! b) getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Add, null);
       },
       true)));    
     eastSouthNorthPanel.add (addPanel);
@@ -305,7 +311,7 @@ public class JTek2440_GPIB
       (b) ->
       {
         // Remove the trace immediately from the Trace panel.
-        if (! b) getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Mult, null);
+        if (! b) getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Mult, null);
       },
       true)));
     eastSouthNorthPanel.add (multPanel);
@@ -452,6 +458,66 @@ public class JTek2440_GPIB
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // JDefaultDigitalStorageOscilloscopeView
+  // AUGMENT TRACE DATA
+  // POST SETTING NEW TRACE DATA
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  protected TraceData augmentTraceData (final InstrumentChannel channel, final TraceData traceData)
+  {
+    return traceData;
+  }
+
+  @Override
+  protected void postSettingNewTraceData (final InstrumentChannel channel)
+  {
+    if (channel == null || ! (channel instanceof Tek2440_GPIB_Settings.DataSource))
+      return;
+    final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) getInstrument ();
+    final Tek2440_GPIB_Settings settings = (Tek2440_GPIB_Settings) tek2440.getCurrentInstrumentSettings ();
+    // Register a proper Y == 0 marker.
+    // XXX We should really have some locking on the TraceDB...
+    switch ((Tek2440_GPIB_Settings.DataSource) channel)
+    {
+      case Ch1:
+      case Ch2:
+      {
+        // Get the Y position of the signal/trace; the returned value is in divisions.
+        final double position = settings.getPosition ((Tek2440_GPIB_Settings.DataSource) channel);
+        // Transform to display/trace Y value.
+        final double position_Y = position
+          * settings.getVoltsPerDivision ((Tek2440_GPIB_Settings.DataSource) channel).getVoltsPerDivision_V ();
+        // Enable the Y == 0 marker and appropriately set its offset.
+        final TraceDB traceDB = getJTrace ().getTraceDB ();
+        traceDB.addTraceMarkers (channel, Collections.singleton (TraceMarker.ZERO_Y_SIDE_MARKER));
+        traceDB.setYOffset (channel, - position_Y);
+        break;
+      }
+      case Add:
+      case Mult:
+        LOG.log (Level.WARNING, "Do not know what to do here for channel {0}!", channel);
+        break;
+      case Ch1Del:
+      case Ch2Del:
+      case AddDel:
+      case MultDel:
+        LOG.log (Level.WARNING, "Do not know what to do here for channel {0}!", channel);
+        break;
+      case Ref1:
+      case Ref2:
+      case Ref3:
+      case Ref4:
+        LOG.log (Level.WARNING, "Do not know what to do here for channel {0}!", channel);
+        break;
+      default:
+        throw new RuntimeException ();
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // SWING
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -544,18 +610,18 @@ public class JTek2440_GPIB
       final Tek2440_GPIB_Settings settings = (Tek2440_GPIB_Settings) instrumentSettings;
       
       if (! settings.isVModeChannel1 ())
-        getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch1, null);
+        JTek2440_GPIB.this.getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch1, null);
       if (! settings.isVModeChannel2 ())
-        getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch2, null);
+        JTek2440_GPIB.this.getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Ch2, null);
       if (! settings.isVModeAdd ())
-        getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Add, null);
+        JTek2440_GPIB.this.getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Add, null);
       if (! settings.isVModeMult ())
-        getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Mult, null);
+        JTek2440_GPIB.this.getJTrace ().setTraceData (Tek2440_GPIB_Settings.DataSource.Mult, null);
       
       if (! settings.isVModeChannel1 ())
-        getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1, null);
+        JTek2440_GPIB.this.getJTrace ().setTraceData (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1, null);
       if (! settings.isVModeChannel2 ())
-        getTracePanel ().getJTrace ().setTraceData (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2, null);
+        JTek2440_GPIB.this.getJTrace ().setTraceData (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2, null);
       
     }
 
