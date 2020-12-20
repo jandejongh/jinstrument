@@ -263,12 +263,24 @@ public class JDefaultDigitalStorageOscilloscopeView
     return traceData;
   }
   
+  /** Sub-class hook for actions needed after a new instrument trace reading has been set on the {@link JTrace} instance.
+   * 
+   * <p>
+   * Useful for adding markers, text, legends, etc.
+   * 
+   * @param channel The {@link InstrumentChannel} for which the {@link TraceData} was set, non-{@code null}.
+   * 
+   */
+  protected void postSettingNewTraceData (final InstrumentChannel channel)
+  {  
+  }
+  
   public final void setTrace (final DigitalStorageOscilloscopeTrace trace)
   {
     if (trace == null)
       return;
     final InstrumentChannel channel = trace.getInstrumentChannel ();
-    if (channel != null)
+    if (channel == null)
       return;
     if (this.isChannelEnabled != null
       // Be careful below as the Function is perfectly allowed to return null: I don't know/care...
@@ -287,6 +299,7 @@ public class JDefaultDigitalStorageOscilloscopeView
         return;
       final TraceData finalTraceData = augmentTraceData (channel, initialTraceData);
       this.jTrace.setTraceData (channel, finalTraceData);
+      postSettingNewTraceData (channel);
     }
     // For future use...
     // SwingUtilities.invokeLater (() -> repaint ());
