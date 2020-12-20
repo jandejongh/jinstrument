@@ -1464,6 +1464,31 @@ public class Tek2440_GPIB_Settings
     }    
   }
   
+  public final double getPosition (final DataSource channel)
+  {
+    if (channel == null)
+      throw new IllegalArgumentException ();
+    switch (channel)
+    {
+      case Ch1: return getPosition (Tek2440_GPIB_Instrument.Tek2440Channel.Channel1);
+      case Ch2: return getPosition (Tek2440_GPIB_Instrument.Tek2440Channel.Channel2);
+      case Add:
+      case Mult:
+      case Ch1Del:
+      case Ch2Del:
+      case AddDel:
+      case MultDel:
+      case Ref1:
+      case Ref2:
+      case Ref3:
+      case Ref4:
+        LOG.log (Level.WARNING, "I really have no clue here; help!!");
+        return 0;
+      default:
+        throw new IllegalArgumentException ();
+    }
+  }
+  
   private static ChannelSettings parseChannelSettings (final String argString, final Tek2440_GPIB_Instrument.Tek2440Channel channel)
   {
     if (argString == null)
