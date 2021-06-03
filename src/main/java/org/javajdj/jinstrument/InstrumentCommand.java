@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>, TNO.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,12 +33,16 @@ import java.util.Map;
 public interface InstrumentCommand
   extends Map<String, Object>
 {
-  
+   
   public final static String IC_COMMAND_KEY = "command";
   
   public final static String IC_RETURN_STATUS_KEY = "returnStatus";
   
+  public final static String IC_RETURN_EXCEPTION_KEY = "returnException";
+  
   public final static String IC_RETURN_VALUE_KEY = "returnValue";
+  
+  public final static String IC_COMPLETION_SEMAPHORE_KEY = "completionSemaphore";
   
   public final static String IC_NOP_KEY = "commandNop";
   
