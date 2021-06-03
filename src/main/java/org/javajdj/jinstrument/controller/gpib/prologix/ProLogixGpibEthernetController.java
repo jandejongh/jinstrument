@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -476,28 +476,18 @@ public final class ProLogixGpibEthernetController
    * indicate the end of the command string (since we just escaped all other potential end-of-command characters).
    * 
    * <p>
-   * The method issues a log warning if the supplied string is not terminated with a carriage return or a linefeed.
-   * 
-   * <p>
    * This method assumes the '++eos 3' command-string termination mode, meaning that the controller does <i>not</i> append
    * any termination character whatsoever before sending the string to the GPIB device. It thus becomes the responsibility of
-   * the {@link Controller} client (typically, a {@link GpibDevice} and this controller implementation.
-   * 
-   * <p>
-   * If applicable, the byte added as termination character for the controller is {@link #COMMAND_TERMINATOR_TO_PROLOGIX}.
+   * the {@link Controller} client (typically, a {@link GpibDevice} and this controller's implementation.
    * 
    * @param bytes     The (command) string (as byte array).
-   * @param isBinary  Whether to skip reporting unexpected termination of the input string (because we are sending binary data),
-   *                    AND to skip the addition of a termination character to the controller.
-   *                  When {@code true}, this method will only take care of escaping the carriage return, linefeed, escape and
-   *                    '+' characters.
    * 
    * @return The prepared (command) string (as byte array).
    * 
    * @throws IllegalArgumentException If the argument is {@code null}.
    * 
    */
-  private static byte[] proLogixCookString (final byte[] bytes, final boolean isBinary)
+  private static byte[] proLogixCookString (final byte[] bytes)
   {
     if (bytes == null)
       throw new IllegalArgumentException ();
@@ -514,24 +504,18 @@ public final class ProLogixGpibEthernetController
         default:
           baos.write (b);
       }
-    // For a command string sent to ANY GPIB device, we always expect termination of the command by a CR or LF.
-    if (! isBinary)
-      if (bytes.length == 0 || (bytes[bytes.length - 1] != LF_BYTE && bytes[bytes.length - 1] != CR_BYTE))
-        LOG.log (Level.WARNING, "Supplied command String {0} is NOT terminated by a LF or CR!",
-          new String (bytes, Charset.forName ("US-ASCII")));
     // Append a 'end-of-command' indication; this WILL be swallowed by the ProLogix controller.
-    if (! isBinary)
-      baos.write (COMMAND_TERMINATOR_TO_PROLOGIX);
+    baos.write (COMMAND_TERMINATOR_TO_PROLOGIX);
     return baos.toByteArray ();
   }
   
-  /** Cooks the given argument as 'command' and writes it to the ProLogix controller.
+  /** Cooks the given argument and writes it to the ProLogix controller.
    * 
    * <p>
    * Invokes {@link #proLogixWriteRaw(byte[]) after cooking the byte array
-   * with {@link #proLogixCookString(byte[], boolean)} with {@code false} second argument (i.e., <i>not</i> binary data).
+   * with {@link #proLogixCookString(byte[])}.
    * 
-   * @param bytes The (command) string (as byte array).
+   * @param bytes The string to (cook and) write (as byte array).
    * 
    * @throws IllegalArgumentException If the argument is {@code null}.
    * @throws IOException              If the socket is {@code null},
@@ -539,59 +523,16 @@ public final class ProLogixGpibEthernetController
    * @throws InterruptedException     If the {@link Thread} was interrupted while writing to the controller socket.
    * 
    */
-  private void proLogixWriteCookedCommand (final byte[] bytes)
+  private void proLogixWriteCooked (final byte[] bytes)
     throws IOException, InterruptedException
   {
-    proLogixWriteRaw (proLogixCookString (bytes, false));
-  }
-
-  /** Cooks the given argument as 'command' and writes it to the ProLogix controller.
-   * 
-   * <p>
-   * Converts the {@code String} to a (ASCII) byte array and invokes {@link #proLogixWriteCookedCommand(byte[])}.
-   * 
-   * @param string The string to (cook and) send, non-{@code null}.
-   * 
-   * @throws IllegalArgumentException If the argument is {@code null}.
-   * @throws IOException              If the socket is {@code null},
-   *                                    or if writing to the socket failed with an {@link IOException}.
-   * @throws InterruptedException     If the {@link Thread} was interrupted while writing to the controller socket.
-   * 
-   * @see #proLogixWriteCookedCommand(byte[])
-   * 
-   */
-  private void proLogixWriteCookedCommand (final String string)
-    throws IOException, InterruptedException
-  {
-    if (string == null)
-      throw new IllegalArgumentException ();
-    proLogixWriteCookedCommand (string.getBytes (Charset.forName ("US-ASCII")));    
+    proLogixWriteRaw (proLogixCookString (bytes));    
   }
   
-  /** Cooks the given argument as 'binary data' and writes it to the ProLogix controller.
+  /** Cooks the given argument and writes it to the ProLogix controller.
    * 
    * <p>
-   * Invokes {@link #proLogixWriteRaw(byte[]) after cooking the byte array
-   * with {@link #proLogixCookString(byte[], boolean)} with {@code true} second argument (i.e., <i>binary</i> data).
-   * 
-   * @param bytes The (binary) string (as byte array).
-   * 
-   * @throws IllegalArgumentException If the argument is {@code null}.
-   * @throws IOException              If the socket is {@code null},
-   *                                    or if writing to the socket failed with an {@link IOException}.
-   * @throws InterruptedException     If the {@link Thread} was interrupted while writing to the controller socket.
-   * 
-   */
-  private void proLogixWriteCookedBinary (final byte[] bytes)
-    throws IOException, InterruptedException
-  {
-    proLogixWriteRaw (proLogixCookString (bytes, true));    
-  }
-  
-  /** Cooks the given argument as 'binary data' and writes it to the ProLogix controller.
-   * 
-   * <p>
-   * Converts the {@code String} to a (ASCII) byte array and invokes {@link #proLogixWriteCookedBinary(byte[])}.
+   * Converts the {@code String} to a (ASCII) byte array and invokes {@link #proLogixWriteCooked(byte[])}.
    * 
    * @param string The string to (cook and) send, non-{@code null}.
    * 
@@ -603,12 +544,12 @@ public final class ProLogixGpibEthernetController
    * @see #proLogixWriteCookedBinary(byte[])
    * 
    */
-  private void proLogixWriteCookedBinary (final String string)
+  private void proLogixWriteCooked (final String string)
     throws IOException, InterruptedException
   {
     if (string == null)
       throw new IllegalArgumentException ();
-    proLogixWriteCookedBinary (string.getBytes (Charset.forName ("US-ASCII")));    
+    proLogixWriteCooked (string.getBytes (Charset.forName ("US-ASCII")));    
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1062,7 +1003,8 @@ public final class ProLogixGpibEthernetController
       proLogixClearReadBuffer ();
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
     }
-    proLogixWriteRaw (bytes);
+    // proLogixWriteRaw (bytes);
+    proLogixWriteCooked (bytes);
   }
   
   private byte[] processCommand_writeAndReadEOI (
@@ -1083,7 +1025,7 @@ public final class ProLogixGpibEthernetController
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
       proLogixCommandSetEOT (true, DEFAULT_EOT);
     }
-    processCommand_write (gpibAddress, bytes, timeout_ms, false);
+    processCommand_write (gpibAddress, bytes, timeout_ms, false); // Will do the cooking...
     return processCommand_readEOI (gpibAddress, deadline_millis - System.currentTimeMillis (), false);
   }
   
@@ -1106,7 +1048,7 @@ public final class ProLogixGpibEthernetController
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
-    processCommand_write (gpibAddress, bytes, timeout_ms, false);
+    processCommand_write (gpibAddress, bytes, timeout_ms, false); // Will do the cooking...
     return processCommand_readln (
       gpibAddress,
       readlineTerminationMode,
@@ -1134,7 +1076,7 @@ public final class ProLogixGpibEthernetController
       proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
-    processCommand_write (gpibAddress, bytes, timeout_ms, false);
+    processCommand_write (gpibAddress, bytes, timeout_ms, false); // Will do the cooking...
     return processCommand_readN (gpibAddress, N, deadline_millis - System.currentTimeMillis (), false);
   }
   
@@ -1159,7 +1101,7 @@ public final class ProLogixGpibEthernetController
       proLogixCommandSetEOT (false, LF_BYTE);
     }
     final byte[][] bytesRead = new byte[N][];
-    processCommand_write (gpibAddress, bytes, timeout_ms, false);
+    processCommand_write (gpibAddress, bytes, timeout_ms, false); // Will do the cooking...
     proLogixCommandWritelnControllerCommand (READ_COMMAND);
     for (int n = 0; n < N; n++)
       bytesRead[n] = processCommand_readln (
