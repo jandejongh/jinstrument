@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>, TNO.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.javajdj.jinstrument;
 
 import java.util.LinkedHashMap;
 
-/** Default implementation of a {@link InstrumentCommand}.
+/** Default implementation of an {@link InstrumentCommand}.
  * 
  * <p>
  * The main purpose of this class is to provide custom constructors with (some) additional error checking.
@@ -46,7 +46,7 @@ public class DefaultInstrumentCommand
       throw new IllegalArgumentException ();
     if (arg3 != null && arg3.trim ().isEmpty ())
       throw new IllegalArgumentException ();
-    put (IC_COMMAND_KEY, command);
+    put (InstrumentCommand.IC_COMMAND_KEY, command);
     if (arg1 != null)
       put (arg1, val1);
     if (arg2 != null)
@@ -74,6 +74,5 @@ public class DefaultInstrumentCommand
   {
     this (command, null, null, null, null, null, null);
   }
-  
   
 }
