@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package org.javajdj.jinstrument;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.javajdj.jservice.Service;
 
-/** A software representation of a (or more) physical instrument.
+/** A software representation of a physical instrument.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
@@ -46,7 +48,57 @@ public interface Instrument
   
   void setPoweredOn (boolean poweredOn);
   
+  /** Adds (queues) an {@code InstrumentCommand} for asynchronous execution on this instrument.
+   * 
+   * <p>
+   * The asynchronous execution of (appropriate) {@link InstrumentCommand}s is one of the
+   * {@link Service} tasks of an {@link Instrument}.
+   * Unless specified otherwise, {@link InstrumentCommand}s added to an {@link Instrument}
+   * are processed in First-Come First-Served order.
+   * 
+   * <p>
+   * Implementations of this method must <i>never</i> block.
+   * 
+   * <p>
+   * The behavior of this method when the {@link Service} is not <i>active</i> is implementation dependent.
+   * (This includes the option of dropping the command.)
+   * 
+   * <p>
+   * In case of finite (command) buffer size, a buffer-full condition upon invoking this method leads to
+   * dropping the command.
+   * 
+   * @param instrumentCommand The command, non-{@code null}.
+   * 
+   * @throws IllegalArgumentException If the command is {@code null}.
+   * 
+   * @see InstrumentCommand
+   * @see Service
+   * 
+   */
   void addCommand (InstrumentCommand instrumentCommand);
+  
+  /** Adds (queues) an {@code InstrumentCommand} for execution on this instrument and awaits its completion.
+   * 
+   * <p>
+   * This method essentially wraps invocation of {@link #addCommand} with synchronization means.
+   * See the description of that method for some details on the execution of {@link InstrumentCommand}s.
+   * 
+   * @param instrumentCommand The command, non-{@code null}.
+   * @param timeout           The timeout (in units given as third argument).
+   * @param unit              The time unit in which the timeout is to be interpreted.
+   * 
+   * @throws IllegalArgumentException If the command is {@code null}.
+   * @throws IOException          If communication with the controller, device or instrument resulted in an error.
+   * @throws InterruptedException If the current thread was interrupted while awaiting command completion.
+   * @throws TimeoutException     If a timeout occurred (this may be an earlier timeout than the one supplied).
+   * 
+   * @see #addCommand
+   * @see InstrumentCommand
+   * @see Service
+   * 
+   */
+  void addAndProcessCommandSync (InstrumentCommand instrumentCommand, long timeout, TimeUnit unit)
+    throws IOException, InterruptedException, TimeoutException;
 
   @FunctionalInterface
   interface InstrumentAction
