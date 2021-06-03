@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -365,12 +365,16 @@ public abstract class AbstractGpibInstrument
       string.getBytes (Charset.forName ("US-ASCII")));
   }
   
+  protected final byte[] writeAndReadEOISync (final byte[] bytes)
+    throws InterruptedException, IOException, TimeoutException
+  {
+    return getDevice ().writeAndReadEOISync (bytes, getReadEOITimeout_ms ());
+  }
+  
   protected final byte[] writeAndReadEOISync (final String string)
     throws InterruptedException, IOException, TimeoutException
   {
-    final byte[] bytes = getDevice ().writeAndReadEOISync (string.getBytes (Charset.forName ("US-ASCII")),
-      getReadEOITimeout_ms ());
-    return bytes;
+    return writeAndReadEOISync (string.getBytes (Charset.forName ("US-ASCII")));
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
