@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -528,6 +530,20 @@ implements Instrument
     if (! this.commandQueue.offer (instrumentCommand))
       LOG.log (Level.WARNING, "Overflow on Instrument Command Queue on {0}.", this);
   }
+
+  @Override
+  public final void addAndProcessCommandSync (final InstrumentCommand instrumentCommand, final long timeout, final TimeUnit unit)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (instrumentCommand == null)
+      throw new IllegalArgumentException ();
+    final Semaphore semaphore = new Semaphore (0);
+    instrumentCommand.put (InstrumentCommand.IC_COMPLETION_SEMAPHORE_KEY, semaphore);
+    if (! this.commandQueue.offer (instrumentCommand))
+      LOG.log (Level.WARNING, "Overflow on Instrument Command Queue on {0}.", this);
+    else if (! semaphore.tryAcquire (timeout, unit))
+      throw new TimeoutException ();
+  }
   
   private InstrumentCommand takeCommand ()
     throws InterruptedException
@@ -538,17 +554,45 @@ implements Instrument
   protected abstract void processCommand (final InstrumentCommand instrumentCommand)
     throws IOException, InterruptedException, TimeoutException;
   
+  private void processCommandAndReleasePotentialWaiter (final InstrumentCommand instrumentCommand)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    try
+    {
+      instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, null);
+      processCommand (instrumentCommand);
+      instrumentCommand.put (InstrumentCommand.IC_RETURN_STATUS_KEY, Boolean.TRUE);
+      // Setting InstrumentCommand.IC_RETURN_VALUE_KEY is the responsibility of #processCommand.
+      instrumentCommand.put (InstrumentCommand.IC_RETURN_EXCEPTION_KEY, null);
+    }
+    catch (Exception e)
+    {
+      if (instrumentCommand != null)
+      {
+        instrumentCommand.put (InstrumentCommand.IC_RETURN_STATUS_KEY, Boolean.FALSE);
+        instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, null);
+        instrumentCommand.put (InstrumentCommand.IC_RETURN_EXCEPTION_KEY, e);
+      }
+      throw (e);
+    }
+    finally
+    {
+      if (instrumentCommand.containsKey (InstrumentCommand.IC_COMPLETION_SEMAPHORE_KEY))
+        ((Semaphore) instrumentCommand.get (InstrumentCommand.IC_COMPLETION_SEMAPHORE_KEY)).release ();
+    }
+  }
+  
   private final Runnable instrumentCommandProcessor = RunnableInvoker.constantlyFromSupplierConsumerChain (
-    "Instrument Command Processor",
-    this,
-    this::takeCommand,
-    this::processCommand,
-    null,
-    null,
-    false,
-    b -> { if (b) error (); },
-    Level.INFO,
-    Level.WARNING);
+    "Instrument Command Processor",                // name (for logging only)
+    this,                                          // host (for logging only)
+    this::takeCommand,                             // resultSupplier
+    this::processCommandAndReleasePotentialWaiter, // resultConsumer
+    (Set<Class<? extends Exception>>) null,        // mustIgnore
+    (Set<Class<? extends Exception>>) null,        // mustTerminate
+    false,                                         // defaultTerminateUponException
+    b -> { if (b) error (); },                     // terminateListener; arg: due to abnormal condition (true) or interrupt (false)
+    Level.INFO,                                    // startTerminateLogLevel
+    Level.WARNING);                                // runnableExceptionLogLevel
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
