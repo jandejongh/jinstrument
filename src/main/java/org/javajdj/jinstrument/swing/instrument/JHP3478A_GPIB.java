@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,22 @@
 package org.javajdj.jinstrument.swing.instrument;
 
 import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.Instrument;
@@ -33,6 +42,7 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
+import org.javajdj.jinstrument.gpib.dmm.hp3478a.HP3478A_GPIB_CalibrationData;
 import org.javajdj.jinstrument.gpib.dmm.hp3478a.HP3478A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dmm.hp3478a.HP3478A_GPIB_Settings;
 import org.javajdj.jinstrument.gpib.dmm.hp3478a.HP3478A_GPIB_Status;
@@ -89,9 +99,23 @@ public class JHP3478A_GPIB
     jSerialPollStatusPanel.add (jSerialPollTags);
     this.jInstrumentSpecificPanel.add (jSerialPollStatusPanel);
     //
-    final JPanel jReserved = new JPanel ();
-    setPanelBorder (jReserved, level + 2, DEFAULT_MANAGEMENT_COLOR, "Reserved");
-    this.jInstrumentSpecificPanel.add (jReserved);
+    final JPanel jCalibrationPanel = new JPanel ();
+    jCalibrationPanel.setLayout (new GridLayout (1, 2));
+    setPanelBorder (jCalibrationPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Calibration");
+    final JPanel jCalibrationSavePanel = new JPanel ();
+    jCalibrationSavePanel.setLayout (new GridLayout (1, 1));
+    setPanelBorder (jCalibrationSavePanel, level + 3, Color.black, "Save");
+    final JColorCheckBox jCalibrationSaveButton = new JColorCheckBox ((t) -> Color.blue);
+    jCalibrationSaveButton.addActionListener (this.jCalibrationSaveListener);
+    jCalibrationSavePanel.add (jCalibrationSaveButton);
+    jCalibrationPanel.add (jCalibrationSavePanel);
+    final JPanel jCalibrationRestorePanel = new JPanel ();
+    jCalibrationRestorePanel.setLayout (new GridLayout (1, 1));
+    setPanelBorder (jCalibrationRestorePanel, level + 3, Color.black, "Restore");
+    final JColorCheckBox jCalibrationRestoreButton = new JColorCheckBox ((t) -> Color.blue);
+    jCalibrationRestorePanel.add (jCalibrationRestoreButton);
+    jCalibrationPanel.add (jCalibrationRestorePanel);
+    this.jInstrumentSpecificPanel.add (jCalibrationPanel);
     //
     final JPanel jAutoZeroPanel = new JPanel ();
     jAutoZeroPanel.setLayout (new GridLayout (1, 1));
@@ -244,6 +268,63 @@ public class JHP3478A_GPIB
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   private final JByte jSerialPollStatus;
+  
+  private final ActionListener jCalibrationSaveListener = (final ActionEvent ae) ->
+  {
+    if (JOptionPane.showConfirmDialog (
+      null,
+      "Read Calibration Data from Instrument " + getInstrument ().getInstrumentUrl () + "?",
+      "Reaed Calibration Data?",
+      JOptionPane.YES_NO_OPTION) == 1)
+      return;
+    final JOptionPane pleaseWaitOptionPane
+      = new JOptionPane ("Please wait while loading calibration data (this dialog needs work!)...");
+    final JDialog pleaseWaitDialog
+      = pleaseWaitOptionPane.createDialog ((Frame) null, "Please Wait (this dialog needs work!)...");
+    pleaseWaitDialog.setMinimumSize (new Dimension (200, 100));
+    pleaseWaitDialog.setModalityType (Dialog.ModalityType.MODELESS);
+    pleaseWaitDialog.setVisible (true);
+    
+    final HP3478A_GPIB_CalibrationData calibrationData;
+    try
+    {
+      calibrationData = ((HP3478A_GPIB_Instrument) getDigitalMultiMeter ()).readCalibrationDataSync ();
+    }
+    catch (Exception e)
+    {
+      LOG.log (Level.WARNING, "Caught exception while reading calibration data on instrument {0}: {1}.",        
+        new Object[]{getInstrument (), Arrays.toString (e.getStackTrace ())});
+      pleaseWaitDialog.setVisible (false);
+      pleaseWaitDialog.dispose ();
+      JOptionPane.showMessageDialog (null,
+        "Reading calibration data failed: " + e.toString () + "; check log for details!",
+        "Error",
+        JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    pleaseWaitDialog.setVisible (false);
+    pleaseWaitDialog.dispose ();
+    final JFileChooser jFileChooser = new JFileChooser ((File) null);
+    if (jFileChooser.showSaveDialog (this) != JFileChooser.APPROVE_OPTION)
+      return;      
+    final File file = jFileChooser.getSelectedFile ();
+    if (file == null)
+    {
+      JOptionPane.showMessageDialog (null, "No file? (Please report this error!)", "Error", JOptionPane.ERROR_MESSAGE);
+      return;      
+    }
+    if (file.exists () && JOptionPane.showConfirmDialog (null, "Overwrite?", "Overwrite file?", JOptionPane.YES_NO_OPTION) != 0)
+      return;
+    try
+    {
+      Files.write (file.toPath (), calibrationData.getBytes ());
+    }
+    catch (IOException ioe)
+    {
+      JOptionPane.showMessageDialog (null, "I/O Exception!", "Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+  };
   
   private final JColorCheckBox<Boolean> jAutoZero;
   
