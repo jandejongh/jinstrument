@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,6 +45,7 @@ import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.DigitalMultiMeterSettings;
 import org.javajdj.junits.Resolution;
 import org.javajdj.jinstrument.controller.gpib.ReadlineTerminationMode;
+import org.javajdj.jinstrument.gpib.AbstractGpibInstrument;
 
 /** Implementation of {@link Instrument} and {@link DigitalMultiMeter} for the HP-3478A.
  *
@@ -518,6 +520,61 @@ public class HP3478A_GPIB_Instrument
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // HP3478A_GPIB_Instrument
+  // READ/WRITE CALIBRATION DATA
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final byte readCalibrationNibbleSync (final int address)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP3478A_InstrumentCommand.IC_HP3478A_READ_CALIBRATION_NIBBLE,
+      HP3478A_InstrumentCommand.ICARG_HP3478A_READ_CALIBRATION_NIBBLE_ADDRESS, address);
+    addAndProcessCommandSync (command, AbstractGpibInstrument.DEFAULT_GET_STATUS_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+    if (! (command.containsKey (InstrumentCommand.IC_RETURN_VALUE_KEY)
+           && command.get (InstrumentCommand.IC_RETURN_VALUE_KEY) != null))
+    {
+      LOG.log (Level.WARNING, "Error obtaining value from readCalibrationNibbleSync on instrument {0}.",
+        new Object[]{this});
+      // XXX We should really check any marked Exceptions on the InstrumentCommand!
+      throw new IOException ();
+    }
+    return (byte) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
+  }
+  
+  public final void writeCalibrationNibbleSync (final int address, final byte calibrationNibble)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public final static long READ_CALIBRATION_DATA_TIMEOUT_S = 60;
+  
+  public final HP3478A_GPIB_CalibrationData readCalibrationDataSync ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    final InstrumentCommand command = new DefaultInstrumentCommand (HP3478A_InstrumentCommand.IC_HP3478A_READ_CALIBRATION_DATA);
+    addAndProcessCommandSync (command, HP3478A_GPIB_Instrument.READ_CALIBRATION_DATA_TIMEOUT_S, TimeUnit.SECONDS);
+    if (! (command.containsKey (InstrumentCommand.IC_RETURN_VALUE_KEY)
+           && command.get (InstrumentCommand.IC_RETURN_VALUE_KEY) != null))
+    {
+      LOG.log (Level.WARNING, "Error obtaining value from readCalibrationDataSync on instrument {0}.",
+        new Object[]{this});
+      // XXX We should really check any marked Exceptions on the InstrumentCommand!
+      throw new IOException ();
+    }
+    return (HP3478A_GPIB_CalibrationData) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);    
+  }
+  
+  public final void writeCalibrationDataSync (final HP3478A_GPIB_CalibrationData calibrationData)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    throw new UnsupportedOperationException ();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // AbstractInstrument
   // PROCESS COMMAND
   //
@@ -692,6 +749,59 @@ public class HP3478A_GPIB_Instrument
           }
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
+        }
+        case HP3478A_InstrumentCommand.IC_HP3478A_READ_CALIBRATION_NIBBLE:
+        {
+          // Not officially documented!
+          final int address =
+            (int) instrumentCommand.get (HP3478A_InstrumentCommand.ICARG_HP3478A_READ_CALIBRATION_NIBBLE_ADDRESS);
+          if (address < 0 || address > 255)
+            throw new UnsupportedOperationException ();
+          final byte[] bytes = writeAndReadEOISync (new byte[]
+          {
+            "W".getBytes (Charset.forName ("US-ASCII"))[0],
+            (byte) address,
+            "\r".getBytes (Charset.forName ("US-ASCII"))[0], // Carriage Return
+            "\n".getBytes (Charset.forName ("US-ASCII"))[0]  // Line Feed
+          });
+          if (bytes == null || bytes.length != 1)
+            throw new IOException ();
+          // We simply return the byte as returned by the instrument, even though we
+          // know that only the low-order nibble is relevant and that the high-order
+          // nibble is set to 0x4.
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, bytes[0]);
+          break;
+        }
+        case HP3478A_InstrumentCommand.IC_HP3478A_WRITE_CALIBRATION_NIBBLE:
+        {
+          throw new UnsupportedOperationException ();
+          // break;
+        }
+        case HP3478A_InstrumentCommand.IC_HP3478A_READ_CALIBRATION_DATA:
+        {
+          final byte[] bytes = new byte[HP3478A_GPIB_CalibrationData.SIZE];
+          for (int a = 0; a < bytes.length; a++)
+          {
+            final byte[] bytes_rx = writeAndReadEOISync (new byte[]
+            {
+              "W".getBytes (Charset.forName ("US-ASCII"))[0],
+              (byte) a,
+              "\r".getBytes (Charset.forName ("US-ASCII"))[0], // Carriage Return
+              "\n".getBytes (Charset.forName ("US-ASCII"))[0]  // Line Feed
+            });
+            if (bytes_rx == null || bytes_rx.length != 1)
+              throw new IOException ();
+            bytes[a] = bytes_rx[0];
+            // LOG.log (Level.INFO, "CAL RAM Address={0}, Value={1}.",
+            //   new Object[]{"0x" + Integer.toHexString (a), "0x" + Integer.toHexString (bytes[a])});
+          }
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, new HP3478A_GPIB_CalibrationData (bytes));
+          break;
+        }
+        case HP3478A_InstrumentCommand.IC_HP3478A_WRITE_CALIBRATION_DATA:
+        {
+          throw new UnsupportedOperationException ();
+          // break;
         }
         default:
           throw new UnsupportedOperationException ();
