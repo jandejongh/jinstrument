@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,12 @@ package org.javajdj.jinstrument.swing.instrument.tek2440;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
@@ -32,6 +36,7 @@ import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import org.javajdj.jswing.jcenter.JCenter;
+import org.javajdj.jswing.jenumsquare.JEnumLine;
 import org.javajdj.jswing.jtrace.JTrace;
 
 /** A Swing panel for the Horizontal settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
@@ -81,7 +86,7 @@ public class JTek2440_GPIB_Channel
       throw new IllegalArgumentException ();
     
     removeAll ();
-    setLayout (new GridLayout (7,2));
+    setLayout (new GridLayout (8,2));
       
     add (new JLabel("Enable"));
     add (JCenter.Y (new JBoolean_JBoolean (
@@ -152,6 +157,29 @@ public class JTek2440_GPIB_Channel
      jPosition.setPreferredSize (new Dimension (100, 40));
     add (JCenter.Y (jPosition));
     
+    add (new JLabel ());
+    final JEnumLine<PositionPresets> jPositionPresets = new JEnumLine<> (
+      SwingConstants.HORIZONTAL,
+      PositionPresets.class,
+      null,
+      (final PositionPresets t) ->
+      {
+        if (t != null)
+          try
+          {
+            tek2440.setChannelPosition (channel, (double) t.intValue ());
+          }
+          catch (IOException | InterruptedException e)
+          {
+            LOG.log (Level.INFO, "Caught exception while setting Y position for channel {0} to {1} on instrument {2}: {3}.",
+              new Object[]{channel, t, getInstrument (), Arrays.toString (e.getStackTrace ())});
+          }
+      },
+      Color.green,
+      new Dimension (10, 10),
+      true);
+    jPositionPresets.getButton (PositionPresets.ZERO).setBorder (BorderFactory.createLineBorder (Color.lightGray, 4));
+    add (jPositionPresets);
   }
 
   public JTek2440_GPIB_Channel (
@@ -310,6 +338,45 @@ public class JTek2440_GPIB_Channel
     return getInstrumentViewUrl ();
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // [Y] POSITION PRESETS
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public enum PositionPresets
+  {
+    
+    MINUS_4 (-4),
+    MINUS_3 (-3),
+    MINUS_2 (-2),
+    MINUS_1 (-1),
+    ZERO    (0),
+    PLUS_1  (1),
+    PLUS_2  (2),
+    PLUS_3  (3),
+    PLUS_4  (4);
+
+    private PositionPresets (final int intValue)
+    {
+      this.intValue = intValue;
+    }
+    
+    private final int intValue;
+    
+    public final int intValue ()
+    {
+      return this.intValue;
+    }
+    
+    @Override
+    public final String toString ()
+    {
+      return Integer.toString (this.intValue);
+    }
+    
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
