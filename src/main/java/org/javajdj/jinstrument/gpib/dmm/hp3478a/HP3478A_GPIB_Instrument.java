@@ -71,19 +71,26 @@ public class HP3478A_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  public final static double DEFAULT_HP3478A_HOUSEKEEPER_PERIOD_S = 0.1;
+  
   public final static double DEFAULT_HP3478A_READING_COLLECTOR_PERIOD_S = 2;
+  
+  private final static boolean USE_SRQ = true;
   
   public HP3478A_GPIB_Instrument (final GpibDevice device)
   {
     super ("HP-3478A", device, null, null,
-      false,  // Initialization
-      true,   // Status
-      false,  // Setings (not needed; they come with Status!)
-      true,   // Command Processor
-      true,   // Acquisition
-      false,  // Housekeeping
-      false); // Service Request Polling
-    setReadingCollectorPeriod_s (HP3478A_GPIB_Instrument.DEFAULT_HP3478A_READING_COLLECTOR_PERIOD_S);
+      true,      // Initialization
+      ! USE_SRQ, // Status
+      false,     // Setings (not needed; they come with Status!)
+      true,      // Command Processor
+      ! USE_SRQ, // Acquisition
+      USE_SRQ,   // Housekeeping (in this implementation used for SRQ/Serial Polling with USE_SRQ.
+      false);    // Service Request Polling
+    if (USE_SRQ)
+      setHousekeeperPeriod_s (HP3478A_GPIB_Instrument.DEFAULT_HP3478A_HOUSEKEEPER_PERIOD_S);
+    else
+      setReadingCollectorPeriod_s (HP3478A_GPIB_Instrument.DEFAULT_HP3478A_READING_COLLECTOR_PERIOD_S);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -374,7 +381,12 @@ public class HP3478A_GPIB_Instrument
   protected final void initializeInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
-    throw new UnsupportedOperationException ();
+    if (USE_SRQ)
+      writeSync ("H0T1KM77\r\n");
+    else
+      writeSync ("H0T1KM00\r\n");      
+    statusReadFromInstrument (getStatusFromInstrumentSync ());
+    settingsReadFromInstrument (getSettingsFromInstrumentSync ());
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -501,7 +513,94 @@ public class HP3478A_GPIB_Instrument
   protected final void instrumentHousekeeping ()
     throws IOException, InterruptedException, TimeoutException
   {
-    throw new UnsupportedOperationException ();
+    // Check to see if we are in the proper implementation mode.
+    if (! USE_SRQ)
+      return;
+    // Check to see if we have any instrument status already; we need it...
+    final HP3478A_GPIB_Status status = (HP3478A_GPIB_Status) getCurrentInstrumentStatus ();
+    if (status == null)
+    {
+      LOG.log (Level.WARNING, "No status (yet) on instrument {0}.", new Object[]{this});
+      return;
+    }
+    // Check to see if we have any instrument settings already; we need them...
+    final HP3478A_GPIB_Settings settings = (HP3478A_GPIB_Settings) getCurrentInstrumentSettings ();
+    if (settings == null)
+    {
+      LOG.log (Level.WARNING, "No settings (yet) on instrument {0}.", new Object[]{this});
+      return;
+    }
+    // Serial Poll.
+    final GpibDevice gpibDevice = (GpibDevice) getDevice ();
+    final byte serialPollStatusByte = gpibDevice.serialPollSync (getSerialPollTimeout_ms ());
+    // Check for SRQ; bail out if inactive.
+    if ((serialPollStatusByte & 0x40) == 0)
+      return;
+    // Report the presumably new status.
+    statusReadFromInstrument (HP3478A_GPIB_Status.fromSerialPollStatusByteAndSettings (serialPollStatusByte, settings));    
+    // Check for calibration/hardware errors -> into ERROR state and return from method.
+    if ((serialPollStatusByte & 0x28) != 0)
+    {
+      LOG.log (Level.WARNING, "Calibration/Hardware Error on instrument {0} -> Entering ERROR state.", new Object[]{this});
+      try
+      {
+        // Attempt to get settings; these provide more details.
+        settingsReadFromInstrument (getSettingsFromInstrumentSync ());
+      }
+      finally
+      {
+        error ();
+        return;
+      }
+    }
+    // Check for Syntax Error -> warn and return from method.
+    if ((serialPollStatusByte & 0x04) != 0)
+    {
+      LOG.log (Level.WARNING, "Syntax Error on instrument {0}.", new Object[]{this});
+      try
+      {
+        // Attempt to get settings; these provide more details.
+        settingsReadFromInstrument (getSettingsFromInstrumentSync ());
+      }
+      finally
+      {
+        return;
+      }
+    }    
+    // Check for Data Ready; get reading if so.
+    final GpibControllerCommand readingCommand = generateGetReadingCommand ();
+    if ((serialPollStatusByte & 0x01) == 1)
+    {
+      // XXX Why are we directly accessing the device; bypassing processCommand?
+      ((GpibDevice) getDevice ()).doControllerCommandSync (readingCommand, getGetReadingTimeout_ms ());
+      final byte[] readingBytes = (byte[]) readingCommand.get (GpibControllerCommand.CCRET_VALUE_KEY);
+      if (readingBytes == null)
+      {
+        LOG.log (Level.WARNING, "No (null) reading from instrument {0}.", new Object[]{this});
+        return;
+      }
+      final double readingValue;
+      final String readingString = new String (readingBytes, Charset.forName ("US-ASCII"));
+      try
+      {
+        readingValue = Double.parseDouble (readingString);      
+      }
+      catch (NumberFormatException nfe)
+      {
+        throw new IOException (nfe);
+      }
+      readingReadFromInstrument (new DefaultDigitalMultiMeterReading (
+        settings,
+        null,
+        readingValue,
+        settings.getReadingUnit (),
+        settings.getResolution (),
+        false,
+        null,
+        false, // XXX DON'T WE HAVE AN OVERFLOW INDICATION??
+        false,
+        false));
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -515,7 +614,12 @@ public class HP3478A_GPIB_Instrument
   protected void onGpibServiceRequestFromInstrument ()
     throws IOException, InterruptedException, TimeoutException
   {
-    throw new UnsupportedOperationException ();
+    // This method should not be invoked in the current implementation.
+    // But we know what to do anyway...
+    // Check to see if we are in the proper implementation mode.
+    if (! USE_SRQ)
+      return;
+    instrumentHousekeeping ();
   }
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
