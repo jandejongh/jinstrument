@@ -589,17 +589,29 @@ public class HP3478A_GPIB_Instrument
       {
         throw new IOException (nfe);
       }
+      final boolean overflow =
+        readingString.trim ().equals ("+9.99900E+9")
+        || readingString.equals ("+9.99990E+9")
+        || readingString.equals ("+9.99999E+9");
+      if ((! overflow) && readingValue > 1E9)
+      {
+        LOG.log (Level.WARNING, "Found overlooked overflow -> too high value; string: {0}.", new Object[]{readingString});
+        throw new IOException ();
+      }
+      final boolean error = overflow;
+      final String errorMessage = overflow ? "Overflow" : null;
       readingReadFromInstrument (new DefaultDigitalMultiMeterReading (
         settings,
-        null,
+        null, // channel
         readingValue,
         settings.getReadingUnit (),
         settings.getResolution (),
-        false,
-        null,
-        false, // XXX DON'T WE HAVE AN OVERFLOW INDICATION??
-        false,
-        false));
+        error,
+        errorMessage,
+        overflow,
+        false, // uncalibrated
+        false  // uncorrected
+      ));
     }
   }
 
