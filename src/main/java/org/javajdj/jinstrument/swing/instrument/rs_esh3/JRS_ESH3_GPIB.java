@@ -80,7 +80,7 @@ public class JRS_ESH3_GPIB
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Rohde&Schwarz ESH-3 [GPIB] DSO View";
+      return "Rohde&Schwarz ESH-3 [GPIB] SLM View";
     }
 
     @Override
