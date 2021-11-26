@@ -76,7 +76,7 @@ implements SelectiveLevelMeter
     public final String getInstrumentTypeUrl ()
     {
       // XXX Would love to add a & between R and S, but not sure if this clashes with URL structures...
-      return "RS-ESH3 [GPIB]";
+      return "Rohde&Schwarz ESH-3 [GPIB]";
     }
     
     @Override
