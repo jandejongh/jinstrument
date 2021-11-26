@@ -91,6 +91,7 @@ import org.javajdj.jinstrument.swing.default_view.JDefaultFunctionGeneratorView;
 import org.javajdj.jinstrument.swing.default_view.JDefaultInstrumentManagementUrlsView;
 import org.javajdj.jinstrument.swing.default_view.JDefaultInstrumentManagementView;
 import org.javajdj.jinstrument.swing.default_view.JDefaultPowerSupplyUnitView;
+import org.javajdj.jinstrument.swing.default_view.JDefaultSelectiveLevelMeterView;
 import org.javajdj.jinstrument.swing.default_view.JDefaultSignalGeneratorView;
 import org.javajdj.jinstrument.swing.default_view.JDefaultSpectrumAnalyzerSettingsPanel;
 import org.javajdj.jinstrument.swing.default_view.JDefaultSpectrumAnalyzerTraceDisplay;
@@ -99,6 +100,7 @@ import org.javajdj.jinstrument.swing.instrument.JHP3478A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JHP5316A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JHP6033A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JHP8116A_GPIB;
+import org.javajdj.jinstrument.swing.instrument.rs_esh3.JRS_ESH3_GPIB;
 import org.javajdj.jinstrument.swing.instrument.tek2440.JTek2440_GPIB;
 
 
@@ -173,11 +175,13 @@ extends JFrame
     this.instrumentRegistry.addInstrumentViewType (JDefaultFunctionGeneratorView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultPowerSupplyUnitView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultFrequencyCounterView.INSTRUMENT_VIEW_TYPE);
+    this.instrumentRegistry.addInstrumentViewType (JDefaultSelectiveLevelMeterView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JHP3478A_GPIB.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JHP5316A_GPIB.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JHP6033A_GPIB.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JHP8116A_GPIB.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JTek2440_GPIB.INSTRUMENT_VIEW_TYPE);
+    this.instrumentRegistry.addInstrumentViewType (JRS_ESH3_GPIB.INSTRUMENT_VIEW_TYPE);
     
     this.jInstrumentRegistry = new JInstrumentRegistry (this.instrumentRegistry, 0);
     this.jTabbedPane.addTab ("Registry", this.jInstrumentRegistry);
