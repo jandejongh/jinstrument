@@ -59,8 +59,8 @@ implements SelectiveLevelMeter
   
   public RS_ESH3_GPIB_Instrument (final GpibDevice device)
   {
-    // XXX Would love to add a & between R and S, but not sure if this clashes with URL structures...
-    super ("RS-ESH3", device, null, null, false, false, false, false, false, false, false);
+    // XXX Why am I passing an instrument name here???
+    super ("R&S ESH-3", device, null, null, false, false, false, false, false, false, false);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,8 +75,7 @@ implements SelectiveLevelMeter
     @Override
     public final String getInstrumentTypeUrl ()
     {
-      // XXX Would love to add a & between R and S, but not sure if this clashes with URL structures...
-      return "Rohde and Schwarz ESH-3 [GPIB]";
+      return "R&S ESH-3 [GPIB]";
     }
     
     @Override
