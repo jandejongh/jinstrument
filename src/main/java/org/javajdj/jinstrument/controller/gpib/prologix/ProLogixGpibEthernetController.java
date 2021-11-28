@@ -159,6 +159,7 @@ public final class ProLogixGpibEthernetController
   
   private class SocketManager implements Runnable
   {
+    
     @Override
     public final void run ()
     {
@@ -186,24 +187,34 @@ public final class ProLogixGpibEthernetController
           new Socket (ProLogixGpibEthernetController.this.ipAddress, ProLogixGpibEthernetController.this.tcpConnectPort);
         ProLogixGpibEthernetController.this.socket = socket;
         ProLogixGpibEthernetController.this.socket.setSoTimeout (SOCKET_TIMEOUT_S);
-        proLogixCommandWritelnControllerCommand ("++mode 1"); // Controller Mode on ProLogix (instead of Device Mode).
-        proLogixCommandWritelnControllerCommand ("++ifc");    // Become Controller-In-Charge on GPIB bus; Interface Clear on GPIB.
-        proLogixCommandWritelnControllerCommand ("++eoi 1");  // Enable EOI assertion with
-                                                              // the last character of any command sent over GPIB port.
-                                                              // (Believed/assumed to be IEEE-488 mandatory.)
-        proLogixCommandWritelnControllerCommand ("++eos 3");  // Do not append anything (like CR/LF or whatever) to the command
-                                                              // received from host (us).
-                                                              // This configuration is necessary
-                                                              // to allow for per-device termination
-                                                              // of commands sent.
-                                                              // In other words, clients (Device objects)
-                                                              // must add command termination themselves.
-                                                              // AND: the controller implementation (us) must escape
-                                                              // all CR, LF, ESC, and '+' characters.
-        proLogixCommandWritelnControllerCommand ("++eot_enable 0"); // Do not append character (to client) when EOI detected.
-        proLogixCommandWritelnControllerCommand ("++auto 0"); // Do NOT automatically address instruments to talk
-                                                              // after sending them a command in order to read their response.
-                                                              // Meaning we must issue the read commands, if applicable, ourselves.
+        //
+        // Below we preconfigure the ProLogix controller. Most configuration settings should NOT be changed
+        // in the implementations of command processing, since various parts of that implementation
+        // actually depend on (and blindly assume) these settings.
+        // The only exception is "++eot_enable" which may be temporarily set for reception of (typically) binary blobs of data
+        // from the device (like binary trace data), along with a suitable "eot_char" setting.
+        // 
+        proLogixCommandWritelnControllerCommand ("++mode 1");       // Controller Mode on ProLogix (instead of Device Mode).
+        proLogixCommandWritelnControllerCommand ("++ifc");          // Become Controller-In-Charge on GPIB bus;
+                                                                    // Interface Clear on GPIB.
+        proLogixCommandWritelnControllerCommand ("++eoi 1");        // Enable EOI assertion with
+                                                                    // the last character of any command sent over GPIB port.
+                                                                    // (Believed/assumed to be IEEE-488 mandatory.)
+        proLogixCommandWritelnControllerCommand ("++eos 3");        // Do not append anything (like CR/LF or whatever)
+                                                                    // to the command
+                                                                    // received from host (us).
+                                                                    // This configuration is necessary
+                                                                    // to allow for per-device termination
+                                                                    // of commands sent.
+                                                                    // In other words, clients (Device objects)
+                                                                    // must add command termination themselves.
+                                                                    // AND: the controller implementation (us) must escape
+                                                                    // all CR, LF, ESC, and '+' characters.
+        proLogixCommandWritelnControllerCommand ("++eot_enable 0"); // Do not append any character (to client) when EOI detected.
+        proLogixCommandWritelnControllerCommand ("++auto 0");       // Do NOT automatically address instruments to talk
+                                                                    // after sending them a command in order to read their response.
+                                                                    // Meaning we must issue the read commands,
+                                                                    // if applicable, ourselves.
       }
       catch (UnknownHostException uhe)
       {
@@ -241,6 +252,9 @@ public final class ProLogixGpibEthernetController
         error ();
         return;
       }
+      // At this point, opening the socket and writing to it (in order to pre-configure the controller) has succeeded.
+      // and the 'socket' member has been set appropriately.
+      // For now, we stay alive, do nothing but sleep, until interrupted.
       while (! Thread.currentThread ().isInterrupted ())
       {
         try
@@ -252,6 +266,10 @@ public final class ProLogixGpibEthernetController
           break;
         }
       }
+      // At this point, we know we have been interrupted.
+      // Try to close the socket to the client, report any errors while doing so,
+      // but make sure the 'socket' member is set to null a posteriori.
+      // Finally report termination of the Thread in the logs.
       try
       {
         ProLogixGpibEthernetController.this.socket.close ();
@@ -266,6 +284,7 @@ public final class ProLogixGpibEthernetController
       }
       LOG.log (Level.INFO, "Terminated Socket Manager (by request) on {0}.", ProLogixGpibEthernetController.this);
     }
+    
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -278,11 +297,13 @@ public final class ProLogixGpibEthernetController
   
   private class SocketReader implements Runnable
   {
+    
     @Override
     public final void run ()
     {
       LOG.log (Level.INFO, "Starting Socket Reader on {0}.", ProLogixGpibEthernetController.this);
       while (! Thread.currentThread ().isInterrupted ())
+      {
         try
         {
           // We allows ourselves a limited number of I/O Exceptions due to switching and initializing the
@@ -328,7 +349,10 @@ public final class ProLogixGpibEthernetController
           LOG.log (Level.INFO, "Terminating Socket Reader (by request) on {0}.", ProLogixGpibEthernetController.this);
           return;
         }
+      }
+      LOG.log (Level.INFO, "Terminating Socket Reader (by request) on {0}.", ProLogixGpibEthernetController.this);
     }
+    
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -405,11 +429,13 @@ public final class ProLogixGpibEthernetController
    * This is the lowest-level processCommand_write access to the controller.
    * 
    * <p>
-   * Called assumes responsibility of proper termination of the byte array if applicable,
+   * Caller assumes responsibility of proper termination of the byte array if applicable,
    * as well as of escaping characters in the byte array in order to avoid them being swallowed by the controller.
    * 
    * <p>
-   * In other words, the bytes provided are <i>exactly</i> the bytes sent to the controller.
+   * In other words, the bytes provided are <i>exactly</i> the bytes sent to the controller,
+   * but these bytes are then subject to processing at the controller
+   * and my not, if applicable, be identical to the sequence of bytes sent to a (the currently addressed) GPIB device.
    * 
    * @param bytes The bytes to send, non-{@code null}.
    * 
@@ -470,8 +496,9 @@ public final class ProLogixGpibEthernetController
   /** Prepare (cook) a string (as byte array) for transmission to the ProLogix Controller.
    * 
    * <p>
-   * This method 'escapes' all ASCII characters (line feed, carriage return, escape and '+') in order to avoid
-   * swallowing by the ProLogix Controller. It then appends an not-escaped {@link #COMMAND_TERMINATOR_TO_PROLOGIX} signaling the
+   * This method 'escapes' those ASCII characters (i.e., line feed, carriage return, escape and '+')
+   * that are otherwise swallowed by the ProLogix Controller.
+   * It then appends an not-escaped {@link #COMMAND_TERMINATOR_TO_PROLOGIX} signaling the
    * end of the string to the controller. This latter byte will be swallowed by the controller, but is essential to
    * indicate the end of the command string (since we just escaped all other potential end-of-command characters).
    * 
@@ -480,7 +507,7 @@ public final class ProLogixGpibEthernetController
    * any termination character whatsoever before sending the string to the GPIB device. It thus becomes the responsibility of
    * the {@link Controller} client (typically, a {@link GpibDevice} and this controller's implementation.
    * 
-   * @param bytes     The (command) string (as byte array).
+   * @param bytes The (command) string (as byte array).
    * 
    * @return The prepared (command) string (as byte array).
    * 
