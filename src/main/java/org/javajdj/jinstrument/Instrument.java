@@ -88,9 +88,9 @@ public interface Instrument
    * @param unit              The time unit in which the timeout is to be interpreted.
    * 
    * @throws IllegalArgumentException If the command is {@code null}.
-   * @throws IOException          If communication with the controller, device or instrument resulted in an error.
-   * @throws InterruptedException If the current thread was interrupted while awaiting command completion.
-   * @throws TimeoutException     If a timeout occurred (this may be an earlier timeout than the one supplied).
+   * @throws IOException              If communication with the controller, device or instrument resulted in an error.
+   * @throws InterruptedException     If the current thread was interrupted while awaiting command completion.
+   * @throws TimeoutException         If a timeout occurred (this may be an earlier timeout than the one supplied).
    * 
    * @see #addCommand
    * @see InstrumentCommand
