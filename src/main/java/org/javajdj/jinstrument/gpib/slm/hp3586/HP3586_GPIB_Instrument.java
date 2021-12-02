@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -241,14 +241,41 @@ implements SelectiveLevelMeter
   // SelectiveLevelMeter
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
+
+  @Override
+  public final double getMinFrequency_Hz ()
+  {
+    // XXX
+    throw new UnsupportedOperationException ("Not supported yet.");
+  }
+
+  @Override
+  public final double getMaxFrequency_Hz ()
+  {
+    // XXX
+    throw new UnsupportedOperationException ("Not supported yet.");
+  }
+
+  @Override
+  public final double getHighestFrequencyResolution_Hz ()
+  {
+    // XXX
+    throw new UnsupportedOperationException ("Not supported yet.");
+  }
+
+  @Override  
+  public final void setFrequency_Hz (final double centerFrequency_Hz) throws IOException, InterruptedException
+  {
+    // XXX
+    throw new UnsupportedOperationException ("Not supported yet.");
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
   // PROCESS COMMAND
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
   @Override
   protected void processCommand (final InstrumentCommand instrumentCommand)
     throws IOException, InterruptedException, TimeoutException
@@ -288,7 +315,7 @@ implements SelectiveLevelMeter
     if (newInstrumentSettings != null)
       settingsReadFromInstrument (newInstrumentSettings);
   }
-
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
