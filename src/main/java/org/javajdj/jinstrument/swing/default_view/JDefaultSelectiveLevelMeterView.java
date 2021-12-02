@@ -50,29 +50,43 @@ public class JDefaultSelectiveLevelMeterView
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JDefaultSelectiveLevelMeterView (final SelectiveLevelMeter selectiveLevelMeter, final int level)
+  public JDefaultSelectiveLevelMeterView (
+    final SelectiveLevelMeter selectiveLevelMeter,
+    final int level,
+    final boolean prepopulate)
   {
+    
     super (selectiveLevelMeter, level);
-    setOpaque (true);
-    // setBackground (Color.white);
-    setLayout (new GridLayout (2, 2));
-    //
-    final JDefaultInstrumentManagementView instrumentManagementPanel= new JDefaultInstrumentManagementView (
-      JDefaultSelectiveLevelMeterView.this.getInstrument (),
-      JDefaultSelectiveLevelMeterView.this.getLevel () + 1);
-    instrumentManagementPanel.setPanelBorder (JInstrumentPanel.getGuiPreferencesManagementColor (), "Management");
-    add (instrumentManagementPanel);
-    //
-    add (new JPanel ());
-    //
-    add (new JPanel ());
-    //
-    add (new JPanel ());
+    
+    if (prepopulate)
+    {
+      setOpaque (true);
+      // setBackground (Color.white);
+      setLayout (new GridLayout (2, 2));
+      //
+      final JDefaultInstrumentManagementView instrumentManagementPanel= new JDefaultInstrumentManagementView (
+        JDefaultSelectiveLevelMeterView.this.getInstrument (),
+        JDefaultSelectiveLevelMeterView.this.getLevel () + 1);
+      instrumentManagementPanel.setPanelBorder (JInstrumentPanel.getGuiPreferencesManagementColor (), "Management");
+      add (instrumentManagementPanel);
+      //
+      add (new JPanel ());
+      //
+      add (new JPanel ());
+      //
+      add (new JPanel ());
+    }
+    
+  }
+  
+  public JDefaultSelectiveLevelMeterView (final SelectiveLevelMeter selectiveLevelMeter, final boolean prepopulate)
+  {
+    this (selectiveLevelMeter, 0, prepopulate);
   }
   
   public JDefaultSelectiveLevelMeterView (final SelectiveLevelMeter selectiveLevelMeter)
   {
-    this (selectiveLevelMeter, 0);
+    this (selectiveLevelMeter, 0, false);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
