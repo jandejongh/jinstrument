@@ -361,7 +361,7 @@ public final class ProLogixGpibEthernetController
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  /** Reads a single byte from the ProLogix controller (through an internal buffer).
+  /** Reads a single byte from the ProLogix controller (through the internal buffer).
    * 
    * <p>
    * This is the lowest-level read access to the controller.
@@ -370,7 +370,7 @@ public final class ProLogixGpibEthernetController
    * Data from the controller is read continuously by an internal service {@code Thread},
    * the Socket Reader,
    * and put into an internal buffer.
-   * This methods reads from that buffer.
+   * This methods reads a single byte from that buffer (or times out trying to).
    * 
    * @param timeout_ms The timeout in milliseconds.
    * 
@@ -378,6 +378,8 @@ public final class ProLogixGpibEthernetController
    * 
    * @throws InterruptedException If we were interrupted while waiting for a byte to arrive from the socket.
    * @throws TimeoutException     If we waited for a next byte in vain for at least the provided timeout period.
+   * 
+   * @see #proLogixReadline
    * 
    */
   private byte proLogixReadByte (final long timeout_ms)
@@ -387,6 +389,167 @@ public final class ProLogixGpibEthernetController
     if (byteRead == null)
       throw new TimeoutException ();
     return byteRead;
+  }
+  
+  // Used for values returned by controller commands (i.e., not originating from the device).
+  private static final ReadlineTerminationMode CONTROLLER_READLINE_TERMINATION_MODE = ReadlineTerminationMode.OPTCR_LF;
+  
+  /** Reads a single line from the ProLogix controller (through the internal buffer).
+   * 
+   * <p>
+   * This method reads consecutive bytes from the input buffer until the line if properly terminated
+   * as determined by the {@link ReadlineTerminationMode} or until a timeout occurs.
+   * The termination character(s) is/are removed from returned byte array.
+   * There is no additional processing (like escaped characters) on the input stream.
+   * Also, the input buffer is not cleared in this method, and the controller is not
+   * asked to read from a device whatsoever.
+   * 
+   * @param readlineTerminationMode The termination mode for the line (i.e., the {@link ReadlineTerminationMode}).
+   * @param timeout_ms              The timeout (for reading the entire line) in milliseconds.
+   * 
+   * @return The line read as an array of bytes, excluding the termination character(s) (but which are written into the logs).
+   * 
+   * @throws IOException          If the bytes in the input stream (i.e., the buffer) are incorrectly formatted with
+   *                                respect to the required termination mode.
+   * @throws InterruptedException If this method was interrupted while waiting for a byte to arrive from the socket.
+   * @throws TimeoutException     If reading the line took longer than the provided timeout period.
+   * 
+   * @see #proLogixReadByte
+   * 
+   */
+  private byte[] proLogixReadline (
+    final ReadlineTerminationMode readlineTerminationMode,
+    final long timeout_ms)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    final long deadline_millis = System.currentTimeMillis () + timeout_ms;
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream ();
+    for (;;)
+    {
+      long now_millis = System.currentTimeMillis ();
+      if (now_millis > deadline_millis)
+      {
+        if (baos.size () > 0)
+          queueLogRx (Instant.now (), baos.toByteArray ());
+        throw new TimeoutException ();
+      }
+      final byte byteRead = proLogixReadByte (deadline_millis - now_millis);
+      now_millis = System.currentTimeMillis ();
+      switch (readlineTerminationMode)
+      {
+        case CR:
+        {
+          if (byteRead == 0x0d)
+          {
+            final byte[] bytesRead = baos.toByteArray ();
+            baos.write (byteRead);
+            queueLogRx (Instant.now (), baos.toByteArray ());
+            return bytesRead;
+          }
+          else
+            baos.write (byteRead);
+          break;
+        }
+        case LF:
+        {
+          if (byteRead == 0x0a)
+          {
+            final byte[] bytesRead = baos.toByteArray ();
+            baos.write (byteRead);
+            queueLogRx (Instant.now (), baos.toByteArray ());
+            return bytesRead;
+          }
+          else
+            baos.write (byteRead);
+          break;
+        }
+        case CR_LF:
+        {
+          if (byteRead == 0x0d)
+          {
+            final byte nextByteRead = proLogixReadByte (deadline_millis - now_millis);
+            if (nextByteRead == 0x0a)
+            {
+              final byte[] bytesRead = baos.toByteArray ();
+              baos.write (byteRead);
+              baos.write (nextByteRead);
+              queueLogRx (Instant.now (), baos.toByteArray ());
+              return bytesRead;
+            }
+            else
+              throw new IOException ();
+          }
+          else
+            baos.write (byteRead);
+          break;
+        }
+        case OPTCR_LF:
+        {
+          switch (byteRead)
+          {
+            case 0x0d:
+            {
+              final byte nextByteRead = proLogixReadByte (deadline_millis - now_millis);
+              if (nextByteRead == 0x0a)
+              {
+                final byte[] bytesRead = baos.toByteArray ();
+                baos.write (byteRead);
+                baos.write (nextByteRead);
+                queueLogRx (Instant.now (), baos.toByteArray ());
+                return bytesRead;
+              }
+              else
+              {
+                baos.write (byteRead);
+                baos.write (nextByteRead);
+                queueLogRx (Instant.now (), baos.toByteArray ());
+                throw new IOException ();
+              }
+            }
+            case 0x0a:
+            {
+              final byte[] bytesRead = baos.toByteArray ();
+              baos.write (byteRead);
+              queueLogRx (Instant.now (), baos.toByteArray ());
+              return bytesRead;
+            }
+            default:
+              baos.write (byteRead);
+              break;
+          }
+          break;
+        }
+        case LF_CR:
+        {
+          if (byteRead == 0x0a)
+          {
+            final byte nextByteRead = proLogixReadByte (deadline_millis - now_millis);
+            if (nextByteRead == 0x0d)
+            {
+              final byte[] bytesRead = baos.toByteArray ();
+              baos.write (byteRead);
+              baos.write (nextByteRead);
+              queueLogRx (Instant.now (), baos.toByteArray ());
+              return bytesRead;
+            }
+            else
+            {
+              baos.write (byteRead);
+              baos.write (nextByteRead);
+              queueLogRx (Instant.now (), baos.toByteArray ());
+              throw new IOException ();
+            }
+          }
+          else
+            baos.write (byteRead);
+          break;
+        }
+        default:
+          throw new RuntimeException ();
+      }
+    }
   }
   
   /** Clears the internal read buffer.
@@ -622,21 +785,14 @@ public final class ProLogixGpibEthernetController
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final String RESET_CONTROLLER_COMMAND = "++rst";
-  
+  private final String RESET_CONTROLLER_COMMAND      = "++rst";
   private final String SELECTED_DEVICE_CLEAR_COMMAND = "++clr";
-  
-  private final String SERVICE_REQUEST_COMMAND = "++srq";
-  
-  private final String SERIAL_POLL_COMMAND = "++spoll";
-  
-  private final String READ_COMMAND = "++read";
-  private final String READ_EOI_COMMAND = "++read eoi";
-  private final String READ_LF_COMMAND = "++read 10";
-  private final String READ_CR_COMMAND = "++read 13";
-  
-  // Used for values returned by controller commands (i.e., not originating from the device).
-  private static final ReadlineTerminationMode CONTROLLER_READLINE_TERMINATION_MODE = ReadlineTerminationMode.OPTCR_LF;
+  private final String SERVICE_REQUEST_COMMAND       = "++srq";
+  private final String SERIAL_POLL_COMMAND           = "++spoll";
+  private final String READ_COMMAND                  = "++read";
+  private final String READ_EOI_COMMAND              = "++read eoi";
+  private final String READ_LF_COMMAND               = "++read 10";
+  private final String READ_CR_COMMAND               = "++read 13";
   
   private final byte DEFAULT_EOT = (byte) 0xFF;
   
@@ -676,6 +832,29 @@ public final class ProLogixGpibEthernetController
     proLogixCommandWritelnControllerCommand (SELECTED_DEVICE_CLEAR_COMMAND);
   }
   
+  private boolean processCommand_pollServiceRequestFromAny (final long timeout_ms)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    final long now_millis = System.currentTimeMillis ();
+    final long deadline_millis = now_millis + timeout_ms;
+    proLogixClearReadBuffer ();
+    proLogixCommandWritelnControllerCommand (SERVICE_REQUEST_COMMAND);
+    final String srqString = new String (proLogixReadline (
+      ProLogixGpibEthernetController.CONTROLLER_READLINE_TERMINATION_MODE,
+      deadline_millis - System.currentTimeMillis ()), Charset.forName ("US-ASCII"));
+    switch (srqString)
+    {
+      case "0":
+        return false;
+      case "1":
+        return true;
+      default:
+        throw new IOException ();
+    }    
+  }
+  
   private boolean processCommand_pollServiceRequest (
     final GpibAddress gpibAddress,
     final long timeout_ms,
@@ -684,36 +863,29 @@ public final class ProLogixGpibEthernetController
   {
     if (timeout_ms <= 0)
       throw new TimeoutException ();
-    final long now_millis = System.currentTimeMillis ();
+    long now_millis = System.currentTimeMillis ();
     final long deadline_millis = now_millis + timeout_ms;
+    // Do a quick check on the SRQ status.
+    // If no device has SRQ activated, we are already done.
+    if (! processCommand_pollServiceRequestFromAny (timeout_ms))
+      return false;
+    // At this point we know that SOME device has activated SRQ.
+    if (gpibAddress == null)
+      return true;
+    now_millis = System.currentTimeMillis ();
+    if (now_millis > deadline_millis)
+      throw new TimeoutException ();
     if (topLevel)
     {
       proLogixClearReadBuffer ();
-      if (gpibAddress != null)
-        proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
       proLogixCommandSetEOT (false, LF_BYTE);
     }
-    if (gpibAddress != null)
-      // ANSI/IEEE Standard 488.1-1987: Bit 6 in Serial Poll Status Byte is SRQ.
-      return (processCommand_serialPoll (gpibAddress, deadline_millis - System.currentTimeMillis (), false) & 0x40) != 0;
-    else
-    {
-      proLogixCommandWritelnControllerCommand (SERVICE_REQUEST_COMMAND);
-      final String srqString = new String (processCommand_readln (gpibAddress,
-        ProLogixGpibEthernetController.CONTROLLER_READLINE_TERMINATION_MODE,
-        deadline_millis - System.currentTimeMillis (),
-        false,
-        false), Charset.forName ("US-ASCII"));
-      switch (srqString)
-      {
-        case "0":
-          return false;
-        case "1":
-          return true;
-        default:
-          throw new IOException ();
-      }
-    }
+    now_millis = System.currentTimeMillis ();
+    if (now_millis > deadline_millis)
+      throw new TimeoutException ();
+    // ANSI/IEEE Standard 488.1-1987: Bit 6 in Serial Poll Status Byte is SRQ.
+    return (processCommand_serialPoll (gpibAddress, deadline_millis - now_millis, false) & 0x40) != 0;
   }
   
   private byte processCommand_serialPoll (
@@ -842,131 +1014,7 @@ public final class ProLogixGpibEthernetController
           throw new RuntimeException ();
       }
     }
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream ();
-    for (;;)
-    {
-      long now_millis = System.currentTimeMillis ();
-      if (now_millis >= deadline_millis)
-      {
-        if (baos.size () > 0)
-          queueLogRx (Instant.now (), baos.toByteArray ());
-        throw new TimeoutException ();
-      }
-      // XXX Shouldn't this better be a byte??
-      final int byteRead;
-      byteRead = proLogixReadByte (deadline_millis - now_millis);
-      now_millis = System.currentTimeMillis ();
-      switch (readlineTerminationMode)
-      {
-        case CR:
-        {
-          if (byteRead == 0x0d)
-          {
-            final byte[] bytesRead = baos.toByteArray ();
-            baos.write (byteRead);
-            queueLogRx (Instant.now (), baos.toByteArray ());
-            return bytesRead;
-          }
-          else
-            baos.write (byteRead);
-          break;
-        }
-        case LF:
-        {
-          if (byteRead == 0x0a)
-          {
-            final byte[] bytesRead = baos.toByteArray ();
-            baos.write (byteRead);
-            queueLogRx (Instant.now (), baos.toByteArray ());
-            return bytesRead;
-          }
-          else
-            baos.write (byteRead);
-          break;
-        }
-        case CR_LF:
-        {
-          if (byteRead == 0x0d)
-          {
-            final byte nextByteRead = proLogixReadByte (deadline_millis - now_millis);
-            if (nextByteRead == 0x0a)
-            {
-              final byte[] bytesRead = baos.toByteArray ();
-              baos.write (byteRead);
-              baos.write (nextByteRead);
-              queueLogRx (Instant.now (), baos.toByteArray ());
-              return bytesRead;
-            }
-            else
-              throw new IOException ();
-          }
-          else
-            baos.write (byteRead);
-          break;
-        }
-        case OPTCR_LF:
-        {
-          switch (byteRead)
-          {
-            case 0x0d:
-              final byte nextByteRead = proLogixReadByte (deadline_millis - now_millis);
-              if (nextByteRead == 0x0a)
-              {
-                final byte[] bytesRead = baos.toByteArray ();
-                baos.write (byteRead);
-                baos.write (nextByteRead);
-                queueLogRx (Instant.now (), baos.toByteArray ());
-                return bytesRead;
-              }
-              else
-              {
-                baos.write (byteRead);
-                baos.write (nextByteRead);
-                queueLogRx (Instant.now (), baos.toByteArray ());
-                throw new IOException ();
-              }
-            case 0x0a:
-            {
-              final byte[] bytesRead = baos.toByteArray ();
-              baos.write (byteRead);
-              queueLogRx (Instant.now (), baos.toByteArray ());
-              return bytesRead;
-            }
-            default:
-              baos.write (byteRead);
-              break;
-          }
-          break;
-        }
-        case LF_CR:
-        {
-          if (byteRead == 0x0a)
-          {
-            final byte nextByteRead = proLogixReadByte (deadline_millis - now_millis);
-            if (nextByteRead == 0x0d)
-            {
-              final byte[] bytesRead = baos.toByteArray ();
-              baos.write (byteRead);
-              baos.write (nextByteRead);
-              queueLogRx (Instant.now (), baos.toByteArray ());
-              return bytesRead;
-            }
-            else
-            {
-              baos.write (byteRead);
-              baos.write (nextByteRead);
-              queueLogRx (Instant.now (), baos.toByteArray ());
-              throw new IOException ();
-            }
-          }
-          else
-            baos.write (byteRead);
-          break;
-        }
-        default:
-          throw new RuntimeException ();
-      }
-    }
+    return proLogixReadline (readlineTerminationMode, timeout_ms);
   }
   
   private byte[] processCommand_readN (
