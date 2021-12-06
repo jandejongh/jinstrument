@@ -128,6 +128,7 @@ public abstract class AbstractGpibInstrument
   protected final byte selectedDeviceCLearSync ()
     throws InterruptedException, IOException, TimeoutException
   {
+    // XXX Review 20211206: Why do we serial sync here, instead of SDC???
     final byte statusByte = getDevice ().serialPollSync (getSelectedDeviceClearTimeout_ms ());
     return statusByte;
   }
