@@ -225,6 +225,6 @@ public interface InstrumentCommand
   public final static String ICARG_GATE_TIME_S = "gateTime_s";  
   
   public final static String IC_INSTRUMENT_MODE = "commandInstrumentMode";  
-  public final static String ICARG_INSTRUMENT_MODE = "instrumentMode";  
+  public final static String ICARG_INSTRUMENT_MODE = "instrumentMode";
   
 }
