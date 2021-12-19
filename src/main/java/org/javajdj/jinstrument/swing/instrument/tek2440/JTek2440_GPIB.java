@@ -603,6 +603,7 @@ public class JTek2440_GPIB
     @Override
     public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
     {
+      
       if (instrument != JTek2440_GPIB.this.getDigitalStorageOscilloscope () || instrumentSettings == null)
         throw new IllegalArgumentException ();
       if (! (instrumentSettings instanceof Tek2440_GPIB_Settings))
