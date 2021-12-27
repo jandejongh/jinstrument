@@ -230,7 +230,7 @@ implements ScalarNetworkAnalyzer
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
-  protected void onGpibServiceRequestFromInstrument ()
+  protected void onGpibServiceRequestFromInstrument (final Byte statusByte)
     throws IOException, InterruptedException, TimeoutException
   {
     throw new UnsupportedOperationException ();
