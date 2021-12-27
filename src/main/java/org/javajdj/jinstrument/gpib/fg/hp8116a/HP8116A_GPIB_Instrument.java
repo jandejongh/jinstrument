@@ -239,7 +239,7 @@ public class HP8116A_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
-  protected void onGpibServiceRequestFromInstrument ()
+  protected void onGpibServiceRequestFromInstrument (final Byte statusByte)
     throws IOException, InterruptedException, TimeoutException
   {
     throw new UnsupportedOperationException ();
