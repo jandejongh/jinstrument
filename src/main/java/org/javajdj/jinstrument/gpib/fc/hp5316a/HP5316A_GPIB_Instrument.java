@@ -287,9 +287,12 @@ public class HP5316A_GPIB_Instrument
   private final static int READING_STRING_LENGTH = 19; // Excluding 0x0d/0x0a.
   
   @Override
-  protected void onGpibServiceRequestFromInstrument ()
+  protected void onGpibServiceRequestFromInstrument (final Byte statusByte)
     throws IOException, InterruptedException, TimeoutException
   {
+    //
+    // XXX 20211227: Since we are now passed the Status Byte, shouldn't we use/inspect it?
+    //
     final HP5316A_GPIB_Settings settings = (HP5316A_GPIB_Settings) getCurrentInstrumentSettings ();
     if (settings == null)
       throw new RuntimeException ();
