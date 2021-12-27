@@ -623,7 +623,7 @@ public class HP3478A_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
-  protected void onGpibServiceRequestFromInstrument ()
+  protected void onGpibServiceRequestFromInstrument (final Byte statusByte)
     throws IOException, InterruptedException, TimeoutException
   {
     // This method should not be invoked in the current implementation.
