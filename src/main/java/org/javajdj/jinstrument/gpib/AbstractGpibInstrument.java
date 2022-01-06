@@ -80,9 +80,7 @@ public abstract class AbstractGpibInstrument
       addAcquisitionServices,
       addHousekeepingServices);
     if (addServiceRequestPollingServices)
-    {
       addRunnable (this.gpibInstrumentServiceRequestCollector);
-    }
     addRunnable (this.gpibServiceRequestDispatcher);
   }
   
@@ -212,6 +210,46 @@ public abstract class AbstractGpibInstrument
     throws InterruptedException, IOException, TimeoutException
   {
     final byte statusByte = getDevice ().serialPollSync (getSerialPollTimeout_ms ());
+    return statusByte;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // POLL SERVICE REQUEST STATUS BYTE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static String POLL_SERVICE_REQUEST_STATUS_BYTE_TIMEOUT_MS_PROPERTY_NAME = "PollServiceRequestStatusByteTimeout_ms";
+  
+  public final static long DEFAULT_POLL_SERVICE_REQUEST_STATUS_BYTE_TIMEOUT_MS = 1000L;
+  
+  // XXX Need locking or AtomicLong here...
+  private volatile long pollServiceRequestStatusByteTimeout_ms = DEFAULT_POLL_SERVICE_REQUEST_STATUS_BYTE_TIMEOUT_MS;
+  
+  public final long getPollServiceRequestStatusByteTimeout_ms ()
+  {
+    return this.pollServiceRequestStatusByteTimeout_ms;
+  }
+  
+  public final void setPollServiceRequestStatusByteTimeout_ms (final long pollServiceRequestStatusByteTimeout_ms)
+  {
+    if (pollServiceRequestStatusByteTimeout_ms <= 0)
+      throw new IllegalArgumentException ();
+    if (pollServiceRequestStatusByteTimeout_ms != this.pollServiceRequestStatusByteTimeout_ms)
+    {
+      final long oldPollServiceRequestStatusByteTimeout_ms = this.pollServiceRequestStatusByteTimeout_ms;
+      this.pollServiceRequestStatusByteTimeout_ms = pollServiceRequestStatusByteTimeout_ms;
+      fireSettingsChanged (
+        POLL_SERVICE_REQUEST_TIMEOUT_MS_PROPERTY_NAME,
+        oldPollServiceRequestStatusByteTimeout_ms,
+        this.pollServiceRequestStatusByteTimeout_ms);
+    }
+  }
+  
+  protected final Byte pollServiceRequestStatusByteSync ()
+    throws InterruptedException, IOException, TimeoutException
+  {
+    final Byte statusByte = getDevice ().pollServiceRequestStatusByteSync (getPollServiceRequestStatusByteTimeout_ms ());
     return statusByte;
   }
   
@@ -511,9 +549,9 @@ public abstract class AbstractGpibInstrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected abstract void onGpibServiceRequestFromInstrument ()
+  protected abstract void onGpibServiceRequestFromInstrument (final Byte statusByte)
     throws IOException, InterruptedException, TimeoutException;
-    
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // GPIB INSTRUMENT SERVICE REQUEST COLLECTOR
@@ -538,10 +576,12 @@ public abstract class AbstractGpibInstrument
         // Mark start of sojourn.
         final long timeBeforeProbe_ms = System.currentTimeMillis ();
         // Obtain SRQ status from the instrument.
-        final boolean srqRead = AbstractGpibInstrument.this.pollServiceRequestSync ();
-        // Report a Service Request.
-        if (srqRead)
-          AbstractGpibInstrument.this.gpibServiceRequestFromInstrument ();
+        final Byte statusByte = AbstractGpibInstrument.this.pollServiceRequestStatusByteSync ();
+        // Report a Service Request Status Byte.
+        // Note: This will insert the Service Request into a blocking queue for
+        // further processing by the gpibServiceRequestDispatcher.
+        if (statusByte != null)
+          AbstractGpibInstrument.this.gpibServiceRequestFromInstrument (statusByte);          
         // Mark end of sojourn.
         final long timeAfterProbeAndDelivery_ms = System.currentTimeMillis ();
         // Calculate sojourn.
@@ -645,11 +685,11 @@ public abstract class AbstractGpibInstrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private final BlockingQueue<Boolean> gpibServiceRequestQueue = new LinkedBlockingQueue<> ();
+  private final BlockingQueue<Byte> gpibServiceRequestQueue = new LinkedBlockingQueue<> ();
   
-  protected void gpibServiceRequestFromInstrument ()
+  protected void gpibServiceRequestFromInstrument (final Byte statusByte)
   {
-    if (! this.gpibServiceRequestQueue.offer (true))
+    if (! this.gpibServiceRequestQueue.offer (statusByte))
       LOG.log (Level.WARNING, "Overflow on GPIB Instrument Service Request Queue on {0}.", this);
   }
   
@@ -666,10 +706,10 @@ public abstract class AbstractGpibInstrument
     {
       try
       {
-        final boolean srq = AbstractGpibInstrument.this.gpibServiceRequestQueue.take ();
-        if (srq)
+        final Byte statusByte = AbstractGpibInstrument.this.gpibServiceRequestQueue.take ();
+        if (statusByte != null)
         {
-          AbstractGpibInstrument.this.onGpibServiceRequestFromInstrument ();
+          AbstractGpibInstrument.this.onGpibServiceRequestFromInstrument (statusByte);
           // XXX It seems like a good idea to clear the SR Queue here...
         }
       }

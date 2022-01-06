@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -323,6 +323,46 @@ public class DefaultGpibDevice
     final GpibControllerCommand command = generateSerialPollCommand ();
     doControllerCommandSync (command, timeout_ms);
     return (byte) command.get (GpibControllerCommand.CCRET_VALUE_KEY);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GpibDevice
+  // POLL SERVICE REQUEST STATUS BYTE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  @Override
+  public GpibControllerCommand generatePollServiceRequestStatusByteCommand ()
+  {
+    final GpibControllerCommand command = new DefaultGpibControllerCommand (
+      GpibControllerCommand.CCCMD_GPIB_POLL_SERVICE_REQUEST_STATUS_BYTE,
+      GpibControllerCommand.CCARG_GPIB_ADDRESS,
+      this.address);
+    return command;
+  }
+  
+  @Override
+  public void pollServiceRequestStatusByteAsync (
+    final Long queueingTimeout_ms,
+    final Long processingTimeout_ms,
+    final Long sojournTimeout_ms)
+    throws UnsupportedOperationException
+  {
+    doControllerCommandAsync (
+      generatePollServiceRequestStatusByteCommand (),
+      queueingTimeout_ms,
+      processingTimeout_ms,
+      sojournTimeout_ms);
+  }
+
+  @Override
+  public Byte pollServiceRequestStatusByteSync (final long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException
+  {
+    final GpibControllerCommand command = generatePollServiceRequestStatusByteCommand ();
+    doControllerCommandSync (command, timeout_ms);
+    return (Byte) command.get (GpibControllerCommand.CCRET_VALUE_KEY);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

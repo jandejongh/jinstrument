@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,6 +109,24 @@ public interface GpibDevice
   byte serialPollSync (long timeout_ms)
     throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException;
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // POLL SERVICE REQUEST STATUS BYTE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  GpibControllerCommand generatePollServiceRequestStatusByteCommand ()
+    throws UnsupportedOperationException;
+
+  void pollServiceRequestStatusByteAsync (
+    Long queueingTimeout_ms,
+    Long processingTimeout_ms,
+    Long sojournTimeout_ms)
+    throws UnsupportedOperationException;
+
+  Byte pollServiceRequestStatusByteSync (long timeout_ms)
+    throws InterruptedException, IOException, TimeoutException, UnsupportedOperationException;
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // READ EOI

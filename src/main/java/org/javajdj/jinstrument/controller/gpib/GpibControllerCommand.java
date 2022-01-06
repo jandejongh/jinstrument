@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ public interface GpibControllerCommand
   public final static String CCCMD_GPIB_SELECTED_DEVICE_CLEAR = "gpibCommandSelectedDeviceClear";
   public final static String CCCMD_GPIB_POLL_SERVICE_REQUEST = "gpibCommandPollServiceRequest";
   public final static String CCCMD_GPIB_SERIAL_POLL = "gpibCommandSerialPoll";
+  public final static String CCCMD_GPIB_POLL_SERVICE_REQUEST_STATUS_BYTE = "gpibCommandPollServiceRequestStatusByte";
   public final static String CCCMD_GPIB_READ_EOI = "gpibCommandReadEOI";
   public final static String CCCMD_GPIB_READLN = "gpibCommandReadln";
   public final static String CCCMD_GPIB_READ_N = "gpibCommandReadN";

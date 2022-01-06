@@ -896,8 +896,6 @@ public final class ProLogixGpibEthernetController
   {
     if (gpibAddress == null)
       throw new IllegalArgumentException ();
-    if (gpibAddress == null)
-      throw new IllegalArgumentException ();
     if (topLevel)
     {
       proLogixClearReadBuffer ();
@@ -919,6 +917,42 @@ public final class ProLogixGpibEthernetController
     {
       throw new IOException (nfe);
     }
+  }
+  
+  private Byte processCommand_pollServiceRequestStatusByte (
+    final GpibAddress gpibAddress,
+    final long timeout_ms,
+    final boolean topLevel)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (gpibAddress == null)
+      throw new IllegalArgumentException ();
+    if (timeout_ms <= 0)
+      throw new TimeoutException ();
+    long now_millis = System.currentTimeMillis ();
+    final long deadline_millis = now_millis + timeout_ms;
+    // Do a quick check on the SRQ status.
+    // If no device has SRQ activated, we are already done.
+    if (! processCommand_pollServiceRequestFromAny (timeout_ms))
+      return null;
+    // At this point we know that SOME device has activated SRQ.
+    // We must perform a Serial Poll on the selected device in order
+    // to figure out if that device caused the SRQ.
+    now_millis = System.currentTimeMillis ();
+    if (now_millis > deadline_millis)
+      throw new TimeoutException ();
+    if (topLevel)
+    {
+      proLogixClearReadBuffer ();
+      proLogixCommandSwitchCurrentDeviceAddress (gpibAddress);
+      proLogixCommandSetEOT (false, LF_BYTE);
+    }
+    now_millis = System.currentTimeMillis ();
+    if (now_millis > deadline_millis)
+      throw new TimeoutException ();
+    final byte serialPollStatusByte = processCommand_serialPoll (gpibAddress, deadline_millis - now_millis, false);
+    // ANSI/IEEE Standard 488.1-1987: Bit 6 in Serial Poll Status Byte is SRQ.
+    return (serialPollStatusByte & 0x40) != 0 ? serialPollStatusByte : null;
   }
   
   private final static long EOI_LINGER_MS = 50L;
@@ -1311,6 +1345,13 @@ public final class ProLogixGpibEthernetController
           final byte statusByte = processCommand_serialPoll (address, timeout_ms, topLevel);
           controllerCommand.put (GpibControllerCommand.CCRET_VALUE_KEY, statusByte);
           break;
+        }
+        case GpibControllerCommand.CCCMD_GPIB_POLL_SERVICE_REQUEST_STATUS_BYTE:
+        {
+          final GpibAddress address = (GpibAddress) controllerCommand.get (GpibControllerCommand.CCARG_GPIB_ADDRESS);
+          final Byte statusByte = processCommand_pollServiceRequestStatusByte (address, timeout_ms, topLevel);
+          controllerCommand.put (GpibControllerCommand.CCRET_VALUE_KEY, statusByte);
+          break;          
         }
         case GpibControllerCommand.CCCMD_GPIB_READ_EOI:
         {
