@@ -18,6 +18,17 @@ package org.javajdj.jinstrument;
 
 /** A <i>channel</i> on an {@link Instrument}.
  *
+ * <p>
+ * For implementations it is recommended to view a channel
+ * as a symbolic representation of one of
+ * the input (or output) measurement ports
+ * on an instrument <i>type</i>,
+ * and <i>not</i> on a specific <i>instrument</i>.
+ * In other words,
+ * it is recommended to share channel instances among instruments of the same type.
+ * In future versions of {@code jinstrument},
+ * this recommendation may turn into a requirement.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
