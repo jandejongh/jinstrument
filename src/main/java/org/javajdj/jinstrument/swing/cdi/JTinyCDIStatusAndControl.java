@@ -36,8 +36,10 @@ import org.javajdj.jservice.swing.JServiceControl;
  * Allows for control over the {@link Controller}, {@link Device} and {@link Instrument},
  * abbreviated, respectively as, well, you get the idea...
  * 
- * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
+ * @see JSmallCDIStatusAndControl
  *
+ * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
+ * 
  */
 public class JTinyCDIStatusAndControl
   extends JInstrumentPanel
