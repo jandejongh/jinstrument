@@ -15,7 +15,7 @@ Apache v2.0.
 
 ## Status [20220107 - v0.7]
 
-### Beta:
+### Beta [Target met for V1.0 Release]:
 - HP-3478A Digital MultiMeter [complete]
 - HP-5316A Frequency Counter [almost complete; could use GUI rework]
 - HP-6033A Power Supply Unit / System Power Supply [almost complete]
@@ -24,12 +24,12 @@ Apache v2.0.
 - R&S ESH-3 Selective Level Meter [almost complete]
 - Tek-2440 Digital Storage Oscilloscope [almost complete]
 
-### Alpha:
+### Alpha [Target: -> Beta for V1.0 Release]:
 - HP-8566B Spectrum Analyzer
 - HP-8663A Synthesized Signal Generator
 - HP-70000 Spectrum Analyzer [MMS]
 
-### Work in Progress [target for V1.0 Release]:
+### Work in Progress [Target: -> Beta for V1.0 Release]:
 - HP-3325B Synthesizer/Function Generator
 - HP-3457A Digital MultiMeter
 - HP-3586A Selective Level Meter
