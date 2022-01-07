@@ -17,6 +17,7 @@
 package org.javajdj.jinstrument.swing.instrument.rs_esh3;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,6 +32,8 @@ import org.javajdj.jinstrument.SelectiveLevelMeter;
 import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Instrument;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jinstrument.swing.base.JSelectiveLevelMeterPanel;
+import org.javajdj.jinstrument.swing.component.JDialogButton;
+import org.javajdj.jinstrument.swing.component.JRealTimeReading;
 import org.javajdj.jswing.jcenter.JCenter;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
@@ -103,7 +106,7 @@ public class JRS_ESH3_GPIB_SF_Test
     add (this.jTestFrequencyDeviation);
     
     final JPanel clearPanel = new JPanel ();
-    clearPanel.setLayout (new GridLayout (1, 2));
+    clearPanel.setLayout (new GridLayout (1, 3));
     add (clearPanel);
     
     final JInstrumentPanel clearSelectionPanel = new JInstrumentPanel (
@@ -128,6 +131,20 @@ public class JRS_ESH3_GPIB_SF_Test
     jClearReadingButton.addActionListener (this.jClearReadingButtonListener);
     clearReadingPanel.add (JCenter.XY (jClearReadingButton));
 
+    final JRealTimeReading graph = new JRealTimeReading (
+        rs_esh3,
+        "Readings Graph(s)",
+        level,
+        getGuiPreferencesManagementColor ());
+    
+    clearPanel.add (new JDialogButton (
+      rs_esh3,
+      "Graph",
+      new Dimension (80, 80),
+      "Graph",
+      new Dimension (800, 600),
+      graph));
+    
   }
 
   public JRS_ESH3_GPIB_SF_Test (final RS_ESH3_GPIB_Instrument selectiveLevelMeter, final int level)
