@@ -80,9 +80,10 @@ public class JRS_ESH3_GPIB_SF_Test_FrequencyOffset
     setLayout (new GridLayout (1, 3));
     
     final JPanel enableStatusPanel = new JPanel ();
-    enableStatusPanel.setLayout (new GridLayout (2,1));
+    enableStatusPanel.setLayout (new GridLayout (2,2));
     add (enableStatusPanel);
     
+    enableStatusPanel.add (JCenter.Y (new JLabel ("Enable")));
     enableStatusPanel.add (JCenter.XY (JCenter.Y (new JBoolean_JBoolean (
       "Frequency Offset",
       (settings) -> ((RS_ESH3_GPIB_Settings) settings).isTestFrequencyOffset (),
@@ -90,6 +91,7 @@ public class JRS_ESH3_GPIB_SF_Test_FrequencyOffset
       Color.green,
       true))));
 
+    enableStatusPanel.add (JCenter.Y (new JLabel ("Valid")));
     this.jValid = new JColorCheckBox.JBoolean ();
     this.jValid.setDisplayedValue (false);
     this.jValid.setToolTipText ("Que?");

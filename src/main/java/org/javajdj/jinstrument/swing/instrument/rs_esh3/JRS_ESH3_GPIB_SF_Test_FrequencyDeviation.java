@@ -19,6 +19,7 @@ package org.javajdj.jinstrument.swing.instrument.rs_esh3;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.Instrument;
@@ -79,9 +80,10 @@ public class JRS_ESH3_GPIB_SF_Test_FrequencyDeviation
     setLayout (new GridLayout (1, 6));
     
     final JPanel enableStatusPanel1 = new JPanel ();
-    enableStatusPanel1.setLayout (new GridLayout (2,1));
+    enableStatusPanel1.setLayout (new GridLayout (2,2));
     add (enableStatusPanel1);
     
+    enableStatusPanel1.add (JCenter.XY (new JLabel ("E")));
     enableStatusPanel1.add (JCenter.XY (JCenter.Y (new JBoolean_JBoolean (
       "[kHz]",
       (settings) -> ((RS_ESH3_GPIB_Settings) settings).isTestFrequencyDeviation (),
@@ -89,6 +91,7 @@ public class JRS_ESH3_GPIB_SF_Test_FrequencyDeviation
       Color.green,
       true))));
     
+    enableStatusPanel1.add (JCenter.XY (new JLabel ("V")));
     this.jValid1 = new JColorCheckBox.JBoolean ();
     this.jValid1.setDisplayedValue (false);
     this.jValid1.setToolTipText ("Que?");
@@ -98,9 +101,10 @@ public class JRS_ESH3_GPIB_SF_Test_FrequencyDeviation
     add (this.jFrequencyDeviation);
     
     final JPanel enableStatusPanel2 = new JPanel ();
-    enableStatusPanel2.setLayout (new GridLayout (2,1));
+    enableStatusPanel2.setLayout (new GridLayout (2,2));
     add (enableStatusPanel2);
     
+    enableStatusPanel2.add (JCenter.XY (new JLabel ("E")));
     enableStatusPanel2.add (JCenter.XY (JCenter.Y (new JBoolean_JBoolean (
       "+[kHz]",
       (settings) -> ((RS_ESH3_GPIB_Settings) settings).isTestFrequencyDeviationPositivePeak (),
@@ -108,6 +112,7 @@ public class JRS_ESH3_GPIB_SF_Test_FrequencyDeviation
       Color.green,
       true))));
     
+    enableStatusPanel2.add (JCenter.XY (new JLabel ("V")));
     this.jValid2 = new JColorCheckBox.JBoolean ();
     this.jValid2.setDisplayedValue (false);
     this.jValid2.setToolTipText ("Que?");
@@ -118,9 +123,10 @@ public class JRS_ESH3_GPIB_SF_Test_FrequencyDeviation
     add (this.jFrequencyDeviationPositivePeak);
     
     final JPanel enableStatusPanel3 = new JPanel ();
-    enableStatusPanel3.setLayout (new GridLayout (2,1));
+    enableStatusPanel3.setLayout (new GridLayout (2,2));
     add (enableStatusPanel3);
     
+    enableStatusPanel3.add (JCenter.XY (new JLabel ("E")));
     enableStatusPanel3.add (JCenter.XY (JCenter.Y (new JBoolean_JBoolean (
       "-[kHz]",
       (settings) -> ((RS_ESH3_GPIB_Settings) settings).isTestFrequencyDeviationNegativePeak (),
@@ -128,6 +134,7 @@ public class JRS_ESH3_GPIB_SF_Test_FrequencyDeviation
       Color.green,
       true))));
     
+    enableStatusPanel3.add (JCenter.XY (new JLabel ("V")));
     this.jValid3 = new JColorCheckBox.JBoolean ();
     this.jValid3.setDisplayedValue (false);
     this.jValid3.setToolTipText ("Que?");
