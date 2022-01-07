@@ -13,56 +13,31 @@ is there as well.
 ## License
 Apache v2.0.
 
-## Status [20201213 - v0.7-SNAPSHOT]
-
-Worked exclusively on Tek-2440 implementation.
-Pretty much completed support for all settings (r/w) and a GUI for that.
-Also added support to the jswing package for "general-purpose" displaying of traces.
-Switched (for the most part) to using JInstrument-wide standard Swing components.
-
-### v0.7 release (minimum) requirements:
-- Read all trace formats and all trace sources, including XY, and display them in the GUI.
-- Read marker values and attach them to the trace data, settings or to another structure.
-- Read waveform analysis data and attach them to the trace data.
-- Show CURSOR values in GUI.
-- Show waveform analysis data in GUI.
-- Horizontal position setting through dragging.
-- Selected markers (ro) in GUI: GND-level, average, trigger points.
-- A conceptual overview of the Tek-2440 operations (channels, acquisition, delay, reference waveforms, etc.);
-- Think of / design a ready-to-go Tek-2440 specific package.
-
-## Status [20201103 - v0.7-SNAPSHOT]
-
-### Working on:
-- Tektronix 2440 full implementation.
-For now, given up on trying to create a suitable abstraction for a generic DSO,
-and instead just focus at getting the Tek-2440 up and running...
-Expect to finish by the end of 2020.
-Stay tuned and healthy and wash your hands!
-
-## Status [20200112 - v0.6]
+## Status [20220107 - v0.7]
 
 ### Beta:
 - ProLogix GPIB Ethernet
 - HP-3478A Digital MultiMeter [complete]
 - HP-8116A 50MHz Programmable Pulse/Function Generator [complete - OPTION001 ONLY!]
 - HP-6033A Power Supply Unit / System Power Supply [almost complete]
+- HP-5316A Frequency Counter [almost complete; could use GUI rework]
+- Tek-2440 Digital Storage Oscilloscope [almost complete]
+- R&S ESH-3 Selective Level Meter [almost complete]
 
 ### Alpha:
 - HP-8566B Spectrum Analyzer
 - HP-8663A Synthesized Signal Generator
-- HP70000 Spectrum Analyzer [MMS]
+- HP-70000 Spectrum Analyzer [MMS]
 
 ### Work in Progress [target for V1.0 Release]:
+- HP-3325B Synthesizer/Function Generator
+- HP-3457A Digital MultiMeter
 - HP-3586A Selective Level Meter
-- HP-5316A Frequency Counter
 - HP-5328A [Option 011] Frequency Counter
 - HP-6050A Electronic Load Mainframe [DC Load]
 - HP-8156A Optical Attenuator
 - HP-8350 Sweep Oscillator
 - HP-54502A Digitizing Oscilloscope
-- Rohde&Schwarz ESH-3 (unit broken though...)
-- Tek-2440 Digital Storage Oscilloscope
 - Wiltron 560A Network Analyzer
 
 ## Release History
