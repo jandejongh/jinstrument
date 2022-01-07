@@ -16,13 +16,13 @@ Apache v2.0.
 ## Status [20220107 - v0.7]
 
 ### Beta:
-- ProLogix GPIB Ethernet
 - HP-3478A Digital MultiMeter [complete]
-- HP-8116A 50MHz Programmable Pulse/Function Generator [complete - OPTION001 ONLY!]
-- HP-6033A Power Supply Unit / System Power Supply [almost complete]
 - HP-5316A Frequency Counter [almost complete; could use GUI rework]
-- Tek-2440 Digital Storage Oscilloscope [almost complete]
+- HP-6033A Power Supply Unit / System Power Supply [almost complete]
+- HP-8116A 50MHz Programmable Pulse/Function Generator [complete - OPTION001 ONLY!]
+- ProLogix GPIB Ethernet
 - R&S ESH-3 Selective Level Meter [almost complete]
+- Tek-2440 Digital Storage Oscilloscope [almost complete]
 
 ### Alpha:
 - HP-8566B Spectrum Analyzer
@@ -79,3 +79,12 @@ Most important change:
 - Completed (almost) Instrument and InstrumentView implementation for HP-8663-A -> beta.
 
 More detailed documentation will follow once the framework has stabilized (notably, the support for channels is still lacking).
+
+### Release 0.7 [20220107]
+Most important changes:
+- HP-5316A Frequency Counter -> beta.
+- R&S ESH-3 Selective Level Meter -> beta.
+- Tek-2440 Digital Storage Oscilloscope -> beta.
+
+Many other changes (almost two years since previous release)
+with respect to the jinstrument framework; see the git log for details.
