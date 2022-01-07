@@ -67,6 +67,7 @@ public class DynamicTimeSeriesChart extends JPanel
     this.dataset.setTimeBase (new Second (0, 0, 0, 1, 1, 1990)); // date 1st jan 0 mins 0 secs
 
     this.dataset.addSeries (new float[1], 0, title);
+    
     this.chart = ChartFactory.createTimeSeriesChart (
       title,
       "Time",
@@ -75,11 +76,14 @@ public class DynamicTimeSeriesChart extends JPanel
       true,
       true,
       false);
+    
     final XYPlot plot = this.chart.getXYPlot ();
 
     final ValueAxis axis = plot.getDomainAxis ();
     axis.setAutoRange (true);
     axis.setFixedAutoRange (200000); // proportional to scroll speed
+    
+    plot.getRangeAxis ().setAutoRange (true);
 
     final ChartPanel chartPanel = new ChartPanel (this.chart);
     
@@ -110,6 +114,18 @@ public class DynamicTimeSeriesChart extends JPanel
     newData[0] = value;
     this.dataset.advanceTime ();
     this.dataset.appendData (newData);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // CLEAR
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public void clear ()
+  {
+    // XXX
+    throw new UnsupportedOperationException ();
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
