@@ -84,9 +84,10 @@ public class JInstrumentPanel
   {
     super ();
     this.instrument = instrument;
+    this.title = title;
     this.level = level;
-    if (title != null)
-      setPanelBorder (panelColor, title);
+    if (this.title != null)
+      setPanelBorder (panelColor, this.title);
   }
 
   public JInstrumentPanel (
@@ -115,6 +116,27 @@ public class JInstrumentPanel
   public final Instrument getInstrument ()
   {
     return this.instrument;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // TITLE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final String title;
+  
+  /** Returns the title of this panel.
+   * 
+   * <p>
+   * The title, if non-{@code null}, is shown in a dedicated panel border.
+   * 
+   * @return The title, may be {@code null}.
+   * 
+   */
+  public final String getTitle ()
+  {
+    return this.title;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
