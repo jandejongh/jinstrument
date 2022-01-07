@@ -42,44 +42,6 @@ Apache v2.0.
 
 ## Release History
 
-### Release 0.1 [20191226]
-Very basis support for
-- Prologix GPIB-Ethernet
-- HP3478A DMM [well, no real support actually]
-- HP8566B SA [basic settings & trace display]
-- HP8663A RF SigGen [basic settings; still lots of trouble reading settings from instrument]
-- A basic GPIB-device console [works OK; very useful]
-
-Reasonable framework for buses, controllers, devices, instruments and instrument views.
-
-### Release 0.2 [20191228]
-Most important changes:
-- Revamped ProLogix controller implementation.
-- Added GPIB Controller logging + Swing component.
-
-### Release 0.3 [20191231]
-Most important changes:
-- Selecting and removing Instrument Views from the Registry.
-- Full-blown HP3478A support (only lacking a few trigger options).
-
-### Release 0.4 [20200104]
-Most important changes:
-- Timeout handling.
-- Added many instrument classes and concrete (placeholder) classes.
-- HP-8116A [partial] enters beta.
-- Improvements to (notably) Controller Debugger.
-
-### Release 0.5 [20200106]
-Most important change:
-- Completed Instrument and InstrumentView implementation for HP-8116A.
-
-### Release 0.6 [20200112]
-Most important change:
-- Reinstated HP-70000 [SpectrumAnalyzer ONLY!] -> alpha.
-- Completed (almost) Instrument and InstrumentView implementation for HP-8663-A -> beta.
-
-More detailed documentation will follow once the framework has stabilized (notably, the support for channels is still lacking).
-
 ### Release 0.7 [20220107]
 Most important changes:
 - HP-5316A Frequency Counter -> beta.
@@ -89,3 +51,41 @@ Most important changes:
 Many other changes (almost two years since previous release)
 with respect to the jinstrument framework, instrument implementations and GUI components;
 see the git log for details.
+
+### Release 0.6 [20200112]
+Most important change:
+- Reinstated HP-70000 [SpectrumAnalyzer ONLY!] -> alpha.
+- Completed (almost) Instrument and InstrumentView implementation for HP-8663-A -> beta.
+
+More detailed documentation will follow once the framework has stabilized (notably, the support for channels is still lacking).
+
+### Release 0.5 [20200106]
+Most important change:
+- Completed Instrument and InstrumentView implementation for HP-8116A.
+
+### Release 0.4 [20200104]
+Most important changes:
+- Timeout handling.
+- Added many instrument classes and concrete (placeholder) classes.
+- HP-8116A [partial] enters beta.
+- Improvements to (notably) Controller Debugger.
+
+### Release 0.3 [20191231]
+Most important changes:
+- Selecting and removing Instrument Views from the Registry.
+- Full-blown HP3478A support (only lacking a few trigger options).
+
+### Release 0.2 [20191228]
+Most important changes:
+- Revamped ProLogix controller implementation.
+- Added GPIB Controller logging + Swing component.
+
+### Release 0.1 [20191226]
+Very basis support for
+- Prologix GPIB-Ethernet
+- HP3478A DMM [well, no real support actually]
+- HP8566B SA [basic settings & trace display]
+- HP8663A RF SigGen [basic settings; still lots of trouble reading settings from instrument]
+- A basic GPIB-device console [works OK; very useful]
+
+Reasonable framework for buses, controllers, devices, instruments and instrument views.
