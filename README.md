@@ -87,4 +87,5 @@ Most important changes:
 - Tek-2440 Digital Storage Oscilloscope -> beta.
 
 Many other changes (almost two years since previous release)
-with respect to the jinstrument framework; see the git log for details.
+with respect to the jinstrument framework, instrument implementations and GUI components;
+see the git log for details.
