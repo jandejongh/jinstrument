@@ -16,21 +16,30 @@
  */
 package org.javajdj.jinstrument.swing.instrument.rs_esh3;
 
+import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
+import org.javajdj.jinstrument.SelectiveLevelMeter;
 import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Instrument;
-import org.javajdj.jinstrument.swing.default_view.JDefaultSelectiveLevelMeterView;
+import org.javajdj.jinstrument.swing.base.JSelectiveLevelMeterPanel;
+import org.javajdj.jswing.jcenter.JCenter;
+import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
-/** A Swing panel for (complete) control and status of a {@link JRS_ESH3_GPIB} Selective Level Meter.
+/** A Swing panel for refreshing the {@link RS_ESH3_GPIB_Instrument} Selective Level Meter
+ *    from GUI settings.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class JRS_ESH3_GPIB
-  extends JDefaultSelectiveLevelMeterView
+public class JRS_ESH3_GPIB_Refresh
+  extends JSelectiveLevelMeterPanel
   implements InstrumentView
 {
   
@@ -39,8 +48,8 @@ public class JRS_ESH3_GPIB
   // LOGGER
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private static final Logger LOG = Logger.getLogger (JRS_ESH3_GPIB.class.getName ());
+
+  private static final Logger LOG = Logger.getLogger (JRS_ESH3_GPIB_Refresh.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -48,69 +57,33 @@ public class JRS_ESH3_GPIB
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JRS_ESH3_GPIB (final RS_ESH3_GPIB_Instrument selectiveLevelMeter, final int level)
+  public JRS_ESH3_GPIB_Refresh (
+    final SelectiveLevelMeter selectiveLevelMeter,
+    final String title,
+    final int level,
+    final Color panelColor)
   {
-    
-    super (selectiveLevelMeter, level, false);
+
+    super (selectiveLevelMeter, title, level, panelColor);
     if (! (selectiveLevelMeter instanceof RS_ESH3_GPIB_Instrument))
       throw new IllegalArgumentException ();
     final RS_ESH3_GPIB_Instrument rs_esh3 = (RS_ESH3_GPIB_Instrument) selectiveLevelMeter;
-    
+
     removeAll ();
-    setOpaque (true);
-    setLayout (new GridLayout (2, 4));
+    setLayout (new GridLayout (1, 1));
     
-    add (new JRS_ESH3_GPIB_Management (
-      selectiveLevelMeter,
-      "Management",
-      level + 1,
-      getGuiPreferencesManagementColor ()));
-    
-    add (new JRS_ESH3_GPIB_Attenuation (
-      selectiveLevelMeter,
-      "Attenuation",
-      level + 1,
-      getGuiPreferencesAmplitudeColor ()));
-    
-    add (new JRS_ESH3_GPIB_Frequency (
-      selectiveLevelMeter,
-      "Frequency [MHz]",
-      level + 1,
-      getGuiPreferencesFrequencyColor ()));
-    
-    add (new JRS_ESH3_GPIB_IFBW_Demodulation (
-      selectiveLevelMeter,
-      null,
-      level + 1,
-      getGuiPreferencesManagementColor ()));
-    
-    add (new JRS_ESH3_GPIB_MeasurementTime (
-      selectiveLevelMeter,
-      "Measurement Time [s]",
-      level + 1,
-      getGuiPreferencesTimeColor ()));
-    
-    add (new JRS_ESH3_GPIB_Frequency_Step (
-      selectiveLevelMeter,
-      "Frequency Step",
-      level + 1,
-      getGuiPreferencesFrequencyColor ()));
-      
-    add (new JRS_ESH3_GPIB_Levels (
-      selectiveLevelMeter,
-      "Levels",
-      level + 2,
-      getGuiPreferencesAmplitudeColor ()));
-    
-    add (new JRS_ESH3_GPIB_SF_Test (
-      selectiveLevelMeter,
-      "SF/Test",
-      level + 1,
-      getGuiPreferencesManagementColor ()));
+    final JColorCheckBox jRefreshButton = new JColorCheckBox ((t) -> Color.blue);
+    jRefreshButton.addActionListener (this.jRefreshButtonListener);
+    add (JCenter.XY (jRefreshButton));
     
   }
+
+  public JRS_ESH3_GPIB_Refresh (final RS_ESH3_GPIB_Instrument selectiveLevelMeter, final int level)
+  {
+    this (selectiveLevelMeter, null, level, null);
+  }
   
-  public JRS_ESH3_GPIB (final RS_ESH3_GPIB_Instrument selectiveLevelMeter)
+  public JRS_ESH3_GPIB_Refresh (final RS_ESH3_GPIB_Instrument selectiveLevelMeter)
   {
     this (selectiveLevelMeter, 0);
   }
@@ -127,14 +100,14 @@ public class JRS_ESH3_GPIB
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "R&S ESH-3 [GPIB] SLM View";
+      return "R&S ESH-3 [GPIB] Refresh Command";
     }
 
     @Override
     public final InstrumentView openInstrumentView (final Instrument instrument)
     {
       if (instrument != null && (instrument instanceof RS_ESH3_GPIB_Instrument))
-        return new JRS_ESH3_GPIB ((RS_ESH3_GPIB_Instrument) instrument);
+        return new JRS_ESH3_GPIB_Refresh ((RS_ESH3_GPIB_Instrument) instrument);
       else
         return null;
     }
@@ -151,7 +124,7 @@ public class JRS_ESH3_GPIB
   @Override
   public String getInstrumentViewUrl ()
   {
-    return JRS_ESH3_GPIB.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
+    return JRS_ESH3_GPIB_Refresh.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
       + "<>"
       + getInstrument ().getInstrumentUrl ();
   }
@@ -161,6 +134,26 @@ public class JRS_ESH3_GPIB
   {
     return getInstrumentViewUrl ();
   }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final ActionListener jRefreshButtonListener = (final ActionEvent ae) ->
+  {
+    try
+    {
+      ((RS_ESH3_GPIB_Instrument) getSelectiveLevelMeter ()).refresh ();
+    }
+    catch (Exception e)
+    {
+      LOG.log (Level.WARNING, "Caught exception while refreshing instrument {0}: {1}.",        
+        new Object[]
+          {getInstrument (), Arrays.toString (e.getStackTrace ())});
+    }
+  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //

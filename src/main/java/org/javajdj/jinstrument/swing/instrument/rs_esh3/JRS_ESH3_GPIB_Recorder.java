@@ -16,21 +16,27 @@
  */
 package org.javajdj.jinstrument.swing.instrument.rs_esh3;
 
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
+import org.javajdj.jinstrument.SelectiveLevelMeter;
 import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Instrument;
-import org.javajdj.jinstrument.swing.default_view.JDefaultSelectiveLevelMeterView;
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
+import org.javajdj.jinstrument.swing.base.JSelectiveLevelMeterPanel;
+import org.javajdj.jswing.jcenter.JCenter;
 
-/** A Swing panel for (complete) control and status of a {@link JRS_ESH3_GPIB} Selective Level Meter.
+/** A Swing panel for the Recorder settings
+ *    of a {@link RS_ESH3_GPIB_Instrument} Selective Level Meter.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class JRS_ESH3_GPIB
-  extends JDefaultSelectiveLevelMeterView
+public class JRS_ESH3_GPIB_Recorder
+  extends JSelectiveLevelMeterPanel
   implements InstrumentView
 {
   
@@ -40,7 +46,7 @@ public class JRS_ESH3_GPIB
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private static final Logger LOG = Logger.getLogger (JRS_ESH3_GPIB.class.getName ());
+  private static final Logger LOG = Logger.getLogger (JRS_ESH3_GPIB_Recorder.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -48,69 +54,39 @@ public class JRS_ESH3_GPIB
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JRS_ESH3_GPIB (final RS_ESH3_GPIB_Instrument selectiveLevelMeter, final int level)
+  public JRS_ESH3_GPIB_Recorder (
+    final SelectiveLevelMeter selectiveLevelMeter,
+    final String title,
+    final int level,
+    final Color panelColor)
   {
-    
-    super (selectiveLevelMeter, level, false);
+
+    super (selectiveLevelMeter, title, level, panelColor);
     if (! (selectiveLevelMeter instanceof RS_ESH3_GPIB_Instrument))
       throw new IllegalArgumentException ();
     final RS_ESH3_GPIB_Instrument rs_esh3 = (RS_ESH3_GPIB_Instrument) selectiveLevelMeter;
-    
+
     removeAll ();
-    setOpaque (true);
-    setLayout (new GridLayout (2, 4));
+    setLayout (new GridLayout (4, 1));
     
-    add (new JRS_ESH3_GPIB_Management (
-      selectiveLevelMeter,
-      "Management",
+    add (new JRS_ESH3_GPIB_RecorderCode (
+      rs_esh3,
+      "Recorder Code",
       level + 1,
-      getGuiPreferencesManagementColor ()));
+      JInstrumentPanel.getGuiPreferencesManagementColor ()));
     
-    add (new JRS_ESH3_GPIB_Attenuation (
-      selectiveLevelMeter,
-      "Attenuation",
-      level + 1,
-      getGuiPreferencesAmplitudeColor ()));
-    
-    add (new JRS_ESH3_GPIB_Frequency (
-      selectiveLevelMeter,
-      "Frequency [MHz]",
-      level + 1,
-      getGuiPreferencesFrequencyColor ()));
-    
-    add (new JRS_ESH3_GPIB_IFBW_Demodulation (
-      selectiveLevelMeter,
-      null,
-      level + 1,
-      getGuiPreferencesManagementColor ()));
-    
-    add (new JRS_ESH3_GPIB_MeasurementTime (
-      selectiveLevelMeter,
-      "Measurement Time [s]",
-      level + 1,
-      getGuiPreferencesTimeColor ()));
-    
-    add (new JRS_ESH3_GPIB_Frequency_Step (
-      selectiveLevelMeter,
-      "Frequency Step",
-      level + 1,
-      getGuiPreferencesFrequencyColor ()));
-      
-    add (new JRS_ESH3_GPIB_Levels (
-      selectiveLevelMeter,
-      "Levels",
-      level + 2,
-      getGuiPreferencesAmplitudeColor ()));
-    
-    add (new JRS_ESH3_GPIB_SF_Test (
-      selectiveLevelMeter,
-      "SF/Test",
-      level + 1,
-      getGuiPreferencesManagementColor ()));
+    add (JCenter.XY (new JLabel ("Not Implemented [yet]:")));
+    add (JCenter.XY (new JLabel ("SF62-66; SF70-71")));
+    add (JCenter.XY (new JLabel ("Y0/Y1; V1; H0/H1")));
     
   }
+
+  public JRS_ESH3_GPIB_Recorder (final RS_ESH3_GPIB_Instrument selectiveLevelMeter, final int level)
+  {
+    this (selectiveLevelMeter, null, level, null);
+  }
   
-  public JRS_ESH3_GPIB (final RS_ESH3_GPIB_Instrument selectiveLevelMeter)
+  public JRS_ESH3_GPIB_Recorder (final RS_ESH3_GPIB_Instrument selectiveLevelMeter)
   {
     this (selectiveLevelMeter, 0);
   }
@@ -127,14 +103,14 @@ public class JRS_ESH3_GPIB
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "R&S ESH-3 [GPIB] SLM View";
+      return "R&S ESH-3 [GPIB] Recorder Settings";
     }
 
     @Override
     public final InstrumentView openInstrumentView (final Instrument instrument)
     {
       if (instrument != null && (instrument instanceof RS_ESH3_GPIB_Instrument))
-        return new JRS_ESH3_GPIB ((RS_ESH3_GPIB_Instrument) instrument);
+        return new JRS_ESH3_GPIB_Recorder ((RS_ESH3_GPIB_Instrument) instrument);
       else
         return null;
     }
@@ -151,7 +127,7 @@ public class JRS_ESH3_GPIB
   @Override
   public String getInstrumentViewUrl ()
   {
-    return JRS_ESH3_GPIB.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
+    return JRS_ESH3_GPIB_Recorder.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
       + "<>"
       + getInstrument ().getInstrumentUrl ();
   }
