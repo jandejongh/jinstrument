@@ -83,9 +83,9 @@ Most important changes:
 ### Release 0.1 [20191226]
 Very basis support for
 - Prologix GPIB-Ethernet
-- HP3478A DMM [well, no real support actually]
-- HP8566B SA [basic settings & trace display]
-- HP8663A RF SigGen [basic settings; still lots of trouble reading settings from instrument]
+- HP-3478A DMM [well, no real support actually]
+- HP-8566B SA [basic settings & trace display]
+- HP-8663A RF SigGen [basic settings; still lots of trouble reading settings from instrument]
 - A basic GPIB-device console [works OK; very useful]
 
 Reasonable framework for buses, controllers, devices, instruments and instrument views.
