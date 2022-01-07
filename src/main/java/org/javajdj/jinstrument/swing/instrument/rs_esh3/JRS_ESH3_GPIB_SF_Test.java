@@ -107,16 +107,16 @@ public class JRS_ESH3_GPIB_SF_Test
       getGuiPreferencesFrequencyColor ());
     add (this.jTestFrequencyDeviation);
     
-    final JPanel clearPanel = new JPanel ();
-    clearPanel.setLayout (new GridLayout (1, 3));
-    add (clearPanel);
+    final JPanel bottomPanel = new JPanel ();
+    bottomPanel.setLayout (new GridLayout (1, 3));
+    add (bottomPanel);
     
     final JInstrumentPanel clearSelectionPanel = new JInstrumentPanel (
       rs_esh3,
       "Clear Selection",
       level + 2,
       getGuiPreferencesManagementColor ());
-    clearPanel.add (clearSelectionPanel);
+    bottomPanel.add (clearSelectionPanel);
     clearSelectionPanel.setLayout (new GridLayout (1, 1));
     final JColorCheckBox jClearSelectionButton = new JColorCheckBox ((t) -> Color.blue);
     jClearSelectionButton.addActionListener (this.jClearSelectionButtonListener);
@@ -127,28 +127,30 @@ public class JRS_ESH3_GPIB_SF_Test
       "Clear Readings",
       level + 2,
       getGuiPreferencesManagementColor ());
-    clearPanel.add (clearReadingPanel);
+    bottomPanel.add (clearReadingPanel);
     clearReadingPanel.setLayout (new GridLayout (1, 1));
     final JColorCheckBox jClearReadingButton = new JColorCheckBox ((t) -> Color.blue);
     jClearReadingButton.addActionListener (this.jClearReadingButtonListener);
     clearReadingPanel.add (JCenter.XY (jClearReadingButton));
 
-    final LinkedHashSet<Enum<?>> readingTypes = new LinkedHashSet<Enum<?>> ();
-    readingTypes.addAll (Arrays.asList (RS_ESH3_GPIB_Reading.ReadingType.values ()));
-    final JRealTimeReading graph = new JRealTimeReading (
+    final LinkedHashSet<Enum<?>> readingTypes = new LinkedHashSet<> ();
+    readingTypes.add (RS_ESH3_GPIB_Reading.ReadingType.Power_dBm);
+    readingTypes.add (RS_ESH3_GPIB_Reading.ReadingType.ModulationDepth_Percent);
+    readingTypes.add (RS_ESH3_GPIB_Reading.ReadingType.FrequencyOffset_kHz);
+    readingTypes.add (RS_ESH3_GPIB_Reading.ReadingType.FrequencyDeviation_kHz);
+    this.jGraph = new JRealTimeReading (
         rs_esh3,
         "Readings Graph(s)",
         level,
         getGuiPreferencesManagementColor (),
         readingTypes);
-    
-    clearPanel.add (new JDialogButton (
+    bottomPanel.add (new JDialogButton (
       rs_esh3,
-      "Graph",
+      "Graph (exp)",
       new Dimension (80, 80),
       "Graph",
-      new Dimension (800, 600),
-      graph));
+      new Dimension (1600, 900),
+      this.jGraph));
     
   }
 
@@ -219,6 +221,7 @@ public class JRS_ESH3_GPIB_SF_Test
   private final JRS_ESH3_GPIB_SF_Test_ModulationDepth jTestModulationDepth;
   private final JRS_ESH3_GPIB_SF_Test_FrequencyOffset jTestFrequencyOffset;
   private final JRS_ESH3_GPIB_SF_Test_FrequencyDeviation jTestFrequencyDeviation;
+  final JRealTimeReading jGraph;
   
   private final ActionListener jClearSelectionButtonListener = (final ActionEvent ae) ->
   {
@@ -240,6 +243,7 @@ public class JRS_ESH3_GPIB_SF_Test
     JRS_ESH3_GPIB_SF_Test.this.jTestModulationDepth.clearReading ();
     JRS_ESH3_GPIB_SF_Test.this.jTestFrequencyOffset.clearReading ();
     JRS_ESH3_GPIB_SF_Test.this.jTestFrequencyDeviation.clearReading ();
+    JRS_ESH3_GPIB_SF_Test.this.jGraph.clearReading ();
   };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
