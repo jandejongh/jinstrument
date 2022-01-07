@@ -294,6 +294,7 @@ public class RS_ESH3_GPIB_Reading
   
   private final ReadingType readingType;
   
+  @Override
   public final ReadingType getReadingType ()
   {
     return this.readingType;
