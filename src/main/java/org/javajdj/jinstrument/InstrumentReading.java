@@ -38,7 +38,7 @@ public interface InstrumentReading<R>
   
   InstrumentChannel getInstrumentChannel ();
   
-  /** Return the type of this reading.
+  /** Returns the type of this reading.
    * 
    * <p>
    * The reading type (which must be an {@code Enum})
