@@ -38,6 +38,21 @@ public interface InstrumentReading<R>
   
   InstrumentChannel getInstrumentChannel ();
   
+  /** Return the type of this reading.
+   * 
+   * <p>
+   * The reading type (which must be an {@code Enum})
+   * is used to distinguish between different readings from the same
+   * {@link Instrument} for which a single {@link InstrumentReading} implementation is used.
+   * 
+   * @return The type of this reading; null (default) if unambiguous.
+   * 
+   */
+  default Enum<?> getReadingType ()
+  {
+    return null;
+  }
+  
   Instant getReadingTime ();
 
   R getReadingValue ();
