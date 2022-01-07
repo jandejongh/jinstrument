@@ -22,6 +22,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
@@ -30,6 +31,7 @@ import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.SelectiveLevelMeter;
 import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Instrument;
+import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Reading;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jinstrument.swing.base.JSelectiveLevelMeterPanel;
 import org.javajdj.jinstrument.swing.component.JDialogButton;
@@ -131,11 +133,14 @@ public class JRS_ESH3_GPIB_SF_Test
     jClearReadingButton.addActionListener (this.jClearReadingButtonListener);
     clearReadingPanel.add (JCenter.XY (jClearReadingButton));
 
+    final LinkedHashSet<Enum<?>> readingTypes = new LinkedHashSet<Enum<?>> ();
+    readingTypes.addAll (Arrays.asList (RS_ESH3_GPIB_Reading.ReadingType.values ()));
     final JRealTimeReading graph = new JRealTimeReading (
         rs_esh3,
         "Readings Graph(s)",
         level,
-        getGuiPreferencesManagementColor ());
+        getGuiPreferencesManagementColor (),
+        readingTypes);
     
     clearPanel.add (new JDialogButton (
       rs_esh3,
