@@ -69,6 +69,7 @@ import org.javajdj.jinstrument.gpib.dso.hp54502a.HP54502A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.fc.hp5316a.HP5316A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.fc.hp5328a.HP5328A_GPIB_Instrument;
+import org.javajdj.jinstrument.gpib.fg.hp3325b.HP3325B_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.fg.hp8116a.HP8116A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.none.NONE_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.oa.hp8156a.HP8156A_GPIB_Instrument;
@@ -100,6 +101,7 @@ import org.javajdj.jinstrument.swing.instrument.JHP3478A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JHP5316A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JHP6033A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.JHP8116A_GPIB;
+import org.javajdj.jinstrument.swing.instrument.hp3325b.JHP3325B_GPIB;
 import org.javajdj.jinstrument.swing.instrument.rs_esh3.JRS_ESH3_GPIB;
 import org.javajdj.jinstrument.swing.instrument.tek2440.JTek2440_GPIB;
 
@@ -144,6 +146,7 @@ extends JFrame
     this.instrumentRegistry.addControllerType (ProLogixGpibEthernetControllerType.getInstance ());
     this.instrumentRegistry.addDeviceType (DeviceType_GPIB.getInstance ());
     this.instrumentRegistry.addInstrumentType (NONE_GPIB_Instrument.INSTRUMENT_TYPE);
+    this.instrumentRegistry.addInstrumentType (HP3325B_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP3478A_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP3586_GPIB_Instrument.INSTRUMENT_TYPE);
     this.instrumentRegistry.addInstrumentType (HP5316A_GPIB_Instrument.INSTRUMENT_TYPE);
@@ -176,6 +179,7 @@ extends JFrame
     this.instrumentRegistry.addInstrumentViewType (JDefaultPowerSupplyUnitView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultFrequencyCounterView.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JDefaultSelectiveLevelMeterView.INSTRUMENT_VIEW_TYPE);
+    this.instrumentRegistry.addInstrumentViewType (JHP3325B_GPIB.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JHP3478A_GPIB.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JHP5316A_GPIB.INSTRUMENT_VIEW_TYPE);
     this.instrumentRegistry.addInstrumentViewType (JHP6033A_GPIB.INSTRUMENT_VIEW_TYPE);
