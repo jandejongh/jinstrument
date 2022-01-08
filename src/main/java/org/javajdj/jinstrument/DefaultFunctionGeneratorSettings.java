@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
  */
 package org.javajdj.jinstrument;
 
-import org.javajdj.junits.Unit;
 import java.util.Arrays;
+import java.util.Objects;
+import org.javajdj.junits.Unit;
 import java.util.logging.Logger;
 
 /** Default implementation of {@link FunctionGeneratorSettings}.
@@ -180,13 +181,23 @@ public class DefaultFunctionGeneratorSettings
   @Override
   public int hashCode ()
   {
+    return this.bytes == null ? hashCode_NonBytes () : hashCode_Bytes ();
+  }
+
+  @Override
+  public boolean equals (Object obj)
+  {
+    return this.bytes == null ? equals_NonBytes (obj) : equals_Bytes (obj);    
+  }
+
+  public int hashCode_Bytes ()
+  {
     int hash = 7;
     hash = 53 * hash + Arrays.hashCode (this.bytes);
     return hash;
   }
 
-  @Override
-  public boolean equals (Object obj)
+  public boolean equals_Bytes (Object obj)
   {
     if (this == obj)
     {
@@ -201,13 +212,62 @@ public class DefaultFunctionGeneratorSettings
       return false;
     }
     final DefaultFunctionGeneratorSettings other = (DefaultFunctionGeneratorSettings) obj;
-    if (!Arrays.equals (this.bytes, other.bytes))
+    if (! Arrays.equals (this.bytes, other.bytes))
     {
       return false;
     }
     return true;
   }
 
+  public int hashCode_NonBytes ()
+  {
+    int hash = 5;
+    hash = 37 * hash + (this.outputEnable ? 1 : 0);
+    hash = 37 * hash + Objects.hashCode (this.waveform);
+    hash = 37 * hash + (int) (Double.doubleToLongBits (this.frequency_Hz) ^ (Double.doubleToLongBits (this.frequency_Hz) >>> 32));
+    hash = 37 * hash + (int) (Double.doubleToLongBits (this.amplitude_Vpp) ^ (Double.doubleToLongBits (this.amplitude_Vpp) >>> 32));
+    hash = 37 * hash + (int) (Double.doubleToLongBits (this.dcOffset_V) ^ (Double.doubleToLongBits (this.dcOffset_V) >>> 32));
+    return hash;
+  }
+
+  public boolean equals_NonBytes (Object obj)
+  {
+    if (this == obj)
+    {
+      return true;
+    }
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass () != obj.getClass ())
+    {
+      return false;
+    }
+    final DefaultFunctionGeneratorSettings other = (DefaultFunctionGeneratorSettings) obj;
+    if (this.outputEnable != other.outputEnable)
+    {
+      return false;
+    }
+    if (Double.doubleToLongBits (this.frequency_Hz) != Double.doubleToLongBits (other.frequency_Hz))
+    {
+      return false;
+    }
+    if (Double.doubleToLongBits (this.amplitude_Vpp) != Double.doubleToLongBits (other.amplitude_Vpp))
+    {
+      return false;
+    }
+    if (Double.doubleToLongBits (this.dcOffset_V) != Double.doubleToLongBits (other.dcOffset_V))
+    {
+      return false;
+    }
+    if (this.waveform != other.waveform)
+    {
+      return false;
+    }
+    return true;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // END OF FILE
