@@ -121,7 +121,8 @@ public class JDefaultFunctionGeneratorView
     this.jOutputEnable = new JColorCheckBox.JBoolean (Color.red);
     this.jOutputEnable.addActionListener (this.jOutputEnableListener);
     jOutputEnablePanel.add (this.jOutputEnable);
-    waveformControlPanel.add (jOutputEnablePanel);
+    if (functionGenerator.supportsOutputEnable ())
+      waveformControlPanel.add (jOutputEnablePanel);
     final JPanel jWaveformPanel = new JPanel ();
     setPanelBorder (
       jWaveformPanel,
