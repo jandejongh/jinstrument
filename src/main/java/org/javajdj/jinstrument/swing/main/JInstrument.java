@@ -133,7 +133,7 @@ extends JFrame
   throws HeadlessException
   {
     
-    super (title == null ? "JInstrument V0.7" : title);
+    super (title == null ? "JInstrument V0.8-SNAPSHOT" : title);
     
     setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
     createMenu ();
