@@ -474,6 +474,38 @@ implements Instrument
       settingsCollectorPeriod_s);
   }
   
+  public final static String OPTIMIZE_SETTINGS_UPDATES_PROPERTY_NAME = "optimizeSettingsUpdates";
+  
+  public final static boolean DEFAULT_OPTIMIZE_SETTINGS_UPDATES = true;
+  
+  private volatile boolean optimizeSettingsUpdates = AbstractInstrument.DEFAULT_OPTIMIZE_SETTINGS_UPDATES;
+
+  public final boolean isOptimizeSettingsUpdates ()
+  {
+    return this.optimizeSettingsUpdates;
+  }
+  
+  protected final void setOptimizeSettingsUpdates (final boolean optimizeSettingsUpdates)
+  {
+    if (optimizeSettingsUpdates == this.optimizeSettingsUpdates)
+      return;
+    this.optimizeSettingsUpdates = optimizeSettingsUpdates;
+    fireSettingsChanged (
+      AbstractInstrument.OPTIMIZE_SETTINGS_UPDATES_PROPERTY_NAME,
+      ! optimizeSettingsUpdates,
+      optimizeSettingsUpdates);
+  }
+  
+  protected final void setOptimizeSettingsUpdates ()
+  {
+    setOptimizeSettingsUpdates (true);
+  }
+  
+  protected final void resetOptimizeSettingsUpdates ()
+  {
+    setOptimizeSettingsUpdates (false);
+  }
+
   private final BlockingQueue<InstrumentSettings> settingsReadQueue = new LinkedBlockingQueue<> ();
   
   protected void settingsReadFromInstrument (final InstrumentSettings instrumentSettings)
@@ -495,7 +527,7 @@ implements Instrument
     synchronized (this.currentInstrumentSettingsLock)
     {
       final InstrumentSettings oldSettings = this.currentInstrumentSettings;
-      if (oldSettings != null && instrumentSettings.equals (oldSettings))
+      if (isOptimizeSettingsUpdates () && oldSettings != null && instrumentSettings.equals (oldSettings))
         return;
       this.currentInstrumentSettings = instrumentSettings;
     }
