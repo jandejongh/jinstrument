@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -107,12 +108,12 @@ public class JDefaultFunctionGeneratorView
     this.jInstrumentSpecificPanel.add (jInstrumentSpecificLabel);
     add (this.jInstrumentSpecificPanel);
     
-    final JPanel waveformControlPanel = new JPanel ();
-    setPanelBorder (waveformControlPanel,
+    this.waveformControlPanel = new JPanel ();
+    setPanelBorder (this.waveformControlPanel,
       getLevel () + 1,
       getGuiPreferencesAmplitudeColor (),
       "Waveform Control");
-    waveformControlPanel.setLayout (new GridLayout (3, 3));
+    this.waveformControlPanel.setLayout (new GridLayout (3, 3));
     final JPanel jOutputEnablePanel = new JPanel ();
     setPanelBorder (jOutputEnablePanel,
       getLevel () + 2,
@@ -122,7 +123,7 @@ public class JDefaultFunctionGeneratorView
     this.jOutputEnable.addActionListener (this.jOutputEnableListener);
     jOutputEnablePanel.add (this.jOutputEnable);
     if (functionGenerator.supportsOutputEnable ())
-      waveformControlPanel.add (jOutputEnablePanel);
+      this.waveformControlPanel.add (jOutputEnablePanel);
     final JPanel jWaveformPanel = new JPanel ();
     setPanelBorder (
       jWaveformPanel,
@@ -135,27 +136,27 @@ public class JDefaultFunctionGeneratorView
     this.jWaveform.setSelectedItem (null);
     this.jWaveform.addActionListener (this.jWaveformListener);
     jWaveformPanel.add (this.jWaveform);
-    waveformControlPanel.add (jWaveformPanel);
-    waveformControlPanel.add (new JLabel ());
-    waveformControlPanel.add (new JLabel ());
-    waveformControlPanel.add (new JLabel ());
-    waveformControlPanel.add (new JLabel ());
-    waveformControlPanel.add (new JLabel ());
-    waveformControlPanel.add (new JLabel ());
-    waveformControlPanel.add (new JLabel ());
-    add (waveformControlPanel);
+    this.waveformControlPanel.add (jWaveformPanel);
+    this.waveformControlPanel.add (new JLabel ());
+    this.waveformControlPanel.add (new JLabel ());
+    this.waveformControlPanel.add (new JLabel ());
+    this.waveformControlPanel.add (new JLabel ());
+    this.waveformControlPanel.add (new JLabel ());
+    this.waveformControlPanel.add (new JLabel ());
+    this.waveformControlPanel.add (new JLabel ());
+    add (this.waveformControlPanel);
     
-    final JPanel frequencyPanel = new JPanel ();
+    this.frequencyPanel = new JPanel ();
     setPanelBorder (
       frequencyPanel,
       getLevel () + 1,
       getGuiPreferencesFrequencyColor (),
       "Frequency [Hz]");
-    frequencyPanel.setOpaque (true);
-    frequencyPanel.setLayout (new GridLayout (5, 1));
+    this.frequencyPanel.setOpaque (true);
+    this.frequencyPanel.setLayout (new GridLayout (5, 1));
     this.jFreq = new JSevenSegmentNumber (JInstrumentPanel.getGuiPreferencesFrequencyColor (), false, 11, 7);
     this.jFreq.addMouseListener (this.jFreqMouseListener);
-    frequencyPanel.add (this.jFreq);
+    this.frequencyPanel.add (this.jFreq);
     this.jFreqSlider_MHz = new JSlider (0, (int) Math.ceil (getFunctionGenerator ().getMaxFrequency_Hz () / 1.0e6), 0);
     this.jFreqSlider_kHz = new JSlider (0, 999, 0);
     this.jFreqSlider_Hz = new JSlider (0, 999, 0);
@@ -171,7 +172,7 @@ public class JDefaultFunctionGeneratorView
       getLevel () + 2,
       getGuiPreferencesFrequencyColor (),
       "[MHz]");
-    frequencyPanel.add (this.jFreqSlider_MHz);
+    this.frequencyPanel.add (this.jFreqSlider_MHz);
     this.jFreqSlider_kHz.setToolTipText ("-");
     this.jFreqSlider_kHz.setMajorTickSpacing (100);
     this.jFreqSlider_kHz.setMinorTickSpacing (10);
@@ -182,7 +183,7 @@ public class JDefaultFunctionGeneratorView
       getLevel () + 2,
       getGuiPreferencesFrequencyColor (),
       "[kHz]");
-    frequencyPanel.add (this.jFreqSlider_kHz);
+    this.frequencyPanel.add (this.jFreqSlider_kHz);
     this.jFreqSlider_Hz.setToolTipText ("-");
     this.jFreqSlider_Hz.setMajorTickSpacing (100);
     this.jFreqSlider_Hz.setMinorTickSpacing (10);
@@ -193,7 +194,7 @@ public class JDefaultFunctionGeneratorView
       getLevel () + 2,
       getGuiPreferencesFrequencyColor (),
       "[Hz]");
-    frequencyPanel.add (this.jFreqSlider_Hz);
+    this.frequencyPanel.add (this.jFreqSlider_Hz);
     this.jFreqSlider_mHz.setToolTipText ("-");
     this.jFreqSlider_mHz.setMajorTickSpacing (100);
     this.jFreqSlider_mHz.setMinorTickSpacing (10);
@@ -204,19 +205,19 @@ public class JDefaultFunctionGeneratorView
       getLevel () + 2,
       getGuiPreferencesFrequencyColor (),
       "[mHz]");
-    frequencyPanel.add (this.jFreqSlider_mHz);
+    this.frequencyPanel.add (this.jFreqSlider_mHz);
     add (frequencyPanel);
     
-    final JPanel amplitudePanel = new JPanel ();
+    this.amplitudePanel = new JPanel ();
     setPanelBorder (
       amplitudePanel,
       getLevel () + 1,
       getGuiPreferencesAmplitudeColor (),
       "Amplitude [V] (pp)");
-    amplitudePanel.setLayout (new GridLayout (3, 1));
+    this.amplitudePanel.setLayout (new GridLayout (3, 1));
     this.jAmp = new JSevenSegmentNumber (getGuiPreferencesAmplitudeColor (), false, 5, 1);
     this.jAmp.addMouseListener (this.jAmpMouseListener);
-    amplitudePanel.add (this.jAmp);
+    this.amplitudePanel.add (this.jAmp);
     this.jAmpSlider_V = new JSlider (0, (int) Math.ceil (getFunctionGenerator ().getMaxAmplitude_Vpp ()), 0);
     setPanelBorder (
       this.jAmpSlider_V,
@@ -228,7 +229,7 @@ public class JDefaultFunctionGeneratorView
     this.jAmpSlider_V.setPaintTicks (true);
     this.jAmpSlider_V.setPaintLabels (true);
     this.jAmpSlider_V.addChangeListener (this.jAmpSlider_VChangeListener);
-    amplitudePanel.add (this.jAmpSlider_V);
+    this.amplitudePanel.add (this.jAmpSlider_V);
     this.jAmpSlider_mV = new JSlider (0, 999, 0);
     setPanelBorder (
       this.jAmpSlider_mV,
@@ -241,19 +242,19 @@ public class JDefaultFunctionGeneratorView
     this.jAmpSlider_mV.setPaintTicks (true);
     this.jAmpSlider_mV.setPaintLabels (false);
     this.jAmpSlider_mV.addChangeListener (this.jAmpSlider_mVChangeListener);
-    amplitudePanel.add (this.jAmpSlider_mV);
-    add (amplitudePanel);
+    this.amplitudePanel.add (this.jAmpSlider_mV);
+    add (this.amplitudePanel);
 
-    final JPanel offsetPanel = new JPanel ();
+    this.dcOffsetPanel = new JPanel ();
     setPanelBorder (
-      offsetPanel,
+      this.dcOffsetPanel,
       getLevel () + 1,
       getGuiPreferencesDCColor (),
       "DC Offset [V]");
-    offsetPanel.setLayout (new GridLayout (3, 1));
+    this.dcOffsetPanel.setLayout (new GridLayout (3, 1));
     this.jOffset = new JSevenSegmentNumber (getGuiPreferencesDCColor (), true, 5, 1); // XXX Arbitrary values!
     this.jOffset.addMouseListener (this.jOffsetMouseListener);
-    offsetPanel.add (this.jOffset);
+    this.dcOffsetPanel.add (this.jOffset);
     this.jOffsetSlider_V = new JSlider (
       (int) Math.floor (getFunctionGenerator ().getMinDCOffset_V ()),
       (int) Math.ceil (getFunctionGenerator ().getMaxDCOffset_V ()),
@@ -268,7 +269,7 @@ public class JDefaultFunctionGeneratorView
     this.jOffsetSlider_V.setPaintTicks (true);
     this.jOffsetSlider_V.setPaintLabels (true);
     this.jOffsetSlider_V.addChangeListener (this.jOffsetSlider_VChangeListener);
-    offsetPanel.add (this.jOffsetSlider_V);
+    this.dcOffsetPanel.add (this.jOffsetSlider_V);
     this.jOffsetSlider_mV = new JSlider (0, 999, 0);
     setPanelBorder (
       this.jOffsetSlider_mV,
@@ -281,8 +282,8 @@ public class JDefaultFunctionGeneratorView
     this.jOffsetSlider_mV.setPaintTicks (true);
     this.jOffsetSlider_mV.setPaintLabels (false);
     this.jOffsetSlider_mV.addChangeListener (this.jOffsetSlider_mVChangeListener);
-    offsetPanel.add (this.jOffsetSlider_mV);
-    add (offsetPanel);
+    this.dcOffsetPanel.add (this.jOffsetSlider_mV);
+    add (this.dcOffsetPanel);
     
     getFunctionGenerator ().addInstrumentListener (this.instrumentListener);
     
@@ -365,12 +366,24 @@ public class JDefaultFunctionGeneratorView
     }
   };
   
+  protected final JComponent getOutputEnableComponent ()
+  {
+    return this.jOutputEnable;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SWING
   // WAVEFORM
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JPanel waveformControlPanel;
+  
+  protected final JPanel getWaveformControlPanel ()
+  {
+    return this.waveformControlPanel;
+  }
   
   private final JComboBox<FunctionGenerator.Waveform> jWaveform;
   
@@ -393,12 +406,24 @@ public class JDefaultFunctionGeneratorView
     }
   };
   
+  protected final JComponent getWaveformSelectorComponent ()
+  {
+    return this.jWaveform;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SWING
   // FREQUENCY
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JPanel frequencyPanel;
+  
+  protected final JPanel getFrequencyPanel ()
+  {
+    return this.frequencyPanel;
+  }
   
   private final JSevenSegmentNumber jFreq;
   
@@ -537,6 +562,13 @@ public class JDefaultFunctionGeneratorView
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  private final JPanel amplitudePanel;
+  
+  protected final JPanel getAmplitudePanel ()
+  {
+    return this.amplitudePanel;
+  }
+  
   private final JSevenSegmentNumber jAmp;
   
   private final MouseListener jAmpMouseListener = new MouseAdapter ()
@@ -617,6 +649,13 @@ public class JDefaultFunctionGeneratorView
   // DC OFFSET
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final JPanel dcOffsetPanel;
+  
+  protected final JPanel getDCOffsetPanel ()
+  {
+    return this.dcOffsetPanel;
+  }
   
   private final JSevenSegmentNumber jOffset;
   
