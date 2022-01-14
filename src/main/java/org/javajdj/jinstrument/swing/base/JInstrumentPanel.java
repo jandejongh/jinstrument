@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.swing.base;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
@@ -47,6 +48,7 @@ import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentListener;
 import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jswing.jbyte.JBitsLong;
+import org.javajdj.jswing.jcenter.JCenter;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jtextfieldlistener.JTextFieldListener;
 
@@ -80,7 +82,8 @@ public class JInstrumentPanel
     final Instrument instrument,
     final String title,
     final int level,
-    final Color panelColor)
+    final Color panelColor,
+    final JComponent component)
   {
     super ();
     this.instrument = instrument;
@@ -88,8 +91,22 @@ public class JInstrumentPanel
     this.level = level;
     if (this.title != null)
       setPanelBorder (panelColor, this.title);
+    if (component != null)
+    {
+      setLayout (new GridLayout (1, 1));
+      add (JCenter.XY (component));
+    }
   }
 
+  public JInstrumentPanel (
+    final Instrument instrument,
+    final String title,
+    final int level,
+    final Color panelColor)
+  {
+    this (instrument, title, level, panelColor, null);
+  }
+  
   public JInstrumentPanel (
     final String title,
     final int level,
@@ -217,6 +234,13 @@ public class JInstrumentPanel
   public final static Color getGuiPreferencesFrequencyColor ()
   {
     return JInstrumentPanel.DEFAULT_FREQUENCY_COLOR;
+  }
+  
+  public final static Color DEFAULT_PHASE_COLOR = new Color (20, 164, 164);
+  
+  public final static Color getGuiPreferencesPhaseColor ()
+  {
+    return JInstrumentPanel.DEFAULT_PHASE_COLOR;
   }
   
   public final static Color DEFAULT_AMPLITUDE_COLOR = Color.red;
@@ -845,6 +869,58 @@ public class JInstrumentPanel
         return null;
       }
       return value_percent * conversionFactor;
+    }
+    else
+      return null;
+  }
+  
+  protected Double getPhaseFromDialog_degrees (final String title, final Double startValue_degrees)
+  {
+    final String inputString = JOptionPane.showInputDialog (title, startValue_degrees);
+    if (inputString != null)
+    {
+      final String[] splitString = inputString.split ("\\s+");
+      if (splitString == null || splitString.length == 0 || splitString.length > 2)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + inputString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      final String valueString = splitString[0];
+      final String unitString = splitString.length > 1 ? splitString[1] : null;
+      final double conversionFactor;
+      if (unitString != null)
+      {
+        if (unitString.trim ().equalsIgnoreCase ("deg")
+          || unitString.trim ().equalsIgnoreCase ("degrees"))
+        {
+          conversionFactor = 1.0;
+        }
+        else if (unitString.trim ().equalsIgnoreCase ("rad")
+          || unitString.trim ().equalsIgnoreCase ("radians"))
+        {
+          conversionFactor = 360.0 / (2.0 * Math.PI);
+        }
+        else
+        {
+          JOptionPane.showMessageDialog (null, "Illegal unit " + unitString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+          return null;
+        }
+      }
+      else
+      {
+        conversionFactor = 1.0;
+      }
+      final double value;
+      try
+      {
+        value = Double.parseDouble (valueString);
+      }
+      catch (NumberFormatException nfe)
+      {
+        JOptionPane.showMessageDialog (null, "Illegal value " + valueString + "!", "Illegal Input", JOptionPane.ERROR_MESSAGE);
+        return null;
+      }
+      return value * conversionFactor;
     }
     else
       return null;
