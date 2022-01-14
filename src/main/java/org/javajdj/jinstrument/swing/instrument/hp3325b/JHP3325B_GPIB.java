@@ -18,22 +18,18 @@ package org.javajdj.jinstrument.swing.instrument.hp3325b;
 
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.util.Arrays;
 import java.util.logging.Logger;
-import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
+import javax.swing.JPanel;
 import org.javajdj.jinstrument.Instrument;
-import org.javajdj.jinstrument.InstrumentListener;
-import org.javajdj.jinstrument.InstrumentReading;
 import org.javajdj.jinstrument.InstrumentSettings;
-import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.fg.hp3325b.HP3325B_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.fg.hp3325b.HP3325B_GPIB_Settings;
-import org.javajdj.jinstrument.gpib.fg.hp3325b.HP3325B_GPIB_Status;
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
+import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesManagementColor;
+import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesPowerColor;
 import org.javajdj.jinstrument.swing.default_view.JDefaultFunctionGeneratorView;
-import org.javajdj.jswing.jbyte.JByte;
 
 /** A Swing panel for a {@link HP3325B_GPIB_Instrument} Function Generator.
  *
@@ -59,39 +55,81 @@ public class JHP3325B_GPIB
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JHP3325B_GPIB (final HP3325B_GPIB_Instrument functionGenerator, final int level)
+  public JHP3325B_GPIB (final HP3325B_GPIB_Instrument hp3325b, final int level)
   {
 
-    super (functionGenerator, level);
-
-    this.jInstrumentSpecificPanel.removeAll ();
-    setPanelBorder (
-      this.jInstrumentSpecificPanel,
-      getLevel () + 1,
-      getGuiPreferencesManagementColor (),
-      "HP-3325B Specific");
-    this.jInstrumentSpecificPanel.setLayout (new GridLayout (5, 2));
-
-    this.jSerialPollStatus = new JByte (Color.red,
-      Arrays.asList (new String[]{"BSY", "SRQ", "SWP", "ZERO", "FAIL", "STA", "STO", "UERR"}));
-    setPanelBorder (
-      this.jSerialPollStatus,
-      level + 2,
-      getGuiPreferencesManagementColor (),
-      "Serial Poll Status [Read-Only]");
-    this.jInstrumentSpecificPanel.add (this.jSerialPollStatus);
+    super (hp3325b, level);
     
-    this.jInstrumentSpecificPanel.add (new JLabel ());
-    this.jInstrumentSpecificPanel.add (new JLabel ());
-    this.jInstrumentSpecificPanel.add (new JLabel ());
-    this.jInstrumentSpecificPanel.add (new JLabel ());
-    this.jInstrumentSpecificPanel.add (new JLabel ());
-    this.jInstrumentSpecificPanel.add (new JLabel ());
-    this.jInstrumentSpecificPanel.add (new JLabel ());
-    this.jInstrumentSpecificPanel.add (new JLabel ());
-    this.jInstrumentSpecificPanel.add (new JLabel ());
-
-    getFunctionGenerator ().addInstrumentListener (this.instrumentListener);
+    removeAll ();
+    setOpaque (true);
+    setLayout (new GridLayout (3, 3));
+    
+    add (new JHP3325B_GPIB_Management (
+      hp3325b,
+      "Management",
+      level + 1,
+      getGuiPreferencesManagementColor ()));
+    
+    final JPanel waveformControlPanel = getWaveformControlPanel ();
+    add (waveformControlPanel);
+    waveformControlPanel.removeAll ();
+    waveformControlPanel.setLayout (new GridLayout (3, 1));
+    waveformControlPanel.add (new JInstrumentPanel (
+      hp3325b,
+      "Waveform",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      getWaveformSelectorComponent ()));
+    waveformControlPanel.add (new JInstrumentPanel (
+      hp3325b,
+      "HV Output",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JBoolean_JBoolean (
+      "HV Output",
+      (settings) -> ((HP3325B_GPIB_Settings) settings).isHighVoltageOutput (),
+      hp3325b::setHighVoltageOutput,
+      Color.green,
+      true)));
+    waveformControlPanel.add (new JInstrumentPanel (
+      hp3325b,
+      "Output",
+      level + 1,
+      getGuiPreferencesPowerColor (),
+      new JEnum_JComboBox<> (
+        HP3325B_GPIB_Instrument.RFOutputMode.class,
+        "Output",
+        (final InstrumentSettings settings) -> ((HP3325B_GPIB_Settings) settings).getRFOutputMode (),
+        hp3325b::setRFOutputMode,
+        true)));
+            
+    add (new JHP3325B_GPIB_Misc (
+      hp3325b,
+      "Miscellaneous",
+      level + 1,
+      getGuiPreferencesManagementColor ()));
+    
+    add (getFrequencyPanel ());
+    add (getAmplitudePanel ());
+    add (getDCOffsetPanel ());
+    
+    add (new JHP3325B_GPIB_FrequencySweep (
+      hp3325b,
+      "Frequency Sweep",
+      level + 1,
+      getGuiPreferencesFrequencyColor ()));
+    
+    add (new JHP3325B_GPIB_Modulation (
+      hp3325b,
+      "Modulation",
+      level + 1,
+      getGuiPreferencesModulationColor ()));
+    
+    add (new JHP3325B_GPIB_Phase (
+      hp3325b,
+      "Phase",
+      level + 1,
+      getGuiPreferencesPhaseColor ()));
     
   }
   
@@ -146,66 +184,6 @@ public class JHP3325B_GPIB
   {
     return getInstrumentViewUrl ();
   }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private final JByte jSerialPollStatus;
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT LISTENER
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final InstrumentListener instrumentListener = new InstrumentListener ()
-  {
-    
-    @Override
-    public void newInstrumentStatus (final Instrument instrument, final InstrumentStatus instrumentStatus)
-    {
-      if (instrument != JHP3325B_GPIB.this.getFunctionGenerator ()|| instrumentStatus == null)
-        throw new IllegalArgumentException ();
-      if (! (instrumentStatus instanceof HP3325B_GPIB_Status))
-        throw new IllegalArgumentException ();
-      SwingUtilities.invokeLater (() ->
-      {
-        JHP3325B_GPIB.this.jSerialPollStatus.setDisplayedValue (
-          ((HP3325B_GPIB_Status) instrumentStatus).getSerialPollStatusByte ());
-      });
-    }
-    
-    @Override
-    public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
-    {
-      if (instrument != JHP3325B_GPIB.this.getFunctionGenerator ()|| instrumentSettings == null)
-        throw new IllegalArgumentException ();
-      if (! (instrumentSettings instanceof HP3325B_GPIB_Settings))
-        throw new IllegalArgumentException ();
-      final HP3325B_GPIB_Settings settings = (HP3325B_GPIB_Settings) instrumentSettings;
-      SwingUtilities.invokeLater (() ->
-      {
-        JHP3325B_GPIB.this.inhibitInstrumentControl = true;
-        try
-        {
-        }
-        finally
-        {
-          JHP3325B_GPIB.this.inhibitInstrumentControl = false;
-        }
-      });
-    }
-
-    @Override
-    public void newInstrumentReading (final Instrument instrument, final InstrumentReading instrumentReading)
-    {
-      // EMPTY
-    }
-    
-  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
