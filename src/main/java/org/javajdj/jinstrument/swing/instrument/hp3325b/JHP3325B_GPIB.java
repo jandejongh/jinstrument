@@ -97,7 +97,7 @@ public class JHP3325B_GPIB
       level + 1,
       getGuiPreferencesPowerColor (),
       new JEnum_JComboBox<> (
-        HP3325B_GPIB_Instrument.RFOutputMode.class,
+        HP3325B_GPIB_Settings.RFOutputMode.class,
         "Output",
         (final InstrumentSettings settings) -> ((HP3325B_GPIB_Settings) settings).getRFOutputMode (),
         hp3325b::setRFOutputMode,
