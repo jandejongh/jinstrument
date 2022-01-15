@@ -70,7 +70,7 @@ public class JHP3325B_GPIB_AmplitudeCalibration
     setLayout (new GridLayout (2, 2));
 
     add (JCenter.XY (new JEnum_JComboBox<> (
-      HP3325B_GPIB_Instrument.AmpltitudeCalibrationMode.class,
+      HP3325B_GPIB_Settings.AmpltitudeCalibrationMode.class,
       "CALM",
       (final InstrumentSettings settings) -> ((HP3325B_GPIB_Settings) settings).getAmplitudeCalibrationMode (),
       hp3325b::setAmplitudeCalibrationMode,
