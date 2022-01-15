@@ -13,6 +13,11 @@ is there as well.
 ## License
 Apache v2.0.
 
+## Status [20220115 - v0.8-SNAPSHOT]
+
+### Added Beta:
+- HP-3325B Function Generator [complete except arbitrary waveform and memory functions]
+
 ## Status [20220107 - v0.7]
 
 ### Beta [Target met for V1.0 Release]:
