@@ -13,9 +13,9 @@ is there as well.
 ## License
 Apache v2.0.
 
-## Status [20220115 - v0.8-SNAPSHOT]
+## Status/Log [20220115 - v0.8-SNAPSHOT]
 
-### Added Beta:
+### [20220115] Added Beta:
 - HP-3325B Function Generator [complete except arbitrary waveform and memory functions]
 
 ## Status [20220107 - v0.7]
@@ -35,7 +35,6 @@ Apache v2.0.
 - HP-70000 Spectrum Analyzer [MMS]
 
 ### Work in Progress [Target: -> Beta for V1.0 Release]:
-- HP-3325B Synthesizer/Function Generator
 - HP-3457A Digital MultiMeter
 - HP-3586A Selective Level Meter
 - HP-5328A [Option 011] Frequency Counter
