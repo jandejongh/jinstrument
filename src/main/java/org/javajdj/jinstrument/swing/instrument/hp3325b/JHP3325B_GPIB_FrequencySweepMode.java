@@ -69,7 +69,7 @@ public class JHP3325B_GPIB_FrequencySweepMode
     setLayout (new GridLayout (1, 1));
 
     add (JCenter.XY (new JEnum_JComboBox<> (
-      HP3325B_GPIB_Instrument.SweepMode.class,
+      HP3325B_GPIB_Settings.SweepMode.class,
       "Mode",
       (final InstrumentSettings settings) -> ((HP3325B_GPIB_Settings) settings).getSweepMode (),
       hp3325b::setSweepMode,
