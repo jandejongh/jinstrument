@@ -69,7 +69,7 @@ public class JHP3325B_GPIB_ModulationSourceWaveform
     setLayout (new GridLayout (1, 1));
 
     add (JCenter.XY (new JEnum_JComboBox<> (
-      HP3325B_GPIB_Instrument.ModulationSourceWaveformFunction.class,
+      HP3325B_GPIB_Settings.ModulationSourceWaveformFunction.class,
       "Waveform",
       (final InstrumentSettings settings) -> ((HP3325B_GPIB_Settings) settings).getModulationSourceWaveformFunction (),
       hp3325b::setModulationSourceWaveformFunction,
