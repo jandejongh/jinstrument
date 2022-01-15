@@ -88,7 +88,7 @@ public class JHP3325B_GPIB_Misc_RareDangerous
       level + 1,
       getGuiPreferencesManagementColor (),
       new JEnum_JComboBox<> (
-        HP3325B_GPIB_Instrument.DataTransferMode.class,
+        HP3325B_GPIB_Settings.DataTransferMode.class,
         "DT Mode",
         (final InstrumentSettings settings) -> ((HP3325B_GPIB_Settings) settings).getDataTransferMode (),
         hp3325b::setDataTransferMode,
