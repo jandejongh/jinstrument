@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.javajdj.jinstrument.DefaultInstrumentCommand;
 import org.javajdj.jinstrument.DefaultSpectrumAnalyzerTrace;
 import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.DeviceType;
@@ -41,6 +42,11 @@ import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
 
 /** Implementation of {@link Instrument} and {@link SpectrumAnalyzer} for the HP-70000 MMS.
  *
+ * <p>
+ * Except where noted otherwise, the implementation follows
+ *   'Programming Manual - HP 70000 Modular Spectrum Analyzer - HP 70900B Local Oscillator -
+ *   Source-Controlled Modules - HP Part No. 70900-90284 - March 1994 - Edition A.0.0'.
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
@@ -367,6 +373,29 @@ public class HP70000_GPIB_Instrument
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // HP70000_GPIB_Instrument
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  /** Interrupts operation of all user-defined functions (asynchronous).
+   * 
+   * <p>
+   * ABORT
+   * 
+   * @throws IOException          If an I/O Exception occurred while pushing the command to the instrument.
+   * @throws InterruptedException If an interrupt of the current {@code Thread} was detected
+   *                                while pushing the command to the instrument.
+   * 
+   */
+  public final void abort ()
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_ABORT));
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // AbstractInstrument
   // PROCESS COMMAND
   //
@@ -472,6 +501,14 @@ public class HP70000_GPIB_Instrument
           writeSync ("AT AUTO\r\n");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
+        }
+        case HP70000_InstrumentCommand.IC_HP70000_ABORT:
+        {
+          // XXX Preferred terminator is ';'.
+          writeSync ("ABORT;");
+          // XXX Does this affect the Settings?
+          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          break;          
         }
         default:
           throw new UnsupportedOperationException ();
