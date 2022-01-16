@@ -97,7 +97,7 @@ import org.javajdj.jinstrument.swing.default_view.JDefaultSignalGeneratorView;
 import org.javajdj.jinstrument.swing.default_view.JDefaultSpectrumAnalyzerSettingsPanel;
 import org.javajdj.jinstrument.swing.default_view.JDefaultSpectrumAnalyzerTraceDisplay;
 import org.javajdj.jinstrument.swing.default_view.JDefaultSpectrumAnalyzerView;
-import org.javajdj.jinstrument.swing.instrument.hp3478a.JHP3478A_GPIB;
+import org.javajdj.jinstrument.swing.instrument.dmm.hp3478a.JHP3478A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.hp5316a.JHP5316A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.hp6033a.JHP6033A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.hp8116a.JHP8116A_GPIB;
