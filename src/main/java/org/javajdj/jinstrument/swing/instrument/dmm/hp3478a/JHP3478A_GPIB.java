@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing.instrument.hp3478a;
+package org.javajdj.jinstrument.swing.instrument.dmm.hp3478a;
 
 import java.awt.Color;
 import java.awt.Dialog;
