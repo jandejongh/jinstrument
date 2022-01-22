@@ -70,7 +70,7 @@ public final class RS_ESH3_GPIB_Status
         switch (this.serialPollStatusByte & 0xf)
         {
           case 0x00: return "GPIB Talker: No Listener";
-          default: return "Unknown Extension in Status Byte";
+          default:   return "Unknown Extension in Status Byte";
         }
       }
       else
