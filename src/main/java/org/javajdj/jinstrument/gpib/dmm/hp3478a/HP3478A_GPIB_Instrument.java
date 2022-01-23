@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,7 +237,7 @@ public class HP3478A_GPIB_Instrument
     }
 
     @Override
-    public final double getValue ()
+    public final double getMaxAbsValue ()
     {
       return this.value;
     }
@@ -623,7 +623,7 @@ public class HP3478A_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
-  protected void onGpibServiceRequestFromInstrument (final Byte statusByte)
+  protected void onGpibServiceRequestFromInstrument (final byte statusByte)
     throws IOException, InterruptedException, TimeoutException
   {
     // This method should not be invoked in the current implementation.
