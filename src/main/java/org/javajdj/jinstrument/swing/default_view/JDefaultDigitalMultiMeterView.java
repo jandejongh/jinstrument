@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -370,7 +370,7 @@ public class JDefaultDigitalMultiMeterView
         final JColorCheckBox<Boolean> jccb = new JColorCheckBox<> ((t) -> (t != null && t) ? Color.red : null);
         this.rangesMap.put (range, jccb);
         add (jccb);
-        add (new JLabel (Double.toString (range.getValue ())));
+        add (new JLabel (Double.toString (range.getMaxAbsValue ())));
         add (new JLabel (range.getUnit ().toString ()));
         jccb.addActionListener ((ActionEvent ae) ->
         {
