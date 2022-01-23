@@ -834,7 +834,7 @@ public class HP3325B_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
-  protected void onGpibServiceRequestFromInstrument (final Byte statusByte)
+  protected void onGpibServiceRequestFromInstrument (final byte statusByte)
     throws IOException, InterruptedException, TimeoutException
   {
     throw new UnsupportedOperationException ();
