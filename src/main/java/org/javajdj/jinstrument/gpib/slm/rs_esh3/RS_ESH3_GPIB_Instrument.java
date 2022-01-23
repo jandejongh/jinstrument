@@ -254,7 +254,7 @@ public class RS_ESH3_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
-  protected void onGpibServiceRequestFromInstrument (final Byte statusByte)
+  protected void onGpibServiceRequestFromInstrument (final byte statusByte)
     throws IOException, InterruptedException, TimeoutException
   {
     final RS_ESH3_GPIB_Status status = new RS_ESH3_GPIB_Status (statusByte);
