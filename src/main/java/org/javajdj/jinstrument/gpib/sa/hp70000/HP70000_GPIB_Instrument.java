@@ -361,7 +361,7 @@ public class HP70000_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   @Override
-  protected void onGpibServiceRequestFromInstrument (final Byte statusByte)
+  protected void onGpibServiceRequestFromInstrument (final byte statusByte)
     throws IOException, InterruptedException, TimeoutException
   {
     final InstrumentReading reading = getReadingFromInstrumentSync ();
