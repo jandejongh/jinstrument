@@ -26,6 +26,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.AbstractInstrument;
+import org.javajdj.jinstrument.controller.gpib.GpibController;
 import org.javajdj.jinstrument.controller.gpib.GpibControllerCommand;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.controller.gpib.ReadlineTerminationMode;
@@ -549,7 +550,25 @@ public abstract class AbstractGpibInstrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected abstract void onGpibServiceRequestFromInstrument (final Byte statusByte)
+  /** Notifies subclasses that the instrument raised a GPIB Service Request.
+   * 
+   * <p>
+   * The {@link GpibController} has indicated that the instrument has raised a GPIB Service Request,
+   * and that the controller has interrogated the instrument with a GPIB Serial Poll.
+   * 
+   * <p>
+   * As it actually indicates a pending Service Request,
+   * bit 6 in the (serial poll) status byte will almost always be 1.
+   * 
+   * @param statusByte The status byte returned by the instrument
+   *                     on a GPIB serial poll performed after the Service Request interrupt.
+   * 
+   * @throws IOException          An I/O Exception occurred while handling the Service Request in the subclass.
+   * @throws InterruptedException Handling the Service Request in the subclass was interrupted.
+   * @throws TimeoutException     Handling the Service Request in the subclass timed out (according to the subclass).
+   * 
+   */
+  protected abstract void onGpibServiceRequestFromInstrument (final byte statusByte)
     throws IOException, InterruptedException, TimeoutException;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
