@@ -79,22 +79,22 @@ public class JDefaultDigitalMultiMeterView
   
   public JDefaultDigitalMultiMeterView (final DigitalMultiMeter digitalMultiMeter, final int level)
   {
-    //
+    
     super (digitalMultiMeter, level);
-    //
+    
     setOpaque (true);
     setLayout (new GridLayout (2, 2));
-    //
-    final JDefaultInstrumentManagementView instrumentManagementPanel= new JDefaultInstrumentManagementView (
+    
+    this.instrumentManagementPanel = new JDefaultInstrumentManagementView (
       JDefaultDigitalMultiMeterView.this.getInstrument (),
       JDefaultDigitalMultiMeterView.this.getLevel () + 1);
     setPanelBorder (
-      instrumentManagementPanel,
+      this.instrumentManagementPanel,
       getLevel () + 1,
       JInstrumentPanel.getGuiPreferencesManagementColor (),
       "Management");
-    add (instrumentManagementPanel);
-    //
+    add (this.instrumentManagementPanel);
+    
     this.jInstrumentSpecificPanel = new JPanel ();
     setPanelBorder (
       this.jInstrumentSpecificPanel,
@@ -188,9 +188,9 @@ public class JDefaultDigitalMultiMeterView
     jUnitPanel.add (this.jUnit);
     readingPanel.add (jUnitPanel);
     add (readingPanel);
-    //
+    
     getDigitalMultiMeter ().addInstrumentListener (this.instrumentListener);
-    //
+    
   }
   
   public JDefaultDigitalMultiMeterView (final DigitalMultiMeter digitalMultiMeter)
@@ -245,6 +245,20 @@ public class JDefaultDigitalMultiMeterView
     return getInstrumentViewUrl ();
   }
   
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  // INSTRUMENT MANAGEMENT PANEL
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final JDefaultInstrumentManagementView instrumentManagementPanel;
+  
+  protected final JDefaultInstrumentManagementView getInstrumentManagementPanel ()
+  {
+    return this.instrumentManagementPanel;
+  }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SWING
