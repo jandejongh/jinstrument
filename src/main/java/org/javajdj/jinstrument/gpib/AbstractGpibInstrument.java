@@ -605,9 +605,31 @@ public abstract class AbstractGpibInstrument
         final long timeAfterProbeAndDelivery_ms = System.currentTimeMillis ();
         // Calculate sojourn.
         final long sojourn_ms = timeAfterProbeAndDelivery_ms - timeBeforeProbe_ms;
+        //
         // Find out the remaining time to wait in order to respect the given period.
+        //
+        // Before 20220123, there was a subtle, yet massive bug in the statement below...
+        //
+        // Original line, with the incorrect (long) cast on double x instead of on (x * 1000):
+        //   final long remainingSleep_ms =
+        //     ((long) AbstractGpibInstrument.this.getGpibInstrumentServiceRequestCollectorPeriod_s () * 1000) - sojourn_ms;
+        //
+        // This would cast all less-than-unit values of
+        // AbstractGpibInstrument.this.getGpibInstrumentServiceRequestCollectorPeriod_s ()
+        // to a zero long value; leading to complaints in the log like
+        // "GPIB Instrument Service Request Collector cannot meet timing reading".
+        //
+        // The line below did by now obvious magic fixes; I checked similar constructs in this file
+        // and in AbstractInstrument, but found no other occurrences of this error.
+        //
+        // XXX But quite some implementations will at this time have
+        // a rather pessimistic views on the achievable SRQ polling rate...
+        //
+        // XXX Isn't there a jservice construct for this??
+        //
         final long remainingSleep_ms =
-          ((long) AbstractGpibInstrument.this.getGpibInstrumentServiceRequestCollectorPeriod_s () * 1000) - sojourn_ms;
+          (long) (AbstractGpibInstrument.this.getGpibInstrumentServiceRequestCollectorPeriod_s () * 1000)
+          - sojourn_ms;
         if (remainingSleep_ms < 0)
         {
           LOG.log (Level.WARNING, "GPIB Instrument Service Request Collector cannot meet timing reading on {0}.",
