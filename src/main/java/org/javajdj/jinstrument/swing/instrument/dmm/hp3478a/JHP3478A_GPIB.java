@@ -76,11 +76,15 @@ public class JHP3478A_GPIB
   
   public JHP3478A_GPIB (final HP3478A_GPIB_Instrument digitalMultiMeter, final int level)
   {
+    
     super (digitalMultiMeter, level);
-    this.jInstrumentSpecificPanel.removeAll ();
-    setPanelBorder (this.jInstrumentSpecificPanel, level + 1, DEFAULT_MANAGEMENT_COLOR, "HP-3478A Specific");
-    this.jInstrumentSpecificPanel.setLayout (new GridLayout (5, 2));
-    //
+    
+    final JPanel jInstrumentSpecificPanel = getInstrumentSpecificPanel ();
+    jInstrumentSpecificPanel.removeAll ();
+    setPanelBorder (jInstrumentSpecificPanel, level + 1, DEFAULT_MANAGEMENT_COLOR, "HP-3478A Specific");
+
+    jInstrumentSpecificPanel.setLayout (new GridLayout (5, 2));
+
     final JPanel jSerialPollStatusPanel = new JPanel ();
     setPanelBorder (jSerialPollStatusPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Serial Poll Status [Read-Only]");
     jSerialPollStatusPanel.setLayout (new GridLayout (2, 1));
@@ -97,8 +101,8 @@ public class JHP3478A_GPIB
     jSerialPollTags.add (new JLabel ("NU"));
     jSerialPollTags.add (new JLabel ("DRDY"));
     jSerialPollStatusPanel.add (jSerialPollTags);
-    this.jInstrumentSpecificPanel.add (jSerialPollStatusPanel);
-    //
+    jInstrumentSpecificPanel.add (jSerialPollStatusPanel);
+    
     final JPanel jCalibrationPanel = new JPanel ();
     jCalibrationPanel.setLayout (new GridLayout (1, 2));
     setPanelBorder (jCalibrationPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Calibration");
@@ -115,23 +119,23 @@ public class JHP3478A_GPIB
     final JColorCheckBox jCalibrationRestoreButton = new JColorCheckBox ((t) -> Color.blue);
     jCalibrationRestorePanel.add (jCalibrationRestoreButton);
     jCalibrationPanel.add (jCalibrationRestorePanel);
-    this.jInstrumentSpecificPanel.add (jCalibrationPanel);
-    //
+    jInstrumentSpecificPanel.add (jCalibrationPanel);
+    
     final JPanel jAutoZeroPanel = new JPanel ();
     jAutoZeroPanel.setLayout (new GridLayout (1, 1));
     this.jAutoZero = new JColorCheckBox<> ((t) -> (t != null && t) ? Color.red : null);
     this.jAutoZero.addActionListener (this.jAutoZeroListener);
     jAutoZeroPanel.add (this.jAutoZero);
     setPanelBorder (jAutoZeroPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Auto Zero");
-    this.jInstrumentSpecificPanel.add (jAutoZeroPanel);
-    //
+    jInstrumentSpecificPanel.add (jAutoZeroPanel);
+
     final JPanel jErrorPanel = new JPanel ();
     jErrorPanel.setLayout (new GridLayout (1, 1));
     setPanelBorder (jErrorPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Error Byte [Read-Only]");    
     this.jError = new JLabel ("Unknown");
     jErrorPanel.add (this.jError);
-    this.jInstrumentSpecificPanel.add (jErrorPanel);
-    //
+    jInstrumentSpecificPanel.add (jErrorPanel);
+
     final JPanel jTriggerPanel = new JPanel ();
     jTriggerPanel.setLayout (new GridLayout (1, 2));
     setPanelBorder (jTriggerPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Triggering");
@@ -149,8 +153,8 @@ public class JHP3478A_GPIB
     this.jExternalTriggerEnabled.addActionListener (this.jExternalTriggerEnabledListener);
     jExternalTriggerEnabledPanel.add (this.jExternalTriggerEnabled);
     jTriggerPanel.add (jExternalTriggerEnabledPanel);
-    this.jInstrumentSpecificPanel.add (jTriggerPanel);
-    //
+    jInstrumentSpecificPanel.add (jTriggerPanel);
+
     final JPanel j50_60HzPanel = new JPanel ();
     j50_60HzPanel.setLayout (new GridLayout (1, 2));
     setPanelBorder (j50_60HzPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "50/60 Hz [Read-Only]");
@@ -166,8 +170,8 @@ public class JHP3478A_GPIB
     this.j60Hz = new JColorCheckBox<> ((t) -> (t != null && t) ? Color.red : null);
     j60HzdPanel.add (this.j60Hz);
     j50_60HzPanel.add (j60HzdPanel);
-    this.jInstrumentSpecificPanel.add (j50_60HzPanel);
-    //
+    jInstrumentSpecificPanel.add (j50_60HzPanel);
+
     final JPanel jFrontRearPanel = new JPanel ();
     jFrontRearPanel.setLayout (new GridLayout (1, 2));
     setPanelBorder (jFrontRearPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Input [Read-Only]");
@@ -183,30 +187,31 @@ public class JHP3478A_GPIB
     this.jRearEnabled = new JColorCheckBox<> ((t) -> (t != null && t) ? Color.red : null);
     jRearEnabledPanel.add (this.jRearEnabled);
     jFrontRearPanel.add (jRearEnabledPanel);
-    this.jInstrumentSpecificPanel.add (jFrontRearPanel);
-    //
+    jInstrumentSpecificPanel.add (jFrontRearPanel);
+
     final JPanel jSerialPollMaskPanel = new JPanel ();
     jSerialPollMaskPanel.setLayout (new GridLayout (1, 1));
     setPanelBorder (jSerialPollMaskPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Serial Poll Mask (SRQ) [Read-Only]");    
     this.jSerialPollMask = new JLabel ("Unknown");
     jSerialPollMaskPanel.add (this.jSerialPollMask);
-    this.jInstrumentSpecificPanel.add (jSerialPollMaskPanel);
-    //
+    jInstrumentSpecificPanel.add (jSerialPollMaskPanel);
+
     final JPanel jCalRamEnabledPanel = new JPanel ();
     jCalRamEnabledPanel.setLayout (new GridLayout (1, 1));
     this.jCalRamEnabled = new JColorCheckBox<> ((t) -> (t != null && t) ? Color.red : null);
     jCalRamEnabledPanel.add (this.jCalRamEnabled);
     setPanelBorder (jCalRamEnabledPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Calibration RAM Enabled [Read-Only]");
-    this.jInstrumentSpecificPanel.add (jCalRamEnabledPanel);
-    //
+    jInstrumentSpecificPanel.add (jCalRamEnabledPanel);
+
     final JPanel jDacSettingsPanel = new JPanel ();
     jDacSettingsPanel.setLayout (new GridLayout (1, 1));
     setPanelBorder (jDacSettingsPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Internal DAC Settings [Read-Only]");    
     this.jDacSettings = new JLabel ("Unknown");
     jDacSettingsPanel.add (this.jDacSettings);
-    this.jInstrumentSpecificPanel.add (jDacSettingsPanel);
-    //
+    jInstrumentSpecificPanel.add (jDacSettingsPanel);
+
     getDigitalMultiMeter ().addInstrumentListener (this.instrumentListener);
+    
   }
   
   public JHP3478A_GPIB (final HP3478A_GPIB_Instrument digitalMultiMeter)
