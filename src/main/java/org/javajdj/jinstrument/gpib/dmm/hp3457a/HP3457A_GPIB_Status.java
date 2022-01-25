@@ -212,7 +212,7 @@ public final class HP3457A_GPIB_Status
     CALIBRATION         ((short) 0x0002, "CAL/ACAL Calibration error"),
     TRIGGER_TOO_FAST    ((short) 0x0004, "Trigger too fast"),
     SYNTAX              ((short) 0x0008, "Bad syntax"),
-    BAD_HEADER          ((short) 0x0010, "Unrecognizable command"),
+    BAD_HEADER          ((short) 0x0010, "Unrecognizable command (bad header)"),
     BAD_PARAMETER       ((short) 0x0020, "Unrecognizable or mismatched parameter"),
     BAD_PARAMETER_RANGE ((short) 0x0040, "Parameter out of range"),
     PARAMETER_REQUIRED  ((short) 0x0080, "Parameter missing"),
@@ -308,7 +308,7 @@ public final class HP3457A_GPIB_Status
   
   public final String getErrorsString ()
   {
-    return Objects.toString (this.errors.toString ());
+    return Objects.toString (this.errors);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
