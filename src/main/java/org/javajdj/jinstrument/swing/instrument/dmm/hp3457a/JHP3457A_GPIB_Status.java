@@ -178,7 +178,6 @@ public class JHP3457A_GPIB_Status
         JHP3457A_GPIB_Status.this.jSerialPollStatus.setDisplayedValue (hp3457a_status.getSerialPollStatusByte ());
         if (hp3457a_status.isError ())
         {
-          // XXX Maybe the auxiliaryErrorsString needs reformatting (intermediate CR/LF between multiple error messages.
           final String errorsString = hp3457a_status.getErrorsString ();
           if (errorsString != null)
             JHP3457A_GPIB_Status.this.jMessage.append (errorsString + "\n");
