@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,8 +58,7 @@ public class JDefaultInstrumentReadingPanel_Double
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  // XXX Why are we protected?
-  protected JDefaultInstrumentReadingPanel_Double (
+  public JDefaultInstrumentReadingPanel_Double (
     final Instrument instrument,
     final String title,
     final int level,
