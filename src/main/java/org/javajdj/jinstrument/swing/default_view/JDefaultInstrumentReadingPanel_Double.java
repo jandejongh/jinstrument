@@ -58,6 +58,7 @@ public class JDefaultInstrumentReadingPanel_Double
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  // XXX Why are we protected?
   protected JDefaultInstrumentReadingPanel_Double (
     final Instrument instrument,
     final String title,
@@ -166,8 +167,16 @@ public class JDefaultInstrumentReadingPanel_Double
       if (this.printUnit)
       {
         this.jUnit = new JLabel ();
-        this.jUnit.setOpaque (true);
-        this.jUnit.setBackground (Color.black);
+        if (! orientationHorizontal)
+        {
+          // If we are in vertical mode, and the parent component this in horizonzal mode,
+          // it looks better if the unit is shown on the same background (black) as
+          // the 7-segment display.
+          // If we are in horizontal mode, on the other hand, the black background for this.jUnit
+          // looks really disturbing.
+          this.jUnit.setOpaque (true);
+          this.jUnit.setBackground (Color.black);
+        }
         this.jUnit.setForeground (displayColor);
         this.jUnit.setFont (new Font ("Serif", Font.BOLD, 64));
         this.jUnit.setHorizontalAlignment (SwingConstants.CENTER);
