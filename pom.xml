@@ -147,7 +147,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jswing</artifactId>
-      <version>0.7</version>
+      <version>0.8-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>javax.json</groupId>
