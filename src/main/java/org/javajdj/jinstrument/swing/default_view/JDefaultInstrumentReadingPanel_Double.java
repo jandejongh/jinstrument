@@ -186,7 +186,7 @@ public class JDefaultInstrumentReadingPanel_Double
       if (this.units != null)
       {      
         final JPanel jUnitControlPanel = new JPanel ();
-        jUnitControlPanel.setLayout (new GridLayout (1, 2));
+        jUnitControlPanel.setLayout (orientationHorizontal ? new GridLayout (2, 1): new GridLayout (1, 2));
         final JPanel jUnitsModePanel = new JPanel ();
         setPanelBorder (jUnitsModePanel, getLevel () + 2, displayColor, "Mode");
         jUnitsModePanel.setLayout (new GridBagLayout ());
