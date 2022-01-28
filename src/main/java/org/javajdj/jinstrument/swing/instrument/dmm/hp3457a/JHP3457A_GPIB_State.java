@@ -88,7 +88,7 @@ public class JHP3457A_GPIB_State
       new Dimension (800, 600),
       new JHP3457A_GPIB_State_Memory (
         hp3457a,
-        "State Memory",
+        "",
         level + 1,
         JInstrumentPanel.getGuiPreferencesManagementColor ())));
     
