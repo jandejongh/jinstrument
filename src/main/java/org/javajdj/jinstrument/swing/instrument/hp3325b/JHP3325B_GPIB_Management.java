@@ -131,11 +131,11 @@ public class JHP3325B_GPIB_Management
       level + 1,
       getGuiPreferencesFrequencyColor (),
       new JBoolean_JBoolean (
-      "Ext Freq Ref Locked",
-      (settings) -> ((HP3325B_GPIB_Settings) settings).isExternalReferenceLocked (),
-      null,
-      Color.green,
-      true)));
+        "Ext Freq Ref Locked",
+        (settings) -> ((HP3325B_GPIB_Settings) settings).isExternalReferenceLocked (),
+        null,
+        Color.green,
+        true)));
     
     bottomPanel.add (new JInstrumentPanel (
       hp3325b,
