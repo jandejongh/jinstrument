@@ -65,12 +65,11 @@ public class JHP3457A_GPIB_OptionsControl
     final HP3457A_GPIB_Instrument hp3457a = (HP3457A_GPIB_Instrument) digitalMultiMeter;
 
     removeAll ();
-    setLayout (new GridLayout (4, 1));
+    setLayout (new GridLayout (3, 1));
 
-    add (JCenter.XY (new JLabel ("CHAN/CHAN?/SLIST/SLIST? [input/options]")));
-    add (JCenter.XY (new JLabel ("CLOSE/OPEN [input/options]")));
-    add (JCenter.XY (new JLabel ("CRESET [input/options]")));
-    add (JCenter.XY (new JLabel ("CHAN/CHAN?/SADV [input/options]")));
+    add (JCenter.XY (new JLabel ("TBD: CRESET [input/options]")));
+    add (JCenter.XY (new JLabel ("TBD: CLOSE/OPEN [input/options]")));
+    add (JCenter.XY (new JLabel ("TBD: CHAN/CHAN?/SLIST/SLIST?/SADV [input/options]")));
     
   }
 
