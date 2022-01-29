@@ -67,7 +67,7 @@ public class JHP3457A_GPIB_Subprograms
     removeAll ();
     setLayout (new GridLayout (1, 1));
     
-    add (JCenter.XY (new JLabel ("TBD: CALL/SUB/SUBEND/PAUSE [subprograms]")));
+    add (JCenter.XY (new JLabel ("TBD: CALL/SUB/SUBEND/PAUSE/SCRATCH [subprograms]")));
       
   }
 
