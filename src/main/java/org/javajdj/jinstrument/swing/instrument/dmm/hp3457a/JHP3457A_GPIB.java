@@ -17,22 +17,15 @@
 package org.javajdj.jinstrument.swing.instrument.dmm.hp3457a;
 
 import java.awt.GridLayout;
+import java.util.Arrays;
 import java.util.logging.Logger;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.Instrument;
-import org.javajdj.jinstrument.InstrumentListener;
-import org.javajdj.jinstrument.InstrumentReading;
-import org.javajdj.jinstrument.InstrumentSettings;
-import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Instrument;
-import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Settings;
-import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Status;
 import org.javajdj.jinstrument.swing.default_view.JDefaultDigitalMultiMeterView;
-import org.javajdj.jswing.jbyte.JByte;
+import org.javajdj.jinstrument.swing.default_view.JDefaultInstrumentReadingPanel_Double;
+import org.javajdj.junits.Unit;
 
 /** A Swing panel for (complete) control and status of a {@link HP3457A_GPIB_Instrument} Digital MultiMeter.
  *
@@ -60,31 +53,71 @@ public class JHP3457A_GPIB
   
   public JHP3457A_GPIB (final HP3457A_GPIB_Instrument digitalMultiMeter, final int level)
   {
-    super (digitalMultiMeter, level);
-    this.jInstrumentSpecificPanel.removeAll ();
-    setPanelBorder (this.jInstrumentSpecificPanel, level + 1, DEFAULT_MANAGEMENT_COLOR, "HP-3457A Specific");
-    this.jInstrumentSpecificPanel.setLayout (new GridLayout (1, 1));
-    //
-    final JPanel jSerialPollStatusPanel = new JPanel ();
-    setPanelBorder (jSerialPollStatusPanel, level + 2, DEFAULT_MANAGEMENT_COLOR, "Serial Poll Status [Read-Only]");
-    jSerialPollStatusPanel.setLayout (new GridLayout (2, 1));
-    this.jSerialPollStatus = new JByte ();
-    jSerialPollStatusPanel.add (this.jSerialPollStatus);
-    final JPanel jSerialPollTags = new JPanel ();
-    jSerialPollTags.setLayout (new GridLayout (1, 8));
-    jSerialPollTags.add (new JLabel ("XXX"));
-    jSerialPollTags.add (new JLabel ("XXX"));
-    jSerialPollTags.add (new JLabel ("XXX"));
-    jSerialPollTags.add (new JLabel ("XXX"));
-    jSerialPollTags.add (new JLabel ("XXX"));
-    jSerialPollTags.add (new JLabel ("XXX"));
-    jSerialPollTags.add (new JLabel ("XXX"));
-    jSerialPollTags.add (new JLabel ("XXX"));
-    jSerialPollStatusPanel.add (jSerialPollTags);
-    this.jInstrumentSpecificPanel.add (jSerialPollStatusPanel);
     
-    getDigitalMultiMeter ().addInstrumentListener (this.instrumentListener);
+    super (
+      digitalMultiMeter,
+      level,
+      false,  // populateInstrumentManagementPanel
+      false,  // populateInstrumentSpecificPanel
+      true,   // populateModeRangeResolutionPanel
+      false); // populateReadingPanel
+
+    remove (getInstrumentSpecificPanel ());
+
+    setLayout (new GridLayout (2, 3));
     
+    getInstrumentManagementPanel ().removeAll ();
+    getInstrumentManagementPanel ().setLayout (new GridLayout (1, 1));
+    getInstrumentManagementPanel ().add (new JHP3457A_GPIB_Management (
+      digitalMultiMeter,
+      null,
+      level + 1,
+      null));
+    
+    add (new JHP3457A_GPIB_Input (
+      digitalMultiMeter,
+      "Input",
+      level + 1,
+      getGuiPreferencesManagementColor ()));
+    
+    add (new JHP3457A_GPIB_Trigger (
+      digitalMultiMeter,
+      "Triggering",
+      level + 1,
+      getGuiPreferencesTriggerColor ()));
+    
+    add (new JHP3457A_GPIB_Misc (
+      digitalMultiMeter,
+      "Miscellaneous",
+      level + 1,
+      getGuiPreferencesManagementColor ()));
+    
+    getReadingPanel ().setLayout (new GridLayout (1, 1));
+    getReadingPanel ().add (new JDefaultInstrumentReadingPanel_Double (
+      digitalMultiMeter,
+      null,
+      level + 1,
+      getGuiPreferencesVoltageColor (),
+      false,
+      getGuiPreferencesManagementColor (),
+      0.000001,
+      1000.0,
+      0.000001,
+      true,
+      Arrays.asList (new Unit[]{
+        Unit.UNIT_mV,
+        Unit.UNIT_V,
+        Unit.UNIT_mA,
+        Unit.UNIT_A,
+        Unit.UNIT_Ohm,
+        Unit.UNIT_kOhm,
+        Unit.UNIT_Hz,
+        Unit.UNIT_kHz,
+        Unit.UNIT_ms,
+        Unit.UNIT_s}),
+      true,
+      true));
+
   }
   
   public JHP3457A_GPIB (final HP3457A_GPIB_Instrument digitalMultiMeter)
@@ -138,68 +171,6 @@ public class JHP3457A_GPIB
   {
     return getInstrumentViewUrl ();
   }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SWING
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private final JByte jSerialPollStatus;
-    
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // INSTRUMENT LISTENER
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  private final InstrumentListener instrumentListener = new InstrumentListener ()
-  {
-    
-    @Override
-    public void newInstrumentStatus (final Instrument instrument, final InstrumentStatus instrumentStatus)
-    {
-      if (instrument != JHP3457A_GPIB.this.getDigitalMultiMeter () || instrumentStatus == null)
-        throw new IllegalArgumentException ();
-      if (! (instrumentStatus instanceof HP3457A_GPIB_Status))
-        throw new IllegalArgumentException ();
-      SwingUtilities.invokeLater (() ->
-      {
-        JHP3457A_GPIB.this.jSerialPollStatus.setDisplayedValue (
-          ((HP3457A_GPIB_Status) instrumentStatus).getSerialPollStatusByte ());
-      });
-    }
-    
-    @Override
-    public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
-    {
-      if (instrument != JHP3457A_GPIB.this.getDigitalMultiMeter () || instrumentSettings == null)
-        throw new IllegalArgumentException ();
-      if (! (instrumentSettings instanceof HP3457A_GPIB_Settings))
-        throw new IllegalArgumentException ();
-      final HP3457A_GPIB_Settings settings = (HP3457A_GPIB_Settings) instrumentSettings;
-      SwingUtilities.invokeLater (() ->
-      {
-        JHP3457A_GPIB.this.inhibitInstrumentControl = true;
-        //
-        try
-        {
-          // JHP3457A_GPIB.this.jXXX.setYYY (settings.XXX);
-        }
-        finally
-        {
-          JHP3457A_GPIB.this.inhibitInstrumentControl = false;
-        }
-      });
-    }
-
-    @Override
-    public void newInstrumentReading (final Instrument instrument, final InstrumentReading instrumentReading)
-    {
-      // EMPTY
-    }
-    
-  };
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
