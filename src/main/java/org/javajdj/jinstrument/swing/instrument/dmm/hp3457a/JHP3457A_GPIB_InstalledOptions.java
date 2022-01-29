@@ -28,12 +28,12 @@ import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalMultiMeterPanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 
-/** A Swing panel for Options Settings of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
+/** A Swing panel for Installed Options of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class JHP3457A_GPIB_Options
+public class JHP3457A_GPIB_InstalledOptions
   extends JDigitalMultiMeterPanel
   implements InstrumentView
 {
@@ -44,7 +44,7 @@ public class JHP3457A_GPIB_Options
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private static final Logger LOG = Logger.getLogger (JHP3457A_GPIB_Options.class.getName ());
+  private static final Logger LOG = Logger.getLogger (JHP3457A_GPIB_InstalledOptions.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -52,7 +52,7 @@ public class JHP3457A_GPIB_Options
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JHP3457A_GPIB_Options (
+  public JHP3457A_GPIB_InstalledOptions (
     final DigitalMultiMeter digitalMultiMeter,
     final String title,
     final int level,
@@ -93,12 +93,12 @@ public class JHP3457A_GPIB_Options
     
   }
 
-  public JHP3457A_GPIB_Options (final HP3457A_GPIB_Instrument digitalMultiMeter, final int level)
+  public JHP3457A_GPIB_InstalledOptions (final HP3457A_GPIB_Instrument digitalMultiMeter, final int level)
   {
     this (digitalMultiMeter, null, level, null);
   }
   
-  public JHP3457A_GPIB_Options (final HP3457A_GPIB_Instrument digitalMultiMeter)
+  public JHP3457A_GPIB_InstalledOptions (final HP3457A_GPIB_Instrument digitalMultiMeter)
   {
     this (digitalMultiMeter, 0);
   }
@@ -115,14 +115,14 @@ public class JHP3457A_GPIB_Options
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "HP-3457A [GPIB] Options Settings";
+      return "HP-3457A [GPIB] Installed Options";
     }
 
     @Override
     public final InstrumentView openInstrumentView (final Instrument instrument)
     {
       if (instrument != null && (instrument instanceof HP3457A_GPIB_Instrument))
-        return new JHP3457A_GPIB_Options ((HP3457A_GPIB_Instrument) instrument);
+        return new JHP3457A_GPIB_InstalledOptions ((HP3457A_GPIB_Instrument) instrument);
       else
         return null;
     }
@@ -139,7 +139,7 @@ public class JHP3457A_GPIB_Options
   @Override
   public String getInstrumentViewUrl ()
   {
-    return JHP3457A_GPIB_Options.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
+    return JHP3457A_GPIB_InstalledOptions.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
       + "<>"
       + getInstrument ().getInstrumentUrl ();
   }
