@@ -26,6 +26,8 @@ import java.util.Map;
  * their arguments.
  * 
  * @see Instrument#addCommand
+ * @see Instrument#addAndProcessCommandSync
+ * @see DefaultInstrumentCommand
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
@@ -43,6 +45,16 @@ public interface InstrumentCommand
   public final static String IC_RETURN_VALUE_KEY = "returnValue";
   
   public final static String IC_COMPLETION_SEMAPHORE_KEY = "completionSemaphore";
+  
+  /** Returns whether or not this command is being processed synchronously.
+   * 
+   * @return Whether or not this command is being processed synchronously.
+   * 
+   */
+  public default boolean isSynchronous ()
+  {
+    return get (InstrumentCommand.IC_COMPLETION_SEMAPHORE_KEY) != null;
+  }
   
   public final static String IC_NOP_KEY = "commandNop";
   
