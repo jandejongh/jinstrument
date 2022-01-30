@@ -279,7 +279,7 @@ public class JHP3478A_GPIB
     if (JOptionPane.showConfirmDialog (
       null,
       "Read Calibration Data from Instrument " + getInstrument ().getInstrumentUrl () + "?",
-      "Reaed Calibration Data?",
+      "Read Calibration Data?",
       JOptionPane.YES_NO_OPTION) == 1)
       return;
     final JOptionPane pleaseWaitOptionPane
