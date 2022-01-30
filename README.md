@@ -13,6 +13,12 @@ is there as well.
 ## License
 Apache v2.0.
 
+## Status/Log [20220130 - v0.8-SNAPSHOT]
+
+### [20220130] Added Alpha:
+- HP-3457A Digital Multimeter [All commands implemented;
+                               acquisition and settings need some more work; requires jswing 0.8-SNAPSHOT]
+
 ## Status/Log [20220115 - v0.8-SNAPSHOT]
 
 ### [20220115] Added Beta:
@@ -35,7 +41,6 @@ Apache v2.0.
 - HP-70000 Spectrum Analyzer [MMS]
 
 ### Work in Progress [Target: -> Beta for V1.0 Release]:
-- HP-3457A Digital MultiMeter
 - HP-3586A Selective Level Meter
 - HP-5328A [Option 011] Frequency Counter
 - HP-6050A Electronic Load Mainframe [DC Load]
