@@ -80,9 +80,9 @@ public class JHP3457A_GPIB
       level + 1,
       getGuiPreferencesManagementColor ()));
     
-    add (new JHP3457A_GPIB_Trigger (
+    add (new JHP3457A_GPIB_TriggerAcquisition (
       digitalMultiMeter,
-      "Triggering",
+      "Triggering/Acquisition",
       level + 1,
       getGuiPreferencesTriggerColor ()));
     
