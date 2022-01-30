@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -297,6 +297,13 @@ public class JInstrumentPanel
   public final static Color getGuiPreferencesTimeColor ()
   {
     return JInstrumentPanel.DEFAULT_TIME_COLOR;
+  }
+  
+  public final static Color DEFAULT_IMPEDANCE_COLOR =  new Color (164, 20, 164);
+  
+  public final static Color getGuiPreferencesImpedanceColor ()
+  {
+    return JInstrumentPanel.DEFAULT_IMPEDANCE_COLOR;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
