@@ -17,15 +17,29 @@
 package org.javajdj.jinstrument.swing.instrument.dmm.hp3457a;
 
 import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridLayout;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
+import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_CalibrationData;
 import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Instrument;
 import org.javajdj.jinstrument.swing.base.JDigitalMultiMeterPanel;
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jswing.jcenter.JCenter;
 
 /** A Swing panel for Rare/Dangerous Settings of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
@@ -65,21 +79,47 @@ public class JHP3457A_GPIB_Misc_RareDangerous
     final HP3457A_GPIB_Instrument hp3457a = (HP3457A_GPIB_Instrument) digitalMultiMeter;
 
     removeAll ();
-    setLayout (new GridLayout (14, 2));
-
-    add (JCenter.XY (new JLabel ("Readings with different TARM/TRIG/NRDGS [acquisition]")));
-    add (JCenter.XY (new JLabel ("Range [acquisition]")));
-    add (JCenter.XY (new JLabel ("Resolution [acquisition]")));
-    add (JCenter.XY (new JLabel ("ISCALE? [acquisition]")));
-    add (JCenter.XY (new JLabel ("LFREQ/LFREQ?/LINE? [acquisition]")));
-    add (JCenter.XY (new JLabel ("NDIG [acquisition]")));
-    add (JCenter.XY (new JLabel ("F10-F58 [acquisition]")));
     
-    add (JCenter.XY (new JLabel ("CSB? [management]")));
-    add (JCenter.XY (new JLabel ("EMASK [management]")));
-    add (JCenter.XY (new JLabel ("INBUF [management]")));
-    add (JCenter.XY (new JLabel ("RQS [management]")));
-    add (JCenter.XY (new JLabel ("SRQ [management/misc]")));
+    setLayout (new GridLayout (2, 1));
+    final JPanel topPanel = new JPanel ();
+    add (topPanel);
+    final JPanel bottomPanel = new JPanel ();
+    add (bottomPanel);
+    
+    topPanel.setLayout (new GridLayout (1, 2));
+    topPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Save Calibration Data",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      JCenter.XY (new JVoid_JColorCheckBox (
+      "Save Calibration Data",
+      this::saveCalibrationData,
+      Color.blue))));
+    topPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Restore Calibration Data",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      JCenter.XY (new JVoid_JColorCheckBox (
+      "Restore Calibration Data",
+      this::restoreCalibrationData,
+      Color.blue))));
+    
+    bottomPanel.setLayout (new GridLayout (11, 1));
+
+    bottomPanel.add (JCenter.XY (new JLabel ("Readings with different TARM/TRIG/NRDGS [acquisition]")));
+    bottomPanel.add (JCenter.XY (new JLabel ("Range [acquisition]")));
+    bottomPanel.add (JCenter.XY (new JLabel ("Resolution [acquisition]")));
+    bottomPanel.add (JCenter.XY (new JLabel ("LFREQ/LFREQ?/LINE? [acquisition]")));
+    bottomPanel.add (JCenter.XY (new JLabel ("NDIG [acquisition]")));
+    bottomPanel.add (JCenter.XY (new JLabel ("F10-F58 [acquisition]")));
+    
+    bottomPanel.add (JCenter.XY (new JLabel ("CSB? [management]")));
+    bottomPanel.add (JCenter.XY (new JLabel ("EMASK [management]")));
+    bottomPanel.add (JCenter.XY (new JLabel ("INBUF [management]")));
+    bottomPanel.add (JCenter.XY (new JLabel ("RQS [management]")));
+    bottomPanel.add (JCenter.XY (new JLabel ("SRQ [management/misc]")));
 
   }
 
@@ -138,6 +178,91 @@ public class JHP3457A_GPIB_Misc_RareDangerous
   public String toString ()
   {
     return getInstrumentViewUrl ();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SAVE CALIBRATION DATA
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private void saveCalibrationData ()
+  {
+    
+    if (JOptionPane.showConfirmDialog (
+      null,
+      "Read Calibration Data from Instrument " + getInstrument ().getInstrumentUrl () + "?",
+      "Read Calibration Data?",
+      JOptionPane.YES_NO_OPTION) == 1)
+      return;
+    
+    final JOptionPane pleaseWaitOptionPane
+      = new JOptionPane ("Please wait while loading calibration data (this dialog needs work!)...");
+    final JDialog pleaseWaitDialog
+      = pleaseWaitOptionPane.createDialog ((Frame) null, "Please Wait (this dialog needs work!)...");
+    pleaseWaitDialog.setMinimumSize (new Dimension (200, 100));
+    pleaseWaitDialog.setModalityType (Dialog.ModalityType.MODELESS);
+    pleaseWaitDialog.setVisible (true);
+    
+    final HP3457A_GPIB_CalibrationData calibrationData;
+    try
+    {
+      calibrationData = ((HP3457A_GPIB_Instrument) getDigitalMultiMeter ()).readCalibrationDataSync ();
+    }
+    catch (Exception e)
+    {
+      LOG.log (Level.WARNING, "Caught exception while reading calibration data on instrument {0}: {1}.",        
+        new Object[]{getInstrument (), Arrays.toString (e.getStackTrace ())});
+      pleaseWaitDialog.setVisible (false);
+      pleaseWaitDialog.dispose ();
+      JOptionPane.showMessageDialog (null,
+        "Reading calibration data failed: " + e.toString () + "; check log for details!",
+        "Error",
+        JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    
+    pleaseWaitDialog.setVisible (false);
+    pleaseWaitDialog.dispose ();
+    
+    final JFileChooser jFileChooser = new JFileChooser ((File) null);
+    if (jFileChooser.showSaveDialog (this) != JFileChooser.APPROVE_OPTION)
+      return;      
+    final File file = jFileChooser.getSelectedFile ();
+    if (file == null)
+    {
+      JOptionPane.showMessageDialog (null, "No file? (Please report this error!)", "Error", JOptionPane.ERROR_MESSAGE);
+      return;      
+    }
+    if (file.exists () && JOptionPane.showConfirmDialog (null, "Overwrite?", "Overwrite file?", JOptionPane.YES_NO_OPTION) != 0)
+      return;
+    
+    try
+    {
+      Files.write (file.toPath (), calibrationData.getBytes ());
+    }
+    catch (IOException ioe)
+    {
+      JOptionPane.showMessageDialog (null, "I/O Exception!", "Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // RESTORE CALIBRATION DATA
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private void restoreCalibrationData ()
+  {
+    // XXX
+    JOptionPane.showMessageDialog (
+      null,
+      "Not implemented yet!",
+      "Not implemented yet!",
+      JOptionPane.ERROR_MESSAGE);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
