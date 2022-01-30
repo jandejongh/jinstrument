@@ -17,6 +17,7 @@
 package org.javajdj.jinstrument.gpib.dmm.hp3457a;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,6 +44,7 @@ import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.junits.Resolution;
 import org.javajdj.jinstrument.gpib.AbstractGpibInstrument;
+import org.javajdj.util.hex.HexUtils;
 
 /** Implementation of {@link Instrument} and {@link DigitalMultiMeter} for the HP-3457A.
  *
@@ -551,17 +553,81 @@ public class HP3457A_GPIB_Instrument
   {
     if (settings == null || status == null)
       throw new RuntimeException ();
-    final String readingValueString = new String (readEOISync (), Charset.forName ("US-ASCII")).trim ();
-    final double readingValue;
-    try
+    final byte[] readBytes = readEOISync ();
+    if (readBytes == null)
     {
-      readingValue = Double.parseDouble (readingValueString);
-    }
-    catch (NumberFormatException nfe)
-    {
-      LOG.log (Level.WARNING, "Error parsing presumed reading {0} on instrument {1}.",
-        new Object[]{readingValueString, this});
+      LOG.log (Level.WARNING, "Null array returned attempting to get reading.");
       return null;
+    }
+    final double readingValue;
+    switch (settings.getReadingFormat ())
+    {
+      case ASCII:
+      {
+        if (readBytes.length != 16)
+        {
+          LOG.log (Level.WARNING, "Error parsing presumed reading {0} (unexpected length for ASCII) on instrument {1}.",
+            new Object[]{HexUtils.bytesToHex (readBytes), this});
+          return null;          
+        }
+        final String readString = new String (readBytes, Charset.forName ("US-ASCII")).trim ();
+        try
+        {
+          readingValue = Double.parseDouble (readString);
+        }
+        catch (NumberFormatException nfe)
+        {
+          LOG.log (Level.WARNING, "Error parsing presumed reading {0} (String: {1}) on instrument {2}.",
+            new Object[]{HexUtils.bytesToHex (readBytes), readString, this});
+          return null;
+        }
+        break;
+      }
+      case SINT:
+      {
+        if (readBytes.length != 2)
+        {
+          LOG.log (Level.WARNING, "Error parsing presumed reading {0} (unexpected length for SINT) on instrument {1}.",
+            new Object[]{HexUtils.bytesToHex (readBytes), this});
+          return null;          
+        }
+        final short iValue = (short)(((readBytes[0] & 0xff) << 8) | (readBytes[1] & 0xff));
+        final double integerScale = settings.isAutoRange () ? processCommand_getIntegerScale () : settings.getIntegerScale ();
+        readingValue = integerScale * iValue;
+        break;
+      }
+      case DINT:
+      {
+        if (readBytes.length != 4)
+        {
+          LOG.log (Level.WARNING, "Error parsing presumed reading {0} (unexpected length for DINT) on instrument {1}.",
+            new Object[]{HexUtils.bytesToHex (readBytes), this});
+          return null;          
+        }
+        final int iValue = (int) (((readBytes[0] & 0xff) << 24)
+                                | ((readBytes[1] & 0xff) << 16)
+                                | ((readBytes[2] & 0xff) << 8)
+                                 | (readBytes[3] & 0xff));
+        final double integerScale = settings.isAutoRange () ? processCommand_getIntegerScale () : settings.getIntegerScale ();
+        readingValue = integerScale * iValue;
+        break;
+      }
+      case SREAL:
+      {
+        if (readBytes.length != 4)
+        {
+          LOG.log (Level.WARNING, "Error parsing presumed reading {0} (unexpected length for SREAL) on instrument {1}.",
+            new Object[]{HexUtils.bytesToHex (readBytes), this});
+        }
+        readingValue = Float.intBitsToFloat (ByteBuffer.wrap (readBytes).getInt ());
+        break;
+      }
+      default:
+      {
+        LOG.log (Level.WARNING, "Null or illegal OFORMAT setting on instrument {0}.",
+          new Object[]{this});
+        return null;        
+      }
     }
     final boolean overflow = status.isHighLow ();
     final String overflowMessage = status.isHighLow () ? "[Over/Under]Flow" : null;
@@ -617,8 +683,21 @@ public class HP3457A_GPIB_Instrument
       switch (settings.getTriggerEvent ())
       {
         case AUTO:
+        case EXT:
+        case SGL:
+        case HOLD:
+        case TIMER:
         {
-          final int numberOfStoredReadings = getNumberOfStoredReadingsSync (getReadEOITimeout_ms (), TimeUnit.MILLISECONDS);
+          final int numberOfStoredReadings;
+          try
+          {
+            numberOfStoredReadings = (int) Math.round (Double.parseDouble (
+              new String (writeAndReadEOISync ("MCOUNT?;"), Charset.forName ("US-ASCII")).trim ()));
+          }
+          catch (NumberFormatException nfe)
+          {
+            throw new IOException ();
+          }
           LOG.log (Level.WARNING, "Number of stored readings: {0}.", new Object[]{numberOfStoredReadings});
           for (int i = 0; i < numberOfStoredReadings; i++)
           {
@@ -2285,6 +2364,12 @@ public class HP3457A_GPIB_Instrument
     return calibrationNumber;
   }
   
+  protected final double processCommand_getIntegerScale ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    return processCommand_getDouble ("ISCALE");
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -3051,19 +3136,8 @@ public class HP3457A_GPIB_Instrument
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_INTEGER_SCALE_FACTOR:
         {
           // ISCALE?
-          final String queryReturn = new String (writeAndReadEOISync ("ISCALE?;"), Charset.forName ("US-ASCII")).trim ();
-          if (queryReturn == null)
-            throw new IOException ();
-          final double scaleFactor;
-          try
-          {
-            scaleFactor = Double.parseDouble (queryReturn);
-          }
-          catch (NumberFormatException nfe)
-          {
-            throw new IOException ();
-          }
-          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, scaleFactor);
+          final double integerScale = processCommand_getIntegerScale ();
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, integerScale);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_LINE_FREQUENCY_REFERENCE:
@@ -3174,9 +3248,7 @@ public class HP3457A_GPIB_Instrument
           final int count;
           try
           {
-            // Are we actually getting a double here?
             count = (int) Math.round (Double.parseDouble (queryReturn));
-            // count = Integer.parseInt (queryReturn);
           }
           catch (NumberFormatException nfe)
           {
@@ -3371,7 +3443,11 @@ public class HP3457A_GPIB_Instrument
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_OUTPUT_FORMAT);
           writeSync ("OFORMAT " + Integer.toString (readingFormat.getCode ()) + ";");
           if (instrumentSettings != null && instrumentSettings.getReadingFormat ()!= readingFormat)
+          {
+            // Clear the reading memory (and set SREAL memory format).
+            writeSync ("MFORMAT 4;");
             newInstrumentSettings = instrumentSettings.withReadingFormat (readingFormat);
+          }
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_OHMS:
