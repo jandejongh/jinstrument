@@ -407,30 +407,54 @@ public class HP3457A_GPIB_Instrument
   protected final void initializeInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
+    
+    // Make sure we are not interrupted by the acquisition process.
     this.isInitializing = true;
+    
     try
     {
+      
+      // Clear the command queue so we're not bothered by pending commands.
+      clearCommandQueue ();
+      
+      // Device Clear for the instrument.
       selectedDeviceCLearSync ();
       Thread.sleep (1000L); // Allow for Device Clear to settle on instrument.
+      
+      // Put the instrument in a known and (to us) reasonable state.
+      // Make sure we get the ID of the instrument.
+      // All in one take (note that the command will be executed atomically on the controller).
       final String id = new String (writeAndReadEOISync (
         "RESET"         // "RESET for reset () or "PRESET" for preset ()
         + ";END 2"      // setEoi ()
-//      + ";INBUF 1"    // setGpibInputBuffer (true);
         + ";MEM 1"      // setReadingMemoryMode (HP3457A_GPIB_Settings.ReadingMemoryMode.LIFO)
         + ";RQS 127"    // setServiceRequestMask (0x7f) // ALL
         + ";ID?;")      // getIdSync ()
         , Charset.forName ("US-ASCII")).trim ();
+      
+      // Get the installed option synchronously.
       final HP3457A_GPIB_Settings.InstalledOption installedOption = processCommand_getInstalledOption ();
+      
+      // Get the GPIB address from our device.
       final byte gpipAddress = getDevice ().getBusAddress ().getPad ();
-      getCalibrationNumberASync ();
-      getNumberOfPowerLineCyclesASync ();
+      
+      // Report new settings.
       settingsReadFromInstrument (
         HP3457A_GPIB_Settings.fromReset ()
           .withId (id)
           .withInstalledOption (installedOption)
           .withGpibAddress (gpipAddress));
-//      final HP3457A_GPIB_Status status = getStatusFromInstrumentSync ();
-//      statusReadFromInstrument (status);
+      
+      // We do not query out status; this will follow soon enough through an SRQ.
+      // final HP3457A_GPIB_Status status = getStatusFromInstrumentSync ();
+      // statusReadFromInstrument (status);
+      
+      // Asynchronously request some (instrument-constant) properties.
+      // We want to see these properties in the settings, but we do not want to take the risk of nuking initialization for them.
+      // Execution of these commands will update the settings.
+      getCalibrationNumberASync ();
+      getNumberOfPowerLineCyclesASync ();
+      
     }
     catch (InterruptedException ie)
     {
@@ -447,6 +471,7 @@ public class HP3457A_GPIB_Instrument
     }
     finally
     {
+      // Make sure the acquisition process can proceed.
       this.isInitializing = false;
     }
   }
