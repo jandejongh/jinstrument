@@ -17,15 +17,22 @@
 package org.javajdj.jinstrument.swing.instrument.dmm.hp3457a;
 
 import java.awt.Color;
+import java.awt.GridLayout;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Instrument;
+import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalMultiMeterPanel;
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 
-/** A Swing panel for input settings of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
+/** A Swing panel for the Input Settings of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
@@ -62,6 +69,116 @@ public class JHP3457A_GPIB_Input
     final HP3457A_GPIB_Instrument hp3457a = (HP3457A_GPIB_Instrument) digitalMultiMeter;
 
     removeAll ();
+    setLayout (new GridLayout (4, 2));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "Terminals",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JEnum_JComboBox<> (
+        HP3457A_GPIB_Settings.MeasurementTerminals.class,
+        "Terminals",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getMeasurementTerminals (),
+        hp3457a::setMeasurementTerminals,
+        true)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "AC Bandwidth",
+      level + 1,
+      getGuiPreferencesFrequencyColor (),
+      new JEnum_JComboBox<> (
+        HP3457A_GPIB_Settings.ACBandwidth.class,
+        "AC Bandwidth",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getACBandwidth (),
+        hp3457a::setACBandwidth,
+        true)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "AutoRange",
+      level + 1,
+      getGuiPreferencesAmplitudeColor (),
+      new JBoolean_JBoolean (
+      "AutoRange",
+      (settings) -> ((HP3457A_GPIB_Settings) settings).isAutoRange (),
+      hp3457a::setAutoRange,
+      Color.green,
+      true)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "AutoZero",
+      level + 1,
+      getGuiPreferencesAmplitudeColor (),
+      new JEnum_JComboBox<> (
+        HP3457A_GPIB_Settings.AutoZeroMode.class,
+        "AutoZero",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getAutoZeroMode (),
+        hp3457a::setAutoZeroMode,
+        true)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "Fixed-Z",
+      level + 1,
+      getGuiPreferencesImpedanceColor (),
+      new JBoolean_JBoolean (
+      "Fixed-Z",
+      (settings) -> ((HP3457A_GPIB_Settings) settings).isFixedImpedance (),
+      hp3457a::setFixedImpedance,
+      Color.green,
+      true)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "Offset Compensation",
+      level + 1,
+      getGuiPreferencesVoltageColor (),
+      new JBoolean_JBoolean (
+      "Offset Compensation",
+      (settings) -> ((HP3457A_GPIB_Settings) settings).isOffsetCompensation (),
+      hp3457a::setOffsetCompensation,
+      Color.green,
+      true)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "Input Channel",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JLabel ("XXX TBD")));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "Frequency/Period Input Source",
+      level + 1,
+      getGuiPreferencesFrequencyColor (),
+      new JEnum_JComboBox<> (
+        DigitalMultiMeter.MeasurementMode.class,
+        "Frequency/Period Input Source",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getFrequencyPeriodInputSource (),
+        (final DigitalMultiMeter.MeasurementMode selection) ->
+        {
+          switch (selection)
+          {
+            case AC_VOLTAGE:
+            case AC_DC_VOLTAGE:
+            case AC_CURRENT:
+            case AC_DC_CURRENT:
+              hp3457a.setFrequencyOrPeriodSource (selection);
+              break;
+            default:
+              JOptionPane.showMessageDialog (
+                new JFrame (),
+                "Illegal value as frequency/period input source: " + selection + "; falling back to AC_VOLTAGE.",
+                "Error - Illegal value!",
+                JOptionPane.ERROR_MESSAGE);
+              hp3457a.setFrequencyOrPeriodSource (DigitalMultiMeter.MeasurementMode.AC_VOLTAGE);              
+          }
+        },
+        true)));
     
   }
 
