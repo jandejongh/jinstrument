@@ -104,7 +104,8 @@ public final class HP3457A_GPIB_Settings
     final int calibrationNumber,
     final ReadingFormat readingFormat,
     final boolean locked,
-    final double numberOfPowerLineCycles
+    final double numberOfPowerLineCycles,
+    final double integerScale
     )
   {
     // DefaultDigitalMultiMeterSettings
@@ -132,6 +133,7 @@ public final class HP3457A_GPIB_Settings
     this.readingFormat = readingFormat;
     this.locked = locked;
     this.numberOfPowerLineCycles = numberOfPowerLineCycles;
+    this.integerScale = integerScale;
   }
 
   public static HP3457A_GPIB_Settings fromReset ()
@@ -165,7 +167,8 @@ public final class HP3457A_GPIB_Settings
       -1, // calibrationNumber: Unknown
       ReadingFormat.ASCII,
       false,
-      10
+      10,
+      Double.NaN // integerScale [ISCALE?]: Unknown
     );
   }
   
@@ -207,7 +210,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -242,7 +246,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -277,7 +282,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -312,7 +318,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -347,7 +354,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -382,7 +390,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -417,7 +426,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -452,7 +462,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -487,7 +498,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -522,7 +534,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -557,7 +570,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -592,7 +606,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -627,7 +642,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -662,7 +678,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -698,7 +715,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -733,7 +751,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -768,7 +787,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -803,7 +823,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -838,7 +859,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -873,7 +895,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -908,7 +931,8 @@ public final class HP3457A_GPIB_Settings
       calibrationNumber,
       this.readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -943,7 +967,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       readingFormat,
       this.locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -978,7 +1003,8 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       locked,
-      this.numberOfPowerLineCycles
+      this.numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
@@ -1013,48 +1039,45 @@ public final class HP3457A_GPIB_Settings
       this.calibrationNumber,
       this.readingFormat,
       this.locked,
-      numberOfPowerLineCycles
+      numberOfPowerLineCycles,
+      this.integerScale
       );
   }
   
-  // XXX
-  
-  final TriggerEvent triggerArmEvent;
-  
-  public final TriggerEvent getTriggerArmEvent ()
+  public final HP3457A_GPIB_Settings withIntegerScale (final double integerScale)
   {
-    return this.triggerArmEvent;
-  }
-  
-  final TriggerEvent triggerEvent;
-  
-  public final TriggerEvent getTriggerEvent ()
-  {
-    return this.triggerEvent;
-  }
-  
-  final TriggerEvent sampleEvent;
-  
-  public final TriggerEvent getSampleEvent ()
-  {
-    return this.sampleEvent;
-  }
-  
-  private final InstalledOption installedOption;
-  
-  public final InstalledOption getInstalledOption ()
-  {
-    return this.installedOption;
-  }
-  
-  public final boolean isInstalledOption44491 ()
-  {
-    return this.installedOption == InstalledOption.HP_44491;
-  }
-  
-  public final boolean isInstalledOption44492 ()
-  {
-    return this.installedOption == InstalledOption.HP_44492;    
+    return new HP3457A_GPIB_Settings (
+      // DefaultDigitalMultiMeterSettings
+      null,
+      getResolution (),
+      getMeasurementMode (),
+      isAutoRange (),
+      getRange (),
+      // HP3457A_GBIB_Settings
+      this.autoZeroMode,
+      this.id,
+      this.triggerArmEvent,
+      this.triggerEvent,
+      this.sampleEvent,
+      this.installedOption,
+      this.acBandwidth,
+      this.measurementTerminals,
+      this.fixedImpedance,
+      this.offsetCompensation,
+      this.beepEnabled,
+      this.gpibAddress,
+      this.frequencyPeriodInputSource,
+      this.numberOfTriggerArms,
+      this.numberOfReadings,
+      this.delay_s,
+      this.timer_s,
+      this.triggerBuffering,
+      this.calibrationNumber,
+      this.readingFormat,
+      this.locked,
+      this.numberOfPowerLineCycles,
+      integerScale
+      );
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1063,12 +1086,14 @@ public final class HP3457A_GPIB_Settings
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  // XXX
   @Override
   public final boolean equals (final Object obj)
   {
     return super.equals (obj);
   }
 
+  // XXX
   @Override
   public final int hashCode ()
   {
@@ -1167,25 +1192,6 @@ public final class HP3457A_GPIB_Settings
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // CALIBRATE
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // CALIBRATION NUMBER
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//  private final int calibrationNumber;
-//  
-//  public final int getCalibrationNumber ()
-//  {
-//    return this.calibrationNumber;
-//  }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
   // CHANNEL
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1203,49 +1209,49 @@ public final class HP3457A_GPIB_Settings
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // CARD RESET
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // CLEAR STATUS BYTE
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // DC CURRENT
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // DC VOLTAGE
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  public enum ActuatorChannel
+  {
+    
+    Channel8 (8),
+    Channel9 (9);
+    
+    private ActuatorChannel (final int code)
+    {
+      this.code = code;
+    }
+    
+    private final int code;
+    
+    public final int getCode ()
+    {
+      return this.code;
+    }
+    
+    public static final ActuatorChannel fromCode (final int code)
+    {
+      switch (code)
+      {
+        case 8:  return Channel8;
+        case 9:  return Channel9;
+        default: throw new IllegalArgumentException ();
+      }
+    }
+    
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DELAY
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//  private final double delay_s;
-//  
-//  public final double getDelay_s ()
-//  {
-//    return this.delay_s;
-//  }
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // DIAGNOSTIC
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  private final double delay_s;
+  
+  public final double getDelay_s ()
+  {
+    return this.delay_s;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DISPLAY
@@ -1285,143 +1291,12 @@ public final class HP3457A_GPIB_Settings
     return this.offsetCompensation;
   }
 
-  public enum MathOperation
-  {
-    
-    OFF    (0),
-    CONT   (1),
-    CTHRM  (3),
-    DB     (4),
-    DBM    (5),
-    FILTER (6),
-    FTHRM  (8),
-    NULL   (9),
-    PERC  (10),
-    PFAIL (11),
-    RMS   (12),
-    SCALE (13),
-    STAT  (14);
-    
-    private MathOperation (final int code)
-    {
-      this.code = code;
-    }
-    
-    public static MathOperation fromCode (final int code)
-    {
-      switch (code)
-      {
-        case  0: return OFF;
-        case  1: return CONT;
-        case  3: return CTHRM;
-        case  4: return DB;
-        case  5: return DBM;
-        case  6: return FILTER;
-        case  8: return FTHRM;
-        case  9: return NULL;
-        case 10: return PERC;
-        case 11: return PFAIL;
-        case 12: return RMS;
-        case 13: return SCALE;
-        case 14: return STAT;
-        default: throw new IllegalArgumentException ();
-      }
-    }
-    
-    private final int code;
-    
-    public final int getCode ()
-    {
-      return this.code;
-    }
-        
-  }
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // TRIGGERING AND SAMPLING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  public final static class MathOperationDefinition
-  {
-
-    public MathOperationDefinition (final MathOperation operationA, final MathOperation operationB)
-    {
-      this.operationA = operationA;
-      this.operationB = operationB;
-    }
-        
-    private final MathOperation operationA;
-
-    public final MathOperation getOperationA ()
-    {
-      return this.operationA;
-    }
-
-    private final MathOperation operationB;
-    
-    public final MathOperation getOperationB ()
-    {
-      return this.operationB;
-    }
-    
-  }
-  
-  
-  public enum ReadingMemoryMode
-  {
-    
-    OFF   (0),
-    LIFO  (1),
-    FIFO  (2),
-    CONT  (3);
-    
-    private ReadingMemoryMode (final int code)
-    {
-      this.code = code;
-    }
-    
-    private final int code;
-    
-    public final int getCode ()
-    {
-      return this.code;
-    }
-    
-    public static final ReadingMemoryMode fromCode (final int code)
-    {
-      switch (code)
-      {
-        case 0:  return OFF;
-        case 1:  return LIFO;
-        case 2:  return FIFO;
-        case 3:  return CONT;
-        default: throw new IllegalArgumentException ();
-      }
-    }
-    
-  }
-  
-  public final static class MemorySizesDefinition
-  {
-
-    public MemorySizesDefinition (final int readings_bytes, final int subprograms_bytes)
-    {
-      this.readings_bytes = readings_bytes;
-      this.subprograms_bytes = subprograms_bytes;
-    }
-    
-    private final int readings_bytes;
-    
-    public final int getMaxReadingsMemorySize_bytes ()
-    {
-      return this.readings_bytes;
-    }
-    
-    private final int subprograms_bytes;
-    
-    public final int getMaxSubprogramsMemorySize_bytes ()
-    {
-      return this.subprograms_bytes;
-    }
-    
-  }
-  
   
   public enum TriggerEvent
   {
@@ -1501,13 +1376,6 @@ public final class HP3457A_GPIB_Settings
     return this.numberOfReadings;
   }
   
-  private final double delay_s;
-  
-  public final double getDelay_s ()
-  {
-    return this.delay_s;
-  }
-  
   private final double timer_s;
   
   public final double getTimer_s ()
@@ -1515,15 +1383,104 @@ public final class HP3457A_GPIB_Settings
     return this.timer_s;
   }
   
-  public enum ActuatorChannel
+  final TriggerEvent triggerArmEvent;
+  
+  public final TriggerEvent getTriggerArmEvent ()
+  {
+    return this.triggerArmEvent;
+  }
+  
+  final TriggerEvent triggerEvent;
+  
+  public final TriggerEvent getTriggerEvent ()
+  {
+    return this.triggerEvent;
+  }
+  
+  final TriggerEvent sampleEvent;
+  
+  public final TriggerEvent getSampleEvent ()
+  {
+    return this.sampleEvent;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INSTALLED OPTION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum InstalledOption
+  {
+    NONE,     // 0
+    HP_44491, // 44491
+    HP_44492; // 44492
+  }
+  
+  private final InstalledOption installedOption;
+  
+  public final InstalledOption getInstalledOption ()
+  {
+    return this.installedOption;
+  }
+  
+  public final boolean isInstalledOption44491 ()
+  {
+    return this.installedOption == InstalledOption.HP_44491;
+  }
+  
+  public final boolean isInstalledOption44492 ()
+  {
+    return this.installedOption == InstalledOption.HP_44492;    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // MATH
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public enum MathOperation
   {
     
-    Channel8 (8),
-    Channel9 (9);
+    OFF    (0),
+    CONT   (1),
+    CTHRM  (3),
+    DB     (4),
+    DBM    (5),
+    FILTER (6),
+    FTHRM  (8),
+    NULL   (9),
+    PERC  (10),
+    PFAIL (11),
+    RMS   (12),
+    SCALE (13),
+    STAT  (14);
     
-    private ActuatorChannel (final int code)
+    private MathOperation (final int code)
     {
       this.code = code;
+    }
+    
+    public static MathOperation fromCode (final int code)
+    {
+      switch (code)
+      {
+        case  0: return OFF;
+        case  1: return CONT;
+        case  3: return CTHRM;
+        case  4: return DB;
+        case  5: return DBM;
+        case  6: return FILTER;
+        case  8: return FTHRM;
+        case  9: return NULL;
+        case 10: return PERC;
+        case 11: return PFAIL;
+        case 12: return RMS;
+        case 13: return SCALE;
+        case 14: return STAT;
+        default: throw new IllegalArgumentException ();
+      }
     }
     
     private final int code;
@@ -1532,24 +1489,32 @@ public final class HP3457A_GPIB_Settings
     {
       return this.code;
     }
-    
-    public static final ActuatorChannel fromCode (final int code)
+        
+  }
+
+  public final static class MathOperationDefinition
+  {
+
+    public MathOperationDefinition (final MathOperation operationA, final MathOperation operationB)
     {
-      switch (code)
-      {
-        case 8:  return Channel8;
-        case 9:  return Channel9;
-        default: throw new IllegalArgumentException ();
-      }
+      this.operationA = operationA;
+      this.operationB = operationB;
+    }
+        
+    private final MathOperation operationA;
+
+    public final MathOperation getOperationA ()
+    {
+      return this.operationA;
+    }
+
+    private final MathOperation operationB;
+    
+    public final MathOperation getOperationB ()
+    {
+      return this.operationB;
     }
     
-  }
-  
-  public enum InstalledOption
-  {
-    NONE,     // 0
-    HP_44491, // 44491
-    HP_44492; // 44492
   }
   
   public enum MathRegister
@@ -1605,6 +1570,83 @@ public final class HP3457A_GPIB_Settings
     }
 
   }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // READING MEMORY MODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public enum ReadingMemoryMode
+  {
+    
+    OFF   (0),
+    LIFO  (1),
+    FIFO  (2),
+    CONT  (3);
+    
+    private ReadingMemoryMode (final int code)
+    {
+      this.code = code;
+    }
+    
+    private final int code;
+    
+    public final int getCode ()
+    {
+      return this.code;
+    }
+    
+    public static final ReadingMemoryMode fromCode (final int code)
+    {
+      switch (code)
+      {
+        case 0:  return OFF;
+        case 1:  return LIFO;
+        case 2:  return FIFO;
+        case 3:  return CONT;
+        default: throw new IllegalArgumentException ();
+      }
+    }
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // MEMORY SIZES
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final static class MemorySizesDefinition
+  {
+
+    public MemorySizesDefinition (final int readings_bytes, final int subprograms_bytes)
+    {
+      this.readings_bytes = readings_bytes;
+      this.subprograms_bytes = subprograms_bytes;
+    }
+    
+    private final int readings_bytes;
+    
+    public final int getMaxReadingsMemorySize_bytes ()
+    {
+      return this.readings_bytes;
+    }
+    
+    private final int subprograms_bytes;
+    
+    public final int getMaxSubprogramsMemorySize_bytes ()
+    {
+      return this.subprograms_bytes;
+    }
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SCAN ADVANCE MODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   public enum ScanAdvanceMode
   {
@@ -1724,6 +1766,19 @@ public final class HP3457A_GPIB_Settings
   public final ReadingFormat getOutputFormat ()
   {
     return getReadingFormat ();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // INTEGER SCALE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final double integerScale;
+  
+  public final double getIntegerScale ()
+  {
+    return this.integerScale;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
