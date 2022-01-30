@@ -682,10 +682,11 @@ public class HP3457A_GPIB_Instrument
       }
       switch (settings.getTriggerEvent ())
       {
+        case HOLD:
+          return;
         case AUTO:
         case EXT:
         case SGL:
-        case HOLD:
         case TIMER:
         {
           final int numberOfStoredReadings;
@@ -730,61 +731,6 @@ public class HP3457A_GPIB_Instrument
   public final boolean isSafeMode ()
   {
     return this.safeMode;
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // HP3457A_GPIB_Instrument
-  // READ/WRITE CALIBRATION DATA
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  public final byte peekSync (final int address)
-    throws IOException, InterruptedException, TimeoutException
-  {
-    final InstrumentCommand command = new DefaultInstrumentCommand (
-      HP3457A_InstrumentCommand.IC_HP3457A_PEEK,
-      HP3457A_InstrumentCommand.ICARG_HP3457A_PEEK_ADDRESS, address);
-    addAndProcessCommandSync (command, AbstractGpibInstrument.DEFAULT_GET_STATUS_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-    if (! (command.containsKey (InstrumentCommand.IC_RETURN_VALUE_KEY)
-           && command.get (InstrumentCommand.IC_RETURN_VALUE_KEY) != null))
-    {
-      LOG.log (Level.WARNING, "Error obtaining value from readCalibrationNibbleSync on instrument {0}.",
-        new Object[]{this});
-      // XXX We should really check any marked Exceptions on the InstrumentCommand!
-      throw new IOException ();
-    }
-    return (byte) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
-  }
-  
-  public final void pokeSync (final int address, final byte data)
-    throws IOException, InterruptedException, TimeoutException
-  {
-    throw new UnsupportedOperationException ();
-  }
-
-  public final static long READ_CALIBRATION_DATA_TIMEOUT_S = 60;
-  
-  public final HP3457A_GPIB_CalibrationData readCalibrationDataSync ()
-    throws IOException, InterruptedException, TimeoutException
-  {
-    final InstrumentCommand command = new DefaultInstrumentCommand (HP3457A_InstrumentCommand.IC_HP3457A_READ_CALIBRATION_DATA);
-    addAndProcessCommandSync (command, HP3457A_GPIB_Instrument.READ_CALIBRATION_DATA_TIMEOUT_S, TimeUnit.SECONDS);
-    if (! (command.containsKey (InstrumentCommand.IC_RETURN_VALUE_KEY)
-           && command.get (InstrumentCommand.IC_RETURN_VALUE_KEY) != null))
-    {
-      LOG.log (Level.WARNING, "Error obtaining value from readCalibrationDataSync on instrument {0}.",
-        new Object[]{this});
-      // XXX We should really check any marked Exceptions on the InstrumentCommand!
-      throw new IOException ();
-    }
-    return (HP3457A_GPIB_CalibrationData) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);    
-  }
-  
-  public final void writeCalibrationDataSync (final HP3457A_GPIB_CalibrationData calibrationData)
-    throws IOException, InterruptedException, TimeoutException
-  {
-    throw new UnsupportedOperationException ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1993,6 +1939,87 @@ public class HP3457A_GPIB_Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // HP3457A_GPIB_Instrument - ONOFFICIAL
+  // PEEK/POKE
+  // READ/WRITE CALIBRATION DATA
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public final void peekASync (final int address)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (address < 0 || address > 32767)
+      throw new IllegalArgumentException ();
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP3457A_InstrumentCommand.IC_HP3457A_PEEK,
+      HP3457A_InstrumentCommand.ICARG_HP3457A_PEEK_ADDRESS, address);
+    addCommand (command);
+  }
+  
+  public final byte peekSync (final int address)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (address < 0 || address > 32767)
+      throw new IllegalArgumentException ();
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP3457A_InstrumentCommand.IC_HP3457A_PEEK,
+      HP3457A_InstrumentCommand.ICARG_HP3457A_PEEK_ADDRESS, address);
+    addAndProcessCommandSync (command, AbstractGpibInstrument.DEFAULT_GET_STATUS_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+    if (! (command.containsKey (InstrumentCommand.IC_RETURN_VALUE_KEY)
+           && command.get (InstrumentCommand.IC_RETURN_VALUE_KEY) != null))
+    {
+      LOG.log (Level.WARNING, "Error obtaining value from peekSync on instrument {0}.",
+        new Object[]{this});
+      // XXX We should really check any marked Exceptions on the InstrumentCommand!
+      throw new IOException ();
+    }
+    return (byte) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
+  }
+  
+  public final void pokeSync (final int address, final byte data)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (address < 0 || address > 32767)
+      throw new IllegalArgumentException ();
+    throw new UnsupportedOperationException ();
+  }
+
+  /** The timeout in seconds for reading calibration data from the instrument.
+   * 
+   */
+  public final static long READ_CALIBRATION_DATA_TIMEOUT_S = 120;
+  
+  public final HP3457A_GPIB_CalibrationData readCalibrationDataSync ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    final InstrumentCommand command = new DefaultInstrumentCommand (HP3457A_InstrumentCommand.IC_HP3457A_READ_CALIBRATION_DATA);
+    addAndProcessCommandSync (command, HP3457A_GPIB_Instrument.READ_CALIBRATION_DATA_TIMEOUT_S, TimeUnit.SECONDS);
+    if (! (command.containsKey (InstrumentCommand.IC_RETURN_VALUE_KEY)
+           && command.get (InstrumentCommand.IC_RETURN_VALUE_KEY) != null))
+    {
+      LOG.log (Level.WARNING, "Error obtaining value from readCalibrationDataSync on instrument {0}.",
+        new Object[]{this});
+      // XXX We should really check any marked Exceptions on the InstrumentCommand!
+      throw new IOException ();
+    }
+    return (HP3457A_GPIB_CalibrationData) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);    
+  }
+  
+  public final void readCalibrationDataASync ()
+    throws IOException, InterruptedException
+  {
+    final InstrumentCommand command = new DefaultInstrumentCommand (HP3457A_InstrumentCommand.IC_HP3457A_READ_CALIBRATION_DATA);
+    addCommand (command);
+  }
+  
+  public final void writeCalibrationDataSync (final HP3457A_GPIB_CalibrationData calibrationData)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    throw new UnsupportedOperationException ();
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // AbstractInstrument
   // PROCESS COMMAND - UTILITY METHODS
   //
@@ -2546,59 +2573,71 @@ public class HP3457A_GPIB_Instrument
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_PEEK:
         {
-          throw new UnsupportedOperationException ();
-//          // Not officially documented!
-//          final int address =
-//            (int) instrumentCommand.get (HP3457A_InstrumentCommand.ICARG_HP3457A_PEEK_ADDRESS);
-//          if (address < 0 || address > 32767)
-//            throw new UnsupportedOperationException ();
-//          //
-//          // XXX OLD CODE XXX
-//          //
-//          final byte[] bytes = writeAndReadEOISync (new byte[]
-//          {
-//            "W".getBytes (Charset.forName ("US-ASCII"))[0],
-//            (byte) address,
-//            "\r".getBytes (Charset.forName ("US-ASCII"))[0], // Carriage Return
-//            "\n".getBytes (Charset.forName ("US-ASCII"))[0]  // Line Feed
-//          });
-//          if (bytes == null || bytes.length != 1)
-//            throw new IOException ();
-//          // We simply return the byte as returned by the instrument, even though we
-//          // know that only the low-order nibble is relevant and that the high-order
-//          // nibble is set to 0x4.
-//          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, bytes[0]);
-//          break;
+          // Not officially documented; see https://www.eevblog.com/forum/metrology/dumping-cal-ram-of-a-hp3457a/
+          final int address = (int) instrumentCommand.get (
+            HP3457A_InstrumentCommand.ICARG_HP3457A_PEEK_ADDRESS);
+          byte firstByte;
+          final String queryReturn =
+            new String (writeAndReadEOISync ("PEEK " + Integer.toString (address) + ";"), Charset.forName ("US-ASCII")).trim ();
+          final int value;
+          try
+          {
+            value = (int) Math.round (Double.parseDouble (queryReturn));
+          }
+          catch (NumberFormatException nfe)
+          {
+            throw new IOException ();
+          }
+          firstByte = (byte) ((value & 0xff00) >>> 8);
+          if (! instrumentCommand.isSynchronous ())
+            LOG.log (Level.INFO,
+              "Peek from {0}, address {1}: {2}.",
+              new Object[]{this, address, HexUtils.bytesToHex (new byte[]{firstByte})});
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, firstByte);
+          break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_POKE:
         {
+          // Not officially documented; see https://www.eevblog.com/forum/metrology/dumping-cal-ram-of-a-hp3457a/
           throw new UnsupportedOperationException ();
           // break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_READ_CALIBRATION_DATA:
         {
-          throw new UnsupportedOperationException ();
-//          final byte[] bytes = new byte[HP3457A_GPIB_CalibrationData.SIZE];
-//          for (int a = 0; a < bytes.length; a++)
-//          {
-//            final byte[] bytes_rx = writeAndReadEOISync (new byte[]
-//            {
-//              "W".getBytes (Charset.forName ("US-ASCII"))[0],
-//              (byte) a,
-//              "\r".getBytes (Charset.forName ("US-ASCII"))[0], // Carriage Return
-//              "\n".getBytes (Charset.forName ("US-ASCII"))[0]  // Line Feed
-//            });
-//            if (bytes_rx == null || bytes_rx.length != 1)
-//              throw new IOException ();
-//            bytes[a] = bytes_rx[0];
-//            // LOG.log (Level.INFO, "CAL RAM Address={0}, Value={1}.",
-//            //   new Object[]{"0x" + Integer.toHexString (a), "0x" + Integer.toHexString (bytes[a])});
-//          }
-//          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, new HP3457A_GPIB_CalibrationData (bytes));
-//          break;
+          // Not officially documented; see https://www.eevblog.com/forum/metrology/dumping-cal-ram-of-a-hp3457a/
+          final byte[] bytes = new byte[0x200-0x40];
+          byte firstByte;
+          byte secondByte = 0; // irrelevant...
+          for (int address = 0x40; address <= 0x1ff; address++)
+          {
+            final String queryReturn =
+              new String (writeAndReadEOISync ("PEEK " + address + ";"), Charset.forName ("US-ASCII")).trim ();
+            final int value;
+            try
+            {
+              value = (int) Math.round (Double.parseDouble (queryReturn));
+            }
+            catch (NumberFormatException nfe)
+            {
+              throw new IOException ();
+            }
+            firstByte = (byte) ((value & 0xff00) >>> 8);
+            if (address > 0x40 && firstByte != secondByte)
+            {
+              LOG.log (Level.WARNING, "Sanity check failed on calibration data while reading.");
+              throw new IOException ();
+            }
+            secondByte = (byte) (value & 0xff);
+            bytes[address - 0x40] = firstByte;
+          }
+          if (! instrumentCommand.isSynchronous ())
+            LOG.log (Level.INFO, "Read calibration data from {0}: {1}.", new Object[]{this, HexUtils.bytesToHex (bytes)});
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, new HP3457A_GPIB_CalibrationData (bytes));
+          break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_WRITE_CALIBRATION_DATA:
         {
+          // Not officially documented; see https://www.eevblog.com/forum/metrology/dumping-cal-ram-of-a-hp3457a/
           throw new UnsupportedOperationException ();
           // break;
         }
