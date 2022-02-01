@@ -88,7 +88,7 @@ public class JHP3457A_GPIB_Misc_RareDangerous
     final JPanel bottomPanel = new JPanel ();
     add (bottomPanel);
     
-    topPanel.setLayout (new GridLayout (1, 3));
+    topPanel.setLayout (new GridLayout (1, 4));
     topPanel.add (new JInstrumentPanel (
       hp3457a,
       "Save Calibration Data",
@@ -121,15 +121,26 @@ public class JHP3457A_GPIB_Misc_RareDangerous
           "",
           level + 1,
           JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+    topPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Display",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JDialogCheckBox (
+        getBackground ().darker (),
+        "Display",
+        new Dimension (800, 600),
+        new JHP3457A_GPIB_Display (
+          hp3457a,
+          "",
+          level + 1,
+          JInstrumentPanel.getGuiPreferencesManagementColor ()))));    
     
-    
-    bottomPanel.setLayout (new GridLayout (11, 1));
+    bottomPanel.setLayout (new GridLayout (9, 1));
 
     bottomPanel.add (JCenter.XY (new JLabel ("Readings with different TARM/TRIG/NRDGS [acquisition]")));
-    bottomPanel.add (JCenter.XY (new JLabel ("Range [acquisition]")));
     bottomPanel.add (JCenter.XY (new JLabel ("Resolution [acquisition]")));
     bottomPanel.add (JCenter.XY (new JLabel ("LFREQ/LFREQ?/LINE? [acquisition]")));
-    bottomPanel.add (JCenter.XY (new JLabel ("NDIG [acquisition]")));
     bottomPanel.add (JCenter.XY (new JLabel ("F10-F58 [acquisition]")));
     
     bottomPanel.add (JCenter.XY (new JLabel ("CSB? [management]")));
