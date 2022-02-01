@@ -552,37 +552,247 @@ implements Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  // BlockingQueue implementations are thread-safe.
   private final BlockingQueue<InstrumentCommand> commandQueue = new LinkedBlockingQueue<> ();
+  
+  private final Object commandQueueLock = new Object ();
+  
+  /** The name of the command queue capacity property.
+   * 
+   */
+  public final static String COMMAND_QUEUE_CAPACITY_PROPERTY_NAME = "commandQueueCapacity";
+  
+  /** The name of the command queue size property.
+   * 
+   */
+  public final static String COMMAND_QUEUE_SIZE_PROPERTY_NAME = "commandQueueSize";
+  
+  /** The default command queue capacity.
+   * 
+   */
+  public static final int DEFAULT_COMMAND_QUEUE_CAPACITY = 10;
+  
+  private int commandQueueCapacity = DEFAULT_COMMAND_QUEUE_CAPACITY;
+  
+  /** Gets the command queue capacity.
+   * 
+   * @return The command queue capacity ({@code >= 0}).
+   * 
+   */
+  public final int getCommandQueueCapacity ()
+  {
+    return this.commandQueueCapacity;
+  }
+  
+  /** Sets the command queue capacity to a new value, leaving its current entries intact (even if beyond capacity).
+   * 
+   * @param commandQueueCapacity The new command queue capacity ({@code >= 1}).
+   * 
+   * @throws IllegalArgumentException If the argument is zero or negative.
+   * 
+   * @see #setCommandQueueCapacityAndClear
+   * 
+   */
+  public final void setCommandQueueCapacity (final int commandQueueCapacity)
+  {
+    if (commandQueueCapacity <= 0)
+      throw new IllegalArgumentException ();
+    final int oldCommandQueueCapacity;
+    synchronized (this.commandQueueLock)
+    {
+      oldCommandQueueCapacity = this.commandQueueCapacity;
+      if (commandQueueCapacity != oldCommandQueueCapacity)
+        this.commandQueueCapacity = commandQueueCapacity;
+      else
+        return;
+    }
+    // Make sure we fire settings changed outside the critical region.
+    fireSettingsChanged (COMMAND_QUEUE_CAPACITY_PROPERTY_NAME, oldCommandQueueCapacity, commandQueueCapacity);
+  }
+  
+  /** Sets the command queue capacity to a new value and clears the (entire) command queue.
+   * 
+   * <p>
+   * The commands deleted from the queue are provided with proper return values
+   * indicating the fact that the commands were not executed;
+   * the {@link InstrumentCommand#IC_RETURN_EXCEPTION_KEY} value is set to a
+   * newly created {@link InterruptedException},
+   * and any {@link Semaphore} set as value in {@link InstrumentCommand#IC_COMPLETION_SEMAPHORE_KEY}
+   * is released.
+   * 
+   * @param commandQueueCapacity The new command queue capacity ({@code >= 1}).
+   * 
+   * @throws IllegalArgumentException If the argument is zero or negative.
+   * 
+   * @see InstrumentCommand#IC_RETURN_STATUS_KEY
+   * @see InstrumentCommand#IC_RETURN_VALUE_KEY
+   * @see InstrumentCommand#IC_RETURN_EXCEPTION_KEY
+   * @see InstrumentCommand#IC_COMPLETION_SEMAPHORE_KEY
+   * 
+   * @see Semaphore#release
+   * 
+   * @see #setCommandQueueCapacity
+   * @see #clearCommandQueue
+   * 
+   */
+  public final void setCommandQueueCapacityAndClear (final int commandQueueCapacity)
+  {
+    if (commandQueueCapacity <= 0)
+      throw new IllegalArgumentException ();
+    final int oldCommandQueueCapacity;
+    final int oldQueueSize;
+    final BlockingQueue<InstrumentCommand> remainingCommands = new LinkedBlockingQueue<> ();
+    synchronized (this.commandQueueLock)
+    {
+      oldCommandQueueCapacity = this.commandQueueCapacity;
+      oldQueueSize = this.commandQueue.size ();
+      if (commandQueueCapacity != oldCommandQueueCapacity)
+        this.commandQueueCapacity = commandQueueCapacity;
+      this.commandQueue.drainTo (remainingCommands);
+      this.commandQueue.clear ();
+    }
+    // Make sure we fire settings changed outside the critical region.
+    fireSettingsChanged (COMMAND_QUEUE_CAPACITY_PROPERTY_NAME, oldCommandQueueCapacity, commandQueueCapacity);
+    if (oldQueueSize > 0)
+      fireSettingsChanged (COMMAND_QUEUE_SIZE_PROPERTY_NAME, oldQueueSize, 0);
+    for (final InstrumentCommand instrumentCommand : remainingCommands)
+    {
+      instrumentCommand.put (InstrumentCommand.IC_RETURN_STATUS_KEY, Boolean.FALSE);
+      instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, null);
+      instrumentCommand.put (InstrumentCommand.IC_RETURN_EXCEPTION_KEY, new InterruptedException ());
+      if (instrumentCommand.containsKey (InstrumentCommand.IC_COMPLETION_SEMAPHORE_KEY))
+        ((Semaphore) instrumentCommand.get (InstrumentCommand.IC_COMPLETION_SEMAPHORE_KEY)).release ();
+    }
+  }
+  
+  /** Clears the command queue.
+   * 
+   * <p>
+   * Sub-classes may at some point in their lifetime decide to ignore
+   * all pending/queued commands in the command queue.
+   * Note that this method does not affect the {@link Service} status of the instrument,
+   * nor does it attempt to interrupt/terminate processing of the current command.
+   * 
+   * <p>
+   * The commands deleted from the queue are provided with proper return values
+   * indicating the fact that the commands were not executed;
+   * the {@link InstrumentCommand#IC_RETURN_EXCEPTION_KEY} value is set to a
+   * newly created {@link InterruptedException},
+   * and any {@link Semaphore} set as value in {@link InstrumentCommand#IC_COMPLETION_SEMAPHORE_KEY}
+   * is released.
+   * 
+   * @see InstrumentCommand#IC_RETURN_STATUS_KEY
+   * @see InstrumentCommand#IC_RETURN_VALUE_KEY
+   * @see InstrumentCommand#IC_RETURN_EXCEPTION_KEY
+   * @see InstrumentCommand#IC_COMPLETION_SEMAPHORE_KEY
+   * 
+   * @see Semaphore#release
+   * 
+   */
+  protected final void clearCommandQueue ()
+  {
+    final BlockingQueue<InstrumentCommand> remainingCommands = new LinkedBlockingQueue<> ();
+    final int oldQueueSize;
+    synchronized (this.commandQueueLock)
+    {
+      oldQueueSize = this.commandQueue.size ();
+      this.commandQueue.drainTo (remainingCommands);
+      this.commandQueue.clear ();
+    }
+    // Make sure we fire settings changed outside the critical region.
+    if (oldQueueSize > 0)
+      fireSettingsChanged (COMMAND_QUEUE_SIZE_PROPERTY_NAME, oldQueueSize, 0);
+    for (final InstrumentCommand instrumentCommand : remainingCommands)
+    {
+      instrumentCommand.put (InstrumentCommand.IC_RETURN_STATUS_KEY, Boolean.FALSE);
+      instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, null);
+      instrumentCommand.put (InstrumentCommand.IC_RETURN_EXCEPTION_KEY, new InterruptedException ());
+      if (instrumentCommand.containsKey (InstrumentCommand.IC_COMPLETION_SEMAPHORE_KEY))
+        ((Semaphore) instrumentCommand.get (InstrumentCommand.IC_COMPLETION_SEMAPHORE_KEY)).release ();
+    }
+  }
+  
+  private void addCommand (
+    final InstrumentCommand instrumentCommand,
+    final boolean synchronous,
+    final long timeout,
+    final TimeUnit unit)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (instrumentCommand == null)
+      throw new IllegalArgumentException ();
+    final boolean overflow;
+    final int newQueueSize;
+    final Semaphore semaphore = synchronous ? new Semaphore (0) : null;
+    synchronized (this.commandQueueLock)
+    {
+      // This statement cannot block...
+      overflow = this.commandQueue.size () >= this.commandQueueCapacity || ! this.commandQueue.offer (instrumentCommand);
+      newQueueSize = this.commandQueue.size ();
+    }
+    if (overflow)
+      LOG.log (Level.WARNING, "Overflow on Instrument Command Queue on {0}.", this);
+      // XXX Shouldn't we think of throwing an Exception here, instead of just logging and ignoring the command?
+    else
+    {
+      // Make sure we fire settings changed outside the critical region.
+      fireSettingsChanged (COMMAND_QUEUE_SIZE_PROPERTY_NAME, newQueueSize - 1, newQueueSize);
+      if (synchronous)
+        if (! semaphore.tryAcquire (timeout, unit))
+          throw new TimeoutException ();  
+    }
+  }
   
   @Override
   public final void addCommand (final InstrumentCommand instrumentCommand)
   {
-    if (instrumentCommand == null)
-      throw new IllegalArgumentException ();
-    if (! this.commandQueue.offer (instrumentCommand))
-      LOG.log (Level.WARNING, "Overflow on Instrument Command Queue on {0}.", this);
+    try
+    {
+      addCommand (instrumentCommand, false, Long.MIN_VALUE /* dummy */, null /* dummy */);
+    }
+    catch (Exception e)
+    {
+      throw new RuntimeException (e);
+    }
   }
 
   @Override
   public final void addAndProcessCommandSync (final InstrumentCommand instrumentCommand, final long timeout, final TimeUnit unit)
     throws IOException, InterruptedException, TimeoutException
   {
-    if (instrumentCommand == null)
-      throw new IllegalArgumentException ();
-    final Semaphore semaphore = new Semaphore (0);
-    instrumentCommand.put (InstrumentCommand.IC_COMPLETION_SEMAPHORE_KEY, semaphore);
-    if (! this.commandQueue.offer (instrumentCommand))
-      LOG.log (Level.WARNING, "Overflow on Instrument Command Queue on {0}.", this);
-    else if (! semaphore.tryAcquire (timeout, unit))
-      throw new TimeoutException ();
+    addCommand (instrumentCommand, true, timeout, unit);
   }
   
   private InstrumentCommand takeCommand ()
     throws InterruptedException
   {
-    return this.commandQueue.take ();
+    // Take a command from the queue; we cannot do this inside the this.commandQueueLock due to the risk of deadlock.
+    // That's OK though, since this.commandQueue is thread safe.
+    final InstrumentCommand instrumentCommand = this.commandQueue.take ();;
+    final int newQueueSize;
+    synchronized (this.commandQueueLock)
+    {
+      newQueueSize = this.commandQueue.size ();
+    }
+    fireSettingsChanged (COMMAND_QUEUE_SIZE_PROPERTY_NAME, newQueueSize + 1, newQueueSize);
+    return instrumentCommand;
   }
   
+  /** Processes a command.
+   * 
+   * <p>
+   * To be implemented by sub-classes.
+   * 
+   * <p>
+   * Sub-classes must make sure to properly put a return value in the map (see {@link InstrumentCommand#IC_RETURN_VALUE_KEY}).
+   * 
+   * @param instrumentCommand The command.
+   * 
+   * @throws IOException          If an I/O Exception was encountered while processing the command.
+   * @throws InterruptedException If processing the command was interrupted.
+   * @throws TimeoutException     If processing the command exceeded a timeout (sojourn/queueing/processing).
+   * 
+   */
   protected abstract void processCommand (final InstrumentCommand instrumentCommand)
     throws IOException, InterruptedException, TimeoutException;
   
