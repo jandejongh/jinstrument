@@ -258,6 +258,8 @@ public class HP3457A_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  // XXX DefaultRange is probably obsolete, given the recent developments of Range intself.
+  
   private static class DefaultRange
     implements Range
   {
@@ -300,6 +302,39 @@ public class HP3457A_GPIB_Instrument
           if (rangeDouble <= 300)  return SUPPORTED_RANGES_MAP.get (measurementMode).get (4);
           return null;
         }
+        case RESISTANCE_2W:
+        case RESISTANCE_4W:
+        {
+          if (rangeDouble <= 30)    return SUPPORTED_RANGES_MAP.get (measurementMode).get (0);
+          if (rangeDouble <= 300)   return SUPPORTED_RANGES_MAP.get (measurementMode).get (1);
+          if (rangeDouble <= 3e3)   return SUPPORTED_RANGES_MAP.get (measurementMode).get (2);
+          if (rangeDouble <= 30e3)  return SUPPORTED_RANGES_MAP.get (measurementMode).get (3);
+          if (rangeDouble <= 300e3) return SUPPORTED_RANGES_MAP.get (measurementMode).get (4);
+          if (rangeDouble <= 3e6)   return SUPPORTED_RANGES_MAP.get (measurementMode).get (5);
+          if (rangeDouble <= 30e6)  return SUPPORTED_RANGES_MAP.get (measurementMode).get (6);
+          if (rangeDouble <= 3e9)   return SUPPORTED_RANGES_MAP.get (measurementMode).get (7);
+          return null;
+        }
+        case DC_CURRENT:
+        {
+          if (rangeDouble <= 300e-6) return SUPPORTED_RANGES_MAP.get (measurementMode).get (0);
+          if (rangeDouble <= 3e-3)   return SUPPORTED_RANGES_MAP.get (measurementMode).get (1);
+          if (rangeDouble <= 30e-3)  return SUPPORTED_RANGES_MAP.get (measurementMode).get (2);
+          if (rangeDouble <= 300e-3) return SUPPORTED_RANGES_MAP.get (measurementMode).get (3);
+          if (rangeDouble <= 3)      return SUPPORTED_RANGES_MAP.get (measurementMode).get (4);
+          return null;          
+        }
+        case AC_CURRENT:
+        case AC_DC_CURRENT:
+        {
+          if (rangeDouble <= 30e-3)  return SUPPORTED_RANGES_MAP.get (measurementMode).get (0);
+          if (rangeDouble <= 300e-3) return SUPPORTED_RANGES_MAP.get (measurementMode).get (1);
+          if (rangeDouble <= 3)      return SUPPORTED_RANGES_MAP.get (measurementMode).get (2);
+          return null;                    
+        }
+        case FREQUENCY:
+        case PERIOD:
+          return SUPPORTED_RANGES_MAP.get (measurementMode).get (0);
         default:
           return null;
       }
@@ -335,7 +370,7 @@ public class HP3457A_GPIB_Instrument
           new DefaultRange (300, Unit.UNIT_kOhm),
           new DefaultRange (3, Unit.UNIT_MOhm),
           new DefaultRange (30, Unit.UNIT_MOhm),
-          new DefaultRange (300, Unit.UNIT_MOhm),
+          // Note: Extended Ohms; combines 300 MOhm and 3 GOhm range.
           new DefaultRange (3, Unit.UNIT_GOhm)})},
       { MeasurementMode.RESISTANCE_4W, Arrays.asList (new Range[] {
           new DefaultRange (30, Unit.UNIT_Ohm),
@@ -345,7 +380,7 @@ public class HP3457A_GPIB_Instrument
           new DefaultRange (300, Unit.UNIT_kOhm),
           new DefaultRange (3, Unit.UNIT_MOhm),
           new DefaultRange (30, Unit.UNIT_MOhm),
-          new DefaultRange (300, Unit.UNIT_MOhm),
+          // Note: Extended Ohms; combines 300 MOhm and 3 GOhm range.
           new DefaultRange (3, Unit.UNIT_GOhm)})},
       { MeasurementMode.DC_CURRENT, Arrays.asList (new Range[] {
           new DefaultRange (300, Unit.UNIT_muA),
@@ -362,7 +397,7 @@ public class HP3457A_GPIB_Instrument
           new DefaultRange (300, Unit.UNIT_mA),
           new DefaultRange (3, Unit.UNIT_A)})},
       { MeasurementMode.FREQUENCY, Arrays.asList (new Range[] {
-          new DefaultRange (1.5E6, Unit.UNIT_Hz)})},      
+          new DefaultRange (1.5, Unit.UNIT_MHz)})},      
       { MeasurementMode.PERIOD, Arrays.asList (new Range[] {
           new DefaultRange (100, Unit.UNIT_ms)})}
     }).collect (Collectors.toMap (kv -> (MeasurementMode) kv[0], kv -> (List<Range>) kv[1]));
@@ -2514,77 +2549,49 @@ public class HP3457A_GPIB_Instrument
         }
         case InstrumentCommand.IC_RANGE:
         {
-          throw new UnsupportedOperationException ();
-//          final DigitalMultiMeterSettings settings = getSettingsFromInstrumentSync ();
-//          final Range range = (Range) instrumentCommand.get (InstrumentCommand.ICARG_RANGE);
-//          final MeasurementMode mode = settings.getMeasurementMode ();
-//          final List<Range> supportedRanges = SUPPORTED_RANGES_MAP.get (mode);
-//          if (! supportedRanges.contains (range))
-//          {
-//            LOG.log (Level.WARNING, "Range {0} is not supported on HP3457A in mode {1}.",
-//              new Object[]{range, mode});
-//            throw new UnsupportedOperationException ();
-//          }
-//          final int rangeIndex = supportedRanges.indexOf (range);
-//          switch (mode)
-//          {
-//            case DC_VOLTAGE:
-//            {
-//              switch (rangeIndex)
-//              {
-//                case 0:  writeSync ("R-2\r\n"); break;
-//                case 1:  writeSync ("R-1\r\n"); break;
-//                case 2:  writeSync ("R0\r\n");  break;
-//                case 3:  writeSync ("R1\r\n");  break;
-//                case 4:  writeSync ("R2\r\n");  break;
-//                default: throw new UnsupportedOperationException ();
-//              }
-//              break;
-//            }
-//            case AC_VOLTAGE:
-//            {
-//              switch (rangeIndex)
-//              {
-//                case 0:  writeSync ("R-1\r\n"); break;
-//                case 1:  writeSync ("R0\r\n");  break;
-//                case 2:  writeSync ("R1\r\n");  break;
-//                case 3:  writeSync ("R2\r\n");  break;
-//                default: throw new UnsupportedOperationException ();
-//              }
-//              break;
-//            }
-//            case RESISTANCE_2W:
-//            case RESISTANCE_4W:
-//            {
-//              switch (rangeIndex)
-//              {
-//                case 0:  writeSync ("R1\r\n"); break;
-//                case 1:  writeSync ("R2\r\n"); break;
-//                case 2:  writeSync ("R3\r\n"); break;
-//                case 3:  writeSync ("R4\r\n"); break;
-//                case 4:  writeSync ("R5\r\n"); break;
-//                case 5:  writeSync ("R6\r\n"); break;
-//                case 6:  writeSync ("R7\r\n"); break;
-//                default: throw new UnsupportedOperationException ();
-//              }
-//              break;
-//            }
-//            case AC_CURRENT:
-//            case DC_CURRENT:
-//            {
-//              switch (rangeIndex)
-//              {
-//                case 0:  writeSync ("R-1\r\n"); break;
-//                case 1:  writeSync ("R0\r\n");  break;
-//                default: throw new UnsupportedOperationException ();
-//              }
-//              break;
-//            }
-//            default:
-//              throw new RuntimeException ();
-//          }
-//          newInstrumentSettings = getSettingsFromInstrumentSync ();
-//          break;
+          if (instrumentSettings == null)
+            throw new UnsupportedOperationException ();
+          final Range range = (Range) instrumentCommand.get (InstrumentCommand.ICARG_RANGE);
+          if (range == null)
+            throw new IllegalArgumentException ();
+          final MeasurementMode measurementMode = instrumentSettings.getMeasurementMode ();
+          final List<Range> supportedRanges = SUPPORTED_RANGES_MAP.get (measurementMode);
+          if (! supportedRanges.contains (range))
+          {
+            LOG.log (Level.WARNING, "Range {0} is not supported on HP3457A in mode {1}.",
+              new Object[]{range, measurementMode});
+            throw new UnsupportedOperationException ();
+          }
+          final double maxValue;
+          switch (measurementMode)
+          {
+            case DC_VOLTAGE:
+            case AC_VOLTAGE:
+            case AC_DC_VOLTAGE:
+              maxValue = Unit.convertToUnit (range.getMaxValue (), range.getUnit (), Unit.UNIT_V);
+              break;
+            case RESISTANCE_2W:
+            case RESISTANCE_4W:
+              maxValue = Unit.convertToUnit (range.getMaxValue (), range.getUnit (), Unit.UNIT_Ohm);
+              break;
+            case DC_CURRENT:
+            case AC_CURRENT:
+            case AC_DC_CURRENT:
+              maxValue = Unit.convertToUnit (range.getMaxValue (), range.getUnit (), Unit.UNIT_A);
+              break;
+            case FREQUENCY:
+            case PERIOD:
+              LOG.log (Level.WARNING,
+                "Cannot set frequency/period measurement range (unsupported by HP-3457A) on instrument {0}.",
+                new Object[]{this});
+              return;
+            default:
+              throw new UnsupportedOperationException ();
+          }
+          writeSync ("R " + Double.toString (maxValue) + ";");
+          final Range newRange = DefaultRange.fromRangeDouble (measurementMode, processCommand_getDouble ("RANGE"));
+          newInstrumentSettings = instrumentSettings.withRange (newRange);
+          break;
         }
         case InstrumentCommand.IC_AUTO_ZERO:
         {
