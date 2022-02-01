@@ -45,6 +45,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import org.javajdj.jinstrument.AbstractController;
 import org.javajdj.jinstrument.Controller;
 import org.javajdj.jinstrument.ControllerCommand;
 import org.javajdj.jinstrument.ControllerListener;
@@ -56,6 +57,7 @@ import org.javajdj.jinstrument.controller.gpib.GpibDevice;
 import org.javajdj.jinstrument.swing.cdi.JTinyCDIStatusAndControl;
 import org.javajdj.jservice.Service;
 import org.javajdj.jservice.swing.JServiceControl;
+import org.javajdj.jswing.jcenter.JCenter;
 
 /** A log/debug panel for a {@link Controller}.
  * 
@@ -146,6 +148,20 @@ public class JControllerDebug
       jControllerLogger.add (jUnsupportedLabel);
     }
     northNorthPanel.add (jControllerLogger);
+    if (controller instanceof AbstractController)
+    {
+      final JControllerCommandQueueMonitor controllerMonitor =
+        new JControllerCommandQueueMonitor ((AbstractController) controller);
+      final JPanel controllerMonitorPanel = new JInstrumentPanel (
+        instrument,
+        "Command Queue Length",
+        level + 1,
+        getGuiPreferencesManagementColor (),
+        JCenter.XY (controllerMonitor));
+      controllerMonitorPanel.setMinimumSize (new Dimension (200, 100));
+      controllerMonitorPanel.setPreferredSize (new Dimension (200, 100));
+      northNorthPanel.add (controllerMonitorPanel);
+    }
     //
     final JPanel buttonPanel = new JPanel ();
     setPanelBorder (buttonPanel, level + 2, subPanelColor, "Actions");
