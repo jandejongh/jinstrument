@@ -134,8 +134,14 @@ implements Controller
   // PROCESS COMMAND [ABSTRACT]
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
+
+  // BlockingQueue implementations are thread-safe.  
   private final BlockingQueue<ControllerCommand> commandQueue = new LinkedBlockingQueue<> ();
+  
+  /** The name of the command queue size property.
+   * 
+   */
+  public final static String COMMAND_QUEUE_SIZE_PROPERTY_NAME = "commandQueueSize";
   
   @Override
   public final void addCommand (final ControllerCommand controllerCommand)
@@ -153,6 +159,12 @@ implements Controller
       queueLogEndCommand (controllerCommand.getDepartureAtControllerTime (), controllerCommand);
       error ();
     }
+    else
+    {
+      final int newQueueSize = this.commandQueue.size ();
+      fireSettingsChanged (COMMAND_QUEUE_SIZE_PROPERTY_NAME, newQueueSize - 1, newQueueSize);
+    }
+      
   }
   
   protected abstract void processCommand (final ControllerCommand controllerCommand, final long timeout_ms)
@@ -178,6 +190,8 @@ implements Controller
       try
       {
         nextCommand = AbstractController.this.commandQueue.take ();
+        final int newQueueSize = this.commandQueue.size ();
+        fireSettingsChanged (COMMAND_QUEUE_SIZE_PROPERTY_NAME, newQueueSize + 1, newQueueSize);
         final Instant now = Instant.now ();
         final Duration sojournTime = Duration.between (nextCommand.getArriveAtControllerTime (), now);
         final Duration queueingTimeout = nextCommand.getQueueingTimeout ();
