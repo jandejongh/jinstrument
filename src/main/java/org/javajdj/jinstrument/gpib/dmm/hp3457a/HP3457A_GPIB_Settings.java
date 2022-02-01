@@ -60,12 +60,10 @@ public final class HP3457A_GPIB_Settings
         return Unit.UNIT_V;
       case RESISTANCE_2W:
       case RESISTANCE_4W:
-        // XXX Is this correct? Always?
         return Unit.UNIT_Ohm;
       case DC_CURRENT:
       case AC_CURRENT:
       case AC_DC_CURRENT:
-        // XXX Is this correct? Always?
         return Unit.UNIT_A;
       case FREQUENCY:
         return Unit.UNIT_Hz;
@@ -224,6 +222,42 @@ public final class HP3457A_GPIB_Settings
       getMeasurementMode (),
       autoRange,
       null, // Range
+      // HP3457A_GBIB_Settings
+      this.autoZeroMode,
+      this.id,
+      this.triggerArmEvent,
+      this.triggerEvent,
+      this.sampleEvent,
+      this.installedOption,
+      this.acBandwidth,
+      this.measurementTerminals,
+      this.fixedImpedance,
+      this.offsetCompensation,
+      this.beepEnabled,
+      this.gpibAddress,
+      this.frequencyPeriodInputSource,
+      this.numberOfTriggerArms,
+      this.numberOfReadings,
+      this.delay_s,
+      this.timer_s,
+      this.triggerBuffering,
+      this.calibrationNumber,
+      this.readingFormat,
+      this.locked,
+      this.numberOfPowerLineCycles,
+      this.integerScale
+      );
+  }
+  
+  public final HP3457A_GPIB_Settings withRange (final DigitalMultiMeter.Range range)
+  {
+    return new HP3457A_GPIB_Settings (
+      // DefaultDigitalMultiMeterSettings
+      null,
+      getResolution (),
+      getMeasurementMode (),
+      range == null, // autoRange
+      range,         // range
       // HP3457A_GBIB_Settings
       this.autoZeroMode,
       this.id,
