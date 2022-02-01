@@ -2790,10 +2790,9 @@ public class HP3457A_GPIB_Instrument
           final boolean autoRange =
             (boolean) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_AUTORANGE);
-          if (instrumentSettings == null)
-            throw new UnsupportedOperationException ();
           writeSync ("ARANGE " + (autoRange ? "1" : "0") + ";");
-          newInstrumentSettings = instrumentSettings.withAutoRange (autoRange);
+          if (instrumentSettings != null)
+            newInstrumentSettings = instrumentSettings.withAutoRange (autoRange);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_AUXILIARY_ERROR:
@@ -2834,9 +2833,8 @@ public class HP3457A_GPIB_Instrument
           // AZERO?
           final HP3457A_GPIB_Settings.AutoZeroMode autoZeroMode = processCommand_getAutoZeroMode ();
           instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, autoZeroMode);
-          // XXX Not sure whether to do that here...
-          // if (instrumentSettings != null)
-          //   newInstrumentSettings = instrumentSettings.withAutoZeroMode (processCommand_getAutoZeroMode ());
+          if (instrumentSettings != null)
+            newInstrumentSettings = instrumentSettings.withAutoZeroMode (autoZeroMode);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_BEEP_MODE:
