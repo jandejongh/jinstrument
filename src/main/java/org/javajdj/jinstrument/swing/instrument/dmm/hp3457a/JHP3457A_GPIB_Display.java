@@ -65,9 +65,10 @@ public class JHP3457A_GPIB_Display
     final HP3457A_GPIB_Instrument hp3457a = (HP3457A_GPIB_Instrument) digitalMultiMeter;
 
     removeAll ();
-    setLayout (new GridLayout (1, 1));
+    setLayout (new GridLayout (2, 1));
 
-    add (JCenter.XY (new JLabel ("TBD: DISP [misc]")));
+    add (JCenter.XY (new JLabel ("TBD: DISP [instrument/display]")));
+    add (JCenter.XY (new JLabel ("TBD: NDIG [instrument/display]")));
     
   }
 
