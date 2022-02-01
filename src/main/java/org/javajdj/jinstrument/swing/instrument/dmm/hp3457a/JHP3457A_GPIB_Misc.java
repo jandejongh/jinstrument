@@ -31,6 +31,7 @@ import org.javajdj.jinstrument.swing.base.JDigitalMultiMeterPanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesManagementColor;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesTimeColor;
+import org.javajdj.jinstrument.swing.debug.JInstrumentCommandQueueMonitor;
 import org.javajdj.jswing.jcenter.JCenter;
 import org.javajdj.jswing.jcolorcheckbox.JDialogCheckBox;
 
@@ -171,18 +172,10 @@ public class JHP3457A_GPIB_Misc
     
     add (new JInstrumentPanel (
       hp3457a,
-      "Service",
+      "Command Queue Length",
       level + 1,
       getGuiPreferencesManagementColor (),
-      new JDialogCheckBox (
-        getBackground ().darker (),
-        "Service",
-        new Dimension (800, 600),
-        new JHP3457A_GPIB_Service (
-          hp3457a,
-          "",
-          level + 1,
-          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+      new JInstrumentCommandQueueMonitor (hp3457a, level + 1)));
     
     add (new JInstrumentPanel (
       hp3457a,

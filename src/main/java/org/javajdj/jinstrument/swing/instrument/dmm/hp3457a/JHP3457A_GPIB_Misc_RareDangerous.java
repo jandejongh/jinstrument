@@ -40,7 +40,9 @@ import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_CalibrationData;
 import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Instrument;
 import org.javajdj.jinstrument.swing.base.JDigitalMultiMeterPanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
+import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesManagementColor;
 import org.javajdj.jswing.jcenter.JCenter;
+import org.javajdj.jswing.jcolorcheckbox.JDialogCheckBox;
 
 /** A Swing panel for Rare/Dangerous Settings of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
  *
@@ -86,7 +88,7 @@ public class JHP3457A_GPIB_Misc_RareDangerous
     final JPanel bottomPanel = new JPanel ();
     add (bottomPanel);
     
-    topPanel.setLayout (new GridLayout (1, 2));
+    topPanel.setLayout (new GridLayout (1, 3));
     topPanel.add (new JInstrumentPanel (
       hp3457a,
       "Save Calibration Data",
@@ -105,6 +107,21 @@ public class JHP3457A_GPIB_Misc_RareDangerous
       "Restore Calibration Data",
       this::restoreCalibrationData,
       Color.blue))));
+    topPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Service",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JDialogCheckBox (
+        getBackground ().darker (),
+        "Service",
+        new Dimension (800, 600),
+        new JHP3457A_GPIB_Service (
+          hp3457a,
+          "",
+          level + 1,
+          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+    
     
     bottomPanel.setLayout (new GridLayout (11, 1));
 
