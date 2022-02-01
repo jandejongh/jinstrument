@@ -134,18 +134,15 @@ public class JHP3457A_GPIB_Misc
       
     add (new JInstrumentPanel (
       hp3457a,
-      "Display",
+      "Reading Memory Mode",
       level + 1,
       getGuiPreferencesManagementColor (),
-      new JDialogCheckBox (
-        getBackground ().darker (),
-        "Display",
-        new Dimension (800, 600),
-        new JHP3457A_GPIB_Display (
-          hp3457a,
-          "",
-          level + 1,
-          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+      new JEnum_JComboBox<> (
+        HP3457A_GPIB_Settings.ReadingMemoryMode.class,
+        "Reading Memory Mode",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getReadingMemoryMode (),
+        hp3457a::setReadingMemoryMode,
+        true)));
     
     add (new JInstrumentPanel (
       hp3457a,
