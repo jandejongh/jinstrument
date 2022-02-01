@@ -476,11 +476,14 @@ public class HP3457A_GPIB_Instrument
       // Report new settings.
       settingsReadFromInstrument (
         HP3457A_GPIB_Settings.fromReset ()
+        //.withEoi (true);
+          .withReadingMemoryMode (HP3457A_GPIB_Settings.ReadingMemoryMode.LIFO)
+        //.withServiceRequestMask (XXX)
           .withId (id)
           .withInstalledOption (installedOption)
           .withGpibAddress (gpipAddress));
       
-      // We do not query out status; this will follow soon enough through an SRQ.
+      // We do not query our status; this will follow soon enough through an SRQ.
       // final HP3457A_GPIB_Status status = getStatusFromInstrumentSync ();
       // statusReadFromInstrument (status);
       
@@ -3329,14 +3332,14 @@ public class HP3457A_GPIB_Instrument
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_READING_MEMORY_CONTROL:
         {
           // MEM
-          final HP3457A_GPIB_Settings.ReadingMemoryMode mode =
+          final HP3457A_GPIB_Settings.ReadingMemoryMode readingMemoryMode =
             (HP3457A_GPIB_Settings.ReadingMemoryMode) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_READING_MEMORY_CONTROL);
           writeSync ("MEM" +
-            (mode != null ? ("," + Integer.toString (mode.getCode ()))  : "") +
+            (readingMemoryMode != null ? ("," + Integer.toString (readingMemoryMode.getCode ()))  : "") +
             ";");
-          // XXX?
-          // newInstrumentSettings = getSettingsFromInstrumentSync ();
+          if (instrumentSettings != null)
+            newInstrumentSettings = instrumentSettings.withReadingMemoryMode (readingMemoryMode);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_FORMAT_READING_MEMORY:
