@@ -731,26 +731,54 @@ public class HP3457A_GPIB_Instrument
     {
       final HP3457A_GPIB_Status status;
       if (! HP3457A_GPIB_Status.isError (statusByte))
-        status = HP3457A_GPIB_Status.fromSerialPollStatusByte (
-          statusByte);
+      {
+        status = HP3457A_GPIB_Status.fromSerialPollStatusByte (statusByte);
+        fireInstrumentStatusChanged (status);
+      }
       else
       {
-        final short errorsShort = getErrorSync (getGetStatusTimeout_ms (), TimeUnit.MILLISECONDS);
+        final short errorsShort;
+        try
+        {
+          // We cannot use getErrorSync since we have locked out the command processor.
+          errorsShort = (short) processCommand_getInt ("ERR"); // ERR?
+        }
+        catch (Exception e)
+        {
+          status = HP3457A_GPIB_Status.fromSerialPollStatusByte (statusByte);
+          fireInstrumentStatusChanged (status);
+          throw e;          
+        }
         if (! HP3457A_GPIB_Status.isHardwareError (errorsShort))
+        {
           status = HP3457A_GPIB_Status.fromSerialPollStatusByteAndErrorsShort (
             statusByte,
             errorsShort);
+          fireInstrumentStatusChanged (status);
+        }
         else
         {
-          final short auxiliaryErrorsShort = getAuxiliaryErrorSync (getGetStatusTimeout_ms (), TimeUnit.MILLISECONDS);
+          final short auxiliaryErrorsShort;
+          try
+          {
+            // We cannot use getAuxiliaryErrorSync since we have locked out the command processor.
+            auxiliaryErrorsShort = (short) processCommand_getInt ("AUXERR"); // AUXERR?
+          }
+          catch (Exception e)
+          {
+            status = HP3457A_GPIB_Status.fromSerialPollStatusByteAndErrorsShort (
+              statusByte,
+              errorsShort);
+            fireInstrumentStatusChanged (status);
+            throw e;
+          }
           status = HP3457A_GPIB_Status.fromSerialPollStatusByteAndErrorsAndAuxiliaryErrorsShort (
             statusByte,
             errorsShort,
             auxiliaryErrorsShort);
         }
       }
-      fireInstrumentStatusChanged (status);
-      if (status.isReady ())
+      if (status.isReady ()) // XXX Should we really proceed in case of errors/hardware errors?
       {
         // Check to see if we have any instrument settings already; we need them...
         final HP3457A_GPIB_Settings settings = (HP3457A_GPIB_Settings) getCurrentInstrumentSettings ();
