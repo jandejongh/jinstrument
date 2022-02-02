@@ -3015,7 +3015,7 @@ public class HP3457A_GPIB_Instrument
         case HP3457A_InstrumentCommand.IC_HP3457A_CLEAR_STATUS_BYTE:
         {
           // CSB
-          writeSync ("CSB;");
+          writeSync ("CSB;"); // XXX Why not writeASync??
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_DC_CURRENT:
