@@ -34,6 +34,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_CalibrationData;
@@ -144,15 +145,26 @@ public class JHP3457A_GPIB_Misc_RareDangerous
       hp3457a,
       "Measured Line Frequency [Hz]",
       level + 1,
-      getGuiPreferencesManagementColor (),
-      new JString_JTextField (
-        "Unknown",
+      getGuiPreferencesFrequencyColor (),
+      new Jdouble_JTextField (
+        Double.NaN,
         8,
         "Measured Line Frequency [Hz]",
-        (settings) -> Double.toString (((HP3457A_GPIB_Settings) settings).getLineFrequency_Hz ()),
+        (settings) -> ((HP3457A_GPIB_Settings) settings).getLineFrequency_Hz (),
         null,
         true)));
-    
+    centerPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Line Frequency Reference [Hz]",
+      level + 1,
+      getGuiPreferencesFrequencyColor (),
+      new Jdouble_JTextField (
+        Double.NaN,
+        8,
+        "Line Frequency Reference [Hz]",
+        (settings) -> ((HP3457A_GPIB_Settings) settings).getLineFrequencyReference_Hz (),
+        hp3457a::setLineFrequencyReference_Hz,
+        true)));
     
     bottomPanel.setLayout (new GridLayout (5, 2));
 

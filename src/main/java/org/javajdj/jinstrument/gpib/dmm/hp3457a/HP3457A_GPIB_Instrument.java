@@ -505,6 +505,7 @@ public class HP3457A_GPIB_Instrument
       getCalibrationNumberASync ();
       getNumberOfPowerLineCyclesASync ();
       getLineFrequency_HzASync ();
+      getLineFrequencyReference_HzASync ();
       
     }
     catch (InterruptedException ie)
@@ -1369,22 +1370,31 @@ public class HP3457A_GPIB_Instrument
     return (double) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
   }
   
-  public final void setLineFrequencyReference_Hz (final int frequency_Hz)
+  public final void setLineFrequencyReference_Hz (final double lineFrequencyReference_Hz)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
       HP3457A_InstrumentCommand.IC_HP3457A_SET_LINE_FREQUENCY_REFERENCE,
-      HP3457A_InstrumentCommand.ICARG_HP3457A_SET_LINE_FREQUENCY_REFERENCE, frequency_Hz));    
+      HP3457A_InstrumentCommand.ICARG_HP3457A_SET_LINE_FREQUENCY_REFERENCE, lineFrequencyReference_Hz));    
   }
   
   public final double getLineFrequencyReference_HzSync (final long timeout, final TimeUnit unit)
     throws IOException, InterruptedException, TimeoutException
   {
-    // XXX always int?
+    // XXX always int? Always 50/60?
     final InstrumentCommand command = new DefaultInstrumentCommand (
       HP3457A_InstrumentCommand.IC_HP3457A_GET_LINE_FREQUENCY_REFERENCE);
     addAndProcessCommandSync (command, timeout, unit);
     return (double) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
+  }
+  
+  public final void getLineFrequencyReference_HzASync ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // XXX always int? Always 50/60?
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP3457A_InstrumentCommand.IC_HP3457A_GET_LINE_FREQUENCY_REFERENCE);
+    addCommand (command);
   }
   
   public final double getLineFrequency_HzSync (final long timeout, final TimeUnit unit)
@@ -3255,30 +3265,20 @@ public class HP3457A_GPIB_Instrument
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_LINE_FREQUENCY_REFERENCE:
         {
           // LFREQ
-          final int frequency_Hz =
-            (int) instrumentCommand.get (
-              HP3457A_InstrumentCommand.ICARG_HP3457A_SET_LINE_FREQUENCY_REFERENCE);
-          writeSync ("LFREQ " + Integer.toString (frequency_Hz) + ";");
-          // XXX Update newInstrumentSettings
+          final double newLineFrequencyReference_Hz = processCommand_setAndGetDouble (
+            instrumentCommand,
+            HP3457A_InstrumentCommand.ICARG_HP3457A_SET_LINE_FREQUENCY_REFERENCE,
+            "LFREQ");
+          if (instrumentSettings != null && instrumentSettings.getLineFrequencyReference_Hz () != newLineFrequencyReference_Hz)
+            newInstrumentSettings = instrumentSettings.withLineFrequencyReference_Hz (newLineFrequencyReference_Hz);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_LINE_FREQUENCY_REFERENCE:
         {
           // LFREQ?
-          final String queryReturn = new String (writeAndReadEOISync ("LFREQ?;"), Charset.forName ("US-ASCII")).trim ();
-          if (queryReturn == null)
-            throw new IOException ();
-          final double frequency_Hz;
-          try
-          {
-            frequency_Hz = Double.parseDouble (queryReturn);
-          }
-          catch (NumberFormatException nfe)
-          {
-            throw new IOException ();
-          }
-          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, frequency_Hz);
-          // XXX Update newInstrumentSettings
+          final double lineFrequencyReference_Hz = processCommand_getDouble (instrumentCommand, "LFREQ");
+          if (instrumentSettings != null && instrumentSettings.getLineFrequencyReference_Hz () != lineFrequencyReference_Hz)
+            newInstrumentSettings = instrumentSettings.withLineFrequencyReference_Hz (lineFrequencyReference_Hz);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_LINE_FREQUENCY:
