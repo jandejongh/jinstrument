@@ -1381,12 +1381,12 @@ public class HP3457A_GPIB_Instrument
     return (String) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
   }
   
-  public final void setGpibInputBuffer (final boolean useBuffer)
+  public final void setGpibInputBuffering (final boolean useBuffer)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
-      HP3457A_InstrumentCommand.IC_HP3457A_SET_GPIB_INPUT_BUFFER,
-      HP3457A_InstrumentCommand.ICARG_HP3457A_SET_GPIB_INPUT_BUFFER, useBuffer));    
+      HP3457A_InstrumentCommand.IC_HP3457A_SET_GPIB_INPUT_BUFFERING,
+      HP3457A_InstrumentCommand.ICARG_HP3457A_SET_GPIB_INPUT_BUFFERING, useBuffer));    
   }
   
   public final double getIntegerScaleFactorSync (final long timeout, final TimeUnit unit)
@@ -3266,20 +3266,18 @@ public class HP3457A_GPIB_Instrument
           if (queryReturn == null)
             throw new IOException ();
           instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, queryReturn);
-          if (instrumentSettings != null)
+          if (instrumentSettings != null && ! queryReturn.equals (instrumentSettings.getId ()))
             newInstrumentSettings = instrumentSettings.withId (queryReturn);
           break;
         }
-        case HP3457A_InstrumentCommand.IC_HP3457A_SET_GPIB_INPUT_BUFFER:
+        case HP3457A_InstrumentCommand.IC_HP3457A_SET_GPIB_INPUT_BUFFERING:
         {
           // INBUF
-          final boolean inputBuffer =
-            (boolean) instrumentCommand.get (
-              HP3457A_InstrumentCommand.ICARG_HP3457A_SET_GPIB_INPUT_BUFFER);
-          if (isSafeMode ())
-            throw new IllegalStateException ();
-          writeSync ("INBUF " + (inputBuffer ? "1" : "0") + ";");
-          // XXX Update newInstrumentSettings
+          final boolean newGpibInputBuffering = processCommand_setBoolean (instrumentCommand,
+            HP3457A_InstrumentCommand.ICARG_HP3457A_SET_GPIB_INPUT_BUFFERING,
+            "INBUF");
+          if (instrumentSettings != null && instrumentSettings.isGpibInputBuffering () != newGpibInputBuffering)
+            newInstrumentSettings = instrumentSettings.withGpibInputBuffering (newGpibInputBuffering);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_INTEGER_SCALE_FACTOR:
