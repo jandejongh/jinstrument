@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -577,6 +578,40 @@ public abstract class AbstractGpibInstrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  private volatile Semaphore controllerAccessSemaphore = null;
+  
+  /** Sets a semaphore for access to the controller.
+   * 
+   * <p>
+   * Only to be used by sub-classes that want to mutually exclude threads from accessing the controller.
+   * This allows for the implementation of atomic sequences for the controller (at least from the viewpoint of this instrument),
+   * as it can, for instance, prevents the service request collector thread from assessing srq status at the controller
+   * <i>while</i> the instrument is processing a sequence of commands that should not be interrupted.
+   * 
+   * <p>
+   * As long as the service-request collector thread cannot acquire a permit from the semaphore, it simply skips srq acquisition,
+   * and reports this in the log.
+   * Note that the thread never blocks on the semaphore (it just attempts to acquire the permit every time it want to
+   * access the controller, which is periodically).
+   * 
+   * <p>
+   * The semaphore is absent by default, and can only be set once (anytime) during the lifetime of this object.
+   * 
+   * @param controllerAccessSemaphore The semaphore.
+   * 
+   * @throws IllegalArgumentException If the semaphore is {@code null}.
+   * @throws IllegalStateException    If the controller access semaphore was already set earlier.
+   * 
+   */
+  protected final synchronized void setControllerAccessSemaphore (final Semaphore controllerAccessSemaphore)
+  {
+    if (controllerAccessSemaphore == null)
+      throw new IllegalArgumentException ();
+    if (this.controllerAccessSemaphore != null)
+      throw new IllegalStateException ();
+    this.controllerAccessSemaphore = controllerAccessSemaphore;
+  }
+  
   private final Runnable gpibInstrumentServiceRequestCollector = () ->
   {
     LOG.log (Level.INFO, "Starting GPIB Instrument Service Request Collector on {0}.", AbstractGpibInstrument.this.toString ());
@@ -592,10 +627,33 @@ public abstract class AbstractGpibInstrument
           Thread.sleep ((long) (AbstractGpibInstrument.this.getGpibInstrumentServiceRequestCollectorPeriod_s () * 1000));
           hadException = false;
         }
+        // We must take a one-time reference copy of the semaphore as it may be set by a concurrent thread.
+        final Semaphore controllerAccessSemaphore = AbstractGpibInstrument.this.controllerAccessSemaphore;
+        final boolean controllerAccess;
+        if (controllerAccessSemaphore != null)
+          controllerAccess = controllerAccessSemaphore.tryAcquire ();
+        else
+          controllerAccess = true;
         // Mark start of sojourn.
         final long timeBeforeProbe_ms = System.currentTimeMillis ();
         // Obtain SRQ status from the instrument.
-        final Byte statusByte = AbstractGpibInstrument.this.pollServiceRequestStatusByteSync ();
+        final Byte statusByte;
+        try
+        {
+          if (controllerAccess)
+            statusByte = AbstractGpibInstrument.this.pollServiceRequestStatusByteSync ();
+          else
+          {
+            statusByte = null;
+            LOG.log (Level.WARNING, "GPIB Instrument Service Request Collector skips SRQ acquisition due to lock on {0}.",
+              AbstractGpibInstrument.this.toString ());
+          }
+        }
+        finally
+        {
+          if (controllerAccessSemaphore != null && controllerAccess)
+            controllerAccessSemaphore.release ();
+        }
         // Report a Service Request Status Byte.
         // Note: This will insert the Service Request into a blocking queue for
         // further processing by the gpibServiceRequestDispatcher.
