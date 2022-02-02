@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -96,6 +97,8 @@ public class HP3457A_GPIB_Instrument
     setGpibInstrumentServiceRequestCollectorPeriod_s (1.0 /* XXX for now XXX */); // Can go as low as 0.005.
     setReadEOITimeout_ms (5000);
     this.safeMode = true;
+    this.operationSemaphore = new Semaphore (1);
+    setControllerAccessSemaphore (this.operationSemaphore);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,6 +153,17 @@ public class HP3457A_GPIB_Instrument
   {
     return getInstrumentUrl ();
   }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // HP3457A_GPIB_Instrument
+  // OPERATION SEMAPHORE
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  // We use a Semaphore for sequencing initilization, acquisition/srq, and command processing.
+  // This save us the trouble of creating atomic operations for the controller...
+  // It is not ideal, and more or less assumes exclusive access to controller and instrument.
+  private final Semaphore operationSemaphore;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -436,19 +450,16 @@ public class HP3457A_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private volatile boolean isInitializing = false;
-  
   @Override
   protected final void initializeInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
     
-    // Make sure we are not interrupted by the acquisition process.
-    this.isInitializing = true;
-    
     try
     {
       
+      this.operationSemaphore.acquire ();
+    
       // Clear the command queue so we're not bothered by pending commands.
       clearCommandQueue ();
       
@@ -462,7 +473,8 @@ public class HP3457A_GPIB_Instrument
       final String id = new String (writeAndReadEOISync (
         "RESET"         // "RESET for reset () or "PRESET" for preset ()
         + ";END 2"      // setEoi ()
-        + ";MEM 1"      // setReadingMemoryMode (HP3457A_GPIB_Settings.ReadingMemoryMode.LIFO)
+//      + ";MEM 1"      // setReadingMemoryMode (HP3457A_GPIB_Settings.ReadingMemoryMode.LIFO)
+        + ";MEM 0"      // setReadingMemoryMode (HP3457A_GPIB_Settings.ReadingMemoryMode.OFF)
         + ";RQS 127"    // setServiceRequestMask (0x7f) // ALL
         + ";ID?;")      // getIdSync ()
         , Charset.forName ("US-ASCII")).trim ();
@@ -477,7 +489,7 @@ public class HP3457A_GPIB_Instrument
       settingsReadFromInstrument (
         HP3457A_GPIB_Settings.fromReset ()
         //.withEoi (true);
-          .withReadingMemoryMode (HP3457A_GPIB_Settings.ReadingMemoryMode.LIFO)
+          .withReadingMemoryMode (HP3457A_GPIB_Settings.ReadingMemoryMode.OFF)
         //.withServiceRequestMask (XXX)
           .withId (id)
           .withInstalledOption (installedOption)
@@ -510,7 +522,7 @@ public class HP3457A_GPIB_Instrument
     finally
     {
       // Make sure the acquisition process can proceed.
-      this.isInitializing = false;
+      this.operationSemaphore.release ();
     }
   }
   
@@ -711,74 +723,92 @@ public class HP3457A_GPIB_Instrument
   protected void onGpibServiceRequestFromInstrument (final byte statusByte)
     throws IOException, InterruptedException, TimeoutException
   {
-    if (this.isInitializing)
+    if (! this.operationSemaphore.tryAcquire ())
       return;
-    final HP3457A_GPIB_Status status;
-    if (! HP3457A_GPIB_Status.isError (statusByte))
-      status = HP3457A_GPIB_Status.fromSerialPollStatusByte (
-        statusByte);
-    else
+    try
     {
-      final short errorsShort = getErrorSync (getGetStatusTimeout_ms (), TimeUnit.MILLISECONDS);
-      if (! HP3457A_GPIB_Status.isHardwareError (errorsShort))
-        status = HP3457A_GPIB_Status.fromSerialPollStatusByteAndErrorsShort (
-          statusByte,
-          errorsShort);
+      final HP3457A_GPIB_Status status;
+      if (! HP3457A_GPIB_Status.isError (statusByte))
+        status = HP3457A_GPIB_Status.fromSerialPollStatusByte (
+          statusByte);
       else
       {
-        final short auxiliaryErrorsShort = getAuxiliaryErrorSync (getGetStatusTimeout_ms (), TimeUnit.MILLISECONDS);
-        status = HP3457A_GPIB_Status.fromSerialPollStatusByteAndErrorsAndAuxiliaryErrorsShort (
-          statusByte,
-          errorsShort,
-          auxiliaryErrorsShort);
-      }
-    }
-    fireInstrumentStatusChanged (status);
-    if (status.isReady ())
-    {
-      // Check to see if we have any instrument settings already; we need them...
-      final HP3457A_GPIB_Settings settings = (HP3457A_GPIB_Settings) getCurrentInstrumentSettings ();
-      if (settings == null)
-      {
-        LOG.log (Level.WARNING, "No settings (yet) on instrument {0}.", new Object[]{this});
-        return;
-      }
-      switch (settings.getTriggerEvent ())
-      {
-        case HOLD:
-          return;
-        case AUTO:
-        case EXT:
-        case SGL:
-        case TIMER:
+        final short errorsShort = getErrorSync (getGetStatusTimeout_ms (), TimeUnit.MILLISECONDS);
+        if (! HP3457A_GPIB_Status.isHardwareError (errorsShort))
+          status = HP3457A_GPIB_Status.fromSerialPollStatusByteAndErrorsShort (
+            statusByte,
+            errorsShort);
+        else
         {
-          final int numberOfStoredReadings;
-          try
+          final short auxiliaryErrorsShort = getAuxiliaryErrorSync (getGetStatusTimeout_ms (), TimeUnit.MILLISECONDS);
+          status = HP3457A_GPIB_Status.fromSerialPollStatusByteAndErrorsAndAuxiliaryErrorsShort (
+            statusByte,
+            errorsShort,
+            auxiliaryErrorsShort);
+        }
+      }
+      fireInstrumentStatusChanged (status);
+      if (status.isReady ())
+      {
+        // Check to see if we have any instrument settings already; we need them...
+        final HP3457A_GPIB_Settings settings = (HP3457A_GPIB_Settings) getCurrentInstrumentSettings ();
+        if (settings == null)
+        {
+          LOG.log (Level.WARNING, "No settings (yet) on instrument {0}.", new Object[]{this});
+          return;
+        }
+        switch (settings.getTriggerEvent ())
+        {
+          case HOLD:
+            return;
+          case AUTO:
+          case EXT:
+          case SGL:
+          case TIMER:
           {
-            numberOfStoredReadings = (int) Math.round (Double.parseDouble (
-              new String (writeAndReadEOISync ("MCOUNT?;"), Charset.forName ("US-ASCII")).trim ()));
+            final int numberOfStoredReadings;
+            switch (settings.getReadingMemoryMode ())
+            {
+              case OFF:
+                numberOfStoredReadings = 1;
+                break;
+              case FIFO:
+              case LIFO:
+                try
+                {
+                  numberOfStoredReadings = (int) Math.round (Double.parseDouble (
+                    new String (writeAndReadEOISync ("MCOUNT?;"), Charset.forName ("US-ASCII")).trim ()));
+                  LOG.log (Level.WARNING, "Number of stored readings: {0}.", new Object[]{numberOfStoredReadings});
+                }
+                catch (NumberFormatException nfe)
+                {
+                  throw new IOException ();
+                }
+                break;
+              default:
+                throw new IOException ();
+            }
+            for (int i = 0; i < numberOfStoredReadings; i++)
+            {
+              final InstrumentReading reading = singleReading (settings, status);
+              if (reading != null)
+                readingReadFromInstrument (reading);
+            }
+            break;
           }
-          catch (NumberFormatException nfe)
-          {
-            throw new IOException ();
-          }
-          LOG.log (Level.WARNING, "Number of stored readings: {0}.", new Object[]{numberOfStoredReadings});
-          for (int i = 0; i < numberOfStoredReadings; i++)
+          case SYN:
           {
             final InstrumentReading reading = singleReading (settings, status);
             if (reading != null)
               readingReadFromInstrument (reading);
+            break;
           }
-          break;
-        }
-        case SYN:
-        {
-          final InstrumentReading reading = singleReading (settings, status);
-          if (reading != null)
-            readingReadFromInstrument (reading);
-          break;
         }
       }
+    }
+    finally
+    {
+      this.operationSemaphore.release ();
     }
   }
     
@@ -2482,6 +2512,7 @@ public class HP3457A_GPIB_Instrument
     final String commandString = (String) instrumentCommand.get (InstrumentCommand.IC_COMMAND_KEY);
     if (commandString.trim ().isEmpty ())
       throw new IllegalArgumentException ();
+    this.operationSemaphore.acquire ();
     final GpibDevice device = (GpibDevice) getDevice ();
     HP3457A_GPIB_Settings instrumentSettings = (HP3457A_GPIB_Settings) getCurrentInstrumentSettings ();
     HP3457A_GPIB_Settings newInstrumentSettings = null;
@@ -4017,14 +4048,23 @@ public class HP3457A_GPIB_Instrument
     }
     finally
     {
-      // EMPTY
+      this.operationSemaphore.release ();
     }
     if (newInstrumentSettings != null)
     {
       settingsReadFromInstrument (newInstrumentSettings);
-      final byte serialPollStatusByte = serialPollSync ();
-      final InstrumentStatus newInstrumentStatus =
-        HP3457A_GPIB_Status.fromSerialPollStatusByte (serialPollStatusByte);
+      this.operationSemaphore.acquire ();
+      final InstrumentStatus newInstrumentStatus;
+      try
+      {
+        final byte serialPollStatusByte = serialPollSync ();
+        newInstrumentStatus =
+          HP3457A_GPIB_Status.fromSerialPollStatusByte (serialPollStatusByte);
+      }
+      finally
+      {
+        this.operationSemaphore.release ();
+      }
       statusReadFromInstrument (newInstrumentStatus);
     }
   }
