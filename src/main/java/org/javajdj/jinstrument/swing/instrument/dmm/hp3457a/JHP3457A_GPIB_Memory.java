@@ -67,7 +67,7 @@ public class JHP3457A_GPIB_Memory
     removeAll ();
     setLayout (new GridLayout (1, 1));
 
-    add (JCenter.XY (new JLabel ("TBD: MEM/MFORMAT/MSIZE/MSIZE? [management/mem]")));
+    add (JCenter.XY (new JLabel ("TBD: MSIZE/MSIZE? [management/mem]")));
     
   }
 
