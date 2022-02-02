@@ -104,7 +104,8 @@ public final class HP3457A_GPIB_Settings
     final boolean locked,
     final double numberOfPowerLineCycles,
     final double integerScale,
-    final ReadingMemoryMode readingMemoryMode
+    final ReadingMemoryMode readingMemoryMode,
+    final double lineFrequency_Hz
     )
   {
     // DefaultDigitalMultiMeterSettings
@@ -134,6 +135,7 @@ public final class HP3457A_GPIB_Settings
     this.numberOfPowerLineCycles = numberOfPowerLineCycles;
     this.integerScale = integerScale;
     this.readingMemoryMode = readingMemoryMode;
+    this.lineFrequency_Hz = lineFrequency_Hz;
   }
 
   public static HP3457A_GPIB_Settings fromReset ()
@@ -169,7 +171,8 @@ public final class HP3457A_GPIB_Settings
       false,
       10,
       Double.NaN, // integerScale [ISCALE?]: Unknown
-      ReadingMemoryMode.OFF
+      ReadingMemoryMode.OFF,
+      Double.NaN // lineFrequency_Hz: Unknown
     );
   }
   
@@ -213,7 +216,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -250,7 +254,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -287,7 +292,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -324,7 +330,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -361,7 +368,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -398,7 +406,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -435,7 +444,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -472,7 +482,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -509,7 +520,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -546,7 +558,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -583,7 +596,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -620,7 +634,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -657,7 +672,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -694,7 +710,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -731,7 +748,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -769,7 +787,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -806,7 +825,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -843,7 +863,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -880,7 +901,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -917,7 +939,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -954,7 +977,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -991,7 +1015,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -1028,7 +1053,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -1065,7 +1091,8 @@ public final class HP3457A_GPIB_Settings
       locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -1102,7 +1129,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       numberOfPowerLineCycles,
       this.integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -1139,7 +1167,8 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       integerScale,
-      this.readingMemoryMode
+      this.readingMemoryMode,
+      this.lineFrequency_Hz
       );
   }
   
@@ -1176,7 +1205,46 @@ public final class HP3457A_GPIB_Settings
       this.locked,
       this.numberOfPowerLineCycles,
       this.integerScale,
-      readingMemoryMode
+      readingMemoryMode,
+      this.lineFrequency_Hz
+      );
+  }
+  
+  public final HP3457A_GPIB_Settings withLineFrequency_Hz (final double lineFrequency_Hz)
+  {
+    return new HP3457A_GPIB_Settings (
+      // DefaultDigitalMultiMeterSettings
+      null,
+      getResolution (),
+      getMeasurementMode (),
+      isAutoRange (),
+      getRange (),
+      // HP3457A_GBIB_Settings
+      this.autoZeroMode,
+      this.id,
+      this.triggerArmEvent,
+      this.triggerEvent,
+      this.sampleEvent,
+      this.installedOption,
+      this.acBandwidth,
+      this.measurementTerminals,
+      this.fixedImpedance,
+      this.offsetCompensation,
+      this.beepEnabled,
+      this.gpibAddress,
+      this.frequencyPeriodInputSource,
+      this.numberOfTriggerArms,
+      this.numberOfReadings,
+      this.delay_s,
+      this.timer_s,
+      this.triggerBuffering,
+      this.calibrationNumber,
+      this.readingFormat,
+      this.locked,
+      this.numberOfPowerLineCycles,
+      this.integerScale,
+      this.readingMemoryMode,
+      lineFrequency_Hz
       );
   }
   
@@ -1389,6 +1457,19 @@ public final class HP3457A_GPIB_Settings
   public final boolean isOffsetCompensation ()
   {
     return this.offsetCompensation;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // [MEASURED] LINE FREQUENCY
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final double lineFrequency_Hz;
+  
+  public final double getLineFrequency_Hz ()
+  {
+    return this.lineFrequency_Hz;
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
