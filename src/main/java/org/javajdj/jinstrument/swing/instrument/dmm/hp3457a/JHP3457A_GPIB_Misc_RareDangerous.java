@@ -139,7 +139,7 @@ public class JHP3457A_GPIB_Misc_RareDangerous
           level + 1,
           JInstrumentPanel.getGuiPreferencesManagementColor ()))));    
     
-    centerPanel.setLayout (new GridLayout (1, 2));
+    centerPanel.setLayout (new GridLayout (1, 4));
     centerPanel.add (new JInstrumentPanel (
       hp3457a,
       "Measured Line Frequency [Hz]",
@@ -164,18 +164,34 @@ public class JHP3457A_GPIB_Misc_RareDangerous
         (settings) -> ((HP3457A_GPIB_Settings) settings).getLineFrequencyReference_Hz (),
         hp3457a::setLineFrequencyReference_Hz,
         true)));
+    centerPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Clear Status Byte",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JVoid_JColorCheckBox (
+        "Clear Status Byte",
+        hp3457a::clearStatusByte,
+        Color.blue)));
+    centerPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Fire Service Request",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JVoid_JColorCheckBox (
+        "Fire Service Request",
+        hp3457a::fireServiceRequest,
+        Color.blue)));
     
-    bottomPanel.setLayout (new GridLayout (4, 2));
+    bottomPanel.setLayout (new GridLayout (3, 2));
 
     bottomPanel.add (JCenter.XY (new JLabel ("Readings with different TARM/TRIG/NRDGS [acquisition]")));
     bottomPanel.add (JCenter.XY (new JLabel ("Resolution [acquisition]")));
     bottomPanel.add (JCenter.XY (new JLabel ("F10-F58 [acquisition]")));
     
-    bottomPanel.add (JCenter.XY (new JLabel ("CSB? [management]")));
     bottomPanel.add (JCenter.XY (new JLabel ("EMASK [management]")));
     bottomPanel.add (JCenter.XY (new JLabel ("INBUF [management]")));
     bottomPanel.add (JCenter.XY (new JLabel ("RQS [management]")));
-    bottomPanel.add (JCenter.XY (new JLabel ("SRQ [management/misc]")));
 
   }
 
