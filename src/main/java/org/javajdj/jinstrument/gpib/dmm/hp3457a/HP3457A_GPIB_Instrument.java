@@ -1908,7 +1908,6 @@ public class HP3457A_GPIB_Instrument
   public final void fireServiceRequest ()
     throws IOException, InterruptedException
   {
-    // XXX
     addCommand (new DefaultInstrumentCommand (HP3457A_InstrumentCommand.IC_HP3457A_FIRE_SERVICE_REQUEST));
   }
     
