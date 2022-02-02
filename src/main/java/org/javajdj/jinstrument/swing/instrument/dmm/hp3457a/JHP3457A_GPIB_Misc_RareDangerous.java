@@ -34,7 +34,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
-import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_CalibrationData;
@@ -166,11 +165,10 @@ public class JHP3457A_GPIB_Misc_RareDangerous
         hp3457a::setLineFrequencyReference_Hz,
         true)));
     
-    bottomPanel.setLayout (new GridLayout (5, 2));
+    bottomPanel.setLayout (new GridLayout (4, 2));
 
     bottomPanel.add (JCenter.XY (new JLabel ("Readings with different TARM/TRIG/NRDGS [acquisition]")));
     bottomPanel.add (JCenter.XY (new JLabel ("Resolution [acquisition]")));
-    bottomPanel.add (JCenter.XY (new JLabel ("LFREQ/LFREQ?/LINE? [acquisition]")));
     bottomPanel.add (JCenter.XY (new JLabel ("F10-F58 [acquisition]")));
     
     bottomPanel.add (JCenter.XY (new JLabel ("CSB? [management]")));
