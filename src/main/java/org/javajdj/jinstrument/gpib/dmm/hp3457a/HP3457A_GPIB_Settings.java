@@ -1350,7 +1350,7 @@ public final class HP3457A_GPIB_Settings
       );
   }
   
-  public final HP3457A_GPIB_Settings withGpibInputBuffer (final boolean gpibInputBuffer)
+  public final HP3457A_GPIB_Settings withGpibInputBuffering (final boolean gpibInputBuffering)
   {
     return new HP3457A_GPIB_Settings (
       // DefaultDigitalMultiMeterSettings
@@ -1386,7 +1386,7 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      gpibInputBuffer
+      gpibInputBuffering
       );
   }
   
