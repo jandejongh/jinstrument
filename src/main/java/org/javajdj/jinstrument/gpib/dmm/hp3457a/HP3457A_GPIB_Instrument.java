@@ -504,6 +504,7 @@ public class HP3457A_GPIB_Instrument
       // Execution of these commands will update the settings.
       getCalibrationNumberASync ();
       getNumberOfPowerLineCyclesASync ();
+      getLineFrequency_HzASync ();
       
     }
     catch (InterruptedException ie)
@@ -1393,6 +1394,14 @@ public class HP3457A_GPIB_Instrument
       HP3457A_InstrumentCommand.IC_HP3457A_GET_LINE_FREQUENCY);
     addAndProcessCommandSync (command, timeout, unit);
     return (double) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
+  }
+  
+  public final void getLineFrequency_HzASync ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP3457A_InstrumentCommand.IC_HP3457A_GET_LINE_FREQUENCY);
+    addCommand (command);
   }
   
   public final void setLockout (final boolean lockout)
@@ -3275,20 +3284,9 @@ public class HP3457A_GPIB_Instrument
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_LINE_FREQUENCY:
         {
           // LINE?
-          final String queryReturn = new String (writeAndReadEOISync ("LINE?;"), Charset.forName ("US-ASCII")).trim ();
-          if (queryReturn == null)
-            throw new IOException ();
-          final double frequency_Hz;
-          try
-          {
-            frequency_Hz = Double.parseDouble (queryReturn);
-          }
-          catch (NumberFormatException nfe)
-          {
-            throw new IOException ();
-          }
-          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, frequency_Hz);
-          // XXX Update newInstrumentSettings
+          final double lineFrequency_Hz = processCommand_getDouble (instrumentCommand, "LINE");
+          if (instrumentSettings != null && instrumentSettings.getLineFrequency_Hz () != lineFrequency_Hz)
+            newInstrumentSettings = instrumentSettings.withLineFrequency_Hz (lineFrequency_Hz);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_LOCKOUT:
