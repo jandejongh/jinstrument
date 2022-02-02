@@ -178,8 +178,8 @@ public interface HP3457A_InstrumentCommand
   public final static String IC_HP3457A_GET_ID = "commandHp3457aGetId";
 
   // INBUF
-  public final static String IC_HP3457A_SET_GPIB_INPUT_BUFFER = "commandHp3457aSetGpibInputBuffer";
-  public final static String ICARG_HP3457A_SET_GPIB_INPUT_BUFFER = "hp3457aSetGpibInputBuffer";
+  public final static String IC_HP3457A_SET_GPIB_INPUT_BUFFERING = "commandHp3457aSetGpibInputBuffering";
+  public final static String ICARG_HP3457A_SET_GPIB_INPUT_BUFFERING = "hp3457aSetGpibInputBuffering";
 
   // ISCALE?
   public final static String IC_HP3457A_GET_INTEGER_SCALE_FACTOR = "commandHp3457aGetIntegerScaleFactor";
