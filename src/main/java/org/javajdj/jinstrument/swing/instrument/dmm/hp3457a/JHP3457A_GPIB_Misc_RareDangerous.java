@@ -139,7 +139,7 @@ public class JHP3457A_GPIB_Misc_RareDangerous
           level + 1,
           JInstrumentPanel.getGuiPreferencesManagementColor ()))));    
     
-    centerPanel.setLayout (new GridLayout (1, 4));
+    centerPanel.setLayout (new GridLayout (1, 5));
     centerPanel.add (new JInstrumentPanel (
       hp3457a,
       "Measured Line Frequency [Hz]",
@@ -182,6 +182,17 @@ public class JHP3457A_GPIB_Misc_RareDangerous
         "Fire Service Request",
         hp3457a::fireServiceRequest,
         Color.blue)));
+      centerPanel.add (new JInstrumentPanel (
+        hp3457a,
+        "GPIB Input Buffering",
+        level + 1,
+        getGuiPreferencesManagementColor (),
+        JCenter.XY (new JBoolean_JBoolean (
+          "GPIB Input Buffering",
+          (settings) -> ((HP3457A_GPIB_Settings) settings).isGpibInputBuffering (),
+          hp3457a::setGpibInputBuffering,
+          Color.green,
+          true))));
     
     bottomPanel.setLayout (new GridLayout (3, 2));
 
@@ -190,7 +201,6 @@ public class JHP3457A_GPIB_Misc_RareDangerous
     bottomPanel.add (JCenter.XY (new JLabel ("F10-F58 [acquisition]")));
     
     bottomPanel.add (JCenter.XY (new JLabel ("EMASK [management]")));
-    bottomPanel.add (JCenter.XY (new JLabel ("INBUF [management]")));
     bottomPanel.add (JCenter.XY (new JLabel ("RQS [management]")));
 
   }
