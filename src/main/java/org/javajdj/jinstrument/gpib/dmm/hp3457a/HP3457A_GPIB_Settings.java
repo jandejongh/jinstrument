@@ -106,7 +106,8 @@ public final class HP3457A_GPIB_Settings
     final double integerScale,
     final ReadingMemoryMode readingMemoryMode,
     final double lineFrequency_Hz,
-    final double lineFrequencyReference_Hz
+    final double lineFrequencyReference_Hz,
+    final boolean gpibInputBuffer
     )
   {
     // DefaultDigitalMultiMeterSettings
@@ -138,6 +139,7 @@ public final class HP3457A_GPIB_Settings
     this.readingMemoryMode = readingMemoryMode;
     this.lineFrequency_Hz = lineFrequency_Hz;
     this.lineFrequencyReference_Hz = lineFrequencyReference_Hz;
+    this.gpibInputBuffer = gpibInputBuffer;
   }
 
   public static HP3457A_GPIB_Settings fromReset ()
@@ -175,7 +177,8 @@ public final class HP3457A_GPIB_Settings
       Double.NaN, // integerScale [ISCALE?]: Unknown
       ReadingMemoryMode.OFF,
       Double.NaN, // lineFrequency_Hz: Unknown
-      Double.NaN  // lineFrequencyReference_Hz: Unknown
+      Double.NaN, // lineFrequencyReference_Hz: Unknown
+      false
     );
   }
   
@@ -221,7 +224,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -260,7 +264,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -299,7 +304,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -338,7 +344,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -377,7 +384,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -416,7 +424,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -455,7 +464,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -494,7 +504,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -533,7 +544,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -572,7 +584,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -611,7 +624,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -650,7 +664,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -689,7 +704,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -728,7 +744,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -767,7 +784,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -807,7 +825,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -846,7 +865,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -885,7 +905,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -924,7 +945,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -963,7 +985,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -1002,7 +1025,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -1041,7 +1065,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -1080,7 +1105,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -1119,7 +1145,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -1158,7 +1185,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -1197,7 +1225,8 @@ public final class HP3457A_GPIB_Settings
       integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -1236,7 +1265,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       readingMemoryMode,
       this.lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -1275,7 +1305,8 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       lineFrequency_Hz,
-      this.lineFrequencyReference_Hz
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffer
       );
   }
   
@@ -1314,7 +1345,48 @@ public final class HP3457A_GPIB_Settings
       this.integerScale,
       this.readingMemoryMode,
       this.lineFrequency_Hz,
-      lineFrequencyReference_Hz
+      lineFrequencyReference_Hz,
+      this.gpibInputBuffer
+      );
+  }
+  
+  public final HP3457A_GPIB_Settings withGpibInputBuffer (final boolean gpibInputBuffer)
+  {
+    return new HP3457A_GPIB_Settings (
+      // DefaultDigitalMultiMeterSettings
+      null,
+      getResolution (),
+      getMeasurementMode (),
+      isAutoRange (),
+      getRange (),
+      // HP3457A_GBIB_Settings
+      this.autoZeroMode,
+      this.id,
+      this.triggerArmEvent,
+      this.triggerEvent,
+      this.sampleEvent,
+      this.installedOption,
+      this.acBandwidth,
+      this.measurementTerminals,
+      this.fixedImpedance,
+      this.offsetCompensation,
+      this.beepEnabled,
+      this.gpibAddress,
+      this.frequencyPeriodInputSource,
+      this.numberOfTriggerArms,
+      this.numberOfReadings,
+      this.delay_s,
+      this.timer_s,
+      this.triggerBuffering,
+      this.calibrationNumber,
+      this.readingFormat,
+      this.locked,
+      this.numberOfPowerLineCycles,
+      this.integerScale,
+      this.readingMemoryMode,
+      this.lineFrequency_Hz,
+      this.lineFrequencyReference_Hz,
+      gpibInputBuffer
       );
   }
   
@@ -1516,6 +1588,19 @@ public final class HP3457A_GPIB_Settings
     return this.fixedImpedance;
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // GPIB INPUT BUFFER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final boolean gpibInputBuffer;
+  
+  public final boolean isGpibInputBuffer ()
+  {
+    return this.gpibInputBuffer;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // OFFSET COMPENSATION
