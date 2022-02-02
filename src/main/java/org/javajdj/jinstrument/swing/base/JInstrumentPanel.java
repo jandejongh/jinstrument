@@ -2395,6 +2395,8 @@ public class JInstrumentPanel
           instrumentSetter,
           JInstrumentPanel.this::isInhibitInstrumentControl,
           showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null));
+      else
+        setEditable (false);
     }
     
     public JString_JTextField (
@@ -2492,6 +2494,8 @@ public class JInstrumentPanel
           JInstrumentPanel.this::isInhibitInstrumentControl,
           showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null,
           true));
+      else
+        setEditable (false);
     }
     
     private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
@@ -2560,6 +2564,8 @@ public class JInstrumentPanel
           JInstrumentPanel.this::isInhibitInstrumentControl,
           showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null,
           true));
+      else
+        setEditable (false);
     }
     
     private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
