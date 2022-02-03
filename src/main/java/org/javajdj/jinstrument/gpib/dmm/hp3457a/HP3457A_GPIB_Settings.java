@@ -107,7 +107,9 @@ public final class HP3457A_GPIB_Settings
     final ReadingMemoryMode readingMemoryMode,
     final double lineFrequency_Hz,
     final double lineFrequencyReference_Hz,
-    final boolean gpibInputBuffering
+    final boolean gpibInputBuffering,
+    final byte serviceRequestMask,
+    final short errorMask
     )
   {
     // DefaultDigitalMultiMeterSettings
@@ -140,6 +142,8 @@ public final class HP3457A_GPIB_Settings
     this.lineFrequency_Hz = lineFrequency_Hz;
     this.lineFrequencyReference_Hz = lineFrequencyReference_Hz;
     this.gpibInputBuffering = gpibInputBuffering;
+    this.serviceRequestMask = serviceRequestMask;
+    this.errorMask = errorMask;
   }
 
   public static HP3457A_GPIB_Settings fromReset ()
@@ -178,7 +182,9 @@ public final class HP3457A_GPIB_Settings
       ReadingMemoryMode.OFF,
       Double.NaN, // lineFrequency_Hz: Unknown
       Double.NaN, // lineFrequencyReference_Hz: Unknown
-      false
+      false,
+      (byte) 0,    // Service Request Mask (actually, PON is unchanged)
+      (short) 2047 // Error Mask: all enabled
     );
   }
   
@@ -225,7 +231,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -265,7 +273,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -305,7 +315,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -345,7 +357,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -385,7 +399,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -425,7 +441,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -465,7 +483,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -505,7 +525,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -545,7 +567,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -585,7 +609,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -625,7 +651,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -665,7 +693,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -705,7 +735,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -745,7 +777,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -785,7 +819,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -826,7 +862,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -866,7 +904,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -906,7 +946,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -946,7 +988,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -986,7 +1030,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -1026,7 +1072,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -1066,7 +1114,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -1106,7 +1156,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -1146,7 +1198,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -1186,7 +1240,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -1226,7 +1282,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -1266,7 +1324,9 @@ public final class HP3457A_GPIB_Settings
       readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -1306,7 +1366,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -1346,7 +1408,9 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       lineFrequencyReference_Hz,
-      this.gpibInputBuffering
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
       );
   }
   
@@ -1386,7 +1450,93 @@ public final class HP3457A_GPIB_Settings
       this.readingMemoryMode,
       this.lineFrequency_Hz,
       this.lineFrequencyReference_Hz,
-      gpibInputBuffering
+      gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask
+      );
+  }
+  
+  public final HP3457A_GPIB_Settings withServiceRequestMask (final byte serviceRequestMask)
+  {
+    return new HP3457A_GPIB_Settings (
+      // DefaultDigitalMultiMeterSettings
+      null,
+      getResolution (),
+      getMeasurementMode (),
+      isAutoRange (),
+      getRange (),
+      // HP3457A_GBIB_Settings
+      this.autoZeroMode,
+      this.id,
+      this.triggerArmEvent,
+      this.triggerEvent,
+      this.sampleEvent,
+      this.installedOption,
+      this.acBandwidth,
+      this.measurementTerminals,
+      this.fixedImpedance,
+      this.offsetCompensation,
+      this.beepEnabled,
+      this.gpibAddress,
+      this.frequencyPeriodInputSource,
+      this.numberOfTriggerArms,
+      this.numberOfReadings,
+      this.delay_s,
+      this.timer_s,
+      this.triggerBuffering,
+      this.calibrationNumber,
+      this.readingFormat,
+      this.locked,
+      this.numberOfPowerLineCycles,
+      this.integerScale,
+      this.readingMemoryMode,
+      this.lineFrequency_Hz,
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffering,
+      serviceRequestMask,
+      this.errorMask
+      );
+  }
+  
+  public final HP3457A_GPIB_Settings withErrorMask (final short errorMask)
+  {
+    return new HP3457A_GPIB_Settings (
+      // DefaultDigitalMultiMeterSettings
+      null,
+      getResolution (),
+      getMeasurementMode (),
+      isAutoRange (),
+      getRange (),
+      // HP3457A_GBIB_Settings
+      this.autoZeroMode,
+      this.id,
+      this.triggerArmEvent,
+      this.triggerEvent,
+      this.sampleEvent,
+      this.installedOption,
+      this.acBandwidth,
+      this.measurementTerminals,
+      this.fixedImpedance,
+      this.offsetCompensation,
+      this.beepEnabled,
+      this.gpibAddress,
+      this.frequencyPeriodInputSource,
+      this.numberOfTriggerArms,
+      this.numberOfReadings,
+      this.delay_s,
+      this.timer_s,
+      this.triggerBuffering,
+      this.calibrationNumber,
+      this.readingFormat,
+      this.locked,
+      this.numberOfPowerLineCycles,
+      this.integerScale,
+      this.readingMemoryMode,
+      this.lineFrequency_Hz,
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      errorMask
       );
   }
   
@@ -1498,6 +1648,32 @@ public final class HP3457A_GPIB_Settings
   public final boolean isBeepEnabled ()
   {
     return this.beepEnabled;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SERVICE REQUEST MASK
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final byte serviceRequestMask;
+  
+  public final byte getServiceRequestMask ()
+  {
+    return this.serviceRequestMask;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // ERROR MASK
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final short errorMask;
+  
+  public final short getErrorMask ()
+  {
+    return this.errorMask;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
