@@ -19,6 +19,7 @@ package org.javajdj.jinstrument.swing.instrument.dmm.hp3457a;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
@@ -69,11 +70,17 @@ public class JHP3457A_GPIB_TriggerAcquisition
 
     removeAll ();
     setLayout (new GridLayout (4, 1));
-
+    final JPanel triggerArmPanel = new JPanel ();
+    add (triggerArmPanel);
     final JPanel triggerPanel = new JPanel ();
     add (triggerPanel);
-    triggerPanel.setLayout (new GridLayout (1, 2));
-    triggerPanel.add (new JInstrumentPanel (
+    final JPanel sampleEventPanel = new JPanel ();
+    add (sampleEventPanel);
+    final JPanel acquisitionPanel = new JPanel ();
+    add (acquisitionPanel);
+
+    triggerArmPanel.setLayout (new GridLayout (1, 2));
+    triggerArmPanel.add (new JInstrumentPanel (
       hp3457a,
       "Trigger Arm Event",
       level + 1,
@@ -84,7 +91,7 @@ public class JHP3457A_GPIB_TriggerAcquisition
         (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getTriggerArmEvent (),
         hp3457a::setTriggerArmEvent,
         true))));
-    triggerPanel.add (new JInstrumentPanel (
+    triggerArmPanel.add (new JInstrumentPanel (
       hp3457a,
       "Number of Arms",
       level + 1,
@@ -100,7 +107,8 @@ public class JHP3457A_GPIB_TriggerAcquisition
         },
         true))));
      
-    add (new JInstrumentPanel (
+    triggerPanel.setLayout (new GridLayout (1, 3));
+    triggerPanel.add (new JInstrumentPanel (
       hp3457a,
       "Trigger Event",
       level + 1,
@@ -111,11 +119,29 @@ public class JHP3457A_GPIB_TriggerAcquisition
         (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getTriggerEvent (),
         hp3457a::setTriggerEvent,
         true))));
+    triggerPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Trigger Buffering",
+      level + 1,
+      getGuiPreferencesTriggerColor (),
+      new JBoolean_JBoolean (
+      "Trigger Buffering",
+      (settings) -> ((HP3457A_GPIB_Settings) settings).isTriggerBuffering (),
+      hp3457a::setTriggerBuffering,
+      Color.green,
+      true)));
+    triggerPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Manual Trigger",
+      level + 1,
+      getGuiPreferencesTriggerColor (),
+      new JVoid_JColorCheckBox (
+        "Manual Trigger",
+        hp3457a::trigger,
+        Color.blue)));
         
-    final JPanel samplePanel = new JPanel ();
-    add (samplePanel);
-    samplePanel.setLayout (new GridLayout (1, 3));
-    samplePanel.add (new JInstrumentPanel (
+    sampleEventPanel.setLayout (new GridLayout (1, 3));
+    sampleEventPanel.add (new JInstrumentPanel (
       hp3457a,
       "Sample Event",
       level + 1,
@@ -126,7 +152,7 @@ public class JHP3457A_GPIB_TriggerAcquisition
         (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getSampleEvent (),
         hp3457a::setSampleEvent,
         true))));
-    samplePanel.add (new JInstrumentPanel (
+    sampleEventPanel.add (new JInstrumentPanel (
       hp3457a,
       "Number of Readings",
       level + 1,
@@ -139,7 +165,7 @@ public class JHP3457A_GPIB_TriggerAcquisition
         hp3457a::setNumberOfReadings,
         true))));
     final JPanel delayTimerPanel = new JPanel ();
-    samplePanel.add (delayTimerPanel);
+    sampleEventPanel.add (delayTimerPanel);
     delayTimerPanel.setLayout (new GridLayout (2, 1));
     delayTimerPanel.add (new JInstrumentPanel (
       hp3457a,
@@ -166,30 +192,32 @@ public class JHP3457A_GPIB_TriggerAcquisition
         hp3457a::setTimer,
         true))));
     
-    final JPanel triggerMiscPanel = new JPanel ();
-    add (triggerMiscPanel);
-    triggerMiscPanel.setLayout (new GridLayout (1, 2));
-    triggerMiscPanel.add (new JInstrumentPanel (
+    acquisitionPanel.setLayout (new GridLayout (1, 3));
+    acquisitionPanel.add (new JInstrumentPanel (
       hp3457a,
-      "Manual Trigger",
+      "#PLCs",
       level + 1,
-      getGuiPreferencesTriggerColor (),
-      new JVoid_JColorCheckBox (
-        "Manual Trigger",
-        hp3457a::trigger,
-        Color.blue)));
-    triggerMiscPanel.add (new JInstrumentPanel (
+      getGuiPreferencesTimeColor (),
+      JCenter.XY (new Jdouble_JTextField (
+        Double.NaN,
+        8,
+        "#PLCs",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getNumberOfPowerLineCycles (),
+        hp3457a::setNumberOfPowerLineCycles,
+        true))));
+    acquisitionPanel.add (new JInstrumentPanel (
       hp3457a,
-      "Trigger Buffering",
+      "Acquisition Time [s]",
       level + 1,
-      getGuiPreferencesTriggerColor (),
-      new JBoolean_JBoolean (
-      "Trigger Buffering",
-      (settings) -> ((HP3457A_GPIB_Settings) settings).isTriggerBuffering (),
-      hp3457a::setTriggerBuffering,
-      Color.green,
-      true)));
-    
+      getGuiPreferencesTimeColor (),
+      JCenter.XY (new JLabel ("TBD"))));
+    acquisitionPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Resolution [%]",
+      level + 1,
+      getGuiPreferencesTimeColor (),
+      JCenter.XY (new JLabel ("TBD"))));
+        
   }
 
   public JHP3457A_GPIB_TriggerAcquisition (final HP3457A_GPIB_Instrument digitalMultiMeter, final int level)
