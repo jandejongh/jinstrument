@@ -19,6 +19,7 @@ package org.javajdj.jinstrument.swing.instrument.dmm.hp3457a;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
@@ -169,18 +170,8 @@ public class JHP3457A_GPIB_Management
       hp3457a::internalTest,
       Color.blue))));
     
-    bottomPanel.add (new JInstrumentPanel (
-      hp3457a,
-      "Lock",
-      level + 1,
-      getGuiPreferencesManagementColor (),
-      new JBoolean_JBoolean (
-      "Lock",
-      (settings) -> ((HP3457A_GPIB_Settings) settings).isLocked (),
-      hp3457a::setLocked,
-      Color.green,
-      true)));
-        
+    bottomPanel.add (new JLabel ());
+    
   }
 
   public JHP3457A_GPIB_Management (final HP3457A_GPIB_Instrument digitalMultiMeter, final int level)
