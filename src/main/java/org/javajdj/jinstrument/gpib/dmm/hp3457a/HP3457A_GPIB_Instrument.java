@@ -1226,7 +1226,7 @@ public class HP3457A_GPIB_Instrument
       HP3457A_InstrumentCommand.ICARG_HP3457A_DISPLAY_MESSAGE, message));    
   }
   
-  public final void setErrorMask (final short mask)
+  public final void setErrorMask (final Short mask)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
@@ -3115,12 +3115,15 @@ public class HP3457A_GPIB_Instrument
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_ERROR_MASK:
         {
           // EMASK
-          final short mask =
-            (short) instrumentCommand.get (
+          final Short errorMask =
+            (Short) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_ERROR_MASK);
-          writeSync ("EMASK " + Short.toString (mask) + ";");
-          // XXX?
-          // newInstrumentSettings = getSettingsFromInstrumentSync ();
+          writeSync ("EMASK " +
+            (errorMask != null ? ("," + Integer.toString (errorMask & 0xff)) : "") +
+            ";");
+          final short newErrorMask = (errorMask != null ? errorMask : (short) 2047);
+          if (instrumentSettings != null && instrumentSettings.getErrorMask () != newErrorMask)
+            newInstrumentSettings = instrumentSettings.withErrorMask (newErrorMask);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_EOI:
@@ -3779,14 +3782,15 @@ public class HP3457A_GPIB_Instrument
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_SERVICE_REQUEST_MASK:
         {
           // RQS
-          final Byte mask =
+          final Byte serviceRequestMask =
             (Byte) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_SERVICE_REQUEST_MASK);
           writeSync ("RQS" +
-            (mask != null ? ("," + Integer.toString (mask & 0xff)) : "") +
+            (serviceRequestMask != null ? ("," + Integer.toString (serviceRequestMask & 0xff)) : "") +
             ";");
-          // XXX?
-          // newInstrumentSettings = getSettingsFromInstrumentSync ();
+          final byte newServiceRequestMask = (serviceRequestMask != null ? serviceRequestMask : (byte) 0);
+          if (instrumentSettings != null && instrumentSettings.getServiceRequestMask () != newServiceRequestMask)
+            newInstrumentSettings = instrumentSettings.withServiceRequestMask (newServiceRequestMask);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_RECALL_STATE:
