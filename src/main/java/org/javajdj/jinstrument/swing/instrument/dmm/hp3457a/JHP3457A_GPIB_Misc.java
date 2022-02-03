@@ -20,7 +20,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
-import javax.swing.JLabel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentSettings;
@@ -31,9 +30,7 @@ import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalMultiMeterPanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesManagementColor;
-import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesTimeColor;
 import org.javajdj.jinstrument.swing.debug.JInstrumentCommandQueueMonitor;
-import org.javajdj.jswing.jcenter.JCenter;
 import org.javajdj.jswing.jcolorcheckbox.JDialogCheckBox;
 
 /** A Swing panel for Miscellaneous Settings of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
@@ -73,7 +70,7 @@ public class JHP3457A_GPIB_Misc
     final HP3457A_GPIB_Instrument hp3457a = (HP3457A_GPIB_Instrument) digitalMultiMeter;
 
     removeAll ();
-    setLayout (new GridLayout (5, 2));
+    setLayout (new GridLayout (4, 2));
     
     add (new JInstrumentPanel (
       hp3457a,
@@ -107,19 +104,6 @@ public class JHP3457A_GPIB_Misc
     
     add (new JInstrumentPanel (
       hp3457a,
-      "#PLCs",
-      level + 1,
-      getGuiPreferencesTimeColor (),
-      JCenter.XY (new Jdouble_JTextField (
-        Double.NaN,
-        8,
-        "#PLCs",
-        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getNumberOfPowerLineCycles (),
-        hp3457a::setNumberOfPowerLineCycles,
-        true))));
-      
-    add (new JInstrumentPanel (
-      hp3457a,
       "Subprograms",
       level + 1,
       getGuiPreferencesManagementColor (),
@@ -135,6 +119,13 @@ public class JHP3457A_GPIB_Misc
       
     add (new JInstrumentPanel (
       hp3457a,
+      "Command Queue Length",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JInstrumentCommandQueueMonitor (hp3457a, level + 1)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
       "Reading Memory Mode",
       level + 1,
       getGuiPreferencesManagementColor (),
@@ -144,9 +135,7 @@ public class JHP3457A_GPIB_Misc
         (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getReadingMemoryMode (),
         hp3457a::setReadingMemoryMode,
         true)));
-    
-    add (new JLabel ());
-    
+        
     add (new JInstrumentPanel (
       hp3457a,
       "Reading Format",
@@ -158,13 +147,6 @@ public class JHP3457A_GPIB_Misc
         (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getReadingFormat (),
         hp3457a::setReadingFormat,
         true)));
-    
-    add (new JInstrumentPanel (
-      hp3457a,
-      "Command Queue Length",
-      level + 1,
-      getGuiPreferencesManagementColor (),
-      new JInstrumentCommandQueueMonitor (hp3457a, level + 1)));
     
     add (new JInstrumentPanel (
       hp3457a,
