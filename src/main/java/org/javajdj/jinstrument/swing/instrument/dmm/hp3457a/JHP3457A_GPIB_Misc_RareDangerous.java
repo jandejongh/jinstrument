@@ -83,16 +83,22 @@ public class JHP3457A_GPIB_Misc_RareDangerous
 
     removeAll ();
     
-    setLayout (new GridLayout (3, 1));
-    final JPanel topPanel = new JPanel ();
-    add (topPanel);
-    final JPanel centerPanel = new JPanel ();
-    add (centerPanel);
-    final JPanel bottomPanel = new JPanel ();
-    add (bottomPanel);
+    setLayout (new GridLayout (6, 1));
+    final JPanel servicePanel = new JPanel ();
+    add (servicePanel);
+    final JPanel maskPanel = new JPanel ();
+    add (maskPanel);
+    final JPanel linePanel = new JPanel ();
+    add (linePanel);
+    final JPanel gpibPanel = new JPanel ();
+    add (gpibPanel);
+    final JPanel instrumentPanel = new JPanel ();
+    add (instrumentPanel);
+    final JPanel toDoPanel = new JPanel ();
+    add (toDoPanel);
     
-    topPanel.setLayout (new GridLayout (1, 4));
-    topPanel.add (new JInstrumentPanel (
+    servicePanel.setLayout (new GridLayout (1, 4));
+    servicePanel.add (new JInstrumentPanel (
       hp3457a,
       "Save Calibration Data",
       level + 1,
@@ -101,7 +107,7 @@ public class JHP3457A_GPIB_Misc_RareDangerous
       "Save Calibration Data",
       this::saveCalibrationData,
       Color.blue))));
-    topPanel.add (new JInstrumentPanel (
+    servicePanel.add (new JInstrumentPanel (
       hp3457a,
       "Restore Calibration Data",
       level + 1,
@@ -110,7 +116,21 @@ public class JHP3457A_GPIB_Misc_RareDangerous
       "Restore Calibration Data",
       this::restoreCalibrationData,
       Color.blue))));
-    topPanel.add (new JInstrumentPanel (
+    servicePanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Peek/Poke RAM",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JDialogCheckBox (
+        getBackground ().darker (),
+        "Peek/Poke RAM",
+        new Dimension (800, 600),
+        new JHP3457A_GPIB_PeekPokeRAM (
+          hp3457a,
+          "",
+          level + 1,
+          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+    servicePanel.add (new JInstrumentPanel (
       hp3457a,
       "Service",
       level + 1,
@@ -124,7 +144,107 @@ public class JHP3457A_GPIB_Misc_RareDangerous
           "",
           level + 1,
           JInstrumentPanel.getGuiPreferencesManagementColor ()))));
-    topPanel.add (new JInstrumentPanel (
+    
+    maskPanel.setLayout (new GridLayout (1, 2));
+    maskPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Service Request Mask",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new Jbyte_JBitsLong (
+        Color.green,
+        8,
+        Arrays.asList (new String[]{" X ", "RQS", "ERR", "RDY", "PON", " FP", "H/L", "SPC"}),
+        true,
+        "Service Request Mask",
+        (settings) -> ((HP3457A_GPIB_Settings) settings).getServiceRequestMask (),
+        hp3457a::setServiceRequestMask,
+        true)));
+    maskPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Error Mask",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new Jshort_JBitsLong (
+        Color.green,
+        11,
+        Arrays.asList (new String[]{"AUC", "OOC", "PIG", "PMI", "PRA", "PRU", "COU", "STX", "TTF", "CAL", "HWE"}),
+        true,
+        "Error Mask",
+        (settings) -> ((HP3457A_GPIB_Settings) settings).getErrorMask (),
+        hp3457a::setErrorMask,
+        true)));
+    
+    linePanel.setLayout (new GridLayout (1, 2));
+    linePanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Measured Line Frequency [Hz]",
+      level + 1,
+      getGuiPreferencesFrequencyColor (),
+      new Jdouble_JTextField (
+        Double.NaN,
+        8,
+        "Measured Line Frequency [Hz]",
+        (settings) -> ((HP3457A_GPIB_Settings) settings).getLineFrequency_Hz (),
+        null,
+        true)));
+    linePanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Line Frequency Reference [Hz]",
+      level + 1,
+      getGuiPreferencesFrequencyColor (),
+      new Jdouble_JTextField (
+        Double.NaN,
+        8,
+        "Line Frequency Reference [Hz]",
+        (settings) -> ((HP3457A_GPIB_Settings) settings).getLineFrequencyReference_Hz (),
+        hp3457a::setLineFrequencyReference_Hz,
+        true)));
+    
+    gpibPanel.setLayout (new GridLayout (1, 4));
+    gpibPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Clear Status Byte",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JVoid_JColorCheckBox (
+        "Clear Status Byte",
+        hp3457a::clearStatusByte,
+        Color.blue)));
+    gpibPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Fire Service Request",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JVoid_JColorCheckBox (
+        "Fire Service Request",
+        hp3457a::fireServiceRequest,
+        Color.blue)));
+    gpibPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "GPIB Input Buffering",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      JCenter.XY (new JBoolean_JBoolean (
+        "GPIB Input Buffering",
+        (settings) -> ((HP3457A_GPIB_Settings) settings).isGpibInputBuffering (),
+        hp3457a::setGpibInputBuffering,
+        Color.green,
+        true))));
+    gpibPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "GPIB EOI",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      JCenter.XY (new JBoolean_JBoolean (
+        "GPIB EOI",
+        (settings) -> ((HP3457A_GPIB_Settings) settings).isEoi (),
+        hp3457a::setEoi,
+        Color.green,
+        true))));
+    
+    instrumentPanel.setLayout (new GridLayout (1, 3));
+    instrumentPanel.add (new JInstrumentPanel (
       hp3457a,
       "Display",
       level + 1,
@@ -137,72 +257,33 @@ public class JHP3457A_GPIB_Misc_RareDangerous
           hp3457a,
           "",
           level + 1,
-          JInstrumentPanel.getGuiPreferencesManagementColor ()))));    
-    
-    centerPanel.setLayout (new GridLayout (1, 5));
-    centerPanel.add (new JInstrumentPanel (
+          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+    instrumentPanel.add (new JInstrumentPanel (
       hp3457a,
-      "Measured Line Frequency [Hz]",
+      "Lock",
       level + 1,
-      getGuiPreferencesFrequencyColor (),
-      new Jdouble_JTextField (
-        Double.NaN,
-        8,
-        "Measured Line Frequency [Hz]",
-        (settings) -> ((HP3457A_GPIB_Settings) settings).getLineFrequency_Hz (),
+      getGuiPreferencesManagementColor (),
+      new JBoolean_JBoolean (
+      "Lock",
+      (settings) -> ((HP3457A_GPIB_Settings) settings).isLocked (),
+      hp3457a::setLocked,
+      Color.green,
+      true)));
+    instrumentPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Audio",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JHP3457A_GPIB_Audio (
+        digitalMultiMeter,
         null,
-        true)));
-    centerPanel.add (new JInstrumentPanel (
-      hp3457a,
-      "Line Frequency Reference [Hz]",
-      level + 1,
-      getGuiPreferencesFrequencyColor (),
-      new Jdouble_JTextField (
-        Double.NaN,
-        8,
-        "Line Frequency Reference [Hz]",
-        (settings) -> ((HP3457A_GPIB_Settings) settings).getLineFrequencyReference_Hz (),
-        hp3457a::setLineFrequencyReference_Hz,
-        true)));
-    centerPanel.add (new JInstrumentPanel (
-      hp3457a,
-      "Clear Status Byte",
-      level + 1,
-      getGuiPreferencesManagementColor (),
-      new JVoid_JColorCheckBox (
-        "Clear Status Byte",
-        hp3457a::clearStatusByte,
-        Color.blue)));
-    centerPanel.add (new JInstrumentPanel (
-      hp3457a,
-      "Fire Service Request",
-      level + 1,
-      getGuiPreferencesManagementColor (),
-      new JVoid_JColorCheckBox (
-        "Fire Service Request",
-        hp3457a::fireServiceRequest,
-        Color.blue)));
-      centerPanel.add (new JInstrumentPanel (
-        hp3457a,
-        "GPIB Input Buffering",
         level + 1,
-        getGuiPreferencesManagementColor (),
-        JCenter.XY (new JBoolean_JBoolean (
-          "GPIB Input Buffering",
-          (settings) -> ((HP3457A_GPIB_Settings) settings).isGpibInputBuffering (),
-          hp3457a::setGpibInputBuffering,
-          Color.green,
-          true))));
+        null)));
+        
+    toDoPanel.setLayout (new GridLayout (1, 2));    
+    toDoPanel.add (JCenter.XY (new JLabel ("Resolution [acquisition]")));
+    toDoPanel.add (JCenter.XY (new JLabel ("F10-F58 [acquisition]")));
     
-    bottomPanel.setLayout (new GridLayout (3, 2));
-
-    bottomPanel.add (JCenter.XY (new JLabel ("Readings with different TARM/TRIG/NRDGS [acquisition]")));
-    bottomPanel.add (JCenter.XY (new JLabel ("Resolution [acquisition]")));
-    bottomPanel.add (JCenter.XY (new JLabel ("F10-F58 [acquisition]")));
-    
-    bottomPanel.add (JCenter.XY (new JLabel ("EMASK [management]")));
-    bottomPanel.add (JCenter.XY (new JLabel ("RQS [management]")));
-
   }
 
   public JHP3457A_GPIB_Misc_RareDangerous (final HP3457A_GPIB_Instrument digitalMultiMeter, final int level)
