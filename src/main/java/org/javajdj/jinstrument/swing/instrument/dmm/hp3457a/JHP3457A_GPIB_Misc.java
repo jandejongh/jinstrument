@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentSettings;
@@ -144,17 +145,8 @@ public class JHP3457A_GPIB_Misc
         hp3457a::setReadingMemoryMode,
         true)));
     
-    add (new JInstrumentPanel (
-      hp3457a,
-      "Audio",
-      level + 1,
-      getGuiPreferencesManagementColor (),
-      new JHP3457A_GPIB_Audio (
-        digitalMultiMeter,
-        null,
-        level + 1,
-        null)));
-        
+    add (new JLabel ());
+    
     add (new JInstrumentPanel (
       hp3457a,
       "Reading Format",
