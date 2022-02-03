@@ -3119,7 +3119,7 @@ public class HP3457A_GPIB_Instrument
             (Short) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_ERROR_MASK);
           writeSync ("EMASK " +
-            (errorMask != null ? ("," + Integer.toString (errorMask & 0xffff /* FIX */)) : "") +
+            (errorMask != null ? ("," + Integer.toString (errorMask & 0xffff)) : "") +
             ";");
           final short newErrorMask = (errorMask != null ? errorMask : (short) 2047);
           if (instrumentSettings != null && instrumentSettings.getErrorMask () != newErrorMask)
