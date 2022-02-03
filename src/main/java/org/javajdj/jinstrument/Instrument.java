@@ -197,10 +197,83 @@ public interface Instrument
   }
   
   @FunctionalInterface
+  interface InstrumentSetter_1Byte
+    extends InstrumentSetter_1Number<Byte>
+  {
+    
+    @Override
+    void set (Byte arg) throws IOException, InterruptedException;
+    
+    default long byteToArg   (final byte   b) { return (byte) b; }
+    default long shortToArg  (final short  s) { return (byte) s; }
+    default long intToArg    (final int    i) { return (byte) i; }
+    default long longToArg   (final long   l) { return (byte) l; }
+    default long floatToArg  (final float  f) { return (byte) Math.round (f); }
+    default long doubleToArg (final double d) { return (byte) Math.round (d); }
+    
+  }
+  
+  @FunctionalInterface
+  interface InstrumentSetter_1byte
+    extends InstrumentSetter_1Number<Byte>
+  {
+    
+    void set (byte arg) throws IOException, InterruptedException;
+    
+    @Override
+    default void set (final Byte arg)  throws IOException, InterruptedException { set ((byte) arg); }
+    
+    default long byteToArg   (final byte   b) { return (byte) b; }
+    default long shortToArg  (final short  s) { return (byte) s; }
+    default long intToArg    (final int    i) { return (byte) i; }
+    default long longToArg   (final long   l) { return (byte) l; }
+    default long floatToArg  (final float  f) { return (byte) Math.round (f); }
+    default long doubleToArg (final double d) { return (byte) Math.round (d); }
+        
+  }
+  
+  @FunctionalInterface
+  interface InstrumentSetter_1Short
+    extends InstrumentSetter_1Number<Short>
+  {
+    
+    @Override
+    void set (Short arg) throws IOException, InterruptedException;
+    
+    default long byteToArg   (final byte   b) { return (short) b; }
+    default long shortToArg  (final short  s) { return (short) s; }
+    default long intToArg    (final int    i) { return (short) i; }
+    default long longToArg   (final long   l) { return (short) l; }
+    default long floatToArg  (final float  f) { return (short) Math.round (f); }
+    default long doubleToArg (final double d) { return (short) Math.round (d); }
+    
+  }
+  
+  @FunctionalInterface
+  interface InstrumentSetter_1short
+    extends InstrumentSetter_1Number<Short>
+  {
+    
+    void set (short arg) throws IOException, InterruptedException;
+    
+    @Override
+    default void set (final Short arg)  throws IOException, InterruptedException { set ((short) arg); }
+    
+    default long byteToArg   (final byte   b) { return (short) b; }
+    default long shortToArg  (final short  s) { return (short) s; }
+    default long intToArg    (final int    i) { return (short) i; }
+    default long longToArg   (final long   l) { return (short) l; }
+    default long floatToArg  (final float  f) { return (short) Math.round (f); }
+    default long doubleToArg (final double d) { return (short) Math.round (d); }
+    
+  }
+  
+  @FunctionalInterface
   interface InstrumentSetter_1Double
     extends InstrumentSetter_1Number<Double>
   {
     
+    @Override
     void set (Double arg) throws IOException, InterruptedException;
     
     default double byteToArg   (final byte   b) { return (double) b; }
