@@ -1699,7 +1699,7 @@ public class JInstrumentPanel
       }
       catch (IOException | InterruptedException e)
       {
-        LOG.log (Level.INFO, "Caught exception while setting " + this.settingString + " from JBitsLong to {0}: {1}.",
+        LOG.log (Level.WARNING, "Caught exception while setting " + this.settingString + " from JBitsLong to {0}: {1}.",
           new Object[]{newValue, Arrays.toString (e.getStackTrace ())});
       }
     }
@@ -2285,6 +2285,524 @@ public class JInstrumentPanel
       setPaintLabels (true);
       return this;
     }
+    
+  }
+  
+  public class Jbyte_JBitsLong
+    extends JBitsLong
+  {
+
+    private final Function<InstrumentSettings, Byte> instrumentGetter;
+    
+    private final boolean showPendingUpdates;
+    
+    public Jbyte_JBitsLong (
+      final Color trueColor,
+      final int length,
+      final List<String> labelStrings,
+      final boolean autoUpdate,
+      final String settingString,
+      final Function<InstrumentSettings, Byte> instrumentGetter,
+      final Instrument.InstrumentSetter_1byte instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super (
+        trueColor,
+        length,
+        labelStrings,
+        null,
+        autoUpdate);
+      if (length > 8)
+        throw new IllegalArgumentException ();
+      this.instrumentGetter = instrumentGetter;
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      if (instrumentSetter != null)
+          setListener (new JInstrumentJBitsLongListener (
+            this,
+            settingString,
+            (final Long l) -> { instrumentSetter.set (l == null ? null : l.byteValue ()); },
+            JInstrumentPanel.this::isInhibitInstrumentControl,
+            showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null));
+      else
+        setEnabled (false);
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (Jbyte_JBitsLong.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final byte newValue = Jbyte_JBitsLong.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            Jbyte_JBitsLong.this.setDisplayedValue (newValue);
+            if (Jbyte_JBitsLong.this.showPendingUpdates)
+              Jbyte_JBitsLong.this.setBackground (JInstrumentPanel.this.getBackground ());
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public class JByte_JBitsLong
+    extends JBitsLong
+  {
+
+    private final Function<InstrumentSettings, Byte> instrumentGetter;
+    
+    private final boolean showPendingUpdates;
+    
+    public JByte_JBitsLong (
+      final Color trueColor,
+      final int length,
+      final List<String> labelStrings,
+      final boolean autoUpdate,
+      final String settingString,
+      final Function<InstrumentSettings, Byte> instrumentGetter,
+      final Instrument.InstrumentSetter_1Byte instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super (
+        trueColor,
+        length,
+        labelStrings,
+        null,
+        autoUpdate);
+      if (length > 8)
+        throw new IllegalArgumentException ();
+      this.instrumentGetter = instrumentGetter;
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      if (instrumentSetter != null)
+          setListener (new JInstrumentJBitsLongListener (
+            this,
+            settingString,
+            (final Long l) -> { instrumentSetter.set (l == null ? null : l.byteValue ()); },
+            JInstrumentPanel.this::isInhibitInstrumentControl,
+            showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null));
+      else
+        setEnabled (false);
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (JByte_JBitsLong.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final Byte newValue = JByte_JBitsLong.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            JByte_JBitsLong.this.setDisplayedValue (newValue);
+            if (JByte_JBitsLong.this.showPendingUpdates)
+              JByte_JBitsLong.this.setBackground (JInstrumentPanel.this.getBackground ());
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public class Jshort_JBitsLong
+    extends JBitsLong
+  {
+
+    private final Function<InstrumentSettings, Short> instrumentGetter;
+    
+    private final boolean showPendingUpdates;
+    
+    public Jshort_JBitsLong (
+      final Color trueColor,
+      final int length,
+      final List<String> labelStrings,
+      final boolean autoUpdate,
+      final String settingString,
+      final Function<InstrumentSettings, Short> instrumentGetter,
+      final Instrument.InstrumentSetter_1short instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super (trueColor,
+        length,
+        labelStrings,
+        null,
+        autoUpdate);
+      if (length > 16)
+        throw new IllegalArgumentException ();
+      this.instrumentGetter = instrumentGetter;
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      if (instrumentSetter != null)
+          setListener (new JInstrumentJBitsLongListener (
+            this,
+            settingString,
+            (final Long l) -> { instrumentSetter.set (l == null ? null : l.shortValue ()); },
+            JInstrumentPanel.this::isInhibitInstrumentControl,
+            showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null));
+      else
+        setEnabled (false);
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (Jshort_JBitsLong.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final short newValue = Jshort_JBitsLong.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            Jshort_JBitsLong.this.setDisplayedValue (newValue);
+            if (Jshort_JBitsLong.this.showPendingUpdates)
+            {
+              Jshort_JBitsLong.this.setBackground (JInstrumentPanel.this.getBackground ());
+              LOG.log (Level.WARNING, "Setting background!");
+            }
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public class JShort_JBitsLong
+    extends JBitsLong
+  {
+
+    private final Function<InstrumentSettings, Short> instrumentGetter;
+    
+    private final boolean showPendingUpdates;
+    
+    public JShort_JBitsLong (
+      final Color trueColor,
+      final int length,
+      final List<String> labelStrings,
+      final boolean autoUpdate,
+      final String settingString,
+      final Function<InstrumentSettings, Short> instrumentGetter,
+      final Instrument.InstrumentSetter_1Short instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super (
+        trueColor,
+        length,
+        labelStrings,
+        null,
+        autoUpdate);
+      if (length > 16)
+        throw new IllegalArgumentException ();
+      this.instrumentGetter = instrumentGetter;
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      if (instrumentSetter != null)
+          setListener (new JInstrumentJBitsLongListener (
+            this,
+            settingString,
+            (final Long l) -> { instrumentSetter.set (l == null ? null : l.shortValue ()); },
+            JInstrumentPanel.this::isInhibitInstrumentControl,
+            showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null));
+      else
+        setEnabled (false);
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (JShort_JBitsLong.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final Short newValue = JShort_JBitsLong.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            JShort_JBitsLong.this.setDisplayedValue (newValue);
+            if (JShort_JBitsLong.this.showPendingUpdates)
+              JShort_JBitsLong.this.setBackground (JInstrumentPanel.this.getBackground ());
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public class Jint_JBitsLong
+    extends JBitsLong
+  {
+
+    private final Function<InstrumentSettings, Integer> instrumentGetter;
+    
+    private final boolean showPendingUpdates;
+    
+    public Jint_JBitsLong (
+      final Color trueColor,
+      final int length,
+      final List<String> labelStrings,
+      final boolean autoUpdate,
+      final String settingString,
+      final Function<InstrumentSettings, Integer> instrumentGetter,
+      final Instrument.InstrumentSetter_1int instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super (
+        trueColor,
+        length,
+        labelStrings,
+        null,
+        autoUpdate);
+      if (length > 32)
+        throw new IllegalArgumentException ();
+      this.instrumentGetter = instrumentGetter;
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      if (instrumentSetter != null)
+          setListener (new JInstrumentJBitsLongListener (
+            this,
+            settingString,
+            (final Long l) -> { instrumentSetter.set (l == null ? null : l.intValue ()); },
+            JInstrumentPanel.this::isInhibitInstrumentControl,
+            showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null));
+      else
+        setEnabled (false);
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (Jint_JBitsLong.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final int newValue = Jint_JBitsLong.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            Jint_JBitsLong.this.setDisplayedValue (newValue);
+            if (Jint_JBitsLong.this.showPendingUpdates)
+              Jint_JBitsLong.this.setBackground (JInstrumentPanel.this.getBackground ());
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public class JInteger_JBitsLong
+    extends JBitsLong
+  {
+
+    private final Function<InstrumentSettings, Integer> instrumentGetter;
+    
+    private final boolean showPendingUpdates;
+    
+    public JInteger_JBitsLong (
+      final Color trueColor,
+      final int length,
+      final List<String> labelStrings,
+      final boolean autoUpdate,
+      final String settingString,
+      final Function<InstrumentSettings, Integer> instrumentGetter,
+      final Instrument.InstrumentSetter_1Integer instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super (
+        trueColor,
+        length,
+        labelStrings,
+        null,
+        autoUpdate);
+      if (length > 32)
+        throw new IllegalArgumentException ();
+      this.instrumentGetter = instrumentGetter;
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      if (instrumentSetter != null)
+          setListener (new JInstrumentJBitsLongListener (
+            this,
+            settingString,
+            (final Long l) -> { instrumentSetter.set (l == null ? null : l.intValue ()); },
+            JInstrumentPanel.this::isInhibitInstrumentControl,
+            showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null));
+      else
+        setEnabled (false);
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (JInteger_JBitsLong.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final Integer newValue = JInteger_JBitsLong.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            JInteger_JBitsLong.this.setDisplayedValue (newValue);
+            if (JInteger_JBitsLong.this.showPendingUpdates)
+              JInteger_JBitsLong.this.setBackground (JInstrumentPanel.this.getBackground ());
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public class Jlong_JBitsLong
+    extends JBitsLong
+  {
+
+    private final Function<InstrumentSettings, Long> instrumentGetter;
+    
+    private final boolean showPendingUpdates;
+    
+    public Jlong_JBitsLong (
+      final Color trueColor,
+      final int length,
+      final List<String> labelStrings,
+      final boolean autoUpdate,
+      final String settingString,
+      final Function<InstrumentSettings, Long> instrumentGetter,
+      final Instrument.InstrumentSetter_1long instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super (
+        trueColor,
+        length,
+        labelStrings,
+        null,
+        autoUpdate);
+      this.instrumentGetter = instrumentGetter;
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      if (instrumentSetter != null)
+          setListener (new JInstrumentJBitsLongListener (
+            this,
+            settingString,
+            (final Long l) -> { instrumentSetter.set ((long) l); },
+            JInstrumentPanel.this::isInhibitInstrumentControl,
+            showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null));
+      else
+        setEnabled (false);
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (Jlong_JBitsLong.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final long newValue = Jlong_JBitsLong.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            Jlong_JBitsLong.this.setDisplayedValue (newValue);
+            if (Jlong_JBitsLong.this.showPendingUpdates)
+              Jlong_JBitsLong.this.setBackground (JInstrumentPanel.this.getBackground ());
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
     
   }
   
