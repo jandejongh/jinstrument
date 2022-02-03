@@ -488,9 +488,9 @@ public class HP3457A_GPIB_Instrument
       // Report new settings.
       settingsReadFromInstrument (
         HP3457A_GPIB_Settings.fromReset ()
-        //.withEoi (true);
+//        .withEoi (true);
           .withReadingMemoryMode (HP3457A_GPIB_Settings.ReadingMemoryMode.OFF)
-        //.withServiceRequestMask (XXX)
+          .withServiceRequestMask ((byte) 0x7f)
           .withId (id)
           .withInstalledOption (installedOption)
           .withGpibAddress (gpipAddress));
@@ -3119,7 +3119,7 @@ public class HP3457A_GPIB_Instrument
             (Short) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_ERROR_MASK);
           writeSync ("EMASK " +
-            (errorMask != null ? ("," + Integer.toString (errorMask & 0xff)) : "") +
+            (errorMask != null ? ("," + Integer.toString (errorMask & 0xffff)) : "") +
             ";");
           final short newErrorMask = (errorMask != null ? errorMask : (short) 2047);
           if (instrumentSettings != null && instrumentSettings.getErrorMask () != newErrorMask)
