@@ -473,7 +473,6 @@ public class HP3457A_GPIB_Instrument
       final String id = new String (writeAndReadEOISync (
         "RESET"         // "RESET for reset () or "PRESET" for preset ()
         + ";END 2"      // setEoi ()
-//      + ";MEM 1"      // setReadingMemoryMode (HP3457A_GPIB_Settings.ReadingMemoryMode.LIFO)
         + ";MEM 0"      // setReadingMemoryMode (HP3457A_GPIB_Settings.ReadingMemoryMode.OFF)
         + ";RQS 127"    // setServiceRequestMask (0x7f) // ALL
         + ";ID?;")      // getIdSync ()
@@ -488,14 +487,15 @@ public class HP3457A_GPIB_Instrument
       // Report new settings.
       settingsReadFromInstrument (
         HP3457A_GPIB_Settings.fromReset ()
-//        .withEoi (true);
+          .withEoi (true)
           .withReadingMemoryMode (HP3457A_GPIB_Settings.ReadingMemoryMode.OFF)
           .withServiceRequestMask ((byte) 0x7f)
           .withId (id)
           .withInstalledOption (installedOption)
           .withGpibAddress (gpipAddress));
       
-      // We do not query our status; this will follow soon enough through an SRQ.
+      // We do not query our status now since we only want to do what's necessary;
+      // the status will follow soon enough through an SRQ.
       // final HP3457A_GPIB_Status status = getStatusFromInstrumentSync ();
       // statusReadFromInstrument (status);
       
@@ -743,7 +743,7 @@ public class HP3457A_GPIB_Instrument
           // We cannot use getErrorSync since we have locked out the command processor.
           errorsShort = (short) processCommand_getInt ("ERR"); // ERR?
         }
-        catch (Exception e)
+        catch (InterruptedException | IOException |TimeoutException e)
         {
           status = HP3457A_GPIB_Status.fromSerialPollStatusByte (statusByte);
           fireInstrumentStatusChanged (status);
@@ -764,7 +764,7 @@ public class HP3457A_GPIB_Instrument
             // We cannot use getAuxiliaryErrorSync since we have locked out the command processor.
             auxiliaryErrorsShort = (short) processCommand_getInt ("AUXERR"); // AUXERR?
           }
-          catch (Exception e)
+          catch (InterruptedException | IOException |TimeoutException e)
           {
             status = HP3457A_GPIB_Status.fromSerialPollStatusByteAndErrorsShort (
               statusByte,
@@ -1234,12 +1234,12 @@ public class HP3457A_GPIB_Instrument
       HP3457A_InstrumentCommand.ICARG_HP3457A_SET_ERROR_MASK, mask));    
   }
   
-  public final void setEoi (final boolean useEoi)
+  public final void setEoi (final boolean eoi)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
       HP3457A_InstrumentCommand.IC_HP3457A_SET_EOI,
-      HP3457A_InstrumentCommand.ICARG_HP3457A_SET_EOI, useEoi));    
+      HP3457A_InstrumentCommand.ICARG_HP3457A_SET_EOI, eoi));    
   }
   
   public final void setEoi ()
@@ -3129,13 +3129,13 @@ public class HP3457A_GPIB_Instrument
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_EOI:
         {
           // END
-          final boolean useEoi =
+          final boolean eoi =
             (boolean) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_EOI);
-          // XXX Is the "2" correct below (would expect "1")? Conform HP-3457A Operating Manual...
-          writeSync ("END " + (useEoi ? "2" : "0") + ";");
-          // XXX?
-          // newInstrumentSettings = getSettingsFromInstrumentSync ();
+          // We must use "2" for true below (would expect "1")? Conform HP-3457A Operating Manual...
+          writeSync ("END " + (eoi ? "2" : "0") + ";");
+          if (instrumentSettings != null && instrumentSettings.isEoi () != eoi)
+            newInstrumentSettings = instrumentSettings.withEoi (eoi);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_ERROR:
