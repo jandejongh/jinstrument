@@ -17,9 +17,9 @@
 package org.javajdj.jinstrument.swing.instrument.dmm.hp3457a;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
@@ -32,6 +32,7 @@ import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesManagementColor;
 import org.javajdj.jinstrument.swing.cdi.JTinyCDIStatusAndControl;
 import org.javajdj.jswing.jcenter.JCenter;
+import org.javajdj.jswing.jcolorcheckbox.JDialogCheckBox;
 
 /** A Swing panel for Management Settings of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
  *
@@ -146,21 +147,30 @@ public class JHP3457A_GPIB_Management
       level + 1,
       getGuiPreferencesManagementColor ()));
     
-    bottomPanel.setLayout (new GridLayout (2, 2));
-          
-    bottomPanel.add (new JHP3457A_GPIB_Calibration (
+    bottomPanel.setLayout (new GridLayout (2, 1));
+
+    final JPanel bottomTopPanel = new JPanel ();
+    bottomPanel.add (bottomTopPanel);
+    final JPanel bottomBottomPanel = new JPanel ();
+    bottomPanel.add (bottomBottomPanel);
+    
+    bottomTopPanel.setLayout (new GridLayout (1, 2));
+    
+    bottomTopPanel.add (new JHP3457A_GPIB_Calibration (
       digitalMultiMeter,
       "Calibration",
       level + 1,
       getGuiPreferencesManagementColor ()));
     
-    bottomPanel.add (new JHP3457A_GPIB_State (
+    bottomTopPanel.add (new JHP3457A_GPIB_State (
       digitalMultiMeter,
       "State",
       level + 1,
       getGuiPreferencesManagementColor ()));
     
-    bottomPanel.add (new JInstrumentPanel (
+    bottomBottomPanel.setLayout (new GridLayout (1, 3));
+    
+    bottomBottomPanel.add (new JInstrumentPanel (
       hp3457a,
       "Internal Test",
       level + 1,
@@ -170,7 +180,35 @@ public class JHP3457A_GPIB_Management
       hp3457a::internalTest,
       Color.blue))));
     
-    bottomPanel.add (new JLabel ());
+    bottomBottomPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Math",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JDialogCheckBox (
+        getBackground ().darker (), 
+        "Math",
+        new Dimension (800, 600),
+        new JHP3457A_GPIB_Math (
+          hp3457a,
+          "",
+          level + 1,
+          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+    
+    bottomBottomPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Subprograms",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JDialogCheckBox (
+        getBackground ().darker (),
+        "Subprograms",
+        new Dimension (800, 600),
+        new JHP3457A_GPIB_Subprograms (
+          hp3457a,
+          "",
+          level + 1,
+          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
     
   }
 
