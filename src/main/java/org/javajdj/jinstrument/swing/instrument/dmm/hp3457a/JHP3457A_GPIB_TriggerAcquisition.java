@@ -207,10 +207,16 @@ public class JHP3457A_GPIB_TriggerAcquisition
         true))));
     acquisitionPanel.add (new JInstrumentPanel (
       hp3457a,
-      "Acquisition Time [s]",
+      "Sample Time [s]",
       level + 1,
       getGuiPreferencesTimeColor (),
-      JCenter.XY (new JLabel ("TBD"))));
+      JCenter.XY (new Jdouble_JTextField (
+        Double.NaN,
+        8,
+        "Sample Time [s]",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getSampleTime_s (),
+        null,
+        true))));
     acquisitionPanel.add (new JInstrumentPanel (
       hp3457a,
       "Resolution [%]",
