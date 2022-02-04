@@ -280,8 +280,7 @@ public class JHP3457A_GPIB_Misc_RareDangerous
         level + 1,
         null)));
         
-    toDoPanel.setLayout (new GridLayout (1, 2));    
-    toDoPanel.add (JCenter.XY (new JLabel ("Resolution [acquisition]")));
+    toDoPanel.setLayout (new GridLayout (1, 1));
     toDoPanel.add (JCenter.XY (new JLabel ("F10-F58 [acquisition]")));
     
   }
