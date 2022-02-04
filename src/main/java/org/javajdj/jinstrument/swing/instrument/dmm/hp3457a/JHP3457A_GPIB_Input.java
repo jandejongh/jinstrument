@@ -21,6 +21,7 @@ import java.awt.GridLayout;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentSettings;
@@ -94,17 +95,7 @@ public class JHP3457A_GPIB_Input
         hp3457a::setACBandwidth,
         true)));
     
-    add (new JInstrumentPanel (
-      hp3457a,
-      "AutoRange",
-      level + 1,
-      getGuiPreferencesAmplitudeColor (),
-      new JBoolean_JBoolean (
-      "AutoRange",
-      (settings) -> ((HP3457A_GPIB_Settings) settings).isAutoRange (),
-      hp3457a::setAutoRange,
-      Color.green,
-      true)));
+    add (new JPanel ());
     
     add (new JInstrumentPanel (
       hp3457a,
