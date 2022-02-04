@@ -20,7 +20,6 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
@@ -69,7 +68,7 @@ public class JHP3457A_GPIB_Input
     final HP3457A_GPIB_Instrument hp3457a = (HP3457A_GPIB_Instrument) digitalMultiMeter;
 
     removeAll ();
-    setLayout (new GridLayout (4, 2));
+    setLayout (new GridLayout (5, 2));
     
     add (new JInstrumentPanel (
       hp3457a,
@@ -148,7 +147,19 @@ public class JHP3457A_GPIB_Input
       "Input Channel",
       level + 1,
       getGuiPreferencesManagementColor (),
-      new JLabel ("XXX TBD")));
+      new JEnum_JComboBox<> (
+        HP3457A_GPIB_Settings.InputChannel.class,
+        "Input Channel",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getInputChannel (),
+        hp3457a::setInputChannel,
+        true)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "Actuator Channels",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JHP3457A_GPIB_ActuatorChannels (hp3457a)));
     
     add (new JInstrumentPanel (
       hp3457a,
