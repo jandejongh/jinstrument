@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentSettings;
@@ -147,21 +148,8 @@ public class JHP3457A_GPIB_Misc
         (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getReadingFormat (),
         hp3457a::setReadingFormat,
         true)));
-    
-    add (new JInstrumentPanel (
-      hp3457a,
-      "Options Control",
-      level + 1,
-      getGuiPreferencesManagementColor (),
-      new JDialogCheckBox (
-        getBackground ().darker (),
-        "Options Control",
-        new Dimension (800, 600),
-        new JHP3457A_GPIB_OptionsControl (
-          hp3457a,
-          "",
-          level + 1,
-          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+
+    add (new JLabel ());
     
     add (new JInstrumentPanel (
       hp3457a,
