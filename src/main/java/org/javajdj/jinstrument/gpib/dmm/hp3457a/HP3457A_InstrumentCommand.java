@@ -173,6 +173,10 @@ public interface HP3457A_InstrumentCommand
   public final static String ICARG_HP3457A_SET_FUNCTION_FUNCTION = "hp3457aSetFunctionFunction";
   public final static String ICARG_HP3457A_SET_FUNCTION_RANGE = "hp3457aSetFunctionRange";
   public final static String ICARG_HP3457A_SET_FUNCTION_RESOLUTION = "hp3457aSetFunctionResolution";
+  
+  // FUNC [RESOLUTION ONLY]
+  public final static String IC_HP3457A_SET_RESOLUTION = "commandHp3457aSetResolution";
+  public final static String ICARG_HP3457A_SET_RESOLUTION_RESOLUTION = "hp3457aSetResolutionResolution";
 
   // ID?
   public final static String IC_HP3457A_GET_ID = "commandHp3457aGetId";

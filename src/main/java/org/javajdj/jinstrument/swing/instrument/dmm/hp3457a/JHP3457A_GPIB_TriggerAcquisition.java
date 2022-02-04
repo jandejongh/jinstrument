@@ -205,7 +205,10 @@ public class JHP3457A_GPIB_TriggerAcquisition
         (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getNumberOfPowerLineCycles (),
         hp3457a::setNumberOfPowerLineCycles,
         true))));
-    acquisitionPanel.add (new JInstrumentPanel (
+    final JPanel sampleTimeLineRejectionPanel = new JPanel ();
+    acquisitionPanel.add (sampleTimeLineRejectionPanel);
+    sampleTimeLineRejectionPanel.setLayout (new GridLayout (2, 1));
+    sampleTimeLineRejectionPanel.add (new JInstrumentPanel (
       hp3457a,
       "Sample Time [s]",
       level + 1,
@@ -217,12 +220,30 @@ public class JHP3457A_GPIB_TriggerAcquisition
         (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getSampleTime_s (),
         null,
         true))));
+    sampleTimeLineRejectionPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Line Rejection [dB]",
+      level + 1,
+      getGuiPreferencesPowerColor (),
+      JCenter.XY (new Jdouble_JTextField (
+        Double.NaN,
+        8,
+        "Line Rejection [dB]",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getLineRejection_dB (),
+        null,
+        true))));
     acquisitionPanel.add (new JInstrumentPanel (
       hp3457a,
       "Resolution [%]",
       level + 1,
-      getGuiPreferencesTimeColor (),
-      JCenter.XY (new JLabel ("TBD"))));
+      getGuiPreferencesManagementColor (),
+      JCenter.XY (new Jdouble_JTextField (
+        Double.NaN,
+        8,
+        "Resolution [%]",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getResolution_percent (),
+        hp3457a::setResolution_percent,
+        true))));
         
   }
 

@@ -190,6 +190,11 @@ public class HP3457A_GPIB_Instrument
     return HP3457A_GPIB_Instrument.SUPPORTED_RESOLUTIONS_AS_LIST;
   }
   
+  public final static boolean isSupportedResolution (final Resolution resolution)
+  {
+    return HP3457A_GPIB_Instrument.SUPPORTED_RESOLUTIONS_AS_LIST.contains (resolution);
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // DigitalMultiMeter
@@ -1382,6 +1387,13 @@ public class HP3457A_GPIB_Instrument
     throws IOException, InterruptedException
   {
     setFunction (null, null, null);
+  }
+  
+  public final void setResolution_percent (final double resolution_percent)
+  {
+    addCommand (new DefaultInstrumentCommand (
+      HP3457A_InstrumentCommand.IC_HP3457A_SET_RESOLUTION,
+      HP3457A_InstrumentCommand.ICARG_HP3457A_SET_RESOLUTION_RESOLUTION, resolution_percent));
   }
   
   public final String getIdSync (final long timeout, final TimeUnit unit)
@@ -2614,7 +2626,13 @@ public class HP3457A_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
   @Override
-  protected void processCommand (final InstrumentCommand instrumentCommand)
+  protected final void processCommand (final InstrumentCommand instrumentCommand)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    processCommand (instrumentCommand, true);
+  }
+  
+  protected final void processCommand (final InstrumentCommand instrumentCommand, final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
   {
     if (instrumentCommand == null)
@@ -2628,7 +2646,8 @@ public class HP3457A_GPIB_Instrument
     final String commandString = (String) instrumentCommand.get (InstrumentCommand.IC_COMMAND_KEY);
     if (commandString.trim ().isEmpty ())
       throw new IllegalArgumentException ();
-    this.operationSemaphore.acquire ();
+    if (topLevel)
+      this.operationSemaphore.acquire ();
     final GpibDevice device = (GpibDevice) getDevice ();
     HP3457A_GPIB_Settings instrumentSettings = (HP3457A_GPIB_Settings) getCurrentInstrumentSettings ();
     HP3457A_GPIB_Settings newInstrumentSettings = null;
@@ -2644,24 +2663,28 @@ public class HP3457A_GPIB_Instrument
         }
         case InstrumentCommand.IC_RESOLUTION:
         {
-          throw new UnsupportedOperationException ();
-//          final Resolution resolution = (Resolution) instrumentCommand.get (InstrumentCommand.ICARG_RESOLUTION);
-//          final List<Resolution> supportedResolutions = HP3457A_GPIB_Instrument.SUPPORTED_RESOLUTIONS_AS_LIST;
-//          if (! supportedResolutions.contains (resolution))
-//          {
-//            LOG.log (Level.WARNING, "Resolution {0} is not supported on HP3457A.",
-//              new Object[]{resolution});
-//            throw new UnsupportedOperationException ();
-//          }
-//          switch (resolution)
-//          {
-//            case DIGITS_5_5: writeSync ("N5\r\n"); break;
-//            case DIGITS_4_5: writeSync ("N4\r\n"); break;
-//            case DIGITS_3_5: writeSync ("N3\r\n"); break;
-//            default:         throw new RuntimeException ();
-//          }
-//          newInstrumentSettings = getSettingsFromInstrumentSync ();
-//          break;
+          final Resolution resolution = (Resolution) instrumentCommand.get (InstrumentCommand.ICARG_RESOLUTION);
+          final List<Resolution> supportedResolutions = HP3457A_GPIB_Instrument.SUPPORTED_RESOLUTIONS_AS_LIST;
+          if (! supportedResolutions.contains (resolution))
+          {
+            LOG.log (Level.WARNING, "Resolution {0} is not supported on HP3457A.",
+              new Object[]{resolution});
+            throw new UnsupportedOperationException ();
+          }
+          final double requiredNumberOfPowerLineCycles;
+          switch (resolution)
+          {
+            case DIGITS_3_5: requiredNumberOfPowerLineCycles = 0.0005; break;
+            case DIGITS_4_5: requiredNumberOfPowerLineCycles = 0.005;  break;
+            case DIGITS_5_5: requiredNumberOfPowerLineCycles = 0.1;    break;
+            case DIGITS_6_5: requiredNumberOfPowerLineCycles = 1;      break;
+            default: throw new RuntimeException ();
+          }
+          processCommand (new DefaultInstrumentCommand (
+            HP3457A_InstrumentCommand.IC_HP3457A_SET_ADC_NUMBER_OF_PLCS,
+            HP3457A_InstrumentCommand.ICARG_HP3457A_SET_ADC_NUMBER_OF_PLCS, requiredNumberOfPowerLineCycles),
+            false); // Crucial! We are not a top-level command, so we already have the lock on the processor.
+          break;
         }
         case InstrumentCommand.IC_MEASUREMENT_MODE:
         {
@@ -3302,7 +3325,7 @@ public class HP3457A_GPIB_Instrument
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_FUNCTION:
         {
           // FUNC
-          final MeasurementMode function = 
+          final MeasurementMode measurementMode = 
             (MeasurementMode) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_FUNCTION_FUNCTION);
           final Double maxInput_V_or_A_or_Ohm =
@@ -3311,10 +3334,8 @@ public class HP3457A_GPIB_Instrument
           final Double resolution_percent =
             (Double) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_FUNCTION_RESOLUTION);
-          if (instrumentSettings == null)
-            throw new UnsupportedOperationException ();
           final int modeCode;
-          switch (function)
+          switch (measurementMode)
           {
             case DC_VOLTAGE:    modeCode =  1; break;
             case AC_VOLTAGE:    modeCode =  2; break;
@@ -3329,13 +3350,69 @@ public class HP3457A_GPIB_Instrument
             default:
               throw new UnsupportedOperationException ();
           }
-          writeSync ("FUNC" +
-            (function != null ? ("," + Integer.toString (modeCode)) : "") +
-            (maxInput_V_or_A_or_Ohm != null ? ("," + Double.toString (maxInput_V_or_A_or_Ohm)) : "") +
-            (resolution_percent != null ? ("," + Double.toString (resolution_percent)) : "")  +
+          writeSync ("FUNC " +
+            (measurementMode != null ? ("" + Integer.toString (modeCode)) : "-1") +
+            (maxInput_V_or_A_or_Ohm != null ? ("," + Double.toString (maxInput_V_or_A_or_Ohm)) : ",-1") +
+            (resolution_percent != null ? ("," + Double.toString (resolution_percent)) : ",-1")  +
             ";");
-          // XXX What about range/resolution?
-          newInstrumentSettings = instrumentSettings.withMeasurementMode (function);
+          if (instrumentSettings != null)
+          {
+            final Range newRange = DefaultRange.fromRangeDouble (measurementMode, processCommand_getDouble ("RANGE"));
+            final double numberOfPowerLineCycles = processCommand_getDouble ("NPLC");
+            final double newResolution_percent =
+              resolution_percent != null ? resolution_percent : instrumentSettings.getResolution_percent ();
+            final Resolution resolution = HP3457A_GPIB_Settings.numberOfPowerLineCycles2Resolution (numberOfPowerLineCycles);
+            newInstrumentSettings = instrumentSettings
+              .withMeasurementMode (measurementMode)
+              .withRange (newRange)
+              .withNumberOfPowerLineCycles (numberOfPowerLineCycles)
+              .withResolution_percent (newResolution_percent)
+              .withResolution (resolution);
+          }
+          break;
+        }
+        case HP3457A_InstrumentCommand.IC_HP3457A_SET_RESOLUTION:
+        {
+          final double resolution_percent =
+            (double) instrumentCommand.get (
+              HP3457A_InstrumentCommand.ICARG_HP3457A_SET_RESOLUTION_RESOLUTION);
+          if (instrumentSettings == null)
+          {
+            LOG.log (Level.WARNING, "No settings (yet) on instrument {0}.", new Object[]{this});
+            return;
+          }
+          final MeasurementMode measurementMode = instrumentSettings.getMeasurementMode ();
+          final int modeCode;
+          switch (measurementMode)
+          {
+            case DC_VOLTAGE:    modeCode =  1; break;
+            case AC_VOLTAGE:    modeCode =  2; break;
+            case AC_DC_VOLTAGE: modeCode =  3; break;
+            case RESISTANCE_2W: modeCode =  4; break;
+            case RESISTANCE_4W: modeCode =  5; break;
+            case DC_CURRENT:    modeCode =  6; break;
+            case AC_CURRENT:    modeCode =  7; break;
+            case AC_DC_CURRENT: modeCode =  8; break;
+            case FREQUENCY:     modeCode =  9; break;
+            case PERIOD:        modeCode = 10; break;
+            default:
+              throw new UnsupportedOperationException ();
+          }
+          final Range range = instrumentSettings.getRange ();
+          final double rangeNumber = range != null ? range.getMaxAbsValue () : -1;
+          writeSync ("FUNC " + Integer.toString (modeCode) +
+            "," + Double.toString (rangeNumber) +
+            "," + Double.toString (resolution_percent) +
+            ";");
+          final Range newRange = DefaultRange.fromRangeDouble (measurementMode, processCommand_getDouble ("RANGE"));
+          final double numberOfPowerLineCycles = processCommand_getDouble ("NPLC");
+          final Resolution resolution = HP3457A_GPIB_Settings.numberOfPowerLineCycles2Resolution (numberOfPowerLineCycles);
+          newInstrumentSettings = instrumentSettings
+            .withMeasurementMode (measurementMode)
+            .withRange (newRange)
+            .withResolution_percent (resolution_percent)
+            .withNumberOfPowerLineCycles (numberOfPowerLineCycles)
+            .withResolution (resolution);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_ID:
@@ -3547,31 +3624,34 @@ public class HP3457A_GPIB_Instrument
             (Double) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_ADC_NUMBER_OF_PLCS);
           writeSync ("NPLC" +
-            (numberOfPLCs != null ? ("," + Double.toString (numberOfPLCs)) : "") +
+            (numberOfPLCs != null ? (" " + Double.toString (numberOfPLCs)) : " -1") +
             ";");
-          final double newNumberOfPLCs = numberOfPLCs != null ? numberOfPLCs : 0.005 /* default */;
+          final double newNumberOfPLCs = processCommand_getDouble ("NPLC");
           if (instrumentSettings != null && instrumentSettings.getNumberOfPowerLineCycles () != newNumberOfPLCs)
-            newInstrumentSettings = instrumentSettings.withNumberOfPowerLineCycles (newNumberOfPLCs);
+          {
+            final double resolution_percent = HP3457A_GPIB_Settings.numberOfPowerLineCycles2Resolution_percent (newNumberOfPLCs);
+            final Resolution resolution = HP3457A_GPIB_Settings.numberOfPowerLineCycles2Resolution (newNumberOfPLCs);
+            newInstrumentSettings = instrumentSettings
+              .withNumberOfPowerLineCycles (newNumberOfPLCs)
+              .withResolution_percent (resolution_percent)
+              .withResolution (resolution);
+          }
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_ADC_NUMBER_OF_PLCS:
         {
           // NPLC?
-          final String queryReturn = new String (writeAndReadEOISync ("NPLC?;"), Charset.forName ("US-ASCII")).trim ();
-          if (queryReturn == null)
-            throw new IOException ();
-          final double numberOfPLCs;
-          try
-          {
-            numberOfPLCs = Double.parseDouble (queryReturn);
-          }
-          catch (NumberFormatException nfe)
-          {
-            throw new IOException ();
-          }
+          final double numberOfPLCs = processCommand_getDouble ("NPLC");
           instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, numberOfPLCs);
           if (instrumentSettings != null && instrumentSettings.getNumberOfPowerLineCycles () != numberOfPLCs)
-            newInstrumentSettings = instrumentSettings.withNumberOfPowerLineCycles (numberOfPLCs);
+          {
+            final double resolution_percent = HP3457A_GPIB_Settings.numberOfPowerLineCycles2Resolution_percent (numberOfPLCs);
+            final Resolution resolution = HP3457A_GPIB_Settings.numberOfPowerLineCycles2Resolution (numberOfPLCs);
+            newInstrumentSettings = instrumentSettings
+              .withNumberOfPowerLineCycles (numberOfPLCs)
+              .withResolution_percent (resolution_percent)
+              .withResolution (resolution);
+          }
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_NUMBER_OF_READINGS:
@@ -4168,24 +4248,28 @@ public class HP3457A_GPIB_Instrument
     }
     finally
     {
-      this.operationSemaphore.release ();
+      if (topLevel)
+        this.operationSemaphore.release ();
     }
     if (newInstrumentSettings != null)
     {
       settingsReadFromInstrument (newInstrumentSettings);
-      this.operationSemaphore.acquire ();
-      final InstrumentStatus newInstrumentStatus;
-      try
+      if (topLevel)
       {
-        final byte serialPollStatusByte = serialPollSync ();
-        newInstrumentStatus =
-          HP3457A_GPIB_Status.fromSerialPollStatusByte (serialPollStatusByte);
+        this.operationSemaphore.acquire ();
+        final InstrumentStatus newInstrumentStatus;
+        try
+        {
+          final byte serialPollStatusByte = serialPollSync ();
+          newInstrumentStatus =
+            HP3457A_GPIB_Status.fromSerialPollStatusByte (serialPollStatusByte);
+        }
+        finally
+        {
+          this.operationSemaphore.release ();
+        }
+        statusReadFromInstrument (newInstrumentStatus);
       }
-      finally
-      {
-        this.operationSemaphore.release ();
-      }
-      statusReadFromInstrument (newInstrumentStatus);
     }
   }
 

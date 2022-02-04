@@ -82,6 +82,7 @@ public final class HP3457A_GPIB_Settings
       final boolean autoRange,
       final DigitalMultiMeter.Range range,
       // HP3457A_GBIB_Settings
+      final double resolution_percent,
       final AutoZeroMode autoZeroMode,
       final String id,
       final TriggerEvent triggerArmEvent,
@@ -118,6 +119,7 @@ public final class HP3457A_GPIB_Settings
     // DefaultDigitalMultiMeterSettings
     super (bytes, resolution, measurementMode, autoRange, range, getReadingUnit (measurementMode));
     // HP3457A_GBIB_Settings
+    this.resolution_percent = resolution_percent;
     this.autoZeroMode = autoZeroMode;
     this.id = id;
     this.triggerArmEvent = triggerArmEvent;
@@ -157,11 +159,12 @@ public final class HP3457A_GPIB_Settings
     return new HP3457A_GPIB_Settings (
       // DefaultDigitalMultiMeterSettings
       null,
-      Resolution.DIGITS_6,
+      Resolution.DIGITS_5_5,
       DigitalMultiMeter.MeasurementMode.DC_VOLTAGE,
       true,
       null,
       // HP3457A_GBIB_Settings
+      0.00033, // resolution_percent; 5.5 DIGITS
       AutoZeroMode.Always,
       null,
       TriggerEvent.AUTO,
@@ -201,18 +204,68 @@ public final class HP3457A_GPIB_Settings
     return fromReset ().withTriggerEvent (TriggerEvent.SYN).withNumberOfPowerLineCycles (1);
   }
   
+  public final HP3457A_GPIB_Settings withResolution (final Resolution resolution)
+  {
+    if (resolution == null || ! HP3457A_GPIB_Instrument.isSupportedResolution (resolution))
+      throw new IllegalArgumentException ();
+    return new HP3457A_GPIB_Settings (
+      // DefaultDigitalMultiMeterSettings
+      null,
+      resolution,
+      getMeasurementMode (),
+      isAutoRange (),
+      getRange (),
+      // HP3457A_GBIB_Settings
+      this.resolution_percent,
+      this.autoZeroMode,
+      this.id,
+      this.triggerArmEvent,
+      this.triggerEvent,
+      this.sampleEvent,
+      this.installedOption,
+      this.acBandwidth,
+      this.measurementTerminals,
+      this.fixedImpedance,
+      this.offsetCompensation,
+      this.beepEnabled,
+      this.gpibAddress,
+      this.frequencyPeriodInputSource,
+      this.numberOfTriggerArms,
+      this.numberOfReadings,
+      this.delay_s,
+      this.timer_s,
+      this.triggerBuffering,
+      this.calibrationNumber,
+      this.readingFormat,
+      this.locked,
+      this.numberOfPowerLineCycles,
+      this.integerScale,
+      this.readingMemoryMode,
+      this.lineFrequency_Hz,
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask,
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
+  }
+  
   public final HP3457A_GPIB_Settings withMeasurementMode (final DigitalMultiMeter.MeasurementMode measurementMode)
   {
     if (measurementMode == null || ! HP3457A_GPIB_Instrument.isSupportedMeasurementMode (measurementMode))
       throw new IllegalArgumentException ();
+    if (measurementMode == getMeasurementMode ())
+      return this;
     return new HP3457A_GPIB_Settings (
       // DefaultDigitalMultiMeterSettings
       null,
       getResolution (),
       measurementMode,
-      true, // Implies AutoRange
-      null, // XXX Should be null == AutoRange?
+      true, // AutoRange
+      null, // Range
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -257,6 +310,7 @@ public final class HP3457A_GPIB_Settings
       autoRange,
       null, // Range
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -301,6 +355,7 @@ public final class HP3457A_GPIB_Settings
       range == null, // autoRange
       range,         // range
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -335,6 +390,51 @@ public final class HP3457A_GPIB_Settings
       this.actuatorChannelDefinition);
   }
   
+  public final HP3457A_GPIB_Settings withResolution_percent (final double resolution_percent)
+  {
+    return new HP3457A_GPIB_Settings (
+      // DefaultDigitalMultiMeterSettings
+      null,
+      getResolution (),
+      getMeasurementMode (),
+      isAutoRange (),
+      getRange (),
+      // HP3457A_GBIB_Settings
+      resolution_percent,
+      this.autoZeroMode,
+      this.id,
+      this.triggerArmEvent,
+      this.triggerEvent,
+      this.sampleEvent,
+      this.installedOption,
+      this.acBandwidth,
+      this.measurementTerminals,
+      this.fixedImpedance,
+      this.offsetCompensation,
+      this.beepEnabled,
+      this.gpibAddress,
+      this.frequencyPeriodInputSource,
+      this.numberOfTriggerArms,
+      this.numberOfReadings,
+      this.delay_s,
+      this.timer_s,
+      this.triggerBuffering,
+      this.calibrationNumber,
+      this.readingFormat,
+      this.locked,
+      this.numberOfPowerLineCycles, // XXX MUST CHANGE AS WELL??
+      this.integerScale,
+      this.readingMemoryMode,
+      this.lineFrequency_Hz,
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask,
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
+  }
+  
   public final HP3457A_GPIB_Settings withAutoZeroMode (final AutoZeroMode autoZeroMode)
   {
     return new HP3457A_GPIB_Settings (
@@ -345,6 +445,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -389,6 +490,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (), // Implies AutoRange
       getRange (), // XXX Should be null == AutoRange?
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       id,
       this.triggerArmEvent,
@@ -433,6 +535,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (), // Implies AutoRange
       getRange (), // XXX Should be null == AutoRange?
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       triggerArmEvent,
@@ -477,6 +580,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (), // Implies AutoRange
       getRange (), // XXX Should be null == AutoRange?
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -521,6 +625,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (), // Implies AutoRange
       getRange (), // XXX Should be null == AutoRange?
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -565,6 +670,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (), // Implies AutoRange
       getRange (), // XXX Should be null == AutoRange?
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -609,6 +715,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (), // Implies AutoRange
       getRange (), // XXX Should be null == AutoRange?
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -653,6 +760,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (), // Implies AutoRange
       getRange (), // XXX Should be null == AutoRange?
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -697,6 +805,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -741,6 +850,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -785,6 +895,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -829,6 +940,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -874,6 +986,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -918,6 +1031,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -962,6 +1076,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1006,6 +1121,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1050,6 +1166,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1094,6 +1211,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1138,6 +1256,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1182,6 +1301,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1226,6 +1346,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1270,6 +1391,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1314,6 +1436,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1358,6 +1481,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1402,6 +1526,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1446,6 +1571,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1490,6 +1616,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1534,6 +1661,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1578,6 +1706,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1622,6 +1751,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1666,6 +1796,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -1712,6 +1843,7 @@ public final class HP3457A_GPIB_Settings
       isAutoRange (),
       getRange (),
       // HP3457A_GBIB_Settings
+      this.resolution_percent,
       this.autoZeroMode,
       this.id,
       this.triggerArmEvent,
@@ -2587,6 +2719,8 @@ public final class HP3457A_GPIB_Settings
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // NUMBER OF POWER LINE CYCLES
+  // SAMPLE TIME
+  // RESOLUTION [PERCENT]
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -2600,6 +2734,71 @@ public final class HP3457A_GPIB_Settings
   public final double getSampleTime_s ()
   {
     return this.numberOfPowerLineCycles / this.lineFrequencyReference_Hz;
+  }
+  
+  public final double getLineRejection_dB ()
+  {
+    if (this.numberOfPowerLineCycles < 1)   return 0;
+    if (this.numberOfPowerLineCycles < 10)  return 60;
+    if (this.numberOfPowerLineCycles < 100) return 80;
+                                            return 90;
+  }
+  
+  private final double resolution_percent;
+  
+  public final double getResolution_percent ()
+  {
+    return this.resolution_percent;
+  }
+  
+  /** Calculates the resolution in percent, given the number of power-line cycles.
+   * 
+   * <p>
+   * From HP 3457A Operation Manual, page 3-5.
+   * 
+   * @param numberOfPowerLineCycles The number of power-line cycles.
+   * 
+   * @return The resolution in percent.
+   * 
+   * @throws IllegalArgumentException If the argument is zero or negative or {@code > 100}.
+   * 
+   */
+  public static double numberOfPowerLineCycles2Resolution_percent (final double numberOfPowerLineCycles)
+  {
+    if (numberOfPowerLineCycles <= 0 || numberOfPowerLineCycles > 100)
+      throw new IllegalArgumentException ();
+    if (numberOfPowerLineCycles <  0.005) return 0.033;
+    if (numberOfPowerLineCycles <  0.1  ) return 0.0033;
+    if (numberOfPowerLineCycles <  1    ) return 0.00033;
+    if (numberOfPowerLineCycles <  10   ) return 0.000033;
+    if (numberOfPowerLineCycles <= 100  ) return 0.000033; // XXX not sure here...
+    // Not needed, but satisfies compiler...
+    throw new IllegalArgumentException ();
+  }
+  
+  /** Calculates the resolution in digits, given the number of power-line cycles.
+   * 
+   * <p>
+   * From HP 3457A Operation Manual, page 3-5.
+   * 
+   * @param numberOfPowerLineCycles The number of power-line cycles.
+   * 
+   * @return The resolution in digits.
+   * 
+   * @throws IllegalArgumentException If the argument is zero or negative or {@code > 100}.
+   * 
+   */
+  public static Resolution numberOfPowerLineCycles2Resolution (final double numberOfPowerLineCycles)
+  {
+    if (numberOfPowerLineCycles <= 0 || numberOfPowerLineCycles > 100)
+      throw new IllegalArgumentException ();
+    if (numberOfPowerLineCycles <  0.005) return Resolution.DIGITS_3_5;
+    if (numberOfPowerLineCycles <  0.1  ) return Resolution.DIGITS_4_5;
+    if (numberOfPowerLineCycles <  1    ) return Resolution.DIGITS_5_5;
+    if (numberOfPowerLineCycles <  10   ) return Resolution.DIGITS_6_5;
+    if (numberOfPowerLineCycles <= 100  ) return Resolution.DIGITS_6_5; // XXX not sure here...
+    // Not needed, but satisfies compiler...
+    throw new IllegalArgumentException ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
