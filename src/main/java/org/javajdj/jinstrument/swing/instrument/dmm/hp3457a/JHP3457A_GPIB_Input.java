@@ -17,11 +17,12 @@
 package org.javajdj.jinstrument.swing.instrument.dmm.hp3457a;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentSettings;
@@ -31,6 +32,8 @@ import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalMultiMeterPanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
+import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesManagementColor;
+import org.javajdj.jswing.jcolorcheckbox.JDialogCheckBox;
 
 /** A Swing panel for the Input Settings of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
  *
@@ -85,6 +88,18 @@ public class JHP3457A_GPIB_Input
     
     add (new JInstrumentPanel (
       hp3457a,
+      "Input Channel [Options]",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JEnum_JComboBox<> (
+        HP3457A_GPIB_Settings.InputChannel.class,
+        "Input Channel [Options]",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getInputChannel (),
+        hp3457a::setInputChannel,
+        true)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
       "AC Bandwidth",
       level + 1,
       getGuiPreferencesFrequencyColor (),
@@ -93,20 +108,6 @@ public class JHP3457A_GPIB_Input
         "AC Bandwidth",
         (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getACBandwidth (),
         hp3457a::setACBandwidth,
-        true)));
-    
-    add (new JPanel ());
-    
-    add (new JInstrumentPanel (
-      hp3457a,
-      "AutoZero",
-      level + 1,
-      getGuiPreferencesAmplitudeColor (),
-      new JEnum_JComboBox<> (
-        HP3457A_GPIB_Settings.AutoZeroMode.class,
-        "AutoZero",
-        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getAutoZeroMode (),
-        hp3457a::setAutoZeroMode,
         true)));
     
     add (new JInstrumentPanel (
@@ -123,6 +124,18 @@ public class JHP3457A_GPIB_Input
     
     add (new JInstrumentPanel (
       hp3457a,
+      "AutoZero",
+      level + 1,
+      getGuiPreferencesAmplitudeColor (),
+      new JEnum_JComboBox<> (
+        HP3457A_GPIB_Settings.AutoZeroMode.class,
+        "AutoZero",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getAutoZeroMode (),
+        hp3457a::setAutoZeroMode,
+        true)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
       "Offset Compensation",
       level + 1,
       getGuiPreferencesVoltageColor (),
@@ -135,22 +148,25 @@ public class JHP3457A_GPIB_Input
     
     add (new JInstrumentPanel (
       hp3457a,
-      "Input Channel",
-      level + 1,
-      getGuiPreferencesManagementColor (),
-      new JEnum_JComboBox<> (
-        HP3457A_GPIB_Settings.InputChannel.class,
-        "Input Channel",
-        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getInputChannel (),
-        hp3457a::setInputChannel,
-        true)));
-    
-    add (new JInstrumentPanel (
-      hp3457a,
-      "Actuator Channels",
+      "Actuator Channels [Options]",
       level + 1,
       getGuiPreferencesManagementColor (),
       new JHP3457A_GPIB_ActuatorChannels (hp3457a)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "Reset/Scanning [Options]",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JDialogCheckBox (
+        getBackground ().darker (),
+        "Reset/Scanning [Options]",
+        new Dimension (800, 600),
+        new JHP3457A_GPIB_OptionsControl (
+          hp3457a,
+          "",
+          level + 1,
+          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
     
     add (new JInstrumentPanel (
       hp3457a,
@@ -181,6 +197,13 @@ public class JHP3457A_GPIB_Input
           }
         },
         true)));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "Freq/Per Input Range [V/A]",
+      level + 1,
+      getGuiPreferencesAmplitudeColor (),
+      new JLabel ("TBD")));
     
   }
 
