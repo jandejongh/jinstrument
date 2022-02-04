@@ -20,7 +20,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
-import javax.swing.JLabel;
+import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentSettings;
@@ -71,22 +71,7 @@ public class JHP3457A_GPIB_Misc
     final HP3457A_GPIB_Instrument hp3457a = (HP3457A_GPIB_Instrument) digitalMultiMeter;
 
     removeAll ();
-    setLayout (new GridLayout (4, 2));
-    
-    add (new JInstrumentPanel (
-      hp3457a,
-      "Math",
-      level + 1,
-      getGuiPreferencesManagementColor (),
-      new JDialogCheckBox (
-        getBackground ().darker (), 
-        "Math",
-        new Dimension (800, 600),
-        new JHP3457A_GPIB_Math (
-          hp3457a,
-          "",
-          level + 1,
-          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+    setLayout (new GridLayout (4, 1));
     
     add (new JInstrumentPanel (
       hp3457a,
@@ -105,27 +90,16 @@ public class JHP3457A_GPIB_Misc
     
     add (new JInstrumentPanel (
       hp3457a,
-      "Subprograms",
-      level + 1,
-      getGuiPreferencesManagementColor (),
-      new JDialogCheckBox (
-        getBackground ().darker (),
-        "Subprograms",
-        new Dimension (800, 600),
-        new JHP3457A_GPIB_Subprograms (
-          hp3457a,
-          "",
-          level + 1,
-          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
-      
-    add (new JInstrumentPanel (
-      hp3457a,
       "Command Queue Length",
       level + 1,
       getGuiPreferencesManagementColor (),
       new JInstrumentCommandQueueMonitor (hp3457a, level + 1)));
     
-    add (new JInstrumentPanel (
+    final JPanel readingPanel = new JPanel ();
+    add (readingPanel);
+    readingPanel.setLayout (new GridLayout (1, 2));
+    
+    readingPanel.add (new JInstrumentPanel (
       hp3457a,
       "Reading Memory Mode",
       level + 1,
@@ -137,7 +111,7 @@ public class JHP3457A_GPIB_Misc
         hp3457a::setReadingMemoryMode,
         true)));
         
-    add (new JInstrumentPanel (
+    readingPanel.add (new JInstrumentPanel (
       hp3457a,
       "Reading Format",
       level + 1,
@@ -149,8 +123,6 @@ public class JHP3457A_GPIB_Misc
         hp3457a::setReadingFormat,
         true)));
 
-    add (new JLabel ());
-    
     add (new JInstrumentPanel (
       hp3457a,
       "Rare/Dangerous",
