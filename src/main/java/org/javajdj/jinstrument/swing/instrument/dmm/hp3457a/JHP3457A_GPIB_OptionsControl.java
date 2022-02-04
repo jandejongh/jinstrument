@@ -26,6 +26,8 @@ import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Instrument;
 import org.javajdj.jinstrument.swing.base.JDigitalMultiMeterPanel;
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
+import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesManagementColor;
 import org.javajdj.jswing.jcenter.JCenter;
 
 /** A Swing panel for Options Control of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
@@ -67,11 +69,32 @@ public class JHP3457A_GPIB_OptionsControl
     removeAll ();
     setLayout (new GridLayout (3, 1));
 
-    add (JCenter.XY (new JLabel ("TBD: CRESET [input/options]")));
-    add (JCenter.XY (new JLabel ("TBD: CLOSE/OPEN [input/options]")));
-    add (JCenter.XY (new JLabel ("TBD: CHAN/CHAN?/SLIST/SLIST?/SADV [input/options]")));
+    add (new JInstrumentPanel (
+      hp3457a,
+      "Scan List",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JLabel ("TBD: Scan List [SLIST/SLIST?]")));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "Scan Advance Event",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JLabel ("TBD: Scan Advance Event [SADV]")));
+    
+    add (new JInstrumentPanel (
+      hp3457a,
+      "Card Reset",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      JCenter.XY (new JVoid_JColorCheckBox (
+        "Card Reset",
+        hp3457a::cardReset,
+        Color.blue))));
     
   }
+  
 
   public JHP3457A_GPIB_OptionsControl (final HP3457A_GPIB_Instrument digitalMultiMeter, final int level)
   {
