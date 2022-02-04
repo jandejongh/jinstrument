@@ -3113,6 +3113,7 @@ public class HP3457A_GPIB_Instrument
         {
           // CRESET
           writeSync ("CRESET;");
+          // XXX In time, we should probably have card settings in InstrumentSettings...
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_CLEAR_STATUS_BYTE:
