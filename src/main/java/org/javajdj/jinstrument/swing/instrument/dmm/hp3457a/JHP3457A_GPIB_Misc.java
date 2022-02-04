@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
@@ -32,6 +33,7 @@ import org.javajdj.jinstrument.swing.base.JDigitalMultiMeterPanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesManagementColor;
 import org.javajdj.jinstrument.swing.debug.JInstrumentCommandQueueMonitor;
+import org.javajdj.jswing.jcenter.JCenter;
 import org.javajdj.jswing.jcolorcheckbox.JDialogCheckBox;
 
 /** A Swing panel for Miscellaneous Settings of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
@@ -123,7 +125,12 @@ public class JHP3457A_GPIB_Misc
         hp3457a::setReadingFormat,
         true)));
 
-    add (new JInstrumentPanel (
+    final JPanel bottomPanel = new JPanel ();
+    add (bottomPanel);
+    
+    bottomPanel.setLayout (new GridLayout (1, 2));
+    
+    bottomPanel.add (new JInstrumentPanel (
       hp3457a,
       "Rare/Dangerous",
       level + 1,
@@ -137,6 +144,17 @@ public class JHP3457A_GPIB_Misc
           "",
           level + 1,
           JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+    
+    bottomPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Graph [exp]",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JDialogCheckBox (
+        getBackground ().darker (),
+        "Graph [exp]",
+        new Dimension (800, 600),
+        JCenter.XY (new JLabel ("TBD")))));
     
   }
 
