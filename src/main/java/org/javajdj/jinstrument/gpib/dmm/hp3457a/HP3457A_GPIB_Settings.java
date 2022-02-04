@@ -76,43 +76,44 @@ public final class HP3457A_GPIB_Settings
   
   private HP3457A_GPIB_Settings (
       // DefaultDigitalMultiMeterSettings
-    final byte[] bytes,
-    final Resolution resolution,
-    final DigitalMultiMeter.MeasurementMode measurementMode,
-    final boolean autoRange,
-    final DigitalMultiMeter.Range range,
-    // HP3457A_GBIB_Settings
-    final AutoZeroMode autoZeroMode,
-    final String id,
-    final TriggerEvent triggerArmEvent,
-    final TriggerEvent triggerEvent,
-    final TriggerEvent sampleEvent,
-    final InstalledOption installedOption,
-    final ACBandwidth acBandwidth,
-    final MeasurementTerminals measurementTerminals,
-    final boolean fixedImpedance,
-    final boolean offsetCompensation,
-    final boolean beepEnabled,
-    final Byte gpibAddress,
-    final DigitalMultiMeter.MeasurementMode frequencyPeriodInputSource,
-    final int numberOfTriggerArms,
-    final int numberOfReadings,
-    final double delay_s,
-    final double timer_s,
-    final boolean triggerBuffering,
-    final int calibrationNumber,
-    final ReadingFormat readingFormat,
-    final boolean locked,
-    final double numberOfPowerLineCycles,
-    final double integerScale,
-    final ReadingMemoryMode readingMemoryMode,
-    final double lineFrequency_Hz,
-    final double lineFrequencyReference_Hz,
-    final boolean gpibInputBuffering,
-    final byte serviceRequestMask,
-    final short errorMask,
-    final boolean eoi
-    )
+      final byte[] bytes,
+      final Resolution resolution,
+      final DigitalMultiMeter.MeasurementMode measurementMode,
+      final boolean autoRange,
+      final DigitalMultiMeter.Range range,
+      // HP3457A_GBIB_Settings
+      final AutoZeroMode autoZeroMode,
+      final String id,
+      final TriggerEvent triggerArmEvent,
+      final TriggerEvent triggerEvent,
+      final TriggerEvent sampleEvent,
+      final InstalledOption installedOption,
+      final ACBandwidth acBandwidth,
+      final MeasurementTerminals measurementTerminals,
+      final boolean fixedImpedance,
+      final boolean offsetCompensation,
+      final boolean beepEnabled,
+      final Byte gpibAddress,
+      final DigitalMultiMeter.MeasurementMode frequencyPeriodInputSource,
+      final int numberOfTriggerArms,
+      final int numberOfReadings,
+      final double delay_s,
+      final double timer_s,
+      final boolean triggerBuffering,
+      final int calibrationNumber,
+      final ReadingFormat readingFormat,
+      final boolean locked,
+      final double numberOfPowerLineCycles,
+      final double integerScale,
+      final ReadingMemoryMode readingMemoryMode,
+      final double lineFrequency_Hz,
+      final double lineFrequencyReference_Hz,
+      final boolean gpibInputBuffering,
+      final byte serviceRequestMask,
+      final short errorMask,
+      final boolean eoi,
+      final InputChannel inputChannel,
+      final ActuatorChannelDefinition actuatorChannelDefinition)
   {
     // DefaultDigitalMultiMeterSettings
     super (bytes, resolution, measurementMode, autoRange, range, getReadingUnit (measurementMode));
@@ -147,8 +148,10 @@ public final class HP3457A_GPIB_Settings
     this.serviceRequestMask = serviceRequestMask;
     this.errorMask = errorMask;
     this.eoi = eoi;
+    this.inputChannel = inputChannel;
+    this.actuatorChannelDefinition = actuatorChannelDefinition;
   }
-
+  
   public static HP3457A_GPIB_Settings fromReset ()
   {
     return new HP3457A_GPIB_Settings (
@@ -188,8 +191,9 @@ public final class HP3457A_GPIB_Settings
       false,
       (byte) 0,     // Service Request Mask (actually, PON is unchanged)
       (short) 2047, // Error Mask: all enabled
-      false         // EOI
-    );
+      false,        // EOI
+      InputChannel.None,
+      ActuatorChannelDefinition.fromReset ());
   }
   
   public static HP3457A_GPIB_Settings fromPreset ()
@@ -238,8 +242,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withAutoRange (final boolean autoRange)
@@ -281,8 +286,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withRange (final DigitalMultiMeter.Range range)
@@ -324,8 +330,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withAutoZeroMode (final AutoZeroMode autoZeroMode)
@@ -367,8 +374,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withId (final String id)
@@ -410,8 +418,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withTriggerArmEvent (final TriggerEvent triggerArmEvent)
@@ -453,8 +462,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withTriggerEvent (final TriggerEvent triggerEvent)
@@ -496,8 +506,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withSampleEvent (final TriggerEvent sampleEvent)
@@ -539,8 +550,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withInstalledOption (final InstalledOption installedOption)
@@ -582,8 +594,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withACBandwidth (final ACBandwidth acBandwidth)
@@ -625,8 +638,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withMeasurementTerminals (final MeasurementTerminals measurementTerminals)
@@ -668,8 +682,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withFixedImpedance (final boolean fixedImpedance)
@@ -711,8 +726,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withOffsetCompensation (final boolean offsetCompensation)
@@ -754,8 +770,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withBeepEnabled (final boolean beepEnabled)
@@ -797,8 +814,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withGpibAddress (final Byte gpibAddress)
@@ -840,8 +858,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withFrequencyPeriodInputSource (
@@ -884,8 +903,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withNumberOfTriggerArms (final int numberOfTriggerArms)
@@ -927,8 +947,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withNumberOfReadings (final int numberOfReadings)
@@ -970,8 +991,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withDelay (final double delay_s)
@@ -1013,8 +1035,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withTimer (final double timer_s)
@@ -1056,8 +1079,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withTriggerBuffering (final boolean triggerBuffering)
@@ -1099,8 +1123,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withCalibrationNumber (final int calibrationNumber)
@@ -1142,8 +1167,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withReadingFormat (final ReadingFormat readingFormat)
@@ -1185,8 +1211,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withLocked (final boolean locked)
@@ -1228,8 +1255,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withNumberOfPowerLineCycles (final double numberOfPowerLineCycles)
@@ -1271,8 +1299,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withIntegerScale (final double integerScale)
@@ -1314,8 +1343,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withReadingMemoryMode (final ReadingMemoryMode readingMemoryMode)
@@ -1357,8 +1387,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withLineFrequency_Hz (final double lineFrequency_Hz)
@@ -1400,8 +1431,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withLineFrequencyReference_Hz (final double lineFrequencyReference_Hz)
@@ -1443,8 +1475,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withGpibInputBuffering (final boolean gpibInputBuffering)
@@ -1486,8 +1519,9 @@ public final class HP3457A_GPIB_Settings
       gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withServiceRequestMask (final byte serviceRequestMask)
@@ -1529,8 +1563,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       serviceRequestMask,
       this.errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withErrorMask (final short errorMask)
@@ -1572,8 +1607,9 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       errorMask,
-      this.eoi
-      );
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
   }
   
   public final HP3457A_GPIB_Settings withEoi (final boolean eoi)
@@ -1615,8 +1651,100 @@ public final class HP3457A_GPIB_Settings
       this.gpibInputBuffering,
       this.serviceRequestMask,
       this.errorMask,
-      eoi
-      );
+      eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition);
+  }
+  
+  public final HP3457A_GPIB_Settings withInputChannel (final InputChannel inputChannel)
+  {
+    return new HP3457A_GPIB_Settings (
+      // DefaultDigitalMultiMeterSettings
+      null,
+      getResolution (),
+      getMeasurementMode (),
+      isAutoRange (),
+      getRange (),
+      // HP3457A_GBIB_Settings
+      this.autoZeroMode,
+      this.id,
+      this.triggerArmEvent,
+      this.triggerEvent,
+      this.sampleEvent,
+      this.installedOption,
+      this.acBandwidth,
+      this.measurementTerminals,
+      this.fixedImpedance,
+      this.offsetCompensation,
+      this.beepEnabled,
+      this.gpibAddress,
+      this.frequencyPeriodInputSource,
+      this.numberOfTriggerArms,
+      this.numberOfReadings,
+      this.delay_s,
+      this.timer_s,
+      this.triggerBuffering,
+      this.calibrationNumber,
+      this.readingFormat,
+      this.locked,
+      this.numberOfPowerLineCycles,
+      this.integerScale,
+      this.readingMemoryMode,
+      this.lineFrequency_Hz,
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask,
+      this.eoi,
+      inputChannel,
+      this.actuatorChannelDefinition);
+  }
+  
+  public final HP3457A_GPIB_Settings withActuatorChannelDefinition (final ActuatorChannelDefinition actuatorChannelDefinition)
+  {
+    if (actuatorChannelDefinition == null)
+      throw new IllegalArgumentException ();
+    return new HP3457A_GPIB_Settings (
+      // DefaultDigitalMultiMeterSettings
+      null,
+      getResolution (),
+      getMeasurementMode (),
+      isAutoRange (),
+      getRange (),
+      // HP3457A_GBIB_Settings
+      this.autoZeroMode,
+      this.id,
+      this.triggerArmEvent,
+      this.triggerEvent,
+      this.sampleEvent,
+      this.installedOption,
+      this.acBandwidth,
+      this.measurementTerminals,
+      this.fixedImpedance,
+      this.offsetCompensation,
+      this.beepEnabled,
+      this.gpibAddress,
+      this.frequencyPeriodInputSource,
+      this.numberOfTriggerArms,
+      this.numberOfReadings,
+      this.delay_s,
+      this.timer_s,
+      this.triggerBuffering,
+      this.calibrationNumber,
+      this.readingFormat,
+      this.locked,
+      this.numberOfPowerLineCycles,
+      this.integerScale,
+      this.readingMemoryMode,
+      this.lineFrequency_Hz,
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask,
+      this.eoi,
+      this.inputChannel,
+      actuatorChannelDefinition);
+  
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1757,30 +1885,30 @@ public final class HP3457A_GPIB_Settings
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // CHANNEL
+  // INPUT CHANNEL
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//  private final int channel;
-//  
-//  public final int getChannel ()
-//  {
-//    return this.channel;
-//  }
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //
-  // ACTUATOR CHANNEL
-  //
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  public enum ActuatorChannel
+  public enum InputChannel
   {
     
-    Channel8 (8),
-    Channel9 (9);
+    None      (-1),
+    Channel0  ( 0),
+    Channel1  ( 1),
+    Channel2  ( 2),
+    Channel3  ( 3),
+    Channel4  ( 4),
+    Channel5  ( 5),
+    Channel6  ( 6),
+    Channel7  ( 7),
+    Channel8  ( 8),
+    Channel9  ( 9),
+    Channel10 (10),
+    Channel11 (11),
+    Channel12 (12),
+    Channel13 (13);
     
-    private ActuatorChannel (final int code)
+    private InputChannel (final int code)
     {
       this.code = code;
     }
@@ -1792,16 +1920,169 @@ public final class HP3457A_GPIB_Settings
       return this.code;
     }
     
-    public static final ActuatorChannel fromCode (final int code)
+    public static final InputChannel fromCode (final int code)
     {
       switch (code)
       {
-        case 8:  return Channel8;
-        case 9:  return Channel9;
+        case -1: return None;
+        case  0: return Channel0;
+        case  1: return Channel1;
+        case  2: return Channel2;
+        case  3: return Channel3;
+        case  4: return Channel4;
+        case  5: return Channel5;
+        case  6: return Channel6;
+        case  7: return Channel7;
+        case  8: return Channel8;
+        case  9: return Channel9;
+        case 10: return Channel10;
+        case 11: return Channel11;
+        case 12: return Channel12;
+        case 13: return Channel13;
         default: throw new IllegalArgumentException ();
       }
     }
     
+  }
+  
+  private final InputChannel inputChannel;
+  
+  public final InputChannel getInputChannel ()
+  {
+    return this.inputChannel;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // ACTUATOR CHANNEL DEFINITION
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public final static class ActuatorChannelDefinition
+  {
+    
+    private ActuatorChannelDefinition (
+      final boolean openChannel8,
+      final boolean switchDelayChannel8,
+      final boolean openChannel9,
+      final boolean switchDelayChannel9)
+    {
+      this.openChannel8 = openChannel8;
+      this.switchDelayChannel8 = switchDelayChannel8;
+      this.openChannel9 = openChannel9;
+      this.switchDelayChannel9 = switchDelayChannel9;
+    }
+    
+    private final static ActuatorChannelDefinition FROM_RESET = new ActuatorChannelDefinition (true, false, true, false);
+    
+    public final static ActuatorChannelDefinition fromReset ()
+    {
+      return ActuatorChannelDefinition.FROM_RESET;
+    }
+    
+    private final boolean openChannel8;
+
+    public final boolean isOpenChannel8 ()
+    {
+      return this.openChannel8;
+    }
+
+    private final boolean switchDelayChannel8;
+    
+    public final boolean isSwitchDelayChannel8 ()
+    {
+      return this.switchDelayChannel8;
+    }
+
+    private final boolean openChannel9;
+    
+    public final boolean isOpenChannel9 ()
+    {
+      return this.openChannel9;
+    }
+
+    private final boolean switchDelayChannel9;
+    
+    public final boolean isSwitchDelayChannel9 ()
+    {
+      return this.switchDelayChannel9;
+    }
+    
+  }
+  
+  private final ActuatorChannelDefinition actuatorChannelDefinition;
+  
+  public final ActuatorChannelDefinition getActuatorChannelDefinition ()
+  {
+    return this.actuatorChannelDefinition;
+  }
+
+  public final boolean isOpenChannel8 ()
+  {
+    return this.actuatorChannelDefinition.openChannel8;
+  }
+  
+  public final HP3457A_GPIB_Settings withOpenChannel8 (final boolean openChannel8)
+  {
+    if (this.actuatorChannelDefinition.openChannel8 != openChannel8)
+      return withActuatorChannelDefinition (new ActuatorChannelDefinition (
+        openChannel8,
+        this.actuatorChannelDefinition.switchDelayChannel8,
+        this.actuatorChannelDefinition.openChannel9,
+        this.actuatorChannelDefinition.switchDelayChannel9));
+    else
+      return this;
+  }
+  
+  public final boolean isSwitchDelayChannel8 ()
+  {
+    return this.actuatorChannelDefinition.switchDelayChannel8;
+  }
+  
+  public final HP3457A_GPIB_Settings withSwitchDelayChannel8 (final boolean switchDelayChannel8)
+  {
+    if (this.actuatorChannelDefinition.switchDelayChannel8 != switchDelayChannel8)
+      return withActuatorChannelDefinition (new ActuatorChannelDefinition (
+        this.actuatorChannelDefinition.openChannel8,
+        switchDelayChannel8,
+        this.actuatorChannelDefinition.openChannel9,
+        this.actuatorChannelDefinition.switchDelayChannel9));
+    else
+      return this;
+  }
+  
+  public final boolean isOpenChannel9 ()
+  {
+    return this.actuatorChannelDefinition.openChannel9;
+  }
+  
+  public final HP3457A_GPIB_Settings withOpenChannel9 (final boolean openChannel9)
+  {
+    if (this.actuatorChannelDefinition.openChannel8 != openChannel9)
+      return withActuatorChannelDefinition (new ActuatorChannelDefinition (
+        this.actuatorChannelDefinition.openChannel8,
+        this.actuatorChannelDefinition.switchDelayChannel8,
+        openChannel9,
+        this.actuatorChannelDefinition.switchDelayChannel9));
+    else
+      return this;
+  }
+  
+  public final boolean isSwitchDelayChannel9 ()
+  {
+    return this.actuatorChannelDefinition.switchDelayChannel9;
+  }
+  
+  public final HP3457A_GPIB_Settings withSwitchDelayChannel9 (final boolean switchDelayChannel9)
+  {
+    if (this.actuatorChannelDefinition.switchDelayChannel9 != switchDelayChannel9)
+      return withActuatorChannelDefinition (new ActuatorChannelDefinition (
+        this.actuatorChannelDefinition.openChannel8,
+        this.actuatorChannelDefinition.switchDelayChannel8,
+        this.actuatorChannelDefinition.openChannel9,
+        switchDelayChannel9));
+    else
+      return this;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
