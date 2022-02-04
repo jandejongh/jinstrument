@@ -19,7 +19,6 @@ package org.javajdj.jinstrument.swing.instrument.dmm.hp3457a;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
