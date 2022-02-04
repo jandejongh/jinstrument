@@ -2498,7 +2498,6 @@ public class JInstrumentPanel
             if (Jshort_JBitsLong.this.showPendingUpdates)
             {
               Jshort_JBitsLong.this.setBackground (JInstrumentPanel.this.getBackground ());
-              LOG.log (Level.WARNING, "Setting background!");
             }
           }
           finally
