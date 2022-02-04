@@ -1113,12 +1113,12 @@ public class HP3457A_GPIB_Instrument
     return (int) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
   }
   
-  public final void setChannel (final int channel)
+  public final void setInputChannel (final HP3457A_GPIB_Settings.InputChannel inputChannel)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
       HP3457A_InstrumentCommand.IC_HP3457A_SET_CHANNEL,
-      HP3457A_InstrumentCommand.ICARG_HP3457A_SET_CHANNEL, channel));
+      HP3457A_InstrumentCommand.ICARG_HP3457A_SET_CHANNEL, inputChannel));
   }
   
   public final int getChannelSync (final long timeout, final TimeUnit unit)
@@ -1138,6 +1138,18 @@ public class HP3457A_GPIB_Instrument
     addCommand (new DefaultInstrumentCommand (
       HP3457A_InstrumentCommand.IC_HP3457A_CLOSE_ACTUATOR_CHANNEL,
       HP3457A_InstrumentCommand.ICARG_HP3457A_CLOSE_ACTUATOR_CHANNEL, actuatorChannel));
+  }
+  
+  public final void closeActuatorChannel8 ()
+    throws IOException, InterruptedException
+  {
+    closeActuatorChannel (8);
+  }
+  
+  public final void closeActuatorChannel9 ()
+    throws IOException, InterruptedException
+  {
+    closeActuatorChannel (9);
   }
   
   public final void cardReset ()
@@ -1720,13 +1732,64 @@ public class HP3457A_GPIB_Instrument
     setOhms4W (null, null);
   }
   
-  public final void openActuatorChannel (final HP3457A_GPIB_Settings.ActuatorChannel channel, final boolean delay)
+  public final void openActuatorChannel8 (final Boolean switchDelay)
     throws IOException, InterruptedException
   {
     addCommand (new DefaultInstrumentCommand (
       HP3457A_InstrumentCommand.IC_HP3457A_OPEN_ACTUATOR_CHANNEL,
-      HP3457A_InstrumentCommand.ICARG_HP3457A_OPEN_ACTUATOR_CHANNEL_CHANNEL, channel,
-      HP3457A_InstrumentCommand.ICARG_HP3457A_OPEN_ACTUATOR_CHANNEL_CONTROL, delay));
+      HP3457A_InstrumentCommand.ICARG_HP3457A_OPEN_ACTUATOR_CHANNEL_CHANNEL, 8,
+      HP3457A_InstrumentCommand.ICARG_HP3457A_OPEN_ACTUATOR_CHANNEL_CONTROL, switchDelay));
+  }
+
+  public final void openActuatorChannel8 ()
+    throws IOException, InterruptedException
+  {
+    openActuatorChannel8 (null);
+  }
+
+  public final void setActiveActuatorChannel8 (final boolean active)
+    throws IOException, InterruptedException
+  {
+    if (active)
+      openActuatorChannel8 (null);
+    else
+      closeActuatorChannel (8);
+  }
+
+  public final void setSwitchDelayChannel8 (final boolean switchDelay)
+    throws IOException, InterruptedException
+  {
+    openActuatorChannel8 (switchDelay);
+  }
+
+  public final void openActuatorChannel9 (final Boolean switchDelay)
+    throws IOException, InterruptedException
+  {
+    addCommand (new DefaultInstrumentCommand (
+      HP3457A_InstrumentCommand.IC_HP3457A_OPEN_ACTUATOR_CHANNEL,
+      HP3457A_InstrumentCommand.ICARG_HP3457A_OPEN_ACTUATOR_CHANNEL_CHANNEL, 9,
+      HP3457A_InstrumentCommand.ICARG_HP3457A_OPEN_ACTUATOR_CHANNEL_CONTROL, switchDelay));
+  }
+  
+  public final void openActuatorChannel9 ()
+    throws IOException, InterruptedException
+  {
+    openActuatorChannel9 (null);
+  }
+
+  public final void setActiveActuatorChannel9 (final boolean active)
+    throws IOException, InterruptedException
+  {
+    if (active)
+      openActuatorChannel9 (null);
+    else
+      closeActuatorChannel (9);
+  }
+
+  public final void setSwitchDelayChannel9 (final boolean switchDelay)
+    throws IOException, InterruptedException
+  {
+    openActuatorChannel9 (switchDelay);
   }
 
   public final HP3457A_GPIB_Settings.InstalledOption getInstalledOptionSync (final long timeout, final TimeUnit unit)
@@ -2294,6 +2357,13 @@ public class HP3457A_GPIB_Instrument
   {
     final double doubleValue = processCommand_getDouble (instrumentCommandString);
     return (int) Math.round (doubleValue);
+  }
+  
+  protected final int processCommand_setAndGetInt (final String instrumentCommandString, final int value)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    processCommand_setInt (instrumentCommandString, value);
+    return processCommand_getInt (instrumentCommandString);
   }
   
   protected final int processCommand_getInt (
@@ -2966,32 +3036,24 @@ public class HP3457A_GPIB_Instrument
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_CHANNEL:
         {
           // CHAN
-          final int channel =
-            (int) instrumentCommand.get (
+          final HP3457A_GPIB_Settings.InputChannel inputChannel =
+            (HP3457A_GPIB_Settings.InputChannel) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_CHANNEL);
-          writeSync ("CHAN " + Integer.toString (channel) + ";");
-          // XXX?
-          // newInstrumentSettings = getSettingsFromInstrumentSync ();
+          final int newChannelNumber = processCommand_setAndGetInt ("CHAN", inputChannel.getCode ());
+          final HP3457A_GPIB_Settings.InputChannel newInputChannel =
+            HP3457A_GPIB_Settings.InputChannel.fromCode (newChannelNumber);
+          if (instrumentSettings != null && instrumentSettings.getInputChannel () != newInputChannel)
+            newInstrumentSettings = instrumentSettings.withInputChannel (newInputChannel);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_CHANNEL:
         {
           // CHAN?
-          final String queryReturn = new String (writeAndReadEOISync ("CHAN?;"), Charset.forName ("US-ASCII")).trim ();
-          if (queryReturn == null)
-            throw new IOException ();
-          final int channel;
-          try
-          {
-            channel = Integer.parseInt (queryReturn);
-          }
-          catch (NumberFormatException nfe)
-          {
-            throw new IOException ();
-          }
-          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, channel);
-          // XXX?
-          // newInstrumentSettings = getSettingsFromInstrumentSync ();
+          final int channelNumber = processCommand_getInt ("CHAN");
+          final HP3457A_GPIB_Settings.InputChannel inputChannel = HP3457A_GPIB_Settings.InputChannel.fromCode (channelNumber);
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, inputChannel);
+          if (instrumentSettings != null && instrumentSettings.getInputChannel () != inputChannel)
+            newInstrumentSettings = instrumentSettings.withInputChannel (inputChannel);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_CLOSE_ACTUATOR_CHANNEL:
@@ -3000,9 +3062,23 @@ public class HP3457A_GPIB_Instrument
           final int actuatorChannel =
             (int) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_CLOSE_ACTUATOR_CHANNEL);
+          if (actuatorChannel != 8 && actuatorChannel != 9)
+            throw new IllegalArgumentException ();
           writeSync ("CLOSE " + Integer.toString (actuatorChannel) + ";");
-          // XXX?
-          // newInstrumentSettings = getSettingsFromInstrumentSync ();
+          if (instrumentSettings != null)
+          {
+            switch (actuatorChannel)
+            {
+              case 8:
+                newInstrumentSettings = instrumentSettings.withOpenChannel8 (false);
+                break;
+              case 9:
+                newInstrumentSettings = instrumentSettings.withOpenChannel9 (false);
+                break;
+              default:
+                throw new RuntimeException ();
+            }
+          }
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_CARD_RESET:
@@ -3616,18 +3692,35 @@ public class HP3457A_GPIB_Instrument
         case HP3457A_InstrumentCommand.IC_HP3457A_OPEN_ACTUATOR_CHANNEL:
         {
           // OPEN
-          final HP3457A_GPIB_Settings.ActuatorChannel channel =
-            (HP3457A_GPIB_Settings.ActuatorChannel) instrumentCommand.get (
+          final int channel =
+            (int) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_OPEN_ACTUATOR_CHANNEL_CHANNEL);
-          final boolean delay =
-            (boolean) instrumentCommand.get (
+          final Boolean delay =
+            (Boolean) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_OPEN_ACTUATOR_CHANNEL_CONTROL);
-          writeSync ("OPEN" +
-            (channel != null ? ("," + Integer.toString (channel.getCode ())) : "") +
-            (delay ? ",1" : ",0") +
-            ";");
-          // XXX?
-          // newInstrumentSettings = getSettingsFromInstrumentSync ();
+          if (channel != 8 && channel != 9)
+            throw new IllegalArgumentException ();
+          writeSync ("OPEN " + Integer.toString (channel) + (delay != null ? (delay ? ",1" : ",0") : "") + ";");
+          if (instrumentSettings != null)
+          {
+            switch (channel)
+            {
+              case 8:
+                if (delay != null)
+                  newInstrumentSettings = instrumentSettings.withOpenChannel8 (true).withSwitchDelayChannel8 (delay);
+                else
+                  newInstrumentSettings = instrumentSettings.withOpenChannel8 (true).withSwitchDelayChannel8 (true);
+                break;
+              case 9:
+                if (delay != null)
+                  newInstrumentSettings = instrumentSettings.withOpenChannel9 (true).withSwitchDelayChannel9 (delay);
+                else
+                  newInstrumentSettings = instrumentSettings.withOpenChannel9 (true).withSwitchDelayChannel9 (true);
+                break;
+              default:
+                throw new RuntimeException ();
+            }
+          }
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_INSTALLED_OPTION:
