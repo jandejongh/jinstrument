@@ -82,7 +82,7 @@ public class JHP3457A_GPIB_Management
     topPanel.setLayout (new GridLayout (1, 3));
     topPanel.add (new JInstrumentPanel (
       hp3457a,
-      "",
+      "Controller/Dev/Inst",
       level + 1,
       getGuiPreferencesManagementColor (),
       new JTinyCDIStatusAndControl (
