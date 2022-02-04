@@ -232,7 +232,10 @@ public class JHP3457A_GPIB_TriggerAcquisition
         (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getLineRejection_dB (),
         null,
         true))));
-    acquisitionPanel.add (new JInstrumentPanel (
+    final JPanel resolutionPanel = new JPanel ();
+    acquisitionPanel.add (resolutionPanel);
+    resolutionPanel.setLayout (new GridLayout (2, 1));
+    resolutionPanel.add (new JInstrumentPanel (
       hp3457a,
       "Resolution [%]",
       level + 1,
@@ -243,6 +246,18 @@ public class JHP3457A_GPIB_TriggerAcquisition
         "Resolution [%]",
         (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getResolution_percent (),
         hp3457a::setResolution_percent,
+        true))));
+    resolutionPanel.add (new JInstrumentPanel (
+      hp3457a,
+      "Resolution [ppm]",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      JCenter.XY (new Jdouble_JTextField (
+        Double.NaN,
+        8,
+        "Resolution [ppm]",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getResolution_ppm (),
+        hp3457a::setResolution_ppm,
         true))));
         
   }

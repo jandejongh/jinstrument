@@ -2751,6 +2751,11 @@ public final class HP3457A_GPIB_Settings
     return this.resolution_percent;
   }
   
+  public final double getResolution_ppm ()
+  {
+    return this.resolution_percent * 1e4;
+  }
+  
   /** Calculates the resolution in percent, given the number of power-line cycles.
    * 
    * <p>

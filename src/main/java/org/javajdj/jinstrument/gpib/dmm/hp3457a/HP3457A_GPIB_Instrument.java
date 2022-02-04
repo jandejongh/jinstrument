@@ -1396,6 +1396,11 @@ public class HP3457A_GPIB_Instrument
       HP3457A_InstrumentCommand.ICARG_HP3457A_SET_RESOLUTION_RESOLUTION, resolution_percent));
   }
   
+  public final void setResolution_ppm (final double resolution_ppm)
+  {
+    setResolution_percent (resolution_ppm / 1E4);
+  }
+  
   public final String getIdSync (final long timeout, final TimeUnit unit)
     throws IOException, InterruptedException, TimeoutException
   {
