@@ -114,7 +114,8 @@ public final class HP3457A_GPIB_Settings
       final short errorMask,
       final boolean eoi,
       final InputChannel inputChannel,
-      final ActuatorChannelDefinition actuatorChannelDefinition)
+      final ActuatorChannelDefinition actuatorChannelDefinition,
+      final MemorySizesDefinition memorySizesDefinition)
   {
     // DefaultDigitalMultiMeterSettings
     super (bytes, resolution, measurementMode, autoRange, range, getReadingUnit (measurementMode));
@@ -152,6 +153,7 @@ public final class HP3457A_GPIB_Settings
     this.eoi = eoi;
     this.inputChannel = inputChannel;
     this.actuatorChannelDefinition = actuatorChannelDefinition;
+    this.memorySizesDefinition = memorySizesDefinition;
   }
   
   public static HP3457A_GPIB_Settings fromReset ()
@@ -196,7 +198,8 @@ public final class HP3457A_GPIB_Settings
       (short) 2047, // Error Mask: all enabled
       false,        // EOI
       InputChannel.None,
-      ActuatorChannelDefinition.fromReset ());
+      ActuatorChannelDefinition.fromReset (),
+      null); // MemorySizesDefinition
   }
   
   public static HP3457A_GPIB_Settings fromPreset ()
@@ -248,7 +251,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withMeasurementMode (final DigitalMultiMeter.MeasurementMode measurementMode)
@@ -297,7 +301,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withAutoRange (final boolean autoRange)
@@ -342,7 +347,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withRange (final DigitalMultiMeter.Range range)
@@ -387,7 +393,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withResolution_percent (final double resolution_percent)
@@ -432,7 +439,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withAutoZeroMode (final AutoZeroMode autoZeroMode)
@@ -477,7 +485,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withId (final String id)
@@ -522,7 +531,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withTriggerArmEvent (final TriggerEvent triggerArmEvent)
@@ -567,7 +577,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withTriggerEvent (final TriggerEvent triggerEvent)
@@ -612,7 +623,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withSampleEvent (final TriggerEvent sampleEvent)
@@ -657,7 +669,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withInstalledOption (final InstalledOption installedOption)
@@ -702,7 +715,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withACBandwidth (final ACBandwidth acBandwidth)
@@ -747,7 +761,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withMeasurementTerminals (final MeasurementTerminals measurementTerminals)
@@ -792,7 +807,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withFixedImpedance (final boolean fixedImpedance)
@@ -837,7 +853,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withOffsetCompensation (final boolean offsetCompensation)
@@ -882,7 +899,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withBeepEnabled (final boolean beepEnabled)
@@ -927,7 +945,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withGpibAddress (final Byte gpibAddress)
@@ -972,7 +991,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withFrequencyPeriodInputSource (
@@ -1018,7 +1038,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withNumberOfTriggerArms (final int numberOfTriggerArms)
@@ -1063,7 +1084,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withNumberOfReadings (final int numberOfReadings)
@@ -1108,7 +1130,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withDelay (final double delay_s)
@@ -1153,7 +1176,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withTimer (final double timer_s)
@@ -1198,7 +1222,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withTriggerBuffering (final boolean triggerBuffering)
@@ -1243,7 +1268,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withCalibrationNumber (final int calibrationNumber)
@@ -1288,7 +1314,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withReadingFormat (final ReadingFormat readingFormat)
@@ -1333,7 +1360,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withLocked (final boolean locked)
@@ -1378,7 +1406,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withNumberOfPowerLineCycles (final double numberOfPowerLineCycles)
@@ -1423,7 +1452,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withIntegerScale (final double integerScale)
@@ -1468,7 +1498,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withReadingMemoryMode (final ReadingMemoryMode readingMemoryMode)
@@ -1513,7 +1544,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withLineFrequency_Hz (final double lineFrequency_Hz)
@@ -1558,7 +1590,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withLineFrequencyReference_Hz (final double lineFrequencyReference_Hz)
@@ -1603,7 +1636,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withGpibInputBuffering (final boolean gpibInputBuffering)
@@ -1648,7 +1682,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withServiceRequestMask (final byte serviceRequestMask)
@@ -1693,7 +1728,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withErrorMask (final short errorMask)
@@ -1738,7 +1774,8 @@ public final class HP3457A_GPIB_Settings
       errorMask,
       this.eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withEoi (final boolean eoi)
@@ -1783,7 +1820,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       eoi,
       this.inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withInputChannel (final InputChannel inputChannel)
@@ -1828,7 +1866,8 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       inputChannel,
-      this.actuatorChannelDefinition);
+      this.actuatorChannelDefinition,
+      this.memorySizesDefinition);
   }
   
   public final HP3457A_GPIB_Settings withActuatorChannelDefinition (final ActuatorChannelDefinition actuatorChannelDefinition)
@@ -1875,7 +1914,57 @@ public final class HP3457A_GPIB_Settings
       this.errorMask,
       this.eoi,
       this.inputChannel,
-      actuatorChannelDefinition);
+      actuatorChannelDefinition,
+      this.memorySizesDefinition);
+  
+  }
+  
+  public final HP3457A_GPIB_Settings withMemorySizesDefinition (final MemorySizesDefinition memorySizesDefinition)
+  {
+    if (actuatorChannelDefinition == null)
+      throw new IllegalArgumentException ();
+    return new HP3457A_GPIB_Settings (
+      // DefaultDigitalMultiMeterSettings
+      null,
+      getResolution (),
+      getMeasurementMode (),
+      isAutoRange (),
+      getRange (),
+      // HP3457A_GBIB_Settings
+      this.resolution_percent,
+      this.autoZeroMode,
+      this.id,
+      this.triggerArmEvent,
+      this.triggerEvent,
+      this.sampleEvent,
+      this.installedOption,
+      this.acBandwidth,
+      this.measurementTerminals,
+      this.fixedImpedance,
+      this.offsetCompensation,
+      this.beepEnabled,
+      this.gpibAddress,
+      this.frequencyPeriodInputSource,
+      this.numberOfTriggerArms,
+      this.numberOfReadings,
+      this.delay_s,
+      this.timer_s,
+      this.triggerBuffering,
+      this.calibrationNumber,
+      this.readingFormat,
+      this.locked,
+      this.numberOfPowerLineCycles,
+      this.integerScale,
+      this.readingMemoryMode,
+      this.lineFrequency_Hz,
+      this.lineFrequencyReference_Hz,
+      this.gpibInputBuffering,
+      this.serviceRequestMask,
+      this.errorMask,
+      this.eoi,
+      this.inputChannel,
+      this.actuatorChannelDefinition,
+      memorySizesDefinition);
   
   }
   
@@ -2656,10 +2745,33 @@ public final class HP3457A_GPIB_Settings
   public final static class MemorySizesDefinition
   {
 
+    /** The total memory size (readings, subprograms, states) of the HP-3457.
+     * 
+     * <p>
+     * HP 3457 Operating Manual, pp 4-83...4-85.
+     * 
+     */
+    public final static int TOTAL_MEMORY_SIZE_BYTES = 2208;
+    
+    /** The memory size of a state slot of the HP-3457.
+     * 
+     * <p>
+     * HP 3457 Operating Manual, pp 4-84.
+     * 
+     */
+    public final static int STATE_MEMORY_SIZE_BYTES = 69;
+    
     public MemorySizesDefinition (final int readings_bytes, final int subprograms_bytes)
     {
+      // Argument checking; result is not used.
+      MemorySizesDefinition.getMaxStatesMemorySize_bytes (readings_bytes, subprograms_bytes);
       this.readings_bytes = readings_bytes;
       this.subprograms_bytes = subprograms_bytes;
+    }
+    
+    public final static int getTotalMemorySize_bytes ()
+    {
+      return MemorySizesDefinition.TOTAL_MEMORY_SIZE_BYTES;
     }
     
     private final int readings_bytes;
@@ -2675,7 +2787,112 @@ public final class HP3457A_GPIB_Settings
     {
       return this.subprograms_bytes;
     }
+
+    public final static int getMaxStatesMemorySize_bytes (final int readings_bytes, final int subprograms_bytes)
+    {
+      // HP 3457 Operating Manual, pp 4-83.
+      if (readings_bytes < 32
+        || subprograms_bytes < 32
+        || MemorySizesDefinition.TOTAL_MEMORY_SIZE_BYTES - readings_bytes - subprograms_bytes
+             < MemorySizesDefinition.STATE_MEMORY_SIZE_BYTES)
+        throw new IllegalArgumentException ();
+      return MemorySizesDefinition.TOTAL_MEMORY_SIZE_BYTES - readings_bytes - subprograms_bytes;
+    }
     
+    public final int getMaxStatesMemorySize_bytes ()
+    {
+      return MemorySizesDefinition.getMaxStatesMemorySize_bytes (this.readings_bytes, this.subprograms_bytes);
+    }
+    
+    @Override
+    public final int hashCode ()
+    {
+      int hash = 7;
+      hash = 23 * hash + this.readings_bytes;
+      hash = 23 * hash + this.subprograms_bytes;
+      return hash;
+    }
+
+    @Override
+    public final boolean equals (Object obj)
+    {
+      if (this == obj)
+      {
+        return true;
+      }
+      if (obj == null)
+      {
+        return false;
+      }
+      if (getClass () != obj.getClass ())
+      {
+        return false;
+      }
+      final MemorySizesDefinition other = (MemorySizesDefinition) obj;
+      if (this.readings_bytes != other.readings_bytes)
+      {
+        return false;
+      }
+      return this.subprograms_bytes == other.subprograms_bytes;
+    }
+    
+  }
+  
+  private final MemorySizesDefinition memorySizesDefinition;
+  
+  public final MemorySizesDefinition getMemorySizesDefinition ()
+  {
+    return this.memorySizesDefinition;
+  }
+  
+  public final int getMaxReadings_ASCII ()
+  {
+    return this.memorySizesDefinition != null
+      ? (int) Math.floor (((double) getMaxReadingsMemorySize_bytes ()) / 16 /* XXX Make a constant */)
+      : -1;        
+  }
+  
+  public final int getMaxReadings_SINT ()
+  {
+    return this.memorySizesDefinition != null
+      ? (int) Math.floor (((double) getMaxReadingsMemorySize_bytes ()) / 2 /* XXX Make a constant */)
+      : -1;        
+  }
+  
+  public final int getMaxReadings_DINT ()
+  {
+    return this.memorySizesDefinition != null
+      ? (int) Math.floor (((double) getMaxReadingsMemorySize_bytes ()) / 4 /* XXX Make a constant */)
+      : -1;        
+  }
+  
+  public final int getMaxReadings_SREAL ()
+  {
+    return this.memorySizesDefinition != null
+      ? (int) Math.floor (((double) getMaxReadingsMemorySize_bytes ()) / 4 /* XXX Make a constant */)
+      : -1;        
+  }
+  
+  public final int getMaxReadingsMemorySize_bytes ()
+  {
+    return this.memorySizesDefinition != null ? this.memorySizesDefinition.getMaxReadingsMemorySize_bytes () : -1;
+  }
+  
+  public final int getMaxSubprogramsMemorySize_bytes ()
+  {
+    return this.memorySizesDefinition != null ? this.memorySizesDefinition.getMaxSubprogramsMemorySize_bytes () : -1;    
+  }
+  
+  public final int getMaxStatesMemorySize_bytes ()
+  {
+    return this.memorySizesDefinition != null ? this.memorySizesDefinition.getMaxStatesMemorySize_bytes () : -1;        
+  }
+  
+  public final int getMaxStates ()
+  {
+    return this.memorySizesDefinition != null
+      ? (int) Math.floor (((double) getMaxStatesMemorySize_bytes ()) / MemorySizesDefinition.STATE_MEMORY_SIZE_BYTES)
+      : -1;        
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

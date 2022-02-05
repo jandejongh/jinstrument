@@ -511,6 +511,7 @@ public class HP3457A_GPIB_Instrument
       getNumberOfPowerLineCyclesASync ();
       getLineFrequency_HzASync ();
       getLineFrequencyReference_HzASync ();
+      getMemorySizesASync ();
       
     }
     catch (InterruptedException ie)
@@ -1551,6 +1552,18 @@ public class HP3457A_GPIB_Instrument
       HP3457A_InstrumentCommand.ICARG_HP3457A_SET_MEMORY_SIZES_SUBPROGRAMS, subprograms_bytes));        
   }
 
+  public final void setMaxReadingsMemorySize_bytes (final int readings_bytes)
+    throws IOException, InterruptedException
+  {
+    setMemorySizes (readings_bytes, null);
+  }
+
+  public final void setMaxSubprogramsMemorySize_bytes (final int subprograms_bytes)
+    throws IOException, InterruptedException
+  {
+    setMemorySizes (null, subprograms_bytes);
+  }
+
   public final void setMemorySizes (final Integer readings_bytes)
     throws IOException, InterruptedException
   {
@@ -1570,6 +1583,14 @@ public class HP3457A_GPIB_Instrument
       HP3457A_InstrumentCommand.IC_HP3457A_GET_MEMORY_SIZES);
     addAndProcessCommandSync (command, timeout, unit);
     return (HP3457A_GPIB_Settings.MemorySizesDefinition) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
+  }
+
+  public final void getMemorySizesASync ()
+    throws IOException, InterruptedException
+  {
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP3457A_InstrumentCommand.IC_HP3457A_GET_MEMORY_SIZES);
+    addCommand (command);
   }
 
   public final void setNumberOfDigits (final int numberOfDigits)
@@ -3580,12 +3601,23 @@ public class HP3457A_GPIB_Instrument
           final Integer subProgramsBytes =
             (Integer) instrumentCommand.get (
               HP3457A_InstrumentCommand.ICARG_HP3457A_SET_MEMORY_SIZES_SUBPROGRAMS);
-          writeSync ("MSIZE" +
-            (readingsBytes != null ? ("," + Integer.toString (readingsBytes)) : "") +
-            (subProgramsBytes != null ? ("," + Integer.toString (subProgramsBytes)) : "") +
-            ";");
-          // newInstrumentSettings = getSettingsFromInstrumentSync ();
-          break;
+          if (instrumentSettings == null)
+          {
+            LOG.log (Level.WARNING, "No instrument settings yet; MSIZE command ignored on instrument {0}.",
+              new Object[]{this});
+            throw new UnsupportedOperationException ();
+          }
+          final int readings = readingsBytes != null
+            ? readingsBytes
+            : instrumentSettings.getMaxReadingsMemorySize_bytes ();
+          final int subPrograms = subProgramsBytes != null
+            ? subProgramsBytes
+            : instrumentSettings.getMaxSubprogramsMemorySize_bytes ();
+          // Next line checks the validity of readings and subPrograms; result is not used.
+          HP3457A_GPIB_Settings.MemorySizesDefinition.getMaxStatesMemorySize_bytes (readings, subPrograms);
+          writeSync ("MSIZE " + Integer.toString (readings) + "," + Integer.toString (subPrograms) + ";");
+          // Fallthrough on purpose to get the new memory allocations.
+          // break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_GET_MEMORY_SIZES:
         {
@@ -3600,15 +3632,18 @@ public class HP3457A_GPIB_Instrument
           final int subprograms_bytes;
           try
           {
-            readings_bytes = Integer.parseInt (components[0]);
-            subprograms_bytes = Integer.parseInt (components[1]);
+            readings_bytes = (int) Math.round (Double.parseDouble (components[0]));
+            subprograms_bytes = (int) Math.round (Double.parseDouble (components[1]));
           }
           catch (IllegalArgumentException iae)
           {
             throw new IOException ();
           }
-          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY,
-            new HP3457A_GPIB_Settings.MemorySizesDefinition (readings_bytes, subprograms_bytes));
+          final HP3457A_GPIB_Settings.MemorySizesDefinition newMemorySizesDefinition =
+            new HP3457A_GPIB_Settings.MemorySizesDefinition (readings_bytes, subprograms_bytes);
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, newMemorySizesDefinition);
+          if (instrumentSettings != null && ! newMemorySizesDefinition.equals (instrumentSettings.getMemorySizesDefinition ()))
+            newInstrumentSettings = instrumentSettings.withMemorySizesDefinition (newMemorySizesDefinition);
           break;
         }
         case HP3457A_InstrumentCommand.IC_HP3457A_SET_NUMBER_OF_DIGITS:

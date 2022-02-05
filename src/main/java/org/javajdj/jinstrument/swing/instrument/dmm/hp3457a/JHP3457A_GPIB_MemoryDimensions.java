@@ -22,18 +22,20 @@ import java.util.logging.Logger;
 import javax.swing.JLabel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Instrument;
+import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalMultiMeterPanel;
 import org.javajdj.jswing.jcenter.JCenter;
 
-/** A Swing panel for Memory Control of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
+/** A Swing panel for Memory Dimensions of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class JHP3457A_GPIB_Memory
+public class JHP3457A_GPIB_MemoryDimensions
   extends JDigitalMultiMeterPanel
   implements InstrumentView
 {
@@ -44,7 +46,7 @@ public class JHP3457A_GPIB_Memory
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private static final Logger LOG = Logger.getLogger (JHP3457A_GPIB_Memory.class.getName ());
+  private static final Logger LOG = Logger.getLogger (JHP3457A_GPIB_MemoryDimensions.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -52,7 +54,7 @@ public class JHP3457A_GPIB_Memory
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JHP3457A_GPIB_Memory (
+  public JHP3457A_GPIB_MemoryDimensions (
     final DigitalMultiMeter digitalMultiMeter,
     final String title,
     final int level,
@@ -65,18 +67,95 @@ public class JHP3457A_GPIB_Memory
     final HP3457A_GPIB_Instrument hp3457a = (HP3457A_GPIB_Instrument) digitalMultiMeter;
 
     removeAll ();
-    setLayout (new GridLayout (1, 1));
+    setLayout (new GridLayout (12, 2));
 
-    add (JCenter.XY (new JLabel ("TBD: MSIZE/MSIZE? [management/mem]")));
+    add (new JLabel ("Readings [bytes]:"));
+    add (JCenter.XY (new Jint_JTextField (
+        -1,
+        4,
+        "Readings",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getMaxReadingsMemorySize_bytes (),
+        hp3457a::setMaxReadingsMemorySize_bytes,
+        true)));
+    add (new JLabel ("    -> Max Readings [ASCII]:"));
+    add (JCenter.XY (new Jint_JTextField (
+        -1,
+        4,
+        "Max Readings [ASCII]",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getMaxReadings_ASCII (),
+        null,
+        true)));
+    add (new JLabel ("    -> Max Readings [SINT]:"));
+    add (JCenter.XY (new Jint_JTextField (
+        -1,
+        4,
+        "Max Readings [SINT]",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getMaxReadings_SINT (),
+        null,
+        true)));
+    add (new JLabel ("    -> Max Readings [DINT]:"));
+    add (JCenter.XY (new Jint_JTextField (
+        -1,
+        4,
+        "Max Readings [DINT]",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getMaxReadings_DINT (),
+        null,
+        true)));
+    add (new JLabel ("    -> Max Readings [SREAL]:"));
+    add (JCenter.XY (new Jint_JTextField (
+        -1,
+        4,
+        "Max Readings [SREAL]",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getMaxReadings_SREAL (),
+        null,
+        true)));
+    add (new JLabel ());
+    add (new JLabel ());
+    add (new JLabel ("Subprograms [bytes]:"));
+    add (JCenter.XY (new Jint_JTextField (
+        -1,
+        4,
+        "Subprograms",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getMaxSubprogramsMemorySize_bytes (),
+        hp3457a::setMaxSubprogramsMemorySize_bytes,
+        true)));
+    add (new JLabel ());
+    add (new JLabel ());
+    add (new JLabel ("States [bytes]:"));
+    add (JCenter.XY (new Jint_JTextField (
+        -1,
+        4,
+        "States",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getMaxStatesMemorySize_bytes (),
+        null,
+        true)));
+    add (new JLabel ("    -> Max States:"));
+    add (JCenter.XY (new Jint_JTextField (
+        -1,
+        4,
+        "Max States",
+        (final InstrumentSettings settings) -> ((HP3457A_GPIB_Settings) settings).getMaxStates (),
+        null,
+        true)));
+    add (new JLabel ());
+    add (new JLabel ());
+    add (new JLabel ("Total [bytes]:"));
+    add (JCenter.XY (new Jint_JTextField (
+        -1,
+        4,
+        "Total",
+        (final InstrumentSettings settings) -> HP3457A_GPIB_Settings.MemorySizesDefinition.getTotalMemorySize_bytes (),
+        null,
+        true)));
     
   }
 
-  public JHP3457A_GPIB_Memory (final HP3457A_GPIB_Instrument digitalMultiMeter, final int level)
+  public JHP3457A_GPIB_MemoryDimensions (final HP3457A_GPIB_Instrument digitalMultiMeter, final int level)
   {
     this (digitalMultiMeter, null, level, null);
   }
   
-  public JHP3457A_GPIB_Memory (final HP3457A_GPIB_Instrument digitalMultiMeter)
+  public JHP3457A_GPIB_MemoryDimensions (final HP3457A_GPIB_Instrument digitalMultiMeter)
   {
     this (digitalMultiMeter, 0);
   }
@@ -93,14 +172,14 @@ public class JHP3457A_GPIB_Memory
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "HP-3457A [GPIB] Memory Control";
+      return "HP-3457A [GPIB] Memory Dimensions";
     }
 
     @Override
     public final InstrumentView openInstrumentView (final Instrument instrument)
     {
       if (instrument != null && (instrument instanceof HP3457A_GPIB_Instrument))
-        return new JHP3457A_GPIB_Memory ((HP3457A_GPIB_Instrument) instrument);
+        return new JHP3457A_GPIB_MemoryDimensions ((HP3457A_GPIB_Instrument) instrument);
       else
         return null;
     }
@@ -117,7 +196,7 @@ public class JHP3457A_GPIB_Memory
   @Override
   public String getInstrumentViewUrl ()
   {
-    return JHP3457A_GPIB_Memory.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
+    return JHP3457A_GPIB_MemoryDimensions.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
       + "<>"
       + getInstrument ().getInstrumentUrl ();
   }

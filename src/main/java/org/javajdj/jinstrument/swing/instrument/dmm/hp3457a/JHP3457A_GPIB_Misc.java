@@ -83,8 +83,8 @@ public class JHP3457A_GPIB_Misc
       new JDialogCheckBox (
         getBackground ().darker (),
         "Memory",
-        new Dimension (800, 600),
-        new JHP3457A_GPIB_Memory (
+        new Dimension (600, 400),
+        new JHP3457A_GPIB_MemoryDimensions (
           hp3457a,
           "",
           level + 1,
