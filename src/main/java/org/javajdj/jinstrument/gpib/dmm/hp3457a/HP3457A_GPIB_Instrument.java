@@ -29,7 +29,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.javajdj.jinstrument.DefaultDigitalMultiMeterReading;
 import org.javajdj.jinstrument.DefaultInstrumentCommand;
 import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.DeviceType;
@@ -714,7 +713,7 @@ public class HP3457A_GPIB_Instrument
     }
     final boolean overflow = status.isHighLow ();
     final String overflowMessage = status.isHighLow () ? "[Over/Under]Flow" : null;
-    return new DefaultDigitalMultiMeterReading (
+    return new HP3457A_GPIB_Reading (
       settings,
       null,
       readingValue,
