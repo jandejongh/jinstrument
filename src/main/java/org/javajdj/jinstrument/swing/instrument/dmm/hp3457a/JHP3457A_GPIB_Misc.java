@@ -19,8 +19,8 @@ package org.javajdj.jinstrument.swing.instrument.dmm.hp3457a;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.util.LinkedHashSet;
 import java.util.logging.Logger;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalMultiMeter;
 import org.javajdj.jinstrument.Instrument;
@@ -32,8 +32,8 @@ import org.javajdj.jinstrument.gpib.dmm.hp3457a.HP3457A_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalMultiMeterPanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesManagementColor;
+import org.javajdj.jinstrument.swing.component.JRealTimeReading;
 import org.javajdj.jinstrument.swing.debug.JInstrumentCommandQueueMonitor;
-import org.javajdj.jswing.jcenter.JCenter;
 import org.javajdj.jswing.jcolorcheckbox.JDialogCheckBox;
 
 /** A Swing panel for Miscellaneous Settings of a {@link HP3457A_GPIB_Instrument} Digital Multi Meter.
@@ -145,6 +145,14 @@ public class JHP3457A_GPIB_Misc
           level + 1,
           JInstrumentPanel.getGuiPreferencesManagementColor ()))));
     
+    final LinkedHashSet<Enum<?>> readingTypes = new LinkedHashSet<> ();
+    readingTypes.addAll (hp3457a.getSupportedMeasurementModes ());
+    this.jGraph = new JRealTimeReading (
+        hp3457a,
+        "Readings Graph(s)",
+        level,
+        getGuiPreferencesManagementColor (),
+        readingTypes);
     bottomPanel.add (new JInstrumentPanel (
       hp3457a,
       "Graph [exp]",
@@ -153,8 +161,8 @@ public class JHP3457A_GPIB_Misc
       new JDialogCheckBox (
         getBackground ().darker (),
         "Graph [exp]",
-        new Dimension (800, 600),
-        JCenter.XY (new JLabel ("TBD")))));
+        new Dimension (1600, 900),
+        this.jGraph)));
     
   }
 
@@ -214,6 +222,14 @@ public class JHP3457A_GPIB_Misc
   {
     return getInstrumentViewUrl ();
   }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SWING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  final JRealTimeReading jGraph;
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
