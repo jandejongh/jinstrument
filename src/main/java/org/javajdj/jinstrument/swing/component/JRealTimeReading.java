@@ -19,10 +19,14 @@ package org.javajdj.jinstrument.swing.component;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentListener;
@@ -31,6 +35,8 @@ import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentStatus;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jinstrument.util.DynamicTimeSeriesChart;
+import org.javajdj.jswing.jcenter.JCenter;
+import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
 /** A Swing (base) component showing in real-time the readings (if one-dimensional) from an {@link Instrument}.
  * 
@@ -72,15 +78,51 @@ public class JRealTimeReading
     else for (final Enum<?> readingType : this.readingTypes)
       this.chartMap.put (readingType, new DynamicTimeSeriesChart (readingType.toString ()));
     
+    this.readingTypesEnabledMap = new LinkedHashMap<> ();
+    
     setLayout (new BorderLayout ());
     
+    final JPanel controlPanel = new JPanel ();
+    add (controlPanel, BorderLayout.NORTH);
     this.chartPanel = new JPanel ();
     add (this.chartPanel, BorderLayout.CENTER);
     
-    this.chartPanel.setLayout (new GridLayout (2, 2));
-    
-    for (final DynamicTimeSeriesChart chart : this.chartMap.values ())
-      this.chartPanel.add (chart);
+    controlPanel.setLayout (new GridLayout (1, Math.min (8, 1 + this.chartMap.size ())));
+    final JInstrumentPanel clearReadingPanel = new JInstrumentPanel (
+      instrument,
+      "Clear Readings",
+      level + 1,
+      getGuiPreferencesManagementColor ());
+    controlPanel.add (clearReadingPanel);
+    final JColorCheckBox jClearReadingButton = new JColorCheckBox ((t) -> Color.blue);
+    jClearReadingButton.addActionListener ((ActionEvent ae) -> JRealTimeReading.this.clearReading ());
+    clearReadingPanel.add (JCenter.XY (jClearReadingButton));
+    for (final Enum<?> readingType : this.chartMap.keySet ())
+    {
+      final JPanel readingTypeEnablePanel = new JPanel ();
+      controlPanel.add (readingTypeEnablePanel);
+      readingTypeEnablePanel.setLayout (new GridLayout (2, 1));
+      this.readingTypesEnabledMap.put (readingType, true);
+      final JColorCheckBox.JBoolean jBoolean = new JColorCheckBox.JBoolean (Color.green);
+      jBoolean.addActionListener (new ActionListener ()
+      {
+        @Override
+        public void actionPerformed (final ActionEvent ae)
+        {
+          final boolean oldValue = JRealTimeReading.this.readingTypesEnabledMap.get (readingType);
+          JRealTimeReading.this.readingTypesEnabledMap.put (readingType, ! oldValue);
+          jBoolean.setDisplayedValue (! oldValue);
+          JRealTimeReading.this.rebuildChartPanel ();
+        }
+      });
+      jBoolean.setDisplayedValue (true);
+      readingTypeEnablePanel.add (JCenter.XY (jBoolean));
+      final JLabel jLabel = new JLabel (readingType != null ? readingType.toString () : getTitle ());
+      jLabel.setHorizontalAlignment (SwingConstants.CENTER);
+      readingTypeEnablePanel.add (jLabel);
+    }
+
+    rebuildChartPanel ();
     
     getInstrument ().addInstrumentListener (this.instrumentListener);
 
@@ -113,6 +155,14 @@ public class JRealTimeReading
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // READING TYPES ENABLED MAP
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final LinkedHashMap<Enum<?>, Boolean> readingTypesEnabledMap;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // SWING
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,6 +170,46 @@ public class JRealTimeReading
   private final JPanel chartPanel;
   
   private final LinkedHashMap<Enum<?>, DynamicTimeSeriesChart> chartMap = new LinkedHashMap<> ();
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // REBUILD CHART PANEL
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private void rebuildChartPanel ()
+  {
+    this.chartPanel.removeAll ();
+    if (this.readingTypes == null)
+    {
+      this.chartPanel.setLayout (new GridLayout (1, 1));
+      final boolean active = this.readingTypesEnabledMap.get (null);
+      if (active)
+        this.chartPanel.add (this.chartMap.get (null));
+    }
+    else
+    {
+      int activeGraphs = 0;
+      for (final Enum<?> key: this.readingTypes)
+      {
+        final boolean active = this.readingTypesEnabledMap.get (key);
+        if (active)
+          activeGraphs++;
+      }
+      if (activeGraphs <= 1)
+        this.chartPanel.setLayout (new GridLayout (1, 1));
+      else
+        this.chartPanel.setLayout (new GridLayout (2, 2));
+      for (final Enum<?> key: this.readingTypes)
+      {
+        final boolean active = this.readingTypesEnabledMap.get (key);
+        if (active)
+          this.chartPanel.add (this.chartMap.get (key));
+      }
+    }
+    this.chartPanel.revalidate ();
+    this.chartPanel.repaint ();
+  }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -137,9 +227,7 @@ public class JRealTimeReading
       this.chartMap.put (null, new DynamicTimeSeriesChart (getTitle ()));
     else for (final Enum<?> readingType : this.readingTypes)
       this.chartMap.put (readingType, new DynamicTimeSeriesChart (readingType.toString ()));
-    this.chartPanel.removeAll ();
-    for (final DynamicTimeSeriesChart chart : this.chartMap.values ())
-      this.chartPanel.add (chart);
+    rebuildChartPanel ();
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +257,14 @@ public class JRealTimeReading
       if (instrument != JRealTimeReading.this.getInstrument () || instrumentReading == null)
         throw new IllegalArgumentException ();
       final Enum<?> readingType = instrumentReading.getReadingType ();
-      if (JRealTimeReading.this.readingTypes != null && ! JRealTimeReading.this.readingTypes.contains (readingType))
+      if (JRealTimeReading.this.readingTypes == null)
+      {
+        if (! JRealTimeReading.this.readingTypesEnabledMap.get (null))
+          return;    
+      }
+      else if (! JRealTimeReading.this.readingTypes.contains (readingType))
+        return;
+      else if (! JRealTimeReading.this.readingTypesEnabledMap.get (readingType))
         return;
       final Object readingValue = instrumentReading.getReadingValue ();
       if (readingValue == null || ! (readingValue instanceof Double))
@@ -181,11 +276,9 @@ public class JRealTimeReading
       SwingUtilities.invokeLater (() ->
       {
         setInhibitInstrumentControl ();
-        //
         try
         {
-          // XXX Why the cast to float??
-          chart.update ((float) reading);
+          chart.update ((float) reading); // XXX Why the cast to float??
         }
         finally
         {
