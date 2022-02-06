@@ -44,6 +44,7 @@ import org.javajdj.jinstrument.gpib.fg.hp8116a.HP8116A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.fg.hp8116a.HP8116A_GPIB_Settings;
 import org.javajdj.jinstrument.gpib.fg.hp8116a.HP8116A_GPIB_Status;
 import org.javajdj.jinstrument.swing.default_view.JDefaultFunctionGeneratorView;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jbyte.JByte;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
@@ -472,7 +473,7 @@ public class JHP8116A_GPIB
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newDutyCycle_percent = getDutyCycleFromDialog_percent ("Enter Duty Cycle [%]", null);
+      final Double newDutyCycle_percent = JInstrumentDialog.getDutyCycleFromDialog_percent ("Enter Duty Cycle [%]", null);
       if (newDutyCycle_percent != null)
       {
         try
@@ -496,7 +497,7 @@ public class JHP8116A_GPIB
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newPulseWidth_s = getPeriodFromDialog_s ("Enter Pulse Width [s]", null);
+      final Double newPulseWidth_s = JInstrumentDialog.getPeriodFromDialog_s ("Enter Pulse Width [s]", null);
       if (newPulseWidth_s != null)
       {
         try
@@ -520,7 +521,7 @@ public class JHP8116A_GPIB
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Integer newBurstLength = getIntegerFromDialog ("Enter Burst Length [#]", null);
+      final Integer newBurstLength = JInstrumentDialog.getIntegerFromDialog ("Enter Burst Length [#]", null);
       if (newBurstLength != null)
       {
         try
@@ -544,7 +545,7 @@ public class JHP8116A_GPIB
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newRepeatInterval = getPeriodFromDialog_s ("Enter Repeat Interval [s]", null);
+      final Double newRepeatInterval = JInstrumentDialog.getPeriodFromDialog_s ("Enter Repeat Interval [s]", null);
       if (newRepeatInterval != null)
       {
         try
@@ -568,7 +569,7 @@ public class JHP8116A_GPIB
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newStartFrequency = getFrequencyFromDialog_Hz ("Enter Start Frequency [Hz]", null);
+      final Double newStartFrequency = JInstrumentDialog.getFrequencyFromDialog_Hz ("Enter Start Frequency [Hz]", null);
       if (newStartFrequency != null)
       {
         try
@@ -592,7 +593,7 @@ public class JHP8116A_GPIB
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newStopFrequency = getFrequencyFromDialog_Hz ("Enter Stop Frequency [Hz]", null);
+      final Double newStopFrequency = JInstrumentDialog.getFrequencyFromDialog_Hz ("Enter Stop Frequency [Hz]", null);
       if (newStopFrequency != null)
       {
         try
@@ -616,7 +617,7 @@ public class JHP8116A_GPIB
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newSweepTime = getPeriodFromDialog_s ("Enter Sweep Time [s]", null);
+      final Double newSweepTime = JInstrumentDialog.getPeriodFromDialog_s ("Enter Sweep Time [s]", null);
       if (newSweepTime != null)
       {
         try
@@ -640,7 +641,7 @@ public class JHP8116A_GPIB
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newMarkerFrequency = getFrequencyFromDialog_Hz ("Enter Marker Frequency [Hz]", null);
+      final Double newMarkerFrequency = JInstrumentDialog.getFrequencyFromDialog_Hz ("Enter Marker Frequency [Hz]", null);
       if (newMarkerFrequency != null)
       {
         try

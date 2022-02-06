@@ -48,6 +48,7 @@ import org.javajdj.junits.Unit;
 import org.javajdj.jinstrument.swing.base.JFrequencyCounterPanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.setPanelBorder;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
 /** A one-size-fits-all Swing panel for control and status of a generic {@link FrequencyCounter}.
@@ -334,7 +335,7 @@ public class JDefaultFrequencyCounterView<M, T>
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newGateTime_s = getPeriodFromDialog_s ("Enter Gate Time [s]", null);
+      final Double newGateTime_s = JInstrumentDialog.getPeriodFromDialog_s ("Enter Gate Time [s]", null);
       if (newGateTime_s != null)
         try
         {

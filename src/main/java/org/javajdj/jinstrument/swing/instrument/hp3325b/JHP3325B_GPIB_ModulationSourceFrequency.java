@@ -37,6 +37,7 @@ import org.javajdj.jinstrument.gpib.fg.hp3325b.HP3325B_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.fg.hp3325b.HP3325B_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JFunctionGeneratorPanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
 /** A Swing panel for the Modulation Source Frequency setting of a {@link HP3325B_GPIB_Instrument} Function Generator.
@@ -157,7 +158,7 @@ public class JHP3325B_GPIB_ModulationSourceFrequency
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newFrequency_Hz = getFrequencyFromDialog_Hz ("Enter Modulation Source Frequency [Hz]", null);
+      final Double newFrequency_Hz = JInstrumentDialog.getFrequencyFromDialog_Hz ("Enter Modulation Source Frequency [Hz]", null);
       if (newFrequency_Hz != null)
         try
         {

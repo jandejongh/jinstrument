@@ -38,6 +38,7 @@ import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.SpectrumAnalyzer;
 import org.javajdj.jinstrument.SpectrumAnalyzerSettings;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
@@ -248,7 +249,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       @Override
       public void mouseClicked (final MouseEvent me)
       {
-        final Double newCenterFrequency_MHz = getFrequencyFromDialog_MHz ("Enter Center Frequency [MHz]",
+        final Double newCenterFrequency_MHz = JInstrumentDialog.getFrequencyFromDialog_MHz ("Enter Center Frequency [MHz]",
           ((SpectrumAnalyzerSettings) (getSpectrumAnalyzer ().getCurrentInstrumentSettings ())).getCenterFrequency_MHz ());
         if (newCenterFrequency_MHz != null)
           try
@@ -272,7 +273,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       @Override
       public void mouseClicked (final MouseEvent me)
       {
-        final Double newSpan_MHz = getFrequencyFromDialog_MHz ("Enter Span [MHz]",
+        final Double newSpan_MHz = JInstrumentDialog.getFrequencyFromDialog_MHz ("Enter Span [MHz]",
           ((SpectrumAnalyzerSettings) (getSpectrumAnalyzer ().getCurrentInstrumentSettings ())).getSpan_MHz ());
         if (newSpan_MHz != null)
           try
@@ -296,7 +297,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       @Override
       public void mouseClicked (final MouseEvent me)
       {
-        final Double newResolutionBandwidth_Hz = getFrequencyFromDialog_Hz ("Enter Resolution Bandwidth [Hz]",
+        final Double newResolutionBandwidth_Hz = JInstrumentDialog.getFrequencyFromDialog_Hz ("Enter Resolution Bandwidth [Hz]",
           ((SpectrumAnalyzerSettings) (getSpectrumAnalyzer ().getCurrentInstrumentSettings ())).getResolutionBandwidth_Hz ());
         if (newResolutionBandwidth_Hz != null)
           try
@@ -341,7 +342,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       @Override
       public void mouseClicked (final MouseEvent me)
       {
-        final Double newVideoBandwidth_Hz = getFrequencyFromDialog_Hz ("Enter Video Bandwidth [Hz]",
+        final Double newVideoBandwidth_Hz = JInstrumentDialog.getFrequencyFromDialog_Hz ("Enter Video Bandwidth [Hz]",
           ((SpectrumAnalyzerSettings) (getSpectrumAnalyzer ().getCurrentInstrumentSettings ())).getVideoBandwidth_Hz ());
         if (newVideoBandwidth_Hz != null)
           try
@@ -386,7 +387,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       @Override
       public void mouseClicked (final MouseEvent me)
       {
-        final Double newSweepTime_s = getPeriodFromDialog_s ("Enter Sweep Time [s]",
+        final Double newSweepTime_s = JInstrumentDialog.getPeriodFromDialog_s ("Enter Sweep Time [s]",
           ((SpectrumAnalyzerSettings) (getSpectrumAnalyzer ().getCurrentInstrumentSettings ())).getSweepTime_s ());
         if (newSweepTime_s != null)
           try
@@ -431,7 +432,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       @Override
       public void mouseClicked (final MouseEvent me)
       {
-        final Double newReferenceLevel_dBm = getPowerFromDialog_dBm ("Enter Reference Level [dBm]",
+        final Double newReferenceLevel_dBm = JInstrumentDialog.getPowerFromDialog_dBm ("Enter Reference Level [dBm]",
           ((SpectrumAnalyzerSettings) (getSpectrumAnalyzer ().getCurrentInstrumentSettings ())).getReferenceLevel_dBm ());
         if (newReferenceLevel_dBm != null)
           try
@@ -455,7 +456,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       @Override
       public void mouseClicked (final MouseEvent me)
       {
-        final Double newRfAttenuation_dB = getPowerRatioFromDialog_dB ("Enter RF Attenuation [dB]",
+        final Double newRfAttenuation_dB = JInstrumentDialog.getPowerRatioFromDialog_dB ("Enter RF Attenuation [dB]",
           ((SpectrumAnalyzerSettings) (getSpectrumAnalyzer ().getCurrentInstrumentSettings ())).getRfAttenuation_dB ());
         if (newRfAttenuation_dB != null)
           try

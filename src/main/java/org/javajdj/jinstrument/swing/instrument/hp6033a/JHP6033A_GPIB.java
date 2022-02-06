@@ -44,6 +44,7 @@ import org.javajdj.jinstrument.gpib.psu.hp6033a.HP6033A_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.psu.hp6033a.HP6033A_GPIB_Settings;
 import org.javajdj.jinstrument.gpib.psu.hp6033a.HP6033A_GPIB_Status;
 import org.javajdj.jinstrument.swing.default_view.JDefaultPowerSupplyUnitView;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jbyte.JBitsLong;
 import org.javajdj.jswing.jbyte.JByte;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
@@ -275,7 +276,7 @@ public class JHP6033A_GPIB
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newDelay_s = getPeriodFromDialog_s ("Enter Delay [s]", null);
+      final Double newDelay_s = JInstrumentDialog.getPeriodFromDialog_s ("Enter Delay [s]", null);
       if (newDelay_s != null)
         try
         {

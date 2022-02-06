@@ -37,6 +37,7 @@ import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jinstrument.swing.base.JSelectiveLevelMeterPanel;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
 /** A Swing panel for the Frequency Step [%] setting of a {@link RS_ESH3_GPIB_Instrument} Selective Level Meter.
@@ -157,7 +158,7 @@ public class JRS_ESH3_GPIB_Frequency_Step_Percent
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newFrequencyStep_Percent = getFrequencyFromDialog_MHz ("Enter Frequency Step [%]", null);
+      final Double newFrequencyStep_Percent = JInstrumentDialog.getFrequencyFromDialog_MHz ("Enter Frequency Step [%]", null);
       if (newFrequencyStep_Percent != null)
         try
         {

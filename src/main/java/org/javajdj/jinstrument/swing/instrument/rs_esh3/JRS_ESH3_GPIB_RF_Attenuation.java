@@ -41,6 +41,7 @@ import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.setPanelBorder;
 import org.javajdj.jinstrument.swing.base.JSelectiveLevelMeterPanel;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
 /** A Swing panel for the RF Attenuation settings of a {@link RS_ESH3_GPIB_Instrument} Selective Level Meter.
@@ -173,7 +174,7 @@ public class JRS_ESH3_GPIB_RF_Attenuation
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newAttenuation_dB = getPowerRatioFromDialog_dB ("Enter RF Attenuation [dB]", null);
+      final Double newAttenuation_dB = JInstrumentDialog.getPowerRatioFromDialog_dB ("Enter RF Attenuation [dB]", null);
       if (newAttenuation_dB != null)
         try
         {

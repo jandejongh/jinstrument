@@ -44,6 +44,7 @@ import org.javajdj.jinstrument.PowerSupplyUnitReading;
 import org.javajdj.jinstrument.PowerSupplyUnitSettings;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jinstrument.swing.base.JPowerSupplyUnitPanel;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
@@ -705,7 +706,7 @@ public class JDefaultPowerSupplyUnitView
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newVoltage_V = getVoltageFromDialog_V ("Enter Soft-Limit Voltage [V]", null);
+      final Double newVoltage_V = JInstrumentDialog.getVoltageFromDialog_V ("Enter Soft-Limit Voltage [V]", null);
       if (newVoltage_V != null)
         try
         {
@@ -729,7 +730,7 @@ public class JDefaultPowerSupplyUnitView
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newCurrent_A = getCurrentFromDialog_A ("Enter Soft-Limit Current [A]", null);
+      final Double newCurrent_A = JInstrumentDialog.getCurrentFromDialog_A ("Enter Soft-Limit Current [A]", null);
       if (newCurrent_A != null)
         try
         {
@@ -753,7 +754,7 @@ public class JDefaultPowerSupplyUnitView
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newPower_W = getPowerFromDialog_W ("Enter Soft-Limit Power [W]", null);
+      final Double newPower_W = JInstrumentDialog.getPowerFromDialog_W ("Enter Soft-Limit Power [W]", null);
       if (newPower_W != null)
         try
         {
@@ -777,7 +778,7 @@ public class JDefaultPowerSupplyUnitView
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newVoltage_V = getVoltageFromDialog_V ("Enter Set Voltage [V]", null);
+      final Double newVoltage_V = JInstrumentDialog.getVoltageFromDialog_V ("Enter Set Voltage [V]", null);
       if (newVoltage_V != null)
         try
         {
@@ -831,7 +832,7 @@ public class JDefaultPowerSupplyUnitView
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newCurrent_A = getCurrentFromDialog_A ("Enter Set Current [A]", null);
+      final Double newCurrent_A = JInstrumentDialog.getCurrentFromDialog_A ("Enter Set Current [A]", null);
       if (newCurrent_A != null)
         try
         {
@@ -885,7 +886,7 @@ public class JDefaultPowerSupplyUnitView
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newPower_W = getPowerFromDialog_W ("Enter Set Power [W]", null);
+      final Double newPower_W = JInstrumentDialog.getPowerFromDialog_W ("Enter Set Power [W]", null);
       if (newPower_W != null)
         try
         {

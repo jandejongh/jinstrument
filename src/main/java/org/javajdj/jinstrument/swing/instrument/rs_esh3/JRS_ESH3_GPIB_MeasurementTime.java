@@ -41,6 +41,7 @@ import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.setPanelBorder;
 import org.javajdj.jinstrument.swing.base.JSelectiveLevelMeterPanel;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
 /** A Swing panel for the Measurement Time setting of a {@link RS_ESH3_GPIB_Instrument} Selective Level Meter.
@@ -185,7 +186,7 @@ public class JRS_ESH3_GPIB_MeasurementTime
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newTime_s = getPeriodFromDialog_s ("Enter Measurement Time [s]", null);
+      final Double newTime_s = JInstrumentDialog.getPeriodFromDialog_s ("Enter Measurement Time [s]", null);
       if (newTime_s != null)
         try
         {

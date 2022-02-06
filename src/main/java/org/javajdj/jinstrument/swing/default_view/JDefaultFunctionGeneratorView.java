@@ -51,6 +51,7 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.swing.base.JFunctionGeneratorPanel;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.setPanelBorder;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
@@ -432,7 +433,7 @@ public class JDefaultFunctionGeneratorView
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newFrequency_Hz = getFrequencyFromDialog_Hz ("Enter Frequency [Hz]", null);
+      final Double newFrequency_Hz = JInstrumentDialog.getFrequencyFromDialog_Hz ("Enter Frequency [Hz]", null);
       if (newFrequency_Hz != null)
         try
         {
@@ -576,7 +577,7 @@ public class JDefaultFunctionGeneratorView
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newAmplitude_Vpp = getVoltageFromDialog_V ("Enter Amplitude [V] (pp)", null);
+      final Double newAmplitude_Vpp = JInstrumentDialog.getVoltageFromDialog_V ("Enter Amplitude [V] (pp)", null);
       if (newAmplitude_Vpp != null)
         try
         {
@@ -664,7 +665,7 @@ public class JDefaultFunctionGeneratorView
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newOffset_V = getVoltageFromDialog_V ("Enter DC Offset [V]", null);
+      final Double newOffset_V = JInstrumentDialog.getVoltageFromDialog_V ("Enter DC Offset [V]", null);
       if (newOffset_V != null)
         try
         {

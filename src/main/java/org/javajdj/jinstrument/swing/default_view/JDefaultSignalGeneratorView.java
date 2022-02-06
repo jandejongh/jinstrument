@@ -47,6 +47,7 @@ import org.javajdj.jinstrument.SignalGenerator.ModulationSource;
 import org.javajdj.jinstrument.SignalGeneratorSettings;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import org.javajdj.jinstrument.swing.base.JSignalGeneratorPanel;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
@@ -99,7 +100,7 @@ public class JDefaultSignalGeneratorView
       @Override
       public void mouseClicked (final MouseEvent me)
       {
-        final Double newCenterFrequency_Hz = getFrequencyFromDialog_Hz ("Enter Center Frequency [Hz]", null);
+        final Double newCenterFrequency_Hz = JInstrumentDialog.getFrequencyFromDialog_Hz ("Enter Center Frequency [Hz]", null);
         if (newCenterFrequency_Hz != null)
           try
           {
@@ -277,7 +278,7 @@ public class JDefaultSignalGeneratorView
       @Override
       public void mouseClicked (final MouseEvent me)
       {
-        final Double newSpan_Hz = getFrequencyFromDialog_Hz ("Enter Span [Hz]", null);
+        final Double newSpan_Hz = JInstrumentDialog.getFrequencyFromDialog_Hz ("Enter Span [Hz]", null);
         if (newSpan_Hz != null)
           try
           {
@@ -306,7 +307,7 @@ public class JDefaultSignalGeneratorView
       @Override
       public void mouseClicked (final MouseEvent me)
       {
-        final Double newStartFrequency_Hz = getFrequencyFromDialog_Hz ("Enter Start Frequency [Hz]", null);
+        final Double newStartFrequency_Hz = JInstrumentDialog.getFrequencyFromDialog_Hz ("Enter Start Frequency [Hz]", null);
         if (newStartFrequency_Hz != null)
           try
           {
@@ -335,7 +336,7 @@ public class JDefaultSignalGeneratorView
       @Override
       public void mouseClicked (final MouseEvent me)
       {
-        final Double newStopFrequency_Hz = getFrequencyFromDialog_Hz ("Enter Stop Frequency [Hz]", null);
+        final Double newStopFrequency_Hz = JInstrumentDialog.getFrequencyFromDialog_Hz ("Enter Stop Frequency [Hz]", null);
         if (newStopFrequency_Hz != null)
           try
           {

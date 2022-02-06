@@ -41,6 +41,7 @@ import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.setPanelBorder;
 import org.javajdj.jinstrument.swing.base.JSelectiveLevelMeterPanel;
+import org.javajdj.jinstrument.swing.dialog.JInstrumentDialog;
 import org.javajdj.jswing.jsevensegment.JSevenSegmentNumber;
 
 /** A Swing panel for the Maximum Level settings of a {@link RS_ESH3_GPIB_Instrument} Selective Level Meter.
@@ -173,7 +174,7 @@ public class JRS_ESH3_GPIB_MaxLevel
     @Override
     public void mouseClicked (final MouseEvent me)
     {
-      final Double newLevel_dB = getPowerRatioFromDialog_dB ("Enter Maximum Level [dB]", null);
+      final Double newLevel_dB = JInstrumentDialog.getPowerRatioFromDialog_dB ("Enter Maximum Level [dB]", null);
       if (newLevel_dB != null)
         try
         {
