@@ -18,6 +18,7 @@ package org.javajdj.jinstrument.swing.main;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -53,6 +54,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.Bus;
 import org.javajdj.jinstrument.Controller;
+import org.javajdj.jinstrument.ControllerType;
 import org.javajdj.jinstrument.DefaultInstrumentRegistry;
 import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.Instrument;
@@ -106,6 +108,7 @@ import org.javajdj.jinstrument.swing.instrument.hp8116a.JHP8116A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.hp3325b.JHP3325B_GPIB;
 import org.javajdj.jinstrument.swing.instrument.rs_esh3.JRS_ESH3_GPIB;
 import org.javajdj.jinstrument.swing.instrument.tek2440.JTek2440_GPIB;
+import org.javajdj.jswing.dialog.JArraySelectorDialog;
 
 
 /** Swing {@code JFrame} for opening and interacting with instruments like RF signal generators, spectrum analyzers, etc.
@@ -321,12 +324,26 @@ extends JFrame
       JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
     });
     viewMenu.add (closeCurrentViewMenuItem);
-    final JMenuItem closeViewsMenuItem = new JMenuItem ("Close View(s)");
-    closeViewsMenuItem.addActionListener ((ActionEvent ae) ->
+    final JMenuItem closeViewMenuItem = new JMenuItem ("Close View");
+    closeViewMenuItem.addActionListener ((ActionEvent ae) ->
     {
-      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+      final JArraySelectorDialog<InstrumentView> jInstrumentViewDialog = new JArraySelectorDialog<> (
+        this,
+        "Close Instrument View",
+        true,
+        this.instrumentRegistry.getInstrumentViews ().toArray (new InstrumentView[]{}),
+        null,
+        "Select Instrument View:",
+        null);
+      // Attempt to always have the dialog title completely visible.
+      jInstrumentViewDialog.setMinimumSize (new Dimension (320, 240));
+      jInstrumentViewDialog.setLocationRelativeTo (this);
+      jInstrumentViewDialog.setVisible (true);
+      final InstrumentView selectedItem = jInstrumentViewDialog.getSelectedItem ();
+      if (selectedItem != null)
+        this.instrumentRegistry.removeInstrumentView (selectedItem);
     });
-    viewMenu.add (closeViewsMenuItem);
+    viewMenu.add (closeViewMenuItem);
     jMenuBar.add (viewMenu);
     //
     // Instrument
@@ -369,7 +386,27 @@ extends JFrame
     final JMenuItem openControllerMenuItem = new JMenuItem ("Open Controller");
     openControllerMenuItem.addActionListener ((ActionEvent ae) ->
     {
-      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+      final JArraySelectorDialog<ControllerType> jControllerTypeDialog = new JArraySelectorDialog<> (
+        this,
+        "Open Controller",
+        true,
+        this.instrumentRegistry.getControllerTypes ().toArray (new ControllerType[]{}),
+        null,
+        "Select Controller Type:",
+        null);
+      // Attempt to always have the dialog title completely visible.
+      jControllerTypeDialog.setMinimumSize (new Dimension (320, 240));
+      jControllerTypeDialog.setLocationRelativeTo (this);
+      jControllerTypeDialog.setVisible (true);
+      final ControllerType selectedItem = jControllerTypeDialog.getSelectedItem ();
+      if (selectedItem != null)
+      {
+        JOptionPane.showMessageDialog (
+          this,
+          "Not implemented yet; you selected " + selectedItem + "!",
+          "Error",
+          JOptionPane.ERROR_MESSAGE);
+      }
     });
     controllerMenu.add (openControllerMenuItem);
     final JMenuItem closeControllerMenuItem = new JMenuItem ("Close Controller");
