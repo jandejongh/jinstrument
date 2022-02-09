@@ -13,7 +13,36 @@ is there as well.
 ## License
 Apache v2.0.
 
-## Status/Log [20220130 - v0.8-SNAPSHOT]
+## Status [20220209 - v0.8-SNAPSHOT]
+
+### Beta [Target met for V1.0 Release]:
+- HP-3457A Digital MultiMeter [fairly complete]
+- HP-3478A Digital MultiMeter [complete]
+- HP-5316A Frequency Counter [almost complete; could use GUI rework]
+- HP-6033A Power Supply Unit / System Power Supply [almost complete]
+- HP-8116A 50MHz Programmable Pulse/Function Generator [complete - OPTION001 ONLY!]
+- ProLogix GPIB Ethernet [complete]
+- R&S ESH-3 Selective Level Meter [almost complete]
+- Tek-2440 Digital Storage Oscilloscope [almost complete]
+
+### Alpha [Target: -> Beta for V1.0 Release]:
+- HP-8566B Spectrum Analyzer
+- HP-8663A Synthesized Signal Generator
+- HP-70000 Spectrum Analyzer [MMS]
+
+### Pre-Alpha [Target: -> Beta for V1.0 Release]:
+- Easy Configuration (Framework)
+
+### Pre-Alpha [Target: -> Beta for V1.0 Release]:
+- User Manual
+- Plugin Framework
+- Instrument Tuning Framework
+
+## Status/Log [20220209 - v0.8-SNAPSHOT]
+
+### [20220209] Alpha -> Beta:
+- HP-3457A Digital Multimeter [All commands implemented, except GUI for state memory, MATH, SUBPROGRMs and a few minor functions;
+                               acquisition and settings work; fine-tuning required; requires jswing 0.8-SNAPSHOT]
 
 ### [20220130] Added Alpha:
 - HP-3457A Digital Multimeter [All commands implemented;
