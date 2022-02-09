@@ -15,7 +15,21 @@ Apache v2.0.
 
 ## Status [20220209 - v0.8-SNAPSHOT]
 
+Just to let you know that a V0.8 release is in the making.
+New instruments will be the HP-3457A Digital MultiMeter and
+the HP-3325B Function Generator, more or less completing
+support for my personally-owned DC/LF instruments.
+What I'm currently working on is GUI configuration and documentation.
+I really want to accomplish a much easier interface
+to opening supported instruments through (their) default views.
+I also intend to complete first-order documentation for V0.8.
+I'm currently aiming at a release data of April 1st, 2022.
+After that, I will or intend to make sure the project
+gets more interest, through announcements on forums
+and releases (including dependencies) on Maven Central.
+
 ### Beta [Target met for V1.0 Release]:
+- HP-3325B Function Generator [almost complete]
 - HP-3457A Digital MultiMeter [fairly complete]
 - HP-3478A Digital MultiMeter [complete]
 - HP-5316A Frequency Counter [almost complete; could use GUI rework]
@@ -30,10 +44,10 @@ Apache v2.0.
 - HP-8663A Synthesized Signal Generator
 - HP-70000 Spectrum Analyzer [MMS]
 
-### Pre-Alpha [Target: -> Beta for V1.0 Release]:
+### Pre-Alpha [Target: -> Beta for V0.8 Release]:
 - Easy Configuration (Framework)
 
-### Pre-Alpha [Target: -> Beta for V1.0 Release]:
+### Pre-Alpha [Target: -> Beta for V1.0 Release; Alpha for V0.8 Release]:
 - User Manual
 - Plugin Framework
 - Instrument Tuning Framework
