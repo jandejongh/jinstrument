@@ -21,14 +21,17 @@ New instruments will be the HP-3457A Digital MultiMeter and
   support for my personally-owned DC/LF instruments
   (except for the HP-54502A Digitizing Oscilloscope
   and the HP-6050A DC Load Mainframe).
+
 What I'm currently working on is GUI configuration and documentation.
 I really want to accomplish a much easier interface
   to opening supported instruments through (their) default views.
 I also intend to complete first-order documentation for V0.8.
+
 I'm currently aiming at a release data of April 1st, 2022.
 After that, I will or intend to make sure the project
   gets more interest, through announcements on forums
   and releases (including dependencies) on Maven Central.
+
 I will then also think about and decide upon
   the (modified) target for a V1.0 Release.
 
