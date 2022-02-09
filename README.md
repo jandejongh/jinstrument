@@ -21,6 +21,7 @@ New instruments will be the HP-3457A Digital MultiMeter and
   support for my personally-owned DC/LF instruments
   (except for the HP-54502A Digitizing Oscilloscope
   and the HP-6050A DC Load Mainframe).
+Work on these instruments is more or less finished by now.
 
 What I'm currently working on is GUI configuration and documentation.
 I really want to accomplish a much easier interface
