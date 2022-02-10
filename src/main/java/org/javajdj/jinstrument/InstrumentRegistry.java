@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,33 @@ package org.javajdj.jinstrument;
 
 import java.util.List;
 
-/** Central registry of {@link Controller}, {@link Device}, and {@link Instrument} types and instantiations.
+/** A (central) registry of {@link Controller}, {@link Device}, and {@link Instrument} types and instantiations.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
 public interface InstrumentRegistry
 {
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // CONSTRUCTOR(S) / FACTORY / CLONING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  /** Creates an empty instance of this type of InstrumentRegistry.
+   * 
+   * @return An empty instance of this type of InstrumentRegistry.
+   * 
+   */
+  InstrumentRegistry empty ();
+  
+  InstrumentRegistry withSameTypesButInstancesFromUrlLists (
+    List<String> busUrls,
+    List<String> controllerUrls,
+    List<String> deviceUrls,
+    List<String> instrumentUrls,
+    List<String> instrumentViewUrls);
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -40,7 +60,11 @@ public interface InstrumentRegistry
     
     default void instrumentRegistrySetSelectedInstrumentView (
       final InstrumentRegistry instrumentRegistry,
-      InstrumentView instrumentView) { }
+      InstrumentView instrumentView)
+    {
+      // XXX
+      // EMPTY
+    }
     
   }
   
