@@ -146,53 +146,7 @@ extends JFrame
     this.jTabbedPane = new JTabbedPane ();
     getContentPane ().add (this.jTabbedPane, BorderLayout.CENTER);
     
-    this.instrumentRegistry = new DefaultInstrumentRegistry ();
-    this.instrumentRegistry.addBusType (BusType_GPIB.getInstance ());
-    this.instrumentRegistry.addControllerType (ProLogixGpibEthernetControllerType.getInstance ());
-    this.instrumentRegistry.addDeviceType (DeviceType_GPIB.getInstance ());
-    this.instrumentRegistry.addInstrumentType (NONE_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP3325B_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP3457A_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP3478A_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP3586_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP5316A_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP5328A_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP6033A_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP6050A_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP8116A_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP8156A_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP8350_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP8566B_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP8663A_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP54502A_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (HP70000_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (RS_ESH3_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (Tek2440_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentType (Wiltron560A_GPIB_Instrument.INSTRUMENT_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JControllerDebug.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JGpibDeviceConsole.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JDefaultInstrumentManagementUrlsView.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JDefaultInstrumentManagementView.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JTinyCDIStatusAndControl.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JSettingsMonitor.INSTRUMENT_VIEW_TYPE);    
-    this.instrumentRegistry.addInstrumentViewType (JDefaultDigitalStorageOscilloscopeView.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerView.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerSettingsPanel.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerTraceDisplay.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JDefaultSignalGeneratorView.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JDefaultDigitalMultiMeterView.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JDefaultFunctionGeneratorView.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JDefaultPowerSupplyUnitView.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JDefaultFrequencyCounterView.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JDefaultSelectiveLevelMeterView.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JHP3325B_GPIB.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JHP3457A_GPIB.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JHP3478A_GPIB.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JHP5316A_GPIB.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JHP6033A_GPIB.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JHP8116A_GPIB.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JTek2440_GPIB.INSTRUMENT_VIEW_TYPE);
-    this.instrumentRegistry.addInstrumentViewType (JRS_ESH3_GPIB.INSTRUMENT_VIEW_TYPE);
+    this.instrumentRegistry = createDefaultInstrumentRegistry ();
     
     this.jInstrumentRegistry = new JInstrumentRegistry (this.instrumentRegistry, 0);
     this.jTabbedPane.addTab ("Registry", this.jInstrumentRegistry);
@@ -270,12 +224,72 @@ extends JFrame
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
-  // INSTRUMENT REGISTRY
+  // [DEFAULT] INSTRUMENT REGISTRY
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  private DefaultInstrumentRegistry instrumentRegistry;
+  private InstrumentRegistry instrumentRegistry;
 
+  protected InstrumentRegistry createDefaultInstrumentRegistry ()
+  {
+    
+    final DefaultInstrumentRegistry instrumentRegistry = new DefaultInstrumentRegistry ();
+    
+    instrumentRegistry.addBusType (BusType_GPIB.getInstance ());
+    
+    instrumentRegistry.addControllerType (ProLogixGpibEthernetControllerType.getInstance ());
+    
+    instrumentRegistry.addDeviceType (DeviceType_GPIB.getInstance ());
+    
+    instrumentRegistry.addInstrumentType (NONE_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP3325B_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP3457A_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP3478A_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP3586_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP5316A_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP5328A_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP6033A_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP6050A_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP8116A_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP8156A_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP8350_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP8566B_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP8663A_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP54502A_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (HP70000_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (RS_ESH3_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (Tek2440_GPIB_Instrument.INSTRUMENT_TYPE);
+    instrumentRegistry.addInstrumentType (Wiltron560A_GPIB_Instrument.INSTRUMENT_TYPE);
+    
+    instrumentRegistry.addInstrumentViewType (JControllerDebug.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JGpibDeviceConsole.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JDefaultInstrumentManagementUrlsView.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JDefaultInstrumentManagementView.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JTinyCDIStatusAndControl.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JSettingsMonitor.INSTRUMENT_VIEW_TYPE);    
+    instrumentRegistry.addInstrumentViewType (JDefaultDigitalStorageOscilloscopeView.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerView.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerSettingsPanel.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JDefaultSpectrumAnalyzerTraceDisplay.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JDefaultSignalGeneratorView.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JDefaultDigitalMultiMeterView.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JDefaultFunctionGeneratorView.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JDefaultPowerSupplyUnitView.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JDefaultFrequencyCounterView.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JDefaultSelectiveLevelMeterView.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JHP3325B_GPIB.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JHP3457A_GPIB.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JHP3478A_GPIB.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JHP5316A_GPIB.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JHP6033A_GPIB.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JHP8116A_GPIB.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JTek2440_GPIB.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JRS_ESH3_GPIB.INSTRUMENT_VIEW_TYPE);
+    
+    return instrumentRegistry;
+    
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // [SWING] INSTRUMENT REGISTRY
@@ -522,7 +536,7 @@ extends JFrame
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  private DefaultInstrumentRegistry loadRegistry (
+  private InstrumentRegistry loadRegistry (
     final String fileName,
     final boolean switchRegistry,
     final boolean reportFailure)
@@ -591,7 +605,7 @@ extends JFrame
           final String instrumentViewUrl = instrumentViewOject.getString ("url");
           instrumentViewUrls.add (instrumentViewUrl);
         }
-        final DefaultInstrumentRegistry instrumentRegistry = this.instrumentRegistry.withSameTypesButInstancesFromUrlLists
+        final InstrumentRegistry instrumentRegistry = this.instrumentRegistry.withSameTypesButInstancesFromUrlLists
           (busUrls, controllerUrls, deviceUrls, instrumentUrls, instrumentViewUrls);
         if (instrumentRegistry == null)
           throw new ParseException ("registry", 0);
@@ -634,7 +648,7 @@ extends JFrame
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private void switchRegistry (final DefaultInstrumentRegistry newInstrumentRegistry)
+  private void switchRegistry (final InstrumentRegistry newInstrumentRegistry)
   {
     this.instrumentRegistry.removeRegistryListener (this.instrumentRegistryListener);
     this.instrumentRegistry = newInstrumentRegistry;
