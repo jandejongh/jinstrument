@@ -85,8 +85,6 @@ implements ControllerType
     return BusType_GPIB.getInstance ();
   }
   
-  public final static int DEFAULT_TCP_CONNECT_PORT = 1234;
-  
   @Override
   public final Controller openController (final String relativeControllerUrl)
   {
@@ -96,7 +94,7 @@ implements ControllerType
     if (! addressAndPortString.contains (":"))
     {
       ipAddress = addressAndPortString;
-      tcpConnectPort = ProLogixGpibEthernetControllerType.DEFAULT_TCP_CONNECT_PORT;
+      tcpConnectPort = ProLogixGpibEthernetController.DEFAULT_TCP_PORT;
     }
     else
     {
