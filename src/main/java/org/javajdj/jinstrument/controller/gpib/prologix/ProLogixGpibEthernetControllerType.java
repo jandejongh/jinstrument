@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,12 @@ implements ControllerType
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  @Override
+  public final Class<ProLogixGpibEthernetController> getControllerClass ()
+  {
+    return ProLogixGpibEthernetController.class;
+  }
+  
   public final static String PROLOGIX_GPIB_ETHERNET_CONTROLLER_TYPE_NAME = "prologix-eth";
   
   @Override
