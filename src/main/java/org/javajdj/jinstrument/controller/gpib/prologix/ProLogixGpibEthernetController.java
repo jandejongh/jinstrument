@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2021 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ import org.javajdj.jinstrument.BusType;
 import org.javajdj.jinstrument.Controller;
 import org.javajdj.jinstrument.ControllerCommand;
 import org.javajdj.jinstrument.ControllerListener;
+import org.javajdj.jinstrument.config.Configurable;
+import org.javajdj.jinstrument.config.Configuration;
 import org.javajdj.jinstrument.util.Util;
 import org.javajdj.jinstrument.controller.gpib.AbstractGpibController;
 import org.javajdj.jinstrument.controller.gpib.BusType_GPIB;
@@ -53,6 +55,7 @@ import org.javajdj.jinstrument.controller.gpib.ReadlineTerminationMode;
  */
 public final class ProLogixGpibEthernetController
   extends AbstractGpibController
+  implements Configurable<ProLogixGpibEthernetController>
 {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,16 +74,44 @@ public final class ProLogixGpibEthernetController
   
   public final static String SERVICE_NAME = "ProLogixGpibEthernetController";
   
+  public final static int DEFAULT_TCP_PORT = 1234;
+  
   public ProLogixGpibEthernetController (final String ipAddress, final int tcpConnectPort)
   {
     super (SERVICE_NAME, null, null);
-    if (ipAddress == null || tcpConnectPort < 0 || tcpConnectPort > 65535)
+    if (ipAddress.trim () == null || tcpConnectPort < 0 || tcpConnectPort > 65535)
       throw new IllegalArgumentException ();
-    this.ipAddress = ipAddress;
+    this.ipAddress = ipAddress.trim ();
     this.tcpConnectPort = tcpConnectPort;
     this.buses = new Bus[] {new DefaultGpibBus (getControllerUrl () + "/1")};
     addRunnable (new SocketManager ());
     addRunnable (new SocketReader ());
+  }
+  
+  public ProLogixGpibEthernetController (final String ipAddress)
+  {
+    this (ipAddress, ProLogixGpibEthernetController.DEFAULT_TCP_PORT);
+  }
+  
+  private static ProLogixGpibEthernetControllerConfiguration checkConfiguration (final Configuration configuration)
+  {
+    if (configuration == null || ! (configuration instanceof ProLogixGpibEthernetControllerConfiguration))
+      throw new IllegalArgumentException ();
+    return (ProLogixGpibEthernetControllerConfiguration) configuration;
+  }
+  
+  public ProLogixGpibEthernetController (final Configuration configuration)
+  {
+    this (
+      ProLogixGpibEthernetController.checkConfiguration (configuration).getIpAddress (),
+      ProLogixGpibEthernetController.checkConfiguration (configuration).getTcpConnectPort ());
+  }
+
+  // XXX Really do not know how to set the proper generic types below (or in the declaration for that matter)...
+  @Override
+  public final Class getConfigurationType ()
+  {
+    return ProLogixGpibEthernetControllerConfiguration.class;
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
