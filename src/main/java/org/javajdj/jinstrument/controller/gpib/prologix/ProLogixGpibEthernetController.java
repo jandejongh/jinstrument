@@ -74,12 +74,14 @@ public final class ProLogixGpibEthernetController
   
   public final static String SERVICE_NAME = "ProLogixGpibEthernetController";
   
+  public final static String DEFAULT_IP_ADDRESS = "unknownHost.nonExistantDomain.none";
+  
   public final static int DEFAULT_TCP_PORT = 1234;
   
   public ProLogixGpibEthernetController (final String ipAddress, final int tcpConnectPort)
   {
-    super (SERVICE_NAME, null, null);
-    if (ipAddress.trim () == null || tcpConnectPort < 0 || tcpConnectPort > 65535)
+    super (ProLogixGpibEthernetController.SERVICE_NAME, null, null);
+    if (ipAddress == null || ipAddress.trim ().isEmpty () || tcpConnectPort < 0 || tcpConnectPort > 65535)
       throw new IllegalArgumentException ();
     this.ipAddress = ipAddress.trim ();
     this.tcpConnectPort = tcpConnectPort;
@@ -91,6 +93,11 @@ public final class ProLogixGpibEthernetController
   public ProLogixGpibEthernetController (final String ipAddress)
   {
     this (ipAddress, ProLogixGpibEthernetController.DEFAULT_TCP_PORT);
+  }
+  
+  public ProLogixGpibEthernetController ()
+  {
+    this (ProLogixGpibEthernetController.DEFAULT_IP_ADDRESS, ProLogixGpibEthernetController.DEFAULT_TCP_PORT);
   }
   
   private static ProLogixGpibEthernetControllerConfiguration checkConfiguration (final Configuration configuration)
