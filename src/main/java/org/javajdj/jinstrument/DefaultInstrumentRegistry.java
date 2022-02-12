@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,13 @@ public class DefaultInstrumentRegistry
   {
   }
   
+  @Override
+  public DefaultInstrumentRegistry empty ()
+  {
+    return new DefaultInstrumentRegistry ();
+  }
+  
+  @Override
   public DefaultInstrumentRegistry withSameTypesButInstancesFromUrlLists (
     final List<String> busUrls,
     final List<String> controllerUrls,
