@@ -39,7 +39,7 @@ Work on these instruments is more or less finished by now.
 - ProLogix GPIB Ethernet [complete]
 - R&S ESH-3 Selective Level Meter [almost complete]
 - Tek-2440 Digital Storage Oscilloscope [almost complete]
-- Easy Configuration (Framework)
+- Configuration Framework
 
 ### Alpha [Target: -> Beta for V1.0 Release]:
 - HP-8566B Spectrum Analyzer
