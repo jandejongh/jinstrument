@@ -17,6 +17,18 @@ Apache v2.0.
 
 ## Status/Log [20220209 - v0.8]
 
+Most important changes:
+- HP-3325B Function Generator -> beta.
+- HP-3457A Digital MultiMeter -> beta.
+- Configuration Framework.
+
+New instruments are the HP-3457A Digital MultiMeter and
+  the HP-3325B Function Generator, more or less completing
+  support for my personally-owned DC/LF instruments
+  (except for the HP-54502A Digitizing Oscilloscope
+  and the HP-6050A DC Load Mainframe).
+Work on these instruments is more or less finished by now.
+
 ### Beta [Target met for V1.0 Release]:
 - HP-3325B Function Generator [complete except arbitrary waveform and memory functions]
 - HP-3457A Digital Multimeter [almost complete]
@@ -24,7 +36,7 @@ Apache v2.0.
 - HP-5316A Frequency Counter [almost complete; could use GUI rework]
 - HP-6033A Power Supply Unit / System Power Supply [almost complete]
 - HP-8116A 50MHz Programmable Pulse/Function Generator [complete - OPTION001 ONLY!]
-- ProLogix GPIB Ethernet
+- ProLogix GPIB Ethernet [complete]
 - R&S ESH-3 Selective Level Meter [almost complete]
 - Tek-2440 Digital Storage Oscilloscope [almost complete]
 - Easy Configuration (Framework)
@@ -46,19 +58,6 @@ Apache v2.0.
 - HP-54502A Digitizing Oscilloscope
 - Wiltron 560A Network Analyzer
 
-### Release 0.8 [20220213]
-Most important changes:
-- HP-3325B Function Generator -> beta.
-- HP-3457A Digital MultiMeter -> beta.
-- Configuration Framework.
-
-New instruments are the HP-3457A Digital MultiMeter and
-  the HP-3325B Function Generator, more or less completing
-  support for my personally-owned DC/LF instruments
-  (except for the HP-54502A Digitizing Oscilloscope
-  and the HP-6050A DC Load Mainframe).
-Work on these instruments is more or less finished by now.
-  
 ## Release History
 
 ### Release 0.7 [20220107]
