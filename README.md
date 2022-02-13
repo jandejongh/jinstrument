@@ -37,6 +37,7 @@ Apache v2.0.
 ### Pre-Alpha [Target: -> Beta for V1.0 Release]:
 - User Manual
 - Instrument Tuning Framework
+- Plugin Framework
 - HP-3586A Selective Level Meter
 - HP-5328A [Option 011] Frequency Counter
 - HP-6050A Electronic Load Mainframe [DC Load]
