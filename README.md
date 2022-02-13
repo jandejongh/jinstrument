@@ -13,71 +13,13 @@ is there as well.
 ## License
 Apache v2.0.
 
-## Status [20220209 - v0.8-SNAPSHOT]
+## Status/Log [20220209 - v0.9-SNAPSHOT]
 
-Just to let you know that a V0.8 release is in the making.
-New instruments will be the HP-3457A Digital MultiMeter and
-  the HP-3325B Function Generator, more or less completing
-  support for my personally-owned DC/LF instruments
-  (except for the HP-54502A Digitizing Oscilloscope
-  and the HP-6050A DC Load Mainframe).
-Work on these instruments is more or less finished by now.
-
-What I'm currently working on is GUI configuration and documentation.
-I really want to accomplish a much easier interface
-  to opening supported instruments through (their) default views.
-I also intend to complete first-order documentation for V0.8.
-
-I'm currently aiming at a release data of April 1st, 2022.
-After that, I will or intend to make sure the project
-  gets more interest, through announcements on forums
-  and releases (including dependencies) on Maven Central.
-
-I will then also think about and decide upon
-  the (modified) target for a V1.0 Release.
+## Status/Log [20220209 - v0.8]
 
 ### Beta [Target met for V1.0 Release]:
-- HP-3325B Function Generator [almost complete]
-- HP-3457A Digital MultiMeter [fairly complete]
-- HP-3478A Digital MultiMeter [complete]
-- HP-5316A Frequency Counter [almost complete; could use GUI rework]
-- HP-6033A Power Supply Unit / System Power Supply [almost complete]
-- HP-8116A 50MHz Programmable Pulse/Function Generator [complete - OPTION001 ONLY!]
-- ProLogix GPIB Ethernet [complete]
-- R&S ESH-3 Selective Level Meter [almost complete]
-- Tek-2440 Digital Storage Oscilloscope [almost complete]
-
-### Alpha [Target: -> Beta for V1.0 Release]:
-- HP-8566B Spectrum Analyzer
-- HP-8663A Synthesized Signal Generator
-- HP-70000 Spectrum Analyzer [MMS]
-
-### Pre-Alpha [Target: -> Beta for V0.8 Release]:
-- Easy Configuration (Framework)
-
-### Pre-Alpha [Target: -> Beta for V1.0 Release; Alpha for V0.8 Release]:
-- User Manual
-- Plugin Framework
-- Instrument Tuning Framework
-
-## Status/Log [20220209 - v0.8-SNAPSHOT]
-
-### [20220209] Alpha -> Beta:
-- HP-3457A Digital Multimeter [All commands implemented, except GUI for state memory, MATH, SUBPROGRMs and a few minor functions;
-                               acquisition and settings work; fine-tuning required; requires jswing 0.8-SNAPSHOT]
-
-### [20220130] Added Alpha:
-- HP-3457A Digital Multimeter [All commands implemented;
-                               acquisition and settings need some more work; requires jswing 0.8-SNAPSHOT]
-
-## Status/Log [20220115 - v0.8-SNAPSHOT]
-
-### [20220115] Added Beta:
 - HP-3325B Function Generator [complete except arbitrary waveform and memory functions]
-
-## Status [20220107 - v0.7]
-
-### Beta [Target met for V1.0 Release]:
+- HP-3457A Digital Multimeter [almost complete]
 - HP-3478A Digital MultiMeter [complete]
 - HP-5316A Frequency Counter [almost complete; could use GUI rework]
 - HP-6033A Power Supply Unit / System Power Supply [almost complete]
@@ -85,13 +27,16 @@ I will then also think about and decide upon
 - ProLogix GPIB Ethernet
 - R&S ESH-3 Selective Level Meter [almost complete]
 - Tek-2440 Digital Storage Oscilloscope [almost complete]
+- Easy Configuration (Framework)
 
 ### Alpha [Target: -> Beta for V1.0 Release]:
 - HP-8566B Spectrum Analyzer
 - HP-8663A Synthesized Signal Generator
 - HP-70000 Spectrum Analyzer [MMS]
 
-### Work in Progress [Target: -> Beta for V1.0 Release]:
+### Pre-Alpha [Target: -> Beta for V1.0 Release]:
+- User Manual
+- Instrument Tuning Framework
 - HP-3586A Selective Level Meter
 - HP-5328A [Option 011] Frequency Counter
 - HP-6050A Electronic Load Mainframe [DC Load]
@@ -100,6 +45,19 @@ I will then also think about and decide upon
 - HP-54502A Digitizing Oscilloscope
 - Wiltron 560A Network Analyzer
 
+### Release 0.8 [20220213]
+Most important changes:
+- HP-3325B Function Generator -> beta.
+- HP-3457A Digital MultiMeter -> beta.
+- Configuration Framework.
+
+New instruments are the HP-3457A Digital MultiMeter and
+  the HP-3325B Function Generator, more or less completing
+  support for my personally-owned DC/LF instruments
+  (except for the HP-54502A Digitizing Oscilloscope
+  and the HP-6050A DC Load Mainframe).
+Work on these instruments is more or less finished by now.
+  
 ## Release History
 
 ### Release 0.7 [20220107]
