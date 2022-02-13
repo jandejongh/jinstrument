@@ -28,6 +28,8 @@ import javax.swing.JPanel;
  * 
  * @param <T> The type of objects to be configured.
  * 
+ * @see ConfiguratorType
+ * 
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
