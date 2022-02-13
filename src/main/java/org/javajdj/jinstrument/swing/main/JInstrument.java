@@ -349,77 +349,6 @@ extends JFrame
     fileMenu.add (exitMenuItem);
     jMenuBar.add (fileMenu);
     //
-    // View
-    //
-    final JMenu viewMenu = new JMenu ("View");
-    final JMenuItem openViewMenuItem = new JMenuItem ("Open View");
-    openViewMenuItem.addActionListener ((ActionEvent ae) ->
-    {
-      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
-    });
-    viewMenu.add (openViewMenuItem);
-    final JMenuItem closeCurrentViewMenuItem = new JMenuItem ("Close Current View");
-    closeCurrentViewMenuItem.addActionListener ((ActionEvent ae) ->
-    {
-      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
-    });
-    viewMenu.add (closeCurrentViewMenuItem);
-    final JMenuItem closeViewMenuItem = new JMenuItem ("Close View");
-    closeViewMenuItem.addActionListener ((ActionEvent ae) ->
-    {
-      final JArraySelectorDialog<InstrumentView> jInstrumentViewDialog = new JArraySelectorDialog<> (
-        this,
-        "Close Instrument View",
-        true,
-        this.instrumentRegistry.getInstrumentViews ().toArray (new InstrumentView[]{}),
-        null,
-        "Select Instrument View:",
-        null);
-      // Attempt to always have the dialog title completely visible.
-      jInstrumentViewDialog.setMinimumSize (new Dimension (320, 240));
-      jInstrumentViewDialog.setLocationRelativeTo (this);
-      jInstrumentViewDialog.setVisible (true);
-      final InstrumentView selectedItem = jInstrumentViewDialog.getSelectedItem ();
-      if (selectedItem != null)
-        this.instrumentRegistry.removeInstrumentView (selectedItem);
-    });
-    viewMenu.add (closeViewMenuItem);
-    jMenuBar.add (viewMenu);
-    //
-    // Instrument
-    //
-    final JMenu instrumentMenu = new JMenu ("Instrument");
-    final JMenuItem openInstrumentMenuItem = new JMenuItem ("Open Instrument");
-    openInstrumentMenuItem.addActionListener ((ActionEvent ae) ->
-    {
-      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
-    });
-    instrumentMenu.add (openInstrumentMenuItem);
-    final JMenuItem closeInstrumentMenuItem = new JMenuItem ("Close Instrument");
-    closeInstrumentMenuItem.addActionListener ((ActionEvent ae) ->
-    {
-      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
-    });
-    instrumentMenu.add (closeInstrumentMenuItem);
-    jMenuBar.add (instrumentMenu);
-    //
-    // Device
-    //
-    final JMenu deviceMenu = new JMenu ("Device");
-    final JMenuItem openDeviceMenuItem = new JMenuItem ("Open Device");
-    openDeviceMenuItem.addActionListener ((ActionEvent ae) ->
-    {
-      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
-    });
-    deviceMenu.add (openDeviceMenuItem);
-    final JMenuItem closeDeviceMenuItem = new JMenuItem ("Close Device");
-    closeDeviceMenuItem.addActionListener ((ActionEvent ae) ->
-    {
-      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
-    });
-    deviceMenu.add (closeDeviceMenuItem);
-    jMenuBar.add (deviceMenu);
-    //
     // Controller
     //
     final JMenu controllerMenu = new JMenu ("Controller");
@@ -467,6 +396,77 @@ extends JFrame
     });
     controllerMenu.add (closeControllerMenuItem);
     jMenuBar.add (controllerMenu);
+    //
+    // Device
+    //
+    final JMenu deviceMenu = new JMenu ("Device");
+    final JMenuItem openDeviceMenuItem = new JMenuItem ("Open Device");
+    openDeviceMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    deviceMenu.add (openDeviceMenuItem);
+    final JMenuItem closeDeviceMenuItem = new JMenuItem ("Close Device");
+    closeDeviceMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    deviceMenu.add (closeDeviceMenuItem);
+    jMenuBar.add (deviceMenu);
+    //
+    // Instrument
+    //
+    final JMenu instrumentMenu = new JMenu ("Instrument");
+    final JMenuItem openInstrumentMenuItem = new JMenuItem ("Open Instrument");
+    openInstrumentMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    instrumentMenu.add (openInstrumentMenuItem);
+    final JMenuItem closeInstrumentMenuItem = new JMenuItem ("Close Instrument");
+    closeInstrumentMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    instrumentMenu.add (closeInstrumentMenuItem);
+    jMenuBar.add (instrumentMenu);
+    //
+    // View
+    //
+    final JMenu viewMenu = new JMenu ("View");
+    final JMenuItem openViewMenuItem = new JMenuItem ("Open View");
+    openViewMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    viewMenu.add (openViewMenuItem);
+    final JMenuItem closeCurrentViewMenuItem = new JMenuItem ("Close Current View");
+    closeCurrentViewMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+    });
+    viewMenu.add (closeCurrentViewMenuItem);
+    final JMenuItem closeViewMenuItem = new JMenuItem ("Close View");
+    closeViewMenuItem.addActionListener ((ActionEvent ae) ->
+    {
+      final JArraySelectorDialog<InstrumentView> jInstrumentViewDialog = new JArraySelectorDialog<> (
+        this,
+        "Close Instrument View",
+        true,
+        this.instrumentRegistry.getInstrumentViews ().toArray (new InstrumentView[]{}),
+        null,
+        "Select Instrument View:",
+        null);
+      // Attempt to always have the dialog title completely visible.
+      jInstrumentViewDialog.setMinimumSize (new Dimension (320, 240));
+      jInstrumentViewDialog.setLocationRelativeTo (this);
+      jInstrumentViewDialog.setVisible (true);
+      final InstrumentView selectedItem = jInstrumentViewDialog.getSelectedItem ();
+      if (selectedItem != null)
+        this.instrumentRegistry.removeInstrumentView (selectedItem);
+    });
+    viewMenu.add (closeViewMenuItem);
+    jMenuBar.add (viewMenu);
     //
     // Help
     //
