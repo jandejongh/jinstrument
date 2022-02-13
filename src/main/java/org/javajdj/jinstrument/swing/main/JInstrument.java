@@ -141,7 +141,7 @@ extends JFrame
   throws HeadlessException
   {
     
-    super (title == null ? "JInstrument V0.8-SNAPSHOT" : title);
+    super (title == null ? "JInstrument V0.8" : title);
     
     setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
     
