@@ -54,13 +54,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import org.javajdj.jinstrument.Bus;
 import org.javajdj.jinstrument.Controller;
-import org.javajdj.jinstrument.ControllerType;
 import org.javajdj.jinstrument.DefaultInstrumentRegistry;
 import org.javajdj.jinstrument.Device;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentRegistry;
 import org.javajdj.jinstrument.InstrumentType;
 import org.javajdj.jinstrument.InstrumentView;
+import org.javajdj.jinstrument.config.ConfiguratorTypeDB;
+import org.javajdj.jinstrument.config.DefaultConfiguratorTypeDB;
 import org.javajdj.jinstrument.controller.gpib.BusType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.DeviceType_GPIB;
 import org.javajdj.jinstrument.controller.gpib.GpibDevice;
@@ -85,6 +86,8 @@ import org.javajdj.jinstrument.gpib.slm.hp3586.HP3586_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.slm.rs_esh3.RS_ESH3_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.sna.wiltron560a.Wiltron560A_GPIB_Instrument;
 import org.javajdj.jinstrument.swing.cdi.JTinyCDIStatusAndControl;
+import org.javajdj.jinstrument.swing.config.JControllerConfiguratorType;
+import org.javajdj.jinstrument.swing.config.JProLogixGpibEthernetControllerConfiguratorType;
 import org.javajdj.jinstrument.swing.controller.gpib.JControllerDebug;
 import org.javajdj.jinstrument.swing.controller.gpib.JGpibDeviceConsole;
 import org.javajdj.jinstrument.swing.debug.JSettingsMonitor;
@@ -141,6 +144,7 @@ extends JFrame
     super (title == null ? "JInstrument V0.8-SNAPSHOT" : title);
     
     setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
+    
     createMenu ();
     
     this.jTabbedPane = new JTabbedPane ();
@@ -153,6 +157,8 @@ extends JFrame
     
     this.instrumentRegistry.addRegistryListener (this.instrumentRegistryListener);
     this.instrumentRegistryListener.instrumentRegistryChanged (this.instrumentRegistry);
+    
+    this.configuratorTypeDB = createDefaultConfiguratorTypeDB ();
     
     boolean considerDefaults = true;
     if (checkUserConfigDir ())
@@ -292,6 +298,26 @@ extends JFrame
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // [DEFAULT] CONFIGURATOR-TYPE DB
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private final ConfiguratorTypeDB configuratorTypeDB;
+    
+  protected ConfiguratorTypeDB createDefaultConfiguratorTypeDB ()
+  {
+    
+    final ConfiguratorTypeDB configuratorTypeDB = DefaultConfiguratorTypeDB.getInstance ();
+    
+    configuratorTypeDB.addConfiguratorType (new JControllerConfiguratorType ());
+    configuratorTypeDB.addConfiguratorType (new JProLogixGpibEthernetControllerConfiguratorType ());
+    
+    return configuratorTypeDB;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // [SWING] INSTRUMENT REGISTRY
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -400,33 +426,44 @@ extends JFrame
     final JMenuItem openControllerMenuItem = new JMenuItem ("Open Controller");
     openControllerMenuItem.addActionListener ((ActionEvent ae) ->
     {
-      final JArraySelectorDialog<ControllerType> jControllerTypeDialog = new JArraySelectorDialog<> (
-        this,
-        "Open Controller",
-        true,
-        this.instrumentRegistry.getControllerTypes ().toArray (new ControllerType[]{}),
-        null,
-        "Select Controller Type:",
-        null);
-      // Attempt to always have the dialog title completely visible.
-      jControllerTypeDialog.setMinimumSize (new Dimension (320, 240));
-      jControllerTypeDialog.setLocationRelativeTo (this);
-      jControllerTypeDialog.setVisible (true);
-      final ControllerType selectedItem = jControllerTypeDialog.getSelectedItem ();
-      if (selectedItem != null)
+      final Controller controller =
+        this.configuratorTypeDB.getConfiguratorType (Controller.class).doModalDialogForNewObject (
+          this.instrumentRegistry,
+          this.configuratorTypeDB,
+          "Open Controller");
+      if (controller != null)
       {
-        JOptionPane.showMessageDialog (
-          this,
-          "Not implemented yet; you selected " + selectedItem + "!",
-          "Error",
-          JOptionPane.ERROR_MESSAGE);
+        if (this.instrumentRegistry.getControllerByUrl (controller.getControllerUrl ()) != null)
+        {
+          JOptionPane.showMessageDialog (
+            this,
+            "Controller with URL " + controller.getControllerUrl () + " is already registered!",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        }
+        else
+          this.instrumentRegistry.addController (controller);
       }
     });
     controllerMenu.add (openControllerMenuItem);
     final JMenuItem closeControllerMenuItem = new JMenuItem ("Close Controller");
     closeControllerMenuItem.addActionListener ((ActionEvent ae) ->
     {
-      JOptionPane.showMessageDialog (this, "Not implemented yet!", "Error", JOptionPane.ERROR_MESSAGE);
+      final JArraySelectorDialog<Controller> jControllerDialog = new JArraySelectorDialog<> (
+        this,
+        "Close Controller",
+        true,
+        this.instrumentRegistry.getControllers ().toArray (new Controller[]{}),
+        null,
+        "Select Controller:",
+        null);
+      // Attempt to always have the dialog title completely visible.
+      jControllerDialog.setMinimumSize (new Dimension (320, 240));
+      jControllerDialog.setLocationRelativeTo (this);
+      jControllerDialog.setVisible (true);
+      final Controller selectedItem = jControllerDialog.getSelectedItem ();
+      if (selectedItem != null)
+        this.instrumentRegistry.removeController (selectedItem);
     });
     controllerMenu.add (closeControllerMenuItem);
     jMenuBar.add (controllerMenu);
