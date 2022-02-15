@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,31 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing.instrument.tek2440;
+package org.javajdj.jinstrument.swing.instrument.dso.tek2440;
 
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
 import org.javajdj.jinstrument.Instrument;
-import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
+import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR;
 import org.javajdj.jswing.jcenter.JCenter;
 
-/** A Swing panel for the BTrigger settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
+/** A Swing panel for the Acquisition settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class JTek2440_GPIB_BTrigger
+public class JTek2440_GPIB_Acquisition
   extends JDigitalStorageOscilloscopePanel
   implements InstrumentView
 {
@@ -48,7 +49,7 @@ public class JTek2440_GPIB_BTrigger
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private static final Logger LOG = Logger.getLogger (JTek2440_GPIB_BTrigger.class.getName ());
+  private static final Logger LOG = Logger.getLogger (JTek2440_GPIB_Acquisition.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -56,7 +57,7 @@ public class JTek2440_GPIB_BTrigger
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JTek2440_GPIB_BTrigger (
+  public JTek2440_GPIB_Acquisition (
     final DigitalStorageOscilloscope digitalStorageOscilloscope,
     final String title,
     final int level,
@@ -69,89 +70,98 @@ public class JTek2440_GPIB_BTrigger
     final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
     
     removeAll ();
-    setLayout (new GridLayout (1, 2, 10, 0));
+    setLayout (new GridLayout (2, 1, 0, 0));
     
-    final JPanel leftPanel = new JPanel ();
-    leftPanel.setLayout (new GridLayout (5, 1, 0, 10));
-    add (leftPanel);
-    final JPanel rightPanel = new JPanel ();
-    rightPanel.setLayout (new GridLayout (5, 1, 0, 10));
-    add (rightPanel);
+    final JPanel northPanel = new JPanel ();
+    northPanel.setLayout (new GridLayout (5, 2, 0, 10));
+    northPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Acquisition"));
+    add (northPanel);  
     
-    leftPanel.add (new JLabel ("Mode"));
-    leftPanel.add (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.BTriggerMode.class,
-      "B trigger mode",
-      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getBTriggerMode (),
-      tek2440::setBTriggerMode,
+    final JPanel southPanel = new JPanel ();
+    southPanel.setLayout (new GridLayout (1, 2, 0, 0));
+    add (southPanel);
+    
+    final JPanel southWestPanel = new JPanel ();
+    southWestPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Run"));
+    southWestPanel.setLayout (new BoxLayout (southWestPanel, BoxLayout.X_AXIS));
+    southPanel.add (southWestPanel);
+    
+    final JPanel southEastPanel = new JPanel ();
+    southEastPanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
+        "Smooth"));
+    southEastPanel.setLayout (new GridLayout (1,1));
+    southPanel.add (southEastPanel);
+    
+    northPanel.add (new JLabel ("Acquisition Mode"));
+    northPanel.add (JCenter.Y (new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.AcquisitionMode.class,
+      "acquisition",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getAcquisitionMode (),
+      tek2440::setAcquisitionMode,
+      true)));
+        
+    northPanel.add (new JLabel ("Repetitive"));
+    northPanel.add (new JBoolean_JBoolean (
+      "acquisition repetitive",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isAcquisitionRepetitive (),
+      tek2440::setAcquisitionRepetitive,
+      Color.green,
       true));
     
-    leftPanel.add (new JLabel ("Source"));
-    leftPanel.add (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.BTriggerSource.class,
-      "B trigger source",
-      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getBTriggerSource (),
-      tek2440::setBTriggerSource,
-      true));
+    northPanel.add (new JLabel ("# of Acquisitions Averaged"));
+    northPanel.add (JCenter.Y (new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.NumberOfAcquisitionsAveraged.class,
+      "number of acquisitions averaged",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getNumberOfAcquisitionsAveraged (),
+      tek2440::setNumberOfAcquisitionsAveraged,
+      true)));
     
-    leftPanel.add (new JLabel ("Coupling"));
-    leftPanel.add (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.BTriggerCoupling.class,
-      "B trigger coupling",
-      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getBTriggerCoupling (),
-      tek2440::setBTriggerCoupling,
-      true));
+    northPanel.add (new JLabel ("# of Envelope Sweeps"));
+    northPanel.add (JCenter.Y (new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.NumberOfEnvelopeSweeps.class,
+      "number of envelope sweeps",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getNumberOfEnvelopeSweeps (),
+      tek2440::setNumberOfEnvelopeSweeps,
+      true)));
     
-    leftPanel.add (new JLabel ("Slope"));
-    leftPanel.add (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.Slope.class,
-      "B trigger slope",
-      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getBTriggerSlope (),
-      tek2440::setBTriggerSlope,
-      true));
-    
-    leftPanel.add (new JLabel ("Level [V]"));
-    leftPanel.add (new JDouble_JSlider (
-      SwingConstants.HORIZONTAL,
-      -200.0, // XXX Arbitrary!
-      200.0,  // XXX Arbitrary!
-      0.0,    // XXX Arbitrary!
-      "B trigger level",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getBTriggerLevel (),
-      tek2440::setBTriggerLevel,
-      true));
-    
-    rightPanel.add (new JLabel ("Position"));
-    rightPanel.add (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.BTriggerPosition.class,
-      "B trigger position",
-      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getBTriggerPosition (),
-      tek2440::setBTriggerPosition,
-      true));
-    
-    rightPanel.add (new JLabel ("Ext Clk"));
-    rightPanel.add (JCenter.Y (new JBoolean_JBoolean (
-      "B trigger external clock",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).isBTriggerExtClock (),
-      tek2440::setBTriggerExternalClock,
+    northPanel.add (new JLabel ("Save on Delta"));
+    northPanel.add (JCenter.Y (new JBoolean_JBoolean (
+      "acquisition save-on-delta",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isAcquisitionSaveOnDelta (),
+      tek2440::setAcquisitionSaveOnDelta,
       Color.green,
       true)));
     
-    rightPanel.add (new JLabel ());
-    rightPanel.add (new JLabel ());
-    rightPanel.add (new JLabel ());
-    rightPanel.add (new JLabel ());
-    rightPanel.add (new JLabel ());
-    rightPanel.add (new JLabel ());
+    southWestPanel.add (JCenter.XY (new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.RunMode.class,
+      "run mode",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getRunMode (),
+      tek2440::setRunMode,
+      true)));
+    
+    southEastPanel.add (JCenter.XY (new JBoolean_JBoolean (
+      "smoothing",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isSmoothing (),
+      tek2440::setSmoothing,
+      Color.green,
+      true)));
     
   }
 
-  public JTek2440_GPIB_BTrigger (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
+  public JTek2440_GPIB_Acquisition (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
   {
     this (digitalStorageOscilloscope, null, level, null);
   }
   
-  public JTek2440_GPIB_BTrigger (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
+  public JTek2440_GPIB_Acquisition (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
   {
     this (digitalStorageOscilloscope, 0);
   }
@@ -168,14 +178,14 @@ public class JTek2440_GPIB_BTrigger
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Tektronix 2440 [GPIB] BTrigger Settings";
+      return "Tektronix 2440 [GPIB] Acquisition Settings";
     }
 
     @Override
     public final InstrumentView openInstrumentView (final Instrument instrument)
     {
       if (instrument != null && (instrument instanceof Tek2440_GPIB_Instrument))
-        return new JTek2440_GPIB_BTrigger ((Tek2440_GPIB_Instrument) instrument);
+        return new JTek2440_GPIB_Acquisition ((Tek2440_GPIB_Instrument) instrument);
       else
         return null;
     }
@@ -192,7 +202,7 @@ public class JTek2440_GPIB_BTrigger
   @Override
   public String getInstrumentViewUrl ()
   {
-    return JTek2440_GPIB_BTrigger.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
+    return JTek2440_GPIB_Acquisition.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
       + "<>"
       + getInstrument ().getInstrumentUrl ();
   }

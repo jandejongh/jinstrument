@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing.instrument.tek2440;
+package org.javajdj.jinstrument.swing.instrument.dso.tek2440;
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -23,6 +23,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentView;
@@ -33,12 +34,12 @@ import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR;
 import org.javajdj.jswing.jcenter.JCenter;
 
-/** A Swing panel for the [Print] Device settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
+/** A Swing panel for the Waveform Data settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class JTek2440_GPIB_PrintDevice
+public class JTek2440_GPIB_WaveformData
   extends JDigitalStorageOscilloscopePanel
   implements InstrumentView
 {
@@ -49,7 +50,7 @@ public class JTek2440_GPIB_PrintDevice
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private static final Logger LOG = Logger.getLogger (JTek2440_GPIB_PrintDevice.class.getName ());
+  private static final Logger LOG = Logger.getLogger (JTek2440_GPIB_WaveformData.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -57,7 +58,7 @@ public class JTek2440_GPIB_PrintDevice
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JTek2440_GPIB_PrintDevice (
+  public JTek2440_GPIB_WaveformData (
     final DigitalStorageOscilloscope digitalStorageOscilloscope,
     final String title,
     final int level,
@@ -70,7 +71,7 @@ public class JTek2440_GPIB_PrintDevice
     final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
     
     removeAll ();
-    setLayout (new GridLayout (5, 1, 10, 0));
+    setLayout (new GridLayout (4, 1, 10, 0));
     
     final JTextPane jDescription = new JTextPane ();
     jDescription.setBorder (
@@ -79,33 +80,26 @@ public class JTek2440_GPIB_PrintDevice
         "Description"));
     add (jDescription);
     
-    final JPanel printDeviceTypePanel = new JPanel ();
-    printDeviceTypePanel.setBorder (
+    final JPanel levelCrossingPanel = new JPanel ();
+    levelCrossingPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
-        "[Print] Device Type"));
-    add (printDeviceTypePanel);
-    
-    final JPanel printDevicePageSizePanel = new JPanel ();
-    printDevicePageSizePanel.setBorder (
+        "Level Crossing"));
+    add (levelCrossingPanel);
+
+    final JPanel intervalPanel = new JPanel ();
+    intervalPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
-        "[Print Device] Page Size"));
-    add (printDevicePageSizePanel);
-    
-    final JPanel pageLayoutPanel = new JPanel ();
-    pageLayoutPanel.setBorder (
-      BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
-        "Page Layout"));
-    add (pageLayoutPanel);
+        "Interval"));
+    add (intervalPanel);
     
     final JPanel commandPanel = new JPanel ();
     commandPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
-        "Print Command"));
-    add (commandPanel);
+        "Commands"));
+    add (commandPanel);    
     
     //
     // jDescription
@@ -114,94 +108,108 @@ public class JTek2440_GPIB_PrintDevice
     jDescription.setContentType ("text/html");
     jDescription.setBackground (getBackground ());
     jDescription.setEditable (false);
-    jDescription.setText ("<html><b>Print Settings</b>" +
+    jDescription.setText ("<html><b>Waveform Data Settings</b>" +
                           "<ul>" +
-                            "<li>Defines the device type (ThinkJet or HPGL);</li>" +
-                            "<li>Defines the paper size (US or A4);</li>" +
-                            "<li>Defines what to include in the printout;</li>" +
-                            "<li>Provides the button to start printing.</li>" +
+                            "<li>Features automatic measurement of average/minimum/maximum/number of crossings"
+                                 + " on the waveform selected by the DATa SOUrce variable/settings;</li>" +
+                            "<li>Supports variable threshold level and hysteresis"
+                                 + " with respect to level-crossing detection;</li>" +
+                            "<li>Supports restriction (start/stop) of the X range.</li>" +
                           "</ul>" +
                           "</html>");
 
     //
-    // printDeviceTypePanel
+    // levelCrossingPanel
     //
     
-    printDeviceTypePanel.setLayout (new GridLayout (1, 1, 0, 0));
+    levelCrossingPanel.setLayout (new GridLayout (2, 5));
     
-    printDeviceTypePanel.add (JCenter.XY (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.PrintDeviceType.class,
-      "print device type",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getPrintDeviceType (),
-      tek2440::setPrintDeviceType,
+    levelCrossingPanel.add (new JLabel ("NCross Level"));
+    levelCrossingPanel.add (new JInteger_JSlider (
+      SwingConstants.HORIZONTAL,
+      -100, // XXX Limits??
+      100,  // XXX Limits??
+      0,
+      50,
+      null,
+      "waveform analysis level",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getWaveformAnalysisLevel (),
+      tek2440::setWaveformAnalysisLevel,
+      true).withPaintLabels ());
+    
+    levelCrossingPanel.add (new JLabel ());
+
+    levelCrossingPanel.add (new JLabel ("NCross Hysteresis"));
+    levelCrossingPanel.add (new JInteger_JSlider (
+      SwingConstants.HORIZONTAL,
+      0,
+      256,
+      0,
+      64,
+      null,
+      "waveform analysis hysteresis",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getWaveformAnalysisHysteresis (),
+      tek2440::setWaveformAnalysisHysteresis,
+      true).withPaintLabels ());
+    
+    levelCrossingPanel.add (new JLabel ("NCross Direction"));
+    levelCrossingPanel.add (JCenter.Y (new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.Direction.class,
+      "waveform analysis direction",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getWaveformAnalysisDirection (),
+      tek2440::setWaveformAnalysisDirection,
       true)));
     
-    //
-    // printDevicePageSizePanel
-    //
-    
-    printDevicePageSizePanel.setLayout (new GridLayout (1, 1, 0, 0));
-    
-    printDevicePageSizePanel.add (JCenter.XY (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.PrintPageSize.class,
-      "print page size",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getPrintDevicePageSize (),
-      tek2440::setPrintPageSize,
-      true)));
+    levelCrossingPanel.add (new JLabel ());
+    levelCrossingPanel.add (new JLabel ());
+    levelCrossingPanel.add (new JLabel ());    
     
     //
-    // pageLayoutPanel
+    // intervalPanel
     //
     
-    pageLayoutPanel.setLayout (new GridLayout (2, 4));
+    intervalPanel.setLayout (new GridLayout (2, 2));
     
-    pageLayoutPanel.add (new JLabel ("Graticule"));
-    pageLayoutPanel.add (new JBoolean_JBoolean (
-      "print graticule",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).isPrintGraticule (),
-      tek2440::setPrintGraticule,
-      Color.green,
-      true));
+    intervalPanel.add (new JLabel ("Start"));
+    intervalPanel.add (new JInteger_JSlider (
+      SwingConstants.HORIZONTAL,
+      1,
+      1024,
+      0,
+      1023,
+      512,
+      "waveform analysis start position",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getWaveformAnalysisStart (),
+      tek2440::setWaveformAnalysisStartPosition,
+      true).withPaintLabels ());
     
-    pageLayoutPanel.add (new JLabel ("Settings"));
-    pageLayoutPanel.add (new JBoolean_JBoolean (
-      "print settings",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).isPrintSettings (),
-      tek2440::setPrintSettings,
-      Color.green,
-      true));
-    
-    pageLayoutPanel.add (new JLabel ("Text"));
-    pageLayoutPanel.add (new JBoolean_JBoolean (
-      "print text",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).isPrintText (),
-      tek2440::setPrintText,
-      Color.green,
-      true));
-    
-    pageLayoutPanel.add (new JLabel ("Waveforms"));
-    pageLayoutPanel.add (new JBoolean_JBoolean (
-      "print waveforms",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).isPrintWaveforms (),
-      tek2440::setPrintWaveforms,
-      Color.green,
-      true));
-    
+    intervalPanel.add (new JLabel ("Stop"));
+    intervalPanel.add (new JInteger_JSlider (
+      SwingConstants.HORIZONTAL,
+      1,
+      1024,
+      0,
+      1023,
+      512,
+      "waveform analysis stop position",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getWaveformAnalysisStop (),
+      tek2440::setWaveformAnalysisStopPosition,
+      true).withPaintLabels ());
+        
     //
     // commandPanel
     //
     
     commandPanel.setLayout (new GridLayout (1, 1));
-    commandPanel.add (JCenter.XY (new JVoid_JColorCheckBox ("print", () -> { /* XXX */ }, Color.blue)));
     
   }
 
-  public JTek2440_GPIB_PrintDevice (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
+  public JTek2440_GPIB_WaveformData (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
   {
     this (digitalStorageOscilloscope, null, level, null);
   }
   
-  public JTek2440_GPIB_PrintDevice (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
+  public JTek2440_GPIB_WaveformData (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
   {
     this (digitalStorageOscilloscope, 0);
   }
@@ -218,14 +226,14 @@ public class JTek2440_GPIB_PrintDevice
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Tektronix 2440 [GPIB] Print Device Settings";
+      return "Tektronix 2440 [GPIB] Waveform Data Settings";
     }
 
     @Override
     public final InstrumentView openInstrumentView (final Instrument instrument)
     {
       if (instrument != null && (instrument instanceof Tek2440_GPIB_Instrument))
-        return new JTek2440_GPIB_PrintDevice ((Tek2440_GPIB_Instrument) instrument);
+        return new JTek2440_GPIB_WaveformData ((Tek2440_GPIB_Instrument) instrument);
       else
         return null;
     }
@@ -242,7 +250,7 @@ public class JTek2440_GPIB_PrintDevice
   @Override
   public String getInstrumentViewUrl ()
   {
-    return JTek2440_GPIB_PrintDevice.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
+    return JTek2440_GPIB_WaveformData.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
       + "<>"
       + getInstrument ().getInstrumentUrl ();
   }

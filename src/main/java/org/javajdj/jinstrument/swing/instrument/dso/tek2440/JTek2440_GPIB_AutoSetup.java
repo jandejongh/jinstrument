@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing.instrument.tek2440;
+package org.javajdj.jinstrument.swing.instrument.dso.tek2440;
 
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import javax.swing.JPanel;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentSettings;
@@ -29,13 +29,15 @@ import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.dso.tek2440.Tek2440_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
+import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
+import org.javajdj.jswing.jcenter.JCenter;
 
-/** A Swing panel for the Horizontal settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
+/** A Swing panel for the AutoSetup of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class JTek2440_GPIB_Horizontal
+public class JTek2440_GPIB_AutoSetup
   extends JDigitalStorageOscilloscopePanel
   implements InstrumentView
 {
@@ -46,7 +48,7 @@ public class JTek2440_GPIB_Horizontal
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private static final Logger LOG = Logger.getLogger (JTek2440_GPIB_Horizontal.class.getName ());
+  private static final Logger LOG = Logger.getLogger (JTek2440_GPIB_AutoSetup.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -54,7 +56,7 @@ public class JTek2440_GPIB_Horizontal
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JTek2440_GPIB_Horizontal (
+  public JTek2440_GPIB_AutoSetup (
     final DigitalStorageOscilloscope digitalStorageOscilloscope,
     final String title,
     final int level,
@@ -66,61 +68,54 @@ public class JTek2440_GPIB_Horizontal
       throw new IllegalArgumentException ();
     final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
     
-    setLayout (new GridLayout (5, 2, 0, 10));
+    removeAll ();
+    setLayout (new GridLayout (1, 3));
     
-    add (new JLabel ("Mode"));
-    add (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.HorizontalMode.class,
-      "horizontal mode",
-      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getHorizontalMode (),
-      tek2440::setHorizontalMode,
-      true));
+    final JPanel leftPanel = new JPanel ();
+    add (leftPanel);
+    
+    final JPanel centerPanel = new JPanel ();
+    add (centerPanel);
+    
+    final JPanel rightPanel = new JInstrumentPanel ("Execute", level + 1, Color.blue);
+    add (rightPanel);
+    
+    leftPanel.setLayout (new GridLayout (2, 1));
+    
+    leftPanel.add (new JLabel ("Mode"));
+    leftPanel.add (new JLabel ("Resolution"));
+    
+    centerPanel.setLayout (new GridLayout (2, 1));
+    
+    centerPanel.add (JCenter.Y (new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.AutoSetupMode.class,
+      "auto setup mode",
+      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getAutoSetupMode (),
+      tek2440::setAutoSetupMode,
+      true)));
         
-    add (new JLabel ("A Timebase"));
-    add (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.SecondsPerDivision.class,
-      "A timebase",
-      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getASecondsPerDivision (),
-      tek2440::setTimebaseA,
-      true));
+    centerPanel.add (JCenter.Y (new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.AutoSetupResolution.class,
+      "auto setup resolution",
+      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getAutoSetupResolution (),
+      tek2440::setAutoSetupResolution,
+      true)));
     
-    add (new JLabel ("B Timebase"));
-    add (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.SecondsPerDivision.class,
-      "B timebase",
-      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getBSecondsPerDivision (),
-      tek2440::setTimebaseB,
-      true));
+    rightPanel.setLayout (new GridLayout (1, 1));
     
-    add (new JLabel ("Position"));
-    add (new JDouble_JSlider (
-      SwingConstants.HORIZONTAL,
-      0.0,
-      1023.0,
-      0.0,
-      1023.0,
-      128.0,
-      "horizontal position",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getHorizontalPosition (),
-      tek2440::setHorizontalPosition,
-      true));
-    
-    add (new JLabel ("Hor Ext Expansion"));
-    add (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.HorizontalExternalExpansionFactor.class,
-      "horizontal external expansion factor",
-      (final InstrumentSettings settings) -> ((Tek2440_GPIB_Settings) settings).getHorizontalExternalExpansionFactor (),
-      tek2440::setHorizontalExternalExpansion,
-      true));
+    rightPanel.add (JCenter.XY (new JVoid_JColorCheckBox (
+      "auto setup",
+      tek2440::autoSetup,
+      Color.blue)));
     
   }
 
-  public JTek2440_GPIB_Horizontal (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
+  public JTek2440_GPIB_AutoSetup (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
   {
     this (digitalStorageOscilloscope, null, level, null);
   }
   
-  public JTek2440_GPIB_Horizontal (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
+  public JTek2440_GPIB_AutoSetup (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
   {
     this (digitalStorageOscilloscope, 0);
   }
@@ -137,14 +132,14 @@ public class JTek2440_GPIB_Horizontal
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Tektronix 2440 [GPIB] Horizontal Settings";
+      return "Tektronix 2440 [GPIB] AutoSetup Settings";
     }
 
     @Override
     public final InstrumentView openInstrumentView (final Instrument instrument)
     {
       if (instrument != null && (instrument instanceof Tek2440_GPIB_Instrument))
-        return new JTek2440_GPIB_Horizontal ((Tek2440_GPIB_Instrument) instrument);
+        return new JTek2440_GPIB_AutoSetup ((Tek2440_GPIB_Instrument) instrument);
       else
         return null;
     }
@@ -161,7 +156,7 @@ public class JTek2440_GPIB_Horizontal
   @Override
   public String getInstrumentViewUrl ()
   {
-    return JTek2440_GPIB_Horizontal.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
+    return JTek2440_GPIB_AutoSetup.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
       + "<>"
       + getInstrument ().getInstrumentUrl ();
   }

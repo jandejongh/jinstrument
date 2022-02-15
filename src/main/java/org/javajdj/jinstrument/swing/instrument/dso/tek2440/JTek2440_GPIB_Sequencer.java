@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing.instrument.tek2440;
+package org.javajdj.jinstrument.swing.instrument.dso.tek2440;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentView;
@@ -33,12 +34,12 @@ import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR;
 import org.javajdj.jswing.jcenter.JCenter;
 
-/** A Swing panel for the Acquisition settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
+/** A Swing panel for the Sequencer settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class JTek2440_GPIB_Acquisition
+public class JTek2440_GPIB_Sequencer
   extends JDigitalStorageOscilloscopePanel
   implements InstrumentView
 {
@@ -49,7 +50,7 @@ public class JTek2440_GPIB_Acquisition
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private static final Logger LOG = Logger.getLogger (JTek2440_GPIB_Acquisition.class.getName ());
+  private static final Logger LOG = Logger.getLogger (JTek2440_GPIB_Sequencer.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -57,7 +58,7 @@ public class JTek2440_GPIB_Acquisition
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JTek2440_GPIB_Acquisition (
+  public JTek2440_GPIB_Sequencer (
     final DigitalStorageOscilloscope digitalStorageOscilloscope,
     final String title,
     final int level,
@@ -70,98 +71,116 @@ public class JTek2440_GPIB_Acquisition
     final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
     
     removeAll ();
-    setLayout (new GridLayout (2, 1, 0, 0));
+    setLayout (new GridLayout (4, 1, 10, 0));
     
-    final JPanel northPanel = new JPanel ();
-    northPanel.setLayout (new GridLayout (5, 2, 0, 10));
-    northPanel.setBorder (
+    final JTextPane jDescription = new JTextPane ();
+    jDescription.setBorder (
       BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
-        "Acquisition"));
-    add (northPanel);  
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
+        "Description"));
+    add (jDescription);
     
-    final JPanel southPanel = new JPanel ();
-    southPanel.setLayout (new GridLayout (1, 2, 0, 0));
-    add (southPanel);
-    
-    final JPanel southWestPanel = new JPanel ();
-    southWestPanel.setBorder (
+    final JPanel formatPanel = new JPanel ();
+    formatPanel.setBorder (
       BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
-        "Run"));
-    southWestPanel.setLayout (new BoxLayout (southWestPanel, BoxLayout.X_AXIS));
-    southPanel.add (southWestPanel);
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
+        "Format"));
+    add (formatPanel);
     
-    final JPanel southEastPanel = new JPanel ();
-    southEastPanel.setBorder (
+    final JPanel actionPanel = new JPanel ();
+    actionPanel.setBorder (
       BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR),
-        "Smooth"));
-    southEastPanel.setLayout (new GridLayout (1,1));
-    southPanel.add (southEastPanel);
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
+        "Action(s)"));
+    add (actionPanel);
     
-    northPanel.add (new JLabel ("Acquisition Mode"));
-    northPanel.add (JCenter.Y (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.AcquisitionMode.class,
-      "acquisition",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getAcquisitionMode (),
-      tek2440::setAcquisitionMode,
-      true)));
-        
-    northPanel.add (new JLabel ("Repetitive"));
-    northPanel.add (new JBoolean_JBoolean (
-      "acquisition repetitive",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).isAcquisitionRepetitive (),
-      tek2440::setAcquisitionRepetitive,
-      Color.green,
-      true));
+    final JPanel maintenancePanel = new JPanel ();
+    maintenancePanel.setBorder (
+      BorderFactory.createTitledBorder (
+        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
+        "Sequencer Maintenance"));
+    add (maintenancePanel);
     
-    northPanel.add (new JLabel ("# of Acquisitions Averaged"));
-    northPanel.add (JCenter.Y (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.NumberOfAcquisitionsAveraged.class,
-      "number of acquisitions averaged",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getNumberOfAcquisitionsAveraged (),
-      tek2440::setNumberOfAcquisitionsAveraged,
-      true)));
+    //
+    // jDescription
+    //
     
-    northPanel.add (new JLabel ("# of Envelope Sweeps"));
-    northPanel.add (JCenter.Y (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.NumberOfEnvelopeSweeps.class,
-      "number of envelope sweeps",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getNumberOfEnvelopeSweeps (),
-      tek2440::setNumberOfEnvelopeSweeps,
-      true)));
+    jDescription.setContentType ("text/html");
+    jDescription.setBackground (getBackground ());
+    jDescription.setEditable (false);
+    jDescription.setText ("<html><b>Sequencer Settings and Commands</b>" +
+                          "<ul>" +
+                            "<li>Defines formatting in PRGm? return string;</li>" +
+                            "<li>Defines what actions to associate with a sequence "
+                                 + "or any particular step within that sequence;</li>" +
+                            "<li>Defines protection (or forced unprotect) of a sequence.</li>" +
+                          "</ul>" +
+                          "</html>");
     
-    northPanel.add (new JLabel ("Save on Delta"));
-    northPanel.add (JCenter.Y (new JBoolean_JBoolean (
-      "acquisition save-on-delta",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).isAcquisitionSaveOnDelta (),
-      tek2440::setAcquisitionSaveOnDelta,
+    //
+    // formatPanel
+    //
+    
+    formatPanel.setLayout (new GridLayout (1, 4));
+    
+    formatPanel.add (new JLabel ("Add Formatting [PRGm?]"));
+    formatPanel.add (JCenter.Y (new JBoolean_JBoolean (
+      "[sequencer] format [PRGm?]",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isSequencerFormatCharsEnabled (),
+      tek2440::setSequencerEnableFormatChars,
       Color.green,
       true)));
+    formatPanel.add (new JLabel ()); // Aesthetics, really...
+    formatPanel.add (new JLabel ());
+
+    //
+    // actionsPanel
+    //
     
-    southWestPanel.add (JCenter.XY (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.RunMode.class,
-      "run mode",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getRunMode (),
-      tek2440::setRunMode,
+    actionPanel.setLayout (new GridLayout (1, 1));
+    actionPanel.add (JCenter.XY (new JLong_JBitsLong (
+      Color.green,
+      9,
+      Arrays.asList (
+        "Protect      ",
+        "Pause        ",
+        "SRQ          ",
+        "Bell         ",
+        "Print        ",
+        "AutoSetup    ",
+        "SelfTest     ",
+        "SelfCal      ",
+        "Repeat       "),
+      false,
+      "sequencer actions",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getSequencerActionsAsLong (),
+      tek2440::setSequencerActionsFromLong,
       true)));
     
-    southEastPanel.add (JCenter.XY (new JBoolean_JBoolean (
-      "smoothing",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).isSmoothing (),
-      tek2440::setSmoothing,
+    //
+    // maintenancePanel
+    //
+    
+    maintenancePanel.setLayout (new GridLayout (1, 4));
+    
+    maintenancePanel.add (new JLabel ("Force"));
+    maintenancePanel.add (JCenter.Y (new JBoolean_JBoolean (
+      "[sequencer] force",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isSequencerForce (),
+      tek2440::setSequencerForce,
       Color.green,
       true)));
+    maintenancePanel.add (new JLabel ()); // Aesthetics, really...
+    maintenancePanel.add (new JLabel ());
     
   }
 
-  public JTek2440_GPIB_Acquisition (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
+  public JTek2440_GPIB_Sequencer (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
   {
     this (digitalStorageOscilloscope, null, level, null);
   }
   
-  public JTek2440_GPIB_Acquisition (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
+  public JTek2440_GPIB_Sequencer (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
   {
     this (digitalStorageOscilloscope, 0);
   }
@@ -178,14 +197,14 @@ public class JTek2440_GPIB_Acquisition
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Tektronix 2440 [GPIB] Acquisition Settings";
+      return "Tektronix 2440 [GPIB] Sequencer Settings";
     }
 
     @Override
     public final InstrumentView openInstrumentView (final Instrument instrument)
     {
       if (instrument != null && (instrument instanceof Tek2440_GPIB_Instrument))
-        return new JTek2440_GPIB_Acquisition ((Tek2440_GPIB_Instrument) instrument);
+        return new JTek2440_GPIB_Sequencer ((Tek2440_GPIB_Instrument) instrument);
       else
         return null;
     }
@@ -202,7 +221,7 @@ public class JTek2440_GPIB_Acquisition
   @Override
   public String getInstrumentViewUrl ()
   {
-    return JTek2440_GPIB_Acquisition.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
+    return JTek2440_GPIB_Sequencer.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
       + "<>"
       + getInstrument ().getInstrumentUrl ();
   }

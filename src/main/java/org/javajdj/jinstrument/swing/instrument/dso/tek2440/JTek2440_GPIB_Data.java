@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing.instrument.tek2440;
+package org.javajdj.jinstrument.swing.instrument.dso.tek2440;
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -23,7 +23,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
 import org.javajdj.jinstrument.DigitalStorageOscilloscope;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentView;
@@ -34,12 +33,12 @@ import org.javajdj.jinstrument.swing.base.JDigitalStorageOscilloscopePanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.DEFAULT_MANAGEMENT_COLOR;
 import org.javajdj.jswing.jcenter.JCenter;
 
-/** A Swing panel for the Waveform Data settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
+/** A Swing panel for the Data (Format) settings of a {@link Tek2440_GPIB_Instrument} Digital Storage Oscilloscope.
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
  */
-public class JTek2440_GPIB_WaveformData
+public class JTek2440_GPIB_Data
   extends JDigitalStorageOscilloscopePanel
   implements InstrumentView
 {
@@ -50,7 +49,7 @@ public class JTek2440_GPIB_WaveformData
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  private static final Logger LOG = Logger.getLogger (JTek2440_GPIB_WaveformData.class.getName ());
+  private static final Logger LOG = Logger.getLogger (JTek2440_GPIB_Data.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -58,7 +57,7 @@ public class JTek2440_GPIB_WaveformData
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  public JTek2440_GPIB_WaveformData (
+  public JTek2440_GPIB_Data (
     final DigitalStorageOscilloscope digitalStorageOscilloscope,
     final String title,
     final int level,
@@ -71,7 +70,7 @@ public class JTek2440_GPIB_WaveformData
     final Tek2440_GPIB_Instrument tek2440 = (Tek2440_GPIB_Instrument) digitalStorageOscilloscope;
     
     removeAll ();
-    setLayout (new GridLayout (4, 1, 10, 0));
+    setLayout (new GridLayout (3, 1, 10, 0));
     
     final JTextPane jDescription = new JTextPane ();
     jDescription.setBorder (
@@ -80,26 +79,19 @@ public class JTek2440_GPIB_WaveformData
         "Description"));
     add (jDescription);
     
-    final JPanel levelCrossingPanel = new JPanel ();
-    levelCrossingPanel.setBorder (
+    final JPanel dataFormatPanel = new JPanel ();
+    dataFormatPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
-        "Level Crossing"));
-    add (levelCrossingPanel);
-
-    final JPanel intervalPanel = new JPanel ();
-    intervalPanel.setBorder (
-      BorderFactory.createTitledBorder (
-        BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
-        "Interval"));
-    add (intervalPanel);
+        "Data [Waveforms] Formats"));
+    add (dataFormatPanel);
     
-    final JPanel commandPanel = new JPanel ();
-    commandPanel.setBorder (
+    final JPanel dataTransferPanel = new JPanel ();
+    dataTransferPanel.setBorder (
       BorderFactory.createTitledBorder (
         BorderFactory.createLineBorder (DEFAULT_MANAGEMENT_COLOR, 2),
-        "Commands"));
-    add (commandPanel);    
+        "Data [Waveforms] Transfer"));
+    add (dataTransferPanel);
     
     //
     // jDescription
@@ -108,108 +100,82 @@ public class JTek2440_GPIB_WaveformData
     jDescription.setContentType ("text/html");
     jDescription.setBackground (getBackground ());
     jDescription.setEditable (false);
-    jDescription.setText ("<html><b>Waveform Data Settings</b>" +
+    jDescription.setText ("<html><b>Data Format and Transfer</b>" +
                           "<ul>" +
-                            "<li>Features automatic measurement of average/minimum/maximum/number of crossings"
-                                 + " on the waveform selected by the DATa SOUrce variable/settings;</li>" +
-                            "<li>Supports variable threshold level and hysteresis"
-                                 + " with respect to level-crossing detection;</li>" +
-                            "<li>Supports restriction (start/stop) of the X range.</li>" +
+                            "<li>Controls the data format for transferring settings, status, and traces;</li>" +
+                            "<li>Features manual data transfers to and from the instrument;</li>" +
+                            "<li>Values marked in red are used internally in the software and therefore read-only.</li>" +
                           "</ul>" +
                           "</html>");
-
+    
     //
-    // levelCrossingPanel
+    // dataFormatPanel
     //
     
-    levelCrossingPanel.setLayout (new GridLayout (2, 5));
+    dataFormatPanel.setLayout (new GridLayout (3, 2));
     
-    levelCrossingPanel.add (new JLabel ("NCross Level"));
-    levelCrossingPanel.add (new JInteger_JSlider (
-      SwingConstants.HORIZONTAL,
-      -100, // XXX Limits??
-      100,  // XXX Limits??
-      0,
-      50,
-      null,
-      "waveform analysis level",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getWaveformAnalysisLevel (),
-      tek2440::setWaveformAnalysisLevel,
-      true).withPaintLabels ());
-    
-    levelCrossingPanel.add (new JLabel ());
-
-    levelCrossingPanel.add (new JLabel ("NCross Hysteresis"));
-    levelCrossingPanel.add (new JInteger_JSlider (
-      SwingConstants.HORIZONTAL,
-      0,
-      256,
-      0,
-      64,
-      null,
-      "waveform analysis hysteresis",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getWaveformAnalysisHysteresis (),
-      tek2440::setWaveformAnalysisHysteresis,
-      true).withPaintLabels ());
-    
-    levelCrossingPanel.add (new JLabel ("NCross Direction"));
-    levelCrossingPanel.add (JCenter.Y (new JEnum_JComboBox<> (
-      Tek2440_GPIB_Settings.Direction.class,
-      "waveform analysis direction",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getWaveformAnalysisDirection (),
-      tek2440::setWaveformAnalysisDirection,
+    dataFormatPanel.add (new JLabel ("Encoding"));
+    dataFormatPanel.add (JCenter.Y (new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.DataEncoding.class,
+      "data encoding",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getDataEncoding (),
+      tek2440::setDataEncoding,
       true)));
     
-    levelCrossingPanel.add (new JLabel ());
-    levelCrossingPanel.add (new JLabel ());
-    levelCrossingPanel.add (new JLabel ());    
+    dataFormatPanel.add (new JLabel ("Use Path [in Query Responses]"));
+    dataFormatPanel.add (new JBoolean_JBoolean (
+      "use path [query responses]",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isUsePath (),
+      tek2440::setUsePath,
+      Color.green,
+      true));
+    
+    dataFormatPanel.add (new JLabel ("Long Response [Symbols]"));
+    dataFormatPanel.add (new JBoolean_JBoolean (
+      "use long response [symbols]",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).isUseLongResponse (),
+      tek2440::setUseLongResponse,
+      Color.green,
+      true));
     
     //
-    // intervalPanel
+    // dataTransferPanel
     //
     
-    intervalPanel.setLayout (new GridLayout (2, 2));
+    dataTransferPanel.setLayout (new GridLayout (3, 2));
     
-    intervalPanel.add (new JLabel ("Start"));
-    intervalPanel.add (new JInteger_JSlider (
-      SwingConstants.HORIZONTAL,
-      1,
-      1024,
-      0,
-      1023,
-      512,
-      "waveform analysis start position",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getWaveformAnalysisStart (),
-      tek2440::setWaveformAnalysisStartPosition,
-      true).withPaintLabels ());
+    dataTransferPanel.add (new JLabel ("Source"));
+    dataTransferPanel.add (JCenter.Y (new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.DataSource.class,
+      "data source",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getDataSource (),
+      tek2440::setDataSource,
+      true)));
     
-    intervalPanel.add (new JLabel ("Stop"));
-    intervalPanel.add (new JInteger_JSlider (
-      SwingConstants.HORIZONTAL,
-      1,
-      1024,
-      0,
-      1023,
-      512,
-      "waveform analysis stop position",
-      (settings) -> ((Tek2440_GPIB_Settings) settings).getWaveformAnalysisStop (),
-      tek2440::setWaveformAnalysisStopPosition,
-      true).withPaintLabels ());
-        
-    //
-    // commandPanel
-    //
+    dataTransferPanel.add (new JLabel ("DSource"));
+    dataTransferPanel.add (JCenter.Y (new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.DataSource.class,
+      "data dSource",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getDataDSource (),
+      tek2440::setDataDSource,
+      true)));
     
-    commandPanel.setLayout (new GridLayout (1, 1));
+    dataTransferPanel.add (new JLabel ("Target"));
+    dataTransferPanel.add (JCenter.Y (new JEnum_JComboBox<> (
+      Tek2440_GPIB_Settings.DataTarget.class,
+      "data target",
+      (settings) -> ((Tek2440_GPIB_Settings) settings).getDataTarget (),
+      tek2440::setDataTarget,
+      true)));
     
   }
 
-  public JTek2440_GPIB_WaveformData (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
+  public JTek2440_GPIB_Data (final Tek2440_GPIB_Instrument digitalStorageOscilloscope, final int level)
   {
     this (digitalStorageOscilloscope, null, level, null);
   }
   
-  public JTek2440_GPIB_WaveformData (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
+  public JTek2440_GPIB_Data (final Tek2440_GPIB_Instrument digitalStorageOscilloscope)
   {
     this (digitalStorageOscilloscope, 0);
   }
@@ -226,14 +192,14 @@ public class JTek2440_GPIB_WaveformData
     @Override
     public final String getInstrumentViewTypeUrl ()
     {
-      return "Tektronix 2440 [GPIB] Waveform Data Settings";
+      return "Tektronix 2440 [GPIB] Data [Format] Settings";
     }
 
     @Override
     public final InstrumentView openInstrumentView (final Instrument instrument)
     {
       if (instrument != null && (instrument instanceof Tek2440_GPIB_Instrument))
-        return new JTek2440_GPIB_WaveformData ((Tek2440_GPIB_Instrument) instrument);
+        return new JTek2440_GPIB_Data ((Tek2440_GPIB_Instrument) instrument);
       else
         return null;
     }
@@ -250,7 +216,7 @@ public class JTek2440_GPIB_WaveformData
   @Override
   public String getInstrumentViewUrl ()
   {
-    return JTek2440_GPIB_WaveformData.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
+    return JTek2440_GPIB_Data.INSTRUMENT_VIEW_TYPE.getInstrumentViewTypeUrl ()
       + "<>"
       + getInstrument ().getInstrumentUrl ();
   }
