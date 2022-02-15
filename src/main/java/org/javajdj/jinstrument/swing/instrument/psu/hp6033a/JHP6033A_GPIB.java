@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing.instrument.hp6033a;
+package org.javajdj.jinstrument.swing.instrument.psu.hp6033a;
 
 import java.awt.Color;
 import java.awt.Component;
