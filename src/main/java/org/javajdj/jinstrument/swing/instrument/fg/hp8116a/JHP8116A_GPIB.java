@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing.instrument.hp8116a;
+package org.javajdj.jinstrument.swing.instrument.fg.hp8116a;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
