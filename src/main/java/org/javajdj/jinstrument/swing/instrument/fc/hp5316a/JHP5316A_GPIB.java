@@ -14,7 +14,7 @@
  * limitations under the License.
  * 
  */
-package org.javajdj.jinstrument.swing.instrument.hp5316a;
+package org.javajdj.jinstrument.swing.instrument.fc.hp5316a;
 
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
