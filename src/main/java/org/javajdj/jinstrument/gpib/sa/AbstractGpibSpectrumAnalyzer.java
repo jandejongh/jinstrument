@@ -1,5 +1,5 @@
 /* 
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,8 @@ public abstract class AbstractGpibSpectrumAnalyzer
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  protected AbstractGpibSpectrumAnalyzer (final String name,
+  protected AbstractGpibSpectrumAnalyzer (
+    final String name,
     final GpibDevice device,
     final List<Runnable> runnables,
     final List<Service> targetServices,
@@ -62,7 +63,8 @@ public abstract class AbstractGpibSpectrumAnalyzer
     final boolean addHousekeepingServices,
     final boolean addServiceRequestPollingServices)
   {
-    super (name,
+    super (
+      name,
       device,
       runnables,
       targetServices,
