@@ -71,11 +71,22 @@ public class HP70000_GPIB_Instrument
   
   public HP70000_GPIB_Instrument (final GpibDevice device)
   {
-    super ("HP-70000", device, null, null, false, true, true, true, false, false, true);
-    setStatusCollectorPeriod_s (1.0);
-    setSettingsCollectorPeriod_s (1.0);
-    setGpibInstrumentServiceRequestCollectorPeriod_s (0.75);
-    setPollServiceRequestTimeout_ms (200);
+    super (
+      "HP-70000", // name
+      device,     // device
+      null,       // runnables
+      null,       // targetServices
+      true,       // addInitializationServices
+      true,       // addStatusServices
+      false,      // addSettingsServices
+      true,       // addCommandProcessorServices
+      false,      // addAcquisitionServices
+      false,      // addHousekeepingServices
+      false);     // addServiceRequestPollingServices
+    setStatusCollectorPeriod_s (5.0);
+    // setSettingsCollectorPeriod_s (2.0);
+    // setGpibInstrumentServiceRequestCollectorPeriod_s (0.75);
+    // setPollServiceRequestTimeout_ms (2000);
     setSerialPollTimeout_ms (200);
   }
 
@@ -158,13 +169,21 @@ public class HP70000_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  public final static String INITIALIZATION_STRING = 
+    "CONTS;"     // Continuous Sweep.
+    + "RQS 4;"   // Generate GPIB Service Request at End of Sweep -> DOES NOT WORK WELL WITH PROLOGIX GPIB-ETHERNET.
+//  + "RQS 119;" // Generate GPIB Service Request 0x77 -> always.
+    + "TDF B;";  // Trace Data Format (Binary).
+  
   @Override
   protected void initializeInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
-    writeSync ("CONTS\r\n"); // Continuous Sweep.
-    writeSync ("RQS 4\r\n"); // Generate GPIB Service Request at End of Sweep.
-    writeSync ("TDF B\r\n"); // Trace Data Format (Binary).
+    writeSync (HP70000_GPIB_Instrument.INITIALIZATION_STRING);
+    final InstrumentSettings settings = getSettingsFromInstrumentSync ();
+    if (settings == null)
+      throw new IOException (); // Forces error state, so user can retry.
+    settingsReadFromInstrument (settings);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,9 +198,16 @@ public class HP70000_GPIB_Instrument
     throws IOException, InterruptedException, TimeoutException
   {
     final byte statusByte = serialPollSync ();
-    final String errorString = writeAndReadlnSync ("ERR?\r\n");
+    final String errorString = writeAndReadlnSync ("ERR?;");
     // XXX Could read the message structure from "MSG\r\n"... It contains UNCAL/UNCOR indications.
-    return HP70000_GPIB_Status.fromSerialPollStatusByteAndErrorString (statusByte, errorString);
+    final HP70000_GPIB_Status status = HP70000_GPIB_Status.fromSerialPollStatusByteAndErrorString (statusByte, errorString);
+    if (status.isEndOfSweep ())
+    {
+      final InstrumentReading reading = getReadingFromInstrumentSync ();
+      if (reading != null)
+        readingReadFromInstrument (reading);
+    } 
+    return status;
   }
 
   @Override
@@ -209,21 +235,21 @@ public class HP70000_GPIB_Instrument
     throws IOException, InterruptedException, TimeoutException
   {
     // XXX TODO: Picking up the state (< 1000 bytes) takes a lot of time with zero benefits (currently).
-    final GpibControllerCommand statePreampleCommand = generateWriteAndReadNCommand ("STATE?\r\n", 14); // Fixed size!
+    final GpibControllerCommand statePreampleCommand = generateWriteAndReadNCommand ("STATE?;", 14); // Fixed size!
     final GpibControllerCommand stateCommand = generateReadNCommand (1065); // N will be overwritten!
     final GpibControllerCommand[] atomicSequenceCommands = new GpibControllerCommand[]
     {
       // REMEMBER TO PICK UP THE VALUE BELOW!
       // NOTE: ONCE WE CAN DECODE THE STATE PROPERLY, WE CAN EXTRACT THE PARAMETERS DIRECTLY :-)...
-      generateWriteAndReadlnCommand ("TRDEF TRA,?\r\n"),
-      generateWriteAndReadlnCommand ("CF?\r\n"),
-      generateWriteAndReadlnCommand ("SP?\r\n"),
-      generateWriteAndReadlnCommand ("RB?\r\n"),
-      generateWriteAndReadlnCommand ("VB?\r\n"),
-      generateWriteAndReadlnCommand ("ST?\r\n"),
-      generateWriteAndReadlnCommand ("RL?\r\n"),
-      generateWriteAndReadlnCommand ("AT?\r\n"),
-      generateWriteAndReadlnCommand ("DET?\r\n"),
+      generateWriteAndReadlnCommand ("TRDEF TRA,?;"),
+      generateWriteAndReadlnCommand ("CF?;"),
+      generateWriteAndReadlnCommand ("SP?;"),
+      generateWriteAndReadlnCommand ("RB?;"),
+      generateWriteAndReadlnCommand ("VB?;"),
+      generateWriteAndReadlnCommand ("ST?;"),
+      generateWriteAndReadlnCommand ("RL?;"),
+      generateWriteAndReadlnCommand ("AT?;"),
+      generateWriteAndReadlnCommand ("DET?;"),
       statePreampleCommand,
       generateUserRunnableCommand (() ->
       {
@@ -307,6 +333,7 @@ public class HP70000_GPIB_Instrument
   protected final InstrumentReading getReadingFromInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
+    // XXX Why go through the trouble of getting the settings from the instrument (again)?
     final HP70000_GPIB_Settings settings = (HP70000_GPIB_Settings) getSettingsFromInstrumentSync ();
     settingsReadFromInstrument (settings);
     final int traceLength = settings.getTraceLength ();
@@ -315,7 +342,7 @@ public class HP70000_GPIB_Instrument
     // TDF B: Two bytes per trace point.
     // final byte[] binaryTraceBytes = writeAndReadNSync ("SNGLS;TDF B;TS;TRA?;\r\n", 2 * traceLength);
     // In the other approach, we directly read Trace A, assuming we are invoked from a Service Request.
-    final byte[] binaryTraceBytes = writeAndReadNSync ("TRA?\r\n", 2 * traceLength);
+    final byte[] binaryTraceBytes = writeAndReadNSync ("TRA?;", 2 * traceLength);
     final double samples[] = new double[traceLength];
     int i_buf = 0;
     for (int s = 0; s < samples.length; s++)
@@ -324,7 +351,7 @@ public class HP70000_GPIB_Instrument
       settings,
       null,
       samples,
-      Unit.UNIT_dBm, // XXX Always correct?
+      Unit.UNIT_dBm,       // XXX Always correct?
       Resolution.DIGITS_5, // XXX Educated guess: dynamic range > 100 dB, 0.01 dB resolution...
       false, // XXX
       null,
@@ -364,6 +391,7 @@ public class HP70000_GPIB_Instrument
   protected void onGpibServiceRequestFromInstrument (final byte statusByte)
     throws IOException, InterruptedException, TimeoutException
   {
+    LOG.log (Level.WARNING, "SRQ; statusByte=", statusByte);
     final InstrumentReading reading = getReadingFromInstrumentSync ();
     if (reading != null)
       readingReadFromInstrument (reading);
@@ -432,79 +460,78 @@ public class HP70000_GPIB_Instrument
         case InstrumentCommand.IC_RF_FREQUENCY:
         {
           final double centerFrequency_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_FREQUENCY_MHZ);
-          writeSync ("CF " + centerFrequency_MHz + " MZ\r\n");
+          writeSync ("CF " + centerFrequency_MHz + " MZ;");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case InstrumentCommand.IC_RF_SPAN:
         {
           final double span_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_SPAN_MHZ);
-          writeSync ("SP " + span_MHz + " MZ\r\n");
+          writeSync ("SP " + span_MHz + " MZ;");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case InstrumentCommand.IC_RESOLUTION_BANDWIDTH:
         {
           final double resolutionBandwidth_Hz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RESOLUTION_BANDWIDTH_HZ);
-          writeSync ("RB " + resolutionBandwidth_Hz + " HZ\r\n");
+          writeSync ("RB " + resolutionBandwidth_Hz + " HZ;");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case InstrumentCommand.IC_SET_RESOLUTION_BANDWIDTH_COUPLED:
         {
-          writeSync ("RB AUTO\r\n");
+          writeSync ("RB AUTO;");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case InstrumentCommand.IC_VIDEO_BANDWIDTH:
         {
           final double videoBandwidth_Hz = (double) instrumentCommand.get (InstrumentCommand.ICARG_VIDEO_BANDWIDTH_HZ);
-          writeSync ("VB " + videoBandwidth_Hz + " HZ\r\n");
+          writeSync ("VB " + videoBandwidth_Hz + " HZ;");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case InstrumentCommand.IC_SET_VIDEO_BANDWIDTH_COUPLED:
         {
-          writeSync ("VB AUTO\r\n");
+          writeSync ("VB AUTO;");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case InstrumentCommand.IC_SWEEP_TIME:
         {
           final double sweepTime_s = (double) instrumentCommand.get (InstrumentCommand.ICARG_SWEEP_TIME_S);
-          writeSync ("ST " + sweepTime_s + " SC\r\n");
+          writeSync ("ST " + sweepTime_s + " SC;");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case InstrumentCommand.IC_SET_SWEEP_TIME_COUPLED:
         {
-          writeSync ("ST AUTO\r\n");
+          writeSync ("ST AUTO;");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case InstrumentCommand.IC_REFERENCE_LEVEL:
         {
           final double referenceLevel_dBm = (double) instrumentCommand.get (InstrumentCommand.ICARG_REFERENCE_LEVEL_DBM);
-          writeSync ("RL " + referenceLevel_dBm + " DM\r\n");
+          writeSync ("RL " + referenceLevel_dBm + " DM;");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case InstrumentCommand.IC_RF_ATTENUATION:
         {
           final double rfAttenuation_dB = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_ATTENUATION_DB);
-          writeSync ("AT " + rfAttenuation_dB + " DB\r\n");
+          writeSync ("AT " + rfAttenuation_dB + " DB;");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case InstrumentCommand.IC_SET_RF_ATTENUATION_COUPLED:
         {
-          writeSync ("AT AUTO\r\n");
+          writeSync ("AT AUTO;");
           newInstrumentSettings = getSettingsFromInstrumentSync ();
           break;
         }
         case HP70000_InstrumentCommand.IC_HP70000_ABORT:
         {
-          // XXX Preferred terminator is ';'.
           writeSync ("ABORT;");
           // XXX Does this affect the Settings?
           newInstrumentSettings = getSettingsFromInstrumentSync ();
