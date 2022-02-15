@@ -108,7 +108,7 @@ import org.javajdj.jinstrument.swing.instrument.dmm.hp3478a.JHP3478A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.hp5316a.JHP5316A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.hp6033a.JHP6033A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.hp8116a.JHP8116A_GPIB;
-import org.javajdj.jinstrument.swing.instrument.hp3325b.JHP3325B_GPIB;
+import org.javajdj.jinstrument.swing.instrument.fg.hp3325b.JHP3325B_GPIB;
 import org.javajdj.jinstrument.swing.instrument.rs_esh3.JRS_ESH3_GPIB;
 import org.javajdj.jinstrument.swing.instrument.tek2440.JTek2440_GPIB;
 import org.javajdj.jswing.dialog.JArraySelectorDialog;
