@@ -19,6 +19,7 @@ package org.javajdj.jinstrument.swing.instrument.dmm.hp3457a;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.util.LinkedHashSet;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
@@ -161,7 +162,8 @@ public class JHP3457A_GPIB_Misc
       new JDialogCheckBox (
         getBackground ().darker (),
         "Graph [exp]",
-        new Dimension (1600, 900),
+        // new Dimension (1600, 900),
+        Toolkit.getDefaultToolkit ().getScreenSize (),
         this.jGraph)));
     
   }
