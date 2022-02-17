@@ -63,10 +63,11 @@ public class JDefaultSpectrumAnalyzerView
     instrumentManagementPanel.setPanelBorder (JInstrumentPanel.getGuiPreferencesManagementColor (), "Management");
     add (instrumentManagementPanel);
     this.display = new JDefaultSpectrumAnalyzerTraceDisplay (spectrumAnalyzer, level + 1);
-    JInstrumentPanel.setPanelBorder (this.display,
-      level + 1,
-      Color.pink,
-      "Trace");
+    // jinstrument Issue#0027.
+    //  JInstrumentPanel.setPanelBorder (this.display,
+    //    level + 1,
+    //    Color.pink,
+    //    "Trace");
     add (this.display);
     final JDefaultSpectrumAnalyzerSettingsPanel spectrumAnalyzerSettingsPanel = new JDefaultSpectrumAnalyzerSettingsPanel (
         JDefaultSpectrumAnalyzerView.this.getSpectrumAnalyzer (),
