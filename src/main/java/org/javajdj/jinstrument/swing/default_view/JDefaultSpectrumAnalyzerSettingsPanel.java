@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,9 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       level + 1,
       JInstrumentPanel.DEFAULT_FREQUENCY_COLOR);
     cfPanel.setLayout (new GridLayout (1, 1));
+    // XXX Should consult instrument for frequency range?
     this.jCenterFrequency_MHz = new JSevenSegmentNumber (JInstrumentPanel.getGuiPreferencesFrequencyColor (), 0, 26500, 0.0000001);
+    this.jCenterFrequency_MHz.setSuppressLeadingZeroes (true);
     cfPanel.add (this.jCenterFrequency_MHz);
     add (cfPanel);
     final JInstrumentPanel spPanel = new JInstrumentPanel (
@@ -92,6 +94,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       JInstrumentPanel.DEFAULT_FREQUENCY_COLOR);
     spPanel.setLayout (new GridLayout (1, 1));
     this.jSpan_MHz = new JSevenSegmentNumber (JInstrumentPanel.getGuiPreferencesFrequencyColor (), 0, 26500, 0.0000001);
+    this.jSpan_MHz.setSuppressLeadingZeroes (true);
     spPanel.add (this.jSpan_MHz);
     add (spPanel);
     final JInstrumentPanel rbPanel = new JInstrumentPanel (
@@ -101,6 +104,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       JInstrumentPanel.DEFAULT_FREQUENCY_COLOR);
     rbPanel.setLayout (new GridLayout (1, 2));
     this.jResolutionBandwidth_Hz = new JSevenSegmentNumber (JInstrumentPanel.getGuiPreferencesFrequencyColor (), 1, 1e8, 1);
+    this.jResolutionBandwidth_Hz.setSuppressLeadingZeroes (true);
     rbPanel.add (this.jResolutionBandwidth_Hz);
     this.jResolutionBandwidthCoupled = new JColorCheckBox (
       (Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? JInstrumentPanel.getGuiPreferencesFrequencyColor () : null);
@@ -116,6 +120,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       JInstrumentPanel.DEFAULT_FREQUENCY_COLOR);
     vbPanel.setLayout (new GridLayout (1, 2));
     this.jVideoBandwidth_Hz = new JSevenSegmentNumber (JInstrumentPanel.getGuiPreferencesFrequencyColor (), 1, 1e8, 1);
+    this.jVideoBandwidth_Hz.setSuppressLeadingZeroes (true);
     vbPanel.add (this.jVideoBandwidth_Hz);
     this.jVideoBandwidthCoupled = new JColorCheckBox (
       (Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? JInstrumentPanel.getGuiPreferencesFrequencyColor () : null);
@@ -131,6 +136,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       JInstrumentPanel.DEFAULT_FREQUENCY_COLOR);
     stPanel.setLayout (new GridLayout (1, 2));
     this.jSweepTime_s = new JSevenSegmentNumber (JInstrumentPanel.getGuiPreferencesFrequencyColor (), 1e-6, 1e3, 1e-6);
+    this.jSweepTime_s.setSuppressLeadingZeroes (true);
     stPanel.add (this.jSweepTime_s);
     this.jSweepTimeCoupled = new JColorCheckBox (
       (Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? JInstrumentPanel.getGuiPreferencesFrequencyColor () : null);
@@ -146,6 +152,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       JInstrumentPanel.DEFAULT_AMPLITUDE_COLOR);
     rlPanel.setLayout (new GridLayout (1, 2));
     this.jReferenceLevel_dBm = new JSevenSegmentNumber (JInstrumentPanel.getGuiPreferencesAmplitudeColor (), -130, 60, 0.1);
+    this.jReferenceLevel_dBm.setSuppressLeadingZeroes (true);
     rlPanel.add (this.jReferenceLevel_dBm);
     rlPanel.add (new JLabel ());
     add (rlPanel);
@@ -156,6 +163,7 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
       JInstrumentPanel.DEFAULT_AMPLITUDE_COLOR);
     atPanel.setLayout (new GridLayout (1, 2));
     this.jRfAttenuation_dB = new JSevenSegmentNumber (JInstrumentPanel.getGuiPreferencesAmplitudeColor (), 0, /* 100 */ 1e5, 1);
+    this.jRfAttenuation_dB.setSuppressLeadingZeroes (true);
     atPanel.add (this.jRfAttenuation_dB);
     this.jRfAttenuationCoupled = new JColorCheckBox (
       (Function<Boolean, Color>) (Boolean t) -> (t != null && t) ? JInstrumentPanel.getGuiPreferencesAmplitudeColor () : null);
