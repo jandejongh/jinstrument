@@ -111,6 +111,7 @@ import org.javajdj.jinstrument.swing.instrument.fg.hp8116a.JHP8116A_GPIB;
 import org.javajdj.jinstrument.swing.instrument.fg.hp3325b.JHP3325B_GPIB;
 import org.javajdj.jinstrument.swing.instrument.slm.rs_esh3.JRS_ESH3_GPIB;
 import org.javajdj.jinstrument.swing.instrument.dso.tek2440.JTek2440_GPIB;
+import org.javajdj.jinstrument.swing.instrument.sa.hp70000.JHP70000_GPIB;
 import org.javajdj.jswing.dialog.JArraySelectorDialog;
 
 
@@ -289,6 +290,7 @@ extends JFrame
     instrumentRegistry.addInstrumentViewType (JHP5316A_GPIB.INSTRUMENT_VIEW_TYPE);
     instrumentRegistry.addInstrumentViewType (JHP6033A_GPIB.INSTRUMENT_VIEW_TYPE);
     instrumentRegistry.addInstrumentViewType (JHP8116A_GPIB.INSTRUMENT_VIEW_TYPE);
+    instrumentRegistry.addInstrumentViewType (JHP70000_GPIB.INSTRUMENT_VIEW_TYPE);
     instrumentRegistry.addInstrumentViewType (JTek2440_GPIB.INSTRUMENT_VIEW_TYPE);
     instrumentRegistry.addInstrumentViewType (JRS_ESH3_GPIB.INSTRUMENT_VIEW_TYPE);
     
