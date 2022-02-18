@@ -16,6 +16,7 @@
  */
 package org.javajdj.jinstrument.swing.instrument.sa.hp70000;
 
+import java.awt.GridLayout;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.Instrument;
 import org.javajdj.jinstrument.InstrumentView;
@@ -50,8 +51,21 @@ public class JHP70000_GPIB
   public JHP70000_GPIB (final HP70000_GPIB_Instrument spectrumAnalyzer, final int level)
   {
     
-    super (spectrumAnalyzer, level);
+    super (
+      spectrumAnalyzer,
+      level,
+      false, // populateInstrumentManagementPanel
+      true,  // populateTracePanel
+      true); // populateSettingsPanel
     
+    getInstrumentManagementPanel ().removeAll ();
+    getInstrumentManagementPanel ().setLayout (new GridLayout (1, 1));
+    getInstrumentManagementPanel ().add (new JHP70000_GPIB_Management (
+      spectrumAnalyzer,
+      null,
+      level + 1,
+      null));
+
   }
   
   public JHP70000_GPIB (final HP70000_GPIB_Instrument spectrumAnalyzer)
