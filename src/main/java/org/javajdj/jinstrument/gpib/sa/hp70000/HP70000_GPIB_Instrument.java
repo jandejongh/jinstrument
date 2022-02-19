@@ -18,6 +18,8 @@ package org.javajdj.jinstrument.gpib.sa.hp70000;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,11 +85,14 @@ public class HP70000_GPIB_Instrument
       false,      // addAcquisitionServices
       false,      // addHousekeepingServices
       false);     // addServiceRequestPollingServices
-    setStatusCollectorPeriod_s (5.0);
+    setInstrumentInitializerTimeout_ms (2000L);
+    setStatusCollectorPeriod_s (1.0);
     // setSettingsCollectorPeriod_s (2.0);
     // setGpibInstrumentServiceRequestCollectorPeriod_s (0.75);
     // setPollServiceRequestTimeout_ms (2000);
-    setSerialPollTimeout_ms (200);
+    setSerialPollTimeout_ms (1000);
+    this.operationSemaphore = new Semaphore (1);
+    setControllerAccessSemaphore (this.operationSemaphore);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,6 +150,17 @@ public class HP70000_GPIB_Instrument
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // HP70000_GPIB_Instrument
+  // OPERATION SEMAPHORE
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  // We use a Semaphore for sequencing initilization, acquisition/srq, and command processing.
+  // This save us the trouble of creating atomic operations for the controller...
+  // It is not ideal, and more or less assumes exclusive access to controller and instrument.
+  private final Semaphore operationSemaphore;
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // Instrument
   // POWER
   //
@@ -179,11 +195,25 @@ public class HP70000_GPIB_Instrument
   protected void initializeInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
-    writeSync (HP70000_GPIB_Instrument.INITIALIZATION_STRING);
-    final InstrumentSettings settings = getSettingsFromInstrumentSync ();
-    if (settings == null)
-      throw new IOException (); // Forces error state, so user can retry.
-    settingsReadFromInstrument (settings);
+    try
+    {
+      this.operationSemaphore.acquire ();
+      writeSync (HP70000_GPIB_Instrument.INITIALIZATION_STRING);
+      final HP70000_GPIB_Settings settings = getSettingsFromInstrumentSyncImp ();
+      if (settings == null)
+        throw new IOException (); // Forces error state, so user can retry.
+      final String idString = new String (writeAndReadEOISync ("ID?;"), Charset.forName ("US-ASCII")).trim ();
+      final String configurationString = new String (writeAndReadEOISync ("CONFIG?;"), Charset.forName ("US-ASCII")).trim ();
+      settingsReadFromInstrument (settings
+        .withId (idString)
+        .withConfigurationString (configurationString)
+        );
+    }
+    finally
+    {
+      // Make sure the acquisition process can proceed.
+      this.operationSemaphore.release ();
+    } 
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,21 +223,42 @@ public class HP70000_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  protected InstrumentStatus getStatusFromInstrumentSync (final boolean lock)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    if (lock)
+      this.operationSemaphore.acquire ();
+    try
+    {
+      final byte statusByte = serialPollSync ();
+      if (HP70000_GPIB_Status.isErrorPresent (statusByte))
+      {
+        final String errorString = writeAndReadlnSync ("ERR?;");
+        // XXX Could read the message structure from "MSG\r\n"... It contains UNCAL/UNCOR indications.
+        final HP70000_GPIB_Status status = HP70000_GPIB_Status.fromSerialPollStatusByteAndErrorString (statusByte, errorString);
+        return status;
+      }
+      final HP70000_GPIB_Status status = HP70000_GPIB_Status.fromSerialPollStatusByte (statusByte);
+      if (status.isEndOfSweep ())
+      {
+        final InstrumentReading reading = getReadingFromInstrumentSync ();
+        if (reading != null)
+          readingReadFromInstrument (reading);
+      }
+      return status;
+    }
+    finally
+    {
+      if (lock)
+        this.operationSemaphore.release ();
+    }
+  }
+
   @Override
   protected InstrumentStatus getStatusFromInstrumentSync ()
     throws IOException, InterruptedException, TimeoutException
   {
-    final byte statusByte = serialPollSync ();
-    final String errorString = writeAndReadlnSync ("ERR?;");
-    // XXX Could read the message structure from "MSG\r\n"... It contains UNCAL/UNCOR indications.
-    final HP70000_GPIB_Status status = HP70000_GPIB_Status.fromSerialPollStatusByteAndErrorString (statusByte, errorString);
-    if (status.isEndOfSweep ())
-    {
-      final InstrumentReading reading = getReadingFromInstrumentSync ();
-      if (reading != null)
-        readingReadFromInstrument (reading);
-    } 
-    return status;
+    return getStatusFromInstrumentSync (true);
   }
 
   @Override
@@ -230,8 +281,7 @@ public class HP70000_GPIB_Instrument
     throw new UnsupportedOperationException ();
   }
   
-  @Override
-  public SpectrumAnalyzerSettings getSettingsFromInstrumentSync ()
+  protected HP70000_GPIB_Settings getSettingsFromInstrumentSyncImp ()
     throws IOException, InterruptedException, TimeoutException
   {
     // XXX TODO: Picking up the state (< 1000 bytes) takes a lot of time with zero benefits (currently).
@@ -299,6 +349,7 @@ public class HP70000_GPIB_Instrument
     final String detString = 
       new String (((byte[]) atomicSequenceCommands[i++].get (GpibControllerCommand.CCRET_VALUE_KEY)), Charset.forName ("US-ASCII"))
         .trim ();
+    final HP70000_GPIB_Settings oldSettings = (HP70000_GPIB_Settings) getCurrentInstrumentSettings ();
     return new HP70000_GPIB_Settings (
       state,
       Unit.UNIT_dBm, // XXX This needs proper checking; may be in LIN or zero-span...
@@ -313,7 +364,20 @@ public class HP70000_GPIB_Instrument
       referenceLevel_dBm,
       rfAttenuation_dB,
       false,
-      traceLength);
+      traceLength,
+      oldSettings != null ? oldSettings.getId () : "unknown",
+      oldSettings != null ? oldSettings.getConfigurationString () : null);
+  }
+ 
+  @Override
+  public SpectrumAnalyzerSettings getSettingsFromInstrumentSync ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // We do not use/support getting settings from the framework (AbstractInstrument).
+    // Use getSettingsFromInstrumentSyncImp internally instead.
+    LOG.log (Level.SEVERE, "Illegal call to getSettingsFromInstrumentSync - this is a software error on instrument {0}!",
+      new Object[]{this});
+    throw new UnsupportedOperationException ();
   }
  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -334,7 +398,7 @@ public class HP70000_GPIB_Instrument
     throws IOException, InterruptedException, TimeoutException
   {
     // XXX Why go through the trouble of getting the settings from the instrument (again)?
-    final HP70000_GPIB_Settings settings = (HP70000_GPIB_Settings) getSettingsFromInstrumentSync ();
+    final HP70000_GPIB_Settings settings = (HP70000_GPIB_Settings) getSettingsFromInstrumentSyncImp ();
     settingsReadFromInstrument (settings);
     final int traceLength = settings.getTraceLength ();
     // In the approach below we initiate the trace and await its completion and transfer.
@@ -422,6 +486,40 @@ public class HP70000_GPIB_Instrument
       HP70000_InstrumentCommand.IC_HP70000_ABORT));
   }
   
+  public final String getConfigurationStringSync (final long timeout, final TimeUnit unit)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_GET_CONFIGURATION_STRING);
+    addAndProcessCommandSync (command, timeout, unit);
+    return (String) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
+  }
+    
+  public final void getConfigurationStringASync ()
+    throws IOException, InterruptedException
+  {
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_GET_CONFIGURATION_STRING);
+    addCommand (command);
+  }
+    
+  public final String getIdSync (final long timeout, final TimeUnit unit)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_GET_ID);
+    addAndProcessCommandSync (command, timeout, unit);
+    return (String) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
+  }
+    
+  public final void getIdASync ()
+    throws IOException, InterruptedException
+  {
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_GET_ID);
+    addCommand (command);
+  }
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -430,7 +528,13 @@ public class HP70000_GPIB_Instrument
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
   @Override
-  protected void processCommand (final InstrumentCommand instrumentCommand)
+  protected final void processCommand (final InstrumentCommand instrumentCommand)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    processCommand (instrumentCommand, true);
+  }
+  
+  protected final void processCommand (final InstrumentCommand instrumentCommand, final boolean topLevel)
     throws IOException, InterruptedException, TimeoutException
   {
     if (instrumentCommand == null)
@@ -444,7 +548,10 @@ public class HP70000_GPIB_Instrument
     final String commandString = (String) instrumentCommand.get (InstrumentCommand.IC_COMMAND_KEY);
     if (commandString.trim ().isEmpty ())
       throw new IllegalArgumentException ();
+    if (topLevel)
+      this.operationSemaphore.acquire ();
     final GpibDevice device = (GpibDevice) getDevice ();
+    final HP70000_GPIB_Settings instrumentSettings = (HP70000_GPIB_Settings) getCurrentInstrumentSettings ();
     InstrumentSettings newInstrumentSettings = null;
     try
     {
@@ -454,88 +561,111 @@ public class HP70000_GPIB_Instrument
           break;
         case InstrumentCommand.IC_GET_SETTINGS_KEY:
         {
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case InstrumentCommand.IC_RF_FREQUENCY:
         {
           final double centerFrequency_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_FREQUENCY_MHZ);
           writeSync ("CF " + centerFrequency_MHz + " MZ;");
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case InstrumentCommand.IC_RF_SPAN:
         {
           final double span_MHz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_SPAN_MHZ);
           writeSync ("SP " + span_MHz + " MZ;");
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case InstrumentCommand.IC_RESOLUTION_BANDWIDTH:
         {
           final double resolutionBandwidth_Hz = (double) instrumentCommand.get (InstrumentCommand.ICARG_RESOLUTION_BANDWIDTH_HZ);
           writeSync ("RB " + resolutionBandwidth_Hz + " HZ;");
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case InstrumentCommand.IC_SET_RESOLUTION_BANDWIDTH_COUPLED:
         {
           writeSync ("RB AUTO;");
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case InstrumentCommand.IC_VIDEO_BANDWIDTH:
         {
           final double videoBandwidth_Hz = (double) instrumentCommand.get (InstrumentCommand.ICARG_VIDEO_BANDWIDTH_HZ);
           writeSync ("VB " + videoBandwidth_Hz + " HZ;");
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case InstrumentCommand.IC_SET_VIDEO_BANDWIDTH_COUPLED:
         {
           writeSync ("VB AUTO;");
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case InstrumentCommand.IC_SWEEP_TIME:
         {
           final double sweepTime_s = (double) instrumentCommand.get (InstrumentCommand.ICARG_SWEEP_TIME_S);
           writeSync ("ST " + sweepTime_s + " SC;");
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case InstrumentCommand.IC_SET_SWEEP_TIME_COUPLED:
         {
           writeSync ("ST AUTO;");
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case InstrumentCommand.IC_REFERENCE_LEVEL:
         {
           final double referenceLevel_dBm = (double) instrumentCommand.get (InstrumentCommand.ICARG_REFERENCE_LEVEL_DBM);
           writeSync ("RL " + referenceLevel_dBm + " DM;");
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case InstrumentCommand.IC_RF_ATTENUATION:
         {
           final double rfAttenuation_dB = (double) instrumentCommand.get (InstrumentCommand.ICARG_RF_ATTENUATION_DB);
           writeSync ("AT " + rfAttenuation_dB + " DB;");
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case InstrumentCommand.IC_SET_RF_ATTENUATION_COUPLED:
         {
           writeSync ("AT AUTO;");
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;
         }
         case HP70000_InstrumentCommand.IC_HP70000_ABORT:
         {
+          // ABORT
           writeSync ("ABORT;");
           // XXX Does this affect the Settings?
-          newInstrumentSettings = getSettingsFromInstrumentSync ();
+          newInstrumentSettings = getSettingsFromInstrumentSyncImp ();
           break;          
+        }
+        case HP70000_InstrumentCommand.IC_HP70000_GET_ID:
+        {
+          // ID?
+          final String queryReturn = new String (writeAndReadEOISync ("ID?;"), Charset.forName ("US-ASCII")).trim ();
+          if (queryReturn == null)
+            throw new IOException ();
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, queryReturn);
+          if (instrumentSettings != null && ! queryReturn.equals (instrumentSettings.getId ()))
+            newInstrumentSettings = instrumentSettings.withId (queryReturn);
+          break;
+        }
+        case HP70000_InstrumentCommand.IC_HP70000_GET_CONFIGURATION_STRING:
+        {
+          // ID?
+          final String queryReturn = new String (writeAndReadEOISync ("CONFIG?;"), Charset.forName ("US-ASCII")).trim ();
+          if (queryReturn == null)
+            throw new IOException ();
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, queryReturn);
+          if (instrumentSettings != null && ! queryReturn.equals (instrumentSettings.getConfigurationString ()))
+            newInstrumentSettings = instrumentSettings.withConfigurationString (queryReturn);
+          break;
         }
         default:
           throw new UnsupportedOperationException ();
@@ -543,10 +673,15 @@ public class HP70000_GPIB_Instrument
     }
     finally
     {
-      // EMPTY
+      if (topLevel)
+        this.operationSemaphore.release ();
     }
     if (newInstrumentSettings != null)
+    {
       settingsReadFromInstrument (newInstrumentSettings);
+      if (topLevel)
+        statusReadFromInstrument (getStatusFromInstrumentSync (true));
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
