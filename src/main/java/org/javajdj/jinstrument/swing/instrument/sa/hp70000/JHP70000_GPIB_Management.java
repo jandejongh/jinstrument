@@ -26,10 +26,12 @@ import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.SpectrumAnalyzer;
 import org.javajdj.jinstrument.gpib.sa.hp70000.HP70000_GPIB_Instrument;
+import org.javajdj.jinstrument.gpib.sa.hp70000.HP70000_GPIB_Settings;
 import org.javajdj.jinstrument.swing.base.JInstrumentPanel;
 import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferencesManagementColor;
 import org.javajdj.jinstrument.swing.base.JSpectrumAnalyzerPanel;
 import org.javajdj.jinstrument.swing.cdi.JTinyCDIStatusAndControl;
+import org.javajdj.jswing.jcenter.JCenter;
 
 /** A Swing panel for Management Settings of a {@link HP70000_GPIB_Instrument} Spectrum Analyzer.
  *
@@ -78,6 +80,7 @@ public class JHP70000_GPIB_Management
     add (bottomPanel);
     
     topPanel.setLayout (new GridLayout (1, 3));
+    
     topPanel.add (new JInstrumentPanel (
       hp70000,
       "Controller/Dev/Inst",
@@ -89,28 +92,32 @@ public class JHP70000_GPIB_Management
       spectrumAnalyzer,
       level + 2,
       getGuiPreferencesManagementColor ())));
-//    topPanel.add (new JHP3457A_GPIB_InstalledOptions (
-//      spectrumAnalyzer,
-//      "Options",
-//      level + 2,
-//      getGuiPreferencesManagementColor ()));
-    topPanel.add (new JLabel ("TBD"));
-//    final JPanel idAddressPanel = new JPanel ();
-//    topPanel.add (idAddressPanel);
-    topPanel.add (new JLabel ("TBD"));
-//    idAddressPanel.setLayout (new GridLayout (3, 1));
-//    idAddressPanel.add (new JInstrumentPanel (
-//      hp70000,
-//      "Id",
-//      level + 1,
-//      getGuiPreferencesManagementColor (),
-//      new JString_JTextField (
-//        "Unknown",
-//        16,
-//        "Id",
-//        (settings) -> ((HP3457A_GPIB_Settings) settings).getId (),
-//        null,
-//        true)));
+    
+    topPanel.add (new JHP70000_GPIB_Configuration (
+      spectrumAnalyzer,
+      "Configuration",
+      level + 2,
+      getGuiPreferencesManagementColor ()));
+
+    final JPanel idAddressPanel = new JPanel ();
+    topPanel.add (idAddressPanel);
+    
+    idAddressPanel.setLayout (new GridLayout (3, 1));
+    
+    idAddressPanel.add (new JInstrumentPanel (
+      hp70000,
+      "Id",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JString_JTextField (
+        "Unknown",
+        16,
+        "Id",
+        (settings) -> ((HP70000_GPIB_Settings) settings).getId (),
+        null,
+        true)));
+    
+    idAddressPanel.add (JCenter.XY (new JLabel ("TBD")));
 //    idAddressPanel.add (new JInstrumentPanel (
 //      hp70000,
 //      "GPIB Address",
@@ -126,6 +133,8 @@ public class JHP70000_GPIB_Management
 //        },
 //        null,
 //        true)));
+
+    idAddressPanel.add (JCenter.XY (new JLabel ("TBD")));
 //    idAddressPanel.add (new JInstrumentPanel (
 //      hp70000,
 //      "Calibration Number",
@@ -155,14 +164,14 @@ public class JHP70000_GPIB_Management
     
     bottomTopPanel.setLayout (new GridLayout (1, 2));
     
-    bottomTopPanel.add (new JLabel ("TBD"));
+    bottomTopPanel.add (JCenter.XY (new JLabel ("TBD")));
 //    bottomTopPanel.add (new JHP3457A_GPIB_Calibration (
 //      spectrumAnalyzer,
 //      "Calibration",
 //      level + 1,
 //      getGuiPreferencesManagementColor ()));
     
-    bottomTopPanel.add (new JLabel ("TBD"));
+    bottomTopPanel.add (JCenter.XY (new JLabel ("TBD")));
 //    bottomTopPanel.add (new JHP3457A_GPIB_State (
 //      spectrumAnalyzer,
 //      "State",
@@ -171,7 +180,7 @@ public class JHP70000_GPIB_Management
     
     bottomBottomPanel.setLayout (new GridLayout (1, 3));
     
-    bottomBottomPanel.add (new JLabel ("TBD"));
+    bottomBottomPanel.add (JCenter.XY (new JLabel ("TBD")));
 //    bottomBottomPanel.add (new JInstrumentPanel (
 //      hp70000,
 //      "Internal Test",
@@ -182,7 +191,7 @@ public class JHP70000_GPIB_Management
 //      hp70000::internalTest,
 //      Color.blue))));
     
-    bottomBottomPanel.add (new JLabel ("TBD"));
+    bottomBottomPanel.add (JCenter.XY (new JLabel ("TBD")));
 //    bottomBottomPanel.add (new JInstrumentPanel (
 //      hp70000,
 //      "Math",
@@ -198,7 +207,7 @@ public class JHP70000_GPIB_Management
 //          level + 1,
 //          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
     
-    bottomBottomPanel.add (new JLabel ("TBD"));
+    bottomBottomPanel.add (JCenter.XY (new JLabel ("TBD")));
 //    bottomBottomPanel.add (new JInstrumentPanel (
 //      hp70000,
 //      "Subprograms",
