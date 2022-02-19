@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2020 Jan de Jongh <jfcmdejongh@gmail.com>.
+ * Copyright 2010-2022 Jan de Jongh <jfcmdejongh@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package org.javajdj.jinstrument.gpib.sa.hp70000;
 import java.util.logging.Logger;
 import org.javajdj.jinstrument.InstrumentStatus;
 
-/** Implementation of {@link InstrumentStatus} for the HP-70000 MMS.
+/** Implementation of {@link InstrumentStatus} for the HP-70000 Spectrum Analyzer [MMS].
  *
  * @author Jan de Jongh {@literal <jfcmdejongh@gmail.com>}
  * 
@@ -28,6 +28,12 @@ public class HP70000_GPIB_Status
   implements InstrumentStatus
 {
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // LOGGER
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   private static final Logger LOG = Logger.getLogger (HP70000_GPIB_Status.class.getName ());
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +46,12 @@ public class HP70000_GPIB_Status
   {
     this.serialPollStatusByte = serialPollStatusByte;
     this.errorString = errorString;
+  }
+  
+  public final static HP70000_GPIB_Status fromSerialPollStatusByte (
+    final byte serialPollStatusByte)
+  {
+    return new HP70000_GPIB_Status (serialPollStatusByte, null);
   }
   
   public final static HP70000_GPIB_Status fromSerialPollStatusByteAndErrorString (
@@ -95,34 +107,64 @@ public class HP70000_GPIB_Status
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  public final static boolean isServiceRequest (final byte statusByte)
+  {
+    return (statusByte & 0x40) != 0;    
+  }
+  
   public final boolean isServiceRequest ()
   {
-    return (this.serialPollStatusByte & 0x40) != 0;    
+    return HP70000_GPIB_Status.isServiceRequest (this.serialPollStatusByte);
+  }
+  
+  public final static boolean isErrorPresent (final byte statusByte)
+  {
+    return (statusByte & 0x20) != 0;
   }
   
   public final boolean isErrorPresent ()
   {
-    return (this.serialPollStatusByte & 0x20) != 0;
+    return HP70000_GPIB_Status.isErrorPresent (this.serialPollStatusByte);
+  }
+  
+  public final static boolean isCommandComplete (final byte statusByte)
+  {
+    return (statusByte & 0x10) != 0;        
   }
   
   public final boolean isCommandComplete ()
   {
-    return (this.serialPollStatusByte & 0x10) != 0;        
+    return HP70000_GPIB_Status.isCommandComplete (this.serialPollStatusByte);
+  }
+  
+  public final static boolean isEndOfSweep (final byte statusByte)
+  {
+    return (statusByte & 0x04) != 0;    
   }
   
   public final boolean isEndOfSweep ()
   {
-    return (this.serialPollStatusByte & 0x04) != 0;    
+    return HP70000_GPIB_Status.isEndOfSweep (this.serialPollStatusByte);
+  }
+  
+  public final static boolean isMessagePresent (final byte statusByte)
+  {
+    return (statusByte & 0x02) != 0;    
   }
   
   public final boolean isMessagePresent ()
   {
-    return (this.serialPollStatusByte & 0x02) != 0;    
+    return HP70000_GPIB_Status.isMessagePresent (this.serialPollStatusByte);
+  }
+  
+  public final static boolean isTriggerArmed (final byte statusByte)
+  {
+    return (statusByte & 0x01) != 0;
   }
   
   public final boolean isTriggerArmed ()
   {
-    return (this.serialPollStatusByte & 0x01) != 0;
+    return HP70000_GPIB_Status.isTriggerArmed (this.serialPollStatusByte);
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
