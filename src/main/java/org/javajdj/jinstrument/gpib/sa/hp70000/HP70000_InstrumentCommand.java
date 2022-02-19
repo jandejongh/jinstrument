@@ -27,6 +27,13 @@ public interface HP70000_InstrumentCommand
   extends InstrumentCommand
 {
   
-  public final static String IC_HP70000_ABORT = "commandHp70000Abort";  
+  // ABORT
+  public final static String IC_HP70000_ABORT = "commandHp70000Abort";
+  
+  // CONFIG?
+  public final static String IC_HP70000_GET_CONFIGURATION_STRING = "commandHp70000GetConfigurationString";
+  
+  // ID?
+  public final static String IC_HP70000_GET_ID = "commandHp70000GetId";
   
 }
