@@ -16,6 +16,7 @@
  */
 package org.javajdj.jinstrument;
 
+import org.javajdj.jservice.Service;
 import org.javajdj.junits.Unit;
 
 /** The settings of an {@link Instrument}.
@@ -98,5 +99,21 @@ public interface InstrumentSettings
    * 
    */ 
   Unit getReadingUnit ();
+  
+  /** Returns the {@link InstrumentConfiguration} (when supported) of the instrument.
+   * 
+   * <p>
+   * The configuration of an instrument cannot change during a {@link Service} run of the {@link Instrument} object.
+   * 
+   * @return The instrument configuration, {@code null} if the notion of instrument configuration is unsupported,
+   *           or if the configuration is still unknown.
+   * 
+   * @see InstrumentConfiguration
+   * 
+   */
+  default InstrumentConfiguration getInstrumentConfiguration ()
+  {
+    return null;
+  }
   
 }
