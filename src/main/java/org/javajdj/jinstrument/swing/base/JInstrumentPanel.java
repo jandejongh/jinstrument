@@ -38,6 +38,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -2515,6 +2516,110 @@ public class JInstrumentPanel
             Jdouble_JTextField.this.setText (Double.toString (newValue));
             if (Jdouble_JTextField.this.showPendingUpdates)
               Jdouble_JTextField.this.setBackground (JInstrumentPanel.this.getBackground ());
+          }
+          finally
+          {
+            JInstrumentPanel.this.resetInhibitInstrumentControl ();
+          }
+        });
+      }
+
+    };
+    
+  }
+  
+  public class JString_JTextArea
+    extends JTextArea
+  {
+
+    private final Function<InstrumentSettings, String> instrumentGetter;
+    
+    private final boolean showPendingUpdates;
+    
+    public JString_JTextArea (
+      final String initialString,
+      final Integer columns,
+      final String settingString,
+      final Function<InstrumentSettings, String> instrumentGetter,
+      final Instrument.InstrumentSetter_1String instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      super ();
+      this.instrumentGetter = instrumentGetter;
+      this.showPendingUpdates = showPendingUpdates;
+      if (this.showPendingUpdates)
+        setBackground (getGuiPreferencesUpdatePendingColor ());
+      if (initialString != null)
+        setText (initialString);
+      if (columns != null)
+        setColumns (columns);
+      if (this.instrumentGetter != null)
+        getInstrument ().addInstrumentListener (this.instrumentListener);
+      if (instrumentSetter != null)
+      {
+        // XXX Probably requires something similar to JInstrumentTextFieldListener_1String...
+        LOG.log (Level.SEVERE, "Editing not implemented yet; please fix or report!");
+        //addActionListener (new JInstrumentTextFieldListener_1String (
+        //  this,
+        //  settingString,
+        //  this::getText,
+        //  instrumentSetter,
+        //  JInstrumentPanel.this::isInhibitInstrumentControl,
+        //  showPendingUpdates ? getGuiPreferencesUpdatePendingColor () : null));
+        throw new UnsupportedOperationException ();
+      }
+      else
+        setEditable (false);
+    }
+    
+    public JString_JTextArea (
+      final Integer columns,
+      final String settingString,
+      final Function<InstrumentSettings, String> instrumentGetter,
+      final Instrument.InstrumentSetter_1String instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      this (null, columns, settingString, instrumentGetter, instrumentSetter, showPendingUpdates);
+    }
+    
+    public JString_JTextArea (
+      final String initialString,
+      final String settingString,
+      final Function<InstrumentSettings, String> instrumentGetter,
+      final Instrument.InstrumentSetter_1String instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      this (initialString, null, settingString, instrumentGetter, instrumentSetter, showPendingUpdates);
+    }
+    
+    public JString_JTextArea (
+      final String settingString,
+      final Function<InstrumentSettings, String> instrumentGetter,
+      final Instrument.InstrumentSetter_1String instrumentSetter,
+      final boolean showPendingUpdates)
+    {
+      this (null, null, settingString, instrumentGetter, instrumentSetter, showPendingUpdates);
+    }
+    
+    private final InstrumentListener instrumentListener = new DefaultInstrumentListener ()
+    {
+      
+      @Override
+      public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
+      {
+        if (instrument != JInstrumentPanel.this.getInstrument () || instrumentSettings == null)
+          throw new IllegalArgumentException ();
+        if (JString_JTextArea.this.instrumentGetter == null)
+          throw new RuntimeException ();
+        final String newValue = JString_JTextArea.this.instrumentGetter.apply (instrumentSettings);
+        SwingUtilities.invokeLater (() ->
+        {
+          JInstrumentPanel.this.setInhibitInstrumentControl ();
+          try
+          {
+            JString_JTextArea.this.setText (newValue);
+            if (JString_JTextArea.this.showPendingUpdates)
+              JString_JTextArea.this.setBackground (JInstrumentPanel.this.getBackground ());
           }
           finally
           {
