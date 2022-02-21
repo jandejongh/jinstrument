@@ -46,4 +46,13 @@ public interface HP70000_InstrumentCommand
   public final static String IC_HP70000_SET_MEASURE_MODE = "commandHp70000SetMeasureMode";
   public final static String ICARG_HP70000_SET_MEASURE_MODE = "hp70000SetMeasureMode";
   
+  // SRCPWR?
+  public final static String IC_HP70000_GET_SOURCE_POWER = "commandHp70000GetSourcePower";
+  
+  // SRCPWR
+  public final static String IC_HP70000_SET_SOURCE_POWER = "commandHp70000SetSourcePower";
+  public final static String ICARG_HP70000_SET_SOURCE_POWER = "hp70000SetSourcePower";
+  public final static String IC_HP70000_SET_SOURCE_ACTIVE = "commandHp70000SetSourceActive";
+  public final static String ICARG_HP70000_SET_SOURCE_ACTIVE = "hp70000SetSourceActive";
+  
 }

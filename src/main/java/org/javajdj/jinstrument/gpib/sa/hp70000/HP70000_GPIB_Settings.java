@@ -66,7 +66,9 @@ public class HP70000_GPIB_Settings
     final String id,
     final String configurationString,
     final MeasureMode measureMode,
-    final String identificationNumber)
+    final String identificationNumber,
+    final double sourcePower_dBm,
+    final boolean sourceActive)
   {
     super (
       bytes,
@@ -87,6 +89,8 @@ public class HP70000_GPIB_Settings
     this.configurationString = configurationString;
     this.measureMode = measureMode;
     this.identificationNumber = identificationNumber;
+    this.sourcePower_dBm = sourcePower_dBm;
+    this.sourceActive = sourceActive;
   }
 
   private HP70000_GPIB_Settings with (final Map<String, Object> map)
@@ -111,7 +115,9 @@ public class HP70000_GPIB_Settings
       map.containsKey (ID_KEY) ? (String) map.get (ID_KEY) : this.id,
       map.containsKey (CONFIGURATION_STRING_KEY) ? (String) map.get (CONFIGURATION_STRING_KEY) : this.configurationString,
       map.containsKey (MEASURE_MODE_KEY) ? (MeasureMode) map.get (MEASURE_MODE_KEY) : this.measureMode,
-      map.containsKey (IDENTIFICATION_NUMBER_KEY) ? (String) map.get (IDENTIFICATION_NUMBER_KEY) : this.identificationNumber
+      map.containsKey (IDENTIFICATION_NUMBER_KEY) ? (String) map.get (IDENTIFICATION_NUMBER_KEY) : this.identificationNumber,
+      map.containsKey (SOURCE_POWER_KEY) ? (double) map.get (SOURCE_POWER_KEY) : this.sourcePower_dBm,
+      map.containsKey (SOURCE_ACTIVE_KEY) ? (boolean) map.get (SOURCE_ACTIVE_KEY) : this.sourceActive
     );
   }
   
@@ -237,6 +243,41 @@ public class HP70000_GPIB_Settings
   public final HP70000_GPIB_Settings withMeasureMode (final MeasureMode measureMode)
   {
     return with (new HashMap<String, Object> () {{ put (MEASURE_MODE_KEY, measureMode); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: POWER
+  // SOURCE ACTIVE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_POWER_KEY = "sourcePower";
+  
+  private final double sourcePower_dBm;
+  
+  public final double getSourcePower_dBm ()
+  {
+    return this.sourcePower_dBm;
+  }
+  
+  public final HP70000_GPIB_Settings withSourcePower_dBm (final double sourcePower_dBm)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_POWER_KEY, sourcePower_dBm); }});
+  }
+  
+  private final static String SOURCE_ACTIVE_KEY = "sourceActive";
+  
+  private final boolean sourceActive;
+  
+  public final boolean isSourceActive ()
+  {
+    return this.sourceActive;
+  }
+  
+  public final HP70000_GPIB_Settings withSourceActive (final boolean sourceActive)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_ACTIVE_KEY, sourceActive); }});
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

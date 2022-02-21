@@ -17,6 +17,7 @@
 package org.javajdj.jinstrument.swing.instrument.sa.hp70000;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -33,6 +34,7 @@ import static org.javajdj.jinstrument.swing.base.JInstrumentPanel.getGuiPreferen
 import org.javajdj.jinstrument.swing.base.JSpectrumAnalyzerPanel;
 import org.javajdj.jinstrument.swing.cdi.JTinyCDIStatusAndControl;
 import org.javajdj.jswing.jcenter.JCenter;
+import org.javajdj.jswing.jcolorcheckbox.JDialogCheckBox;
 
 /** A Swing panel for Management Settings of a {@link HP70000_GPIB_Instrument} Spectrum Analyzer.
  *
@@ -200,21 +202,20 @@ public class JHP70000_GPIB_Management
         hp70000::setMeasureMode,
         true))));
     
-    bottomBottomPanel.add (JCenter.XY (new JLabel ("TBD")));
-//    bottomBottomPanel.add (new JInstrumentPanel (
-//      hp70000,
-//      "Subprograms",
-//      level + 1,
-//      getGuiPreferencesManagementColor (),
-//      new JDialogCheckBox (
-//        getBackground ().darker (),
-//        "Subprograms",
-//        new Dimension (800, 600),
-//        new JHP3457A_GPIB_Subprograms (
-//          hp70000,
-//          "",
-//          level + 1,
-//          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+    bottomBottomPanel.add (new JInstrumentPanel (
+      hp70000,
+      "Tracking Generator",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JDialogCheckBox (
+        getBackground ().darker (),
+        "Tracking Generator",
+        new Dimension (800, 600),
+        new JHP70000_GPIB_Source (
+          hp70000,
+          "",
+          level + 1,
+          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
     
   }
 

@@ -85,6 +85,9 @@ public class HP70000_GPIB_Instrument
       false,      // addAcquisitionServices
       false,      // addHousekeepingServices
       false);     // addServiceRequestPollingServices
+    // Make sure every settings update counts.
+    // XXX We can change this once the byte[]-based settings/state implementation works [if ever].
+    setOptimizeSettingsUpdates (false);
     setInstrumentInitializerTimeout_ms (2000L);
     setStatusCollectorPeriod_s (1.0);
     // setSettingsCollectorPeriod_s (2.0);
@@ -206,11 +209,15 @@ public class HP70000_GPIB_Instrument
       final String idnString = new String (writeAndReadEOISync ("IDN?;"), Charset.forName ("US-ASCII")).trim ();
       final String configurationString = new String (writeAndReadEOISync ("CONFIG?;"), Charset.forName ("US-ASCII")).trim ();
       final HP70000_GPIB_Settings.MeasureMode measureMode = getMeasureModeDirect ();
+      final double sourcePower_dBm = getSourcePower_dBmDirect ();
+      setSourceActive_Direct (false);
       settingsReadFromInstrument (settings
         .withId (idString)
         .withIdentificationNumber (idnString)
         .withConfigurationString (configurationString)
         .withMeasureMode (measureMode)
+        .withSourcePower_dBm (sourcePower_dBm)
+        .withSourceActive (false)
         );
     }
     finally
@@ -372,7 +379,9 @@ public class HP70000_GPIB_Instrument
       oldSettings != null ? oldSettings.getId () : "unknown",
       oldSettings != null ? oldSettings.getConfigurationString () : null,
       oldSettings != null ? oldSettings.getMeasureMode () : null,
-      oldSettings != null ? oldSettings.getIdentificationNumber () : null
+      oldSettings != null ? oldSettings.getIdentificationNumber () : null,
+      oldSettings != null ? oldSettings.getSourcePower_dBm () : Double.NaN,
+      oldSettings != null ? oldSettings.isSourceActive () : false
     );
   }
  
@@ -613,6 +622,78 @@ public class HP70000_GPIB_Instrument
       HP70000_InstrumentCommand.ICARG_HP70000_SET_MEASURE_MODE, measureMode));
   }
   
+  // SRCPWR
+  
+  protected final double getSourcePower_dBmDirect ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // SRCPWR?
+    final String queryReturn = new String (writeAndReadEOISync ("SRCPWR?;"), Charset.forName ("US-ASCII")).trim ();
+    if (queryReturn == null)
+      throw new IOException ();
+    final double sourcePower_dBm; // XXX Are we sure that unit is always dBm?
+    try
+    {
+      sourcePower_dBm = Double.parseDouble (queryReturn);
+    }
+    catch (NumberFormatException nfe)
+    {
+      throw new IOException ();
+    }
+    return sourcePower_dBm;
+  }
+    
+  public final double getSourcePower_dBmSync (final long timeout, final TimeUnit unit)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // SRCPWR?
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_GET_SOURCE_POWER);
+    addAndProcessCommandSync (command, timeout, unit);
+    return (double) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
+  }
+    
+  public final void getSourcePower_dBmASync ()
+    throws IOException, InterruptedException
+  {
+    // SRCPWR?
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_GET_SOURCE_POWER);
+    addCommand (command);
+  }
+    
+  protected final void setSourcePower_dBmDirect (final double sourcePower_dBm)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // SRCPWR
+    writeSync ("SRCPWR " + Double.toString (sourcePower_dBm) + "DBM;");
+  }
+    
+  public final void setSourcePower_dBm (final double sourcePower_dBm)
+    throws IOException, InterruptedException
+  {
+    // SRCPWR
+    addCommand (new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_SET_SOURCE_POWER,
+      HP70000_InstrumentCommand.ICARG_HP70000_SET_SOURCE_POWER, sourcePower_dBm));
+  }
+  
+  protected final void setSourceActive_Direct (final boolean sourceActive)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // SRCPWR
+    writeSync ("SRCPWR " + (sourceActive ? "ON" : "OFF") + ";");
+  }
+    
+  public final void setSourceActive (final boolean sourceActive)
+    throws IOException, InterruptedException
+  {
+    // SRCPWR
+    addCommand (new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_SET_SOURCE_ACTIVE,
+      HP70000_InstrumentCommand.ICARG_HP70000_SET_SOURCE_ACTIVE, sourceActive));
+  }
+    
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -782,12 +863,42 @@ public class HP70000_GPIB_Instrument
         }
         case HP70000_InstrumentCommand.IC_HP70000_SET_MEASURE_MODE:
         {
-          // MEASURE?
+          // MEASURE
           final HP70000_GPIB_Settings.MeasureMode measureMode =
             (HP70000_GPIB_Settings.MeasureMode) instrumentCommand.get (HP70000_InstrumentCommand.ICARG_HP70000_SET_MEASURE_MODE);
           setMeasureModeDirect (measureMode);
           if (instrumentSettings != null && ! measureMode.equals (instrumentSettings.getMeasureMode ()))
             newInstrumentSettings = instrumentSettings.withMeasureMode (measureMode);
+          break;
+        }
+        case HP70000_InstrumentCommand.IC_HP70000_GET_SOURCE_POWER:
+        {
+          // SRCPWR?
+          final double sourcePower_dBm = getSourcePower_dBmDirect ();
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, sourcePower_dBm);
+          if (instrumentSettings != null && sourcePower_dBm != instrumentSettings.getSourcePower_dBm ())
+            newInstrumentSettings = instrumentSettings.withSourcePower_dBm (sourcePower_dBm);
+          break;
+        }
+        case HP70000_InstrumentCommand.IC_HP70000_SET_SOURCE_POWER:
+        {
+          // SRCPWR
+          final double sourcePower_dBm =
+            (double) instrumentCommand.get (HP70000_InstrumentCommand.ICARG_HP70000_SET_SOURCE_POWER);
+          setSourcePower_dBmDirect (sourcePower_dBm);
+          if (instrumentSettings != null
+            && (sourcePower_dBm != instrumentSettings.getSourcePower_dBm () || ! instrumentSettings.isSourceActive ()))
+            newInstrumentSettings = instrumentSettings.withSourcePower_dBm (sourcePower_dBm).withSourceActive (true);
+          break;
+        }
+        case HP70000_InstrumentCommand.IC_HP70000_SET_SOURCE_ACTIVE:
+        {
+          // SRCPWR
+          final boolean sourceActive =
+            (boolean) instrumentCommand.get (HP70000_InstrumentCommand.ICARG_HP70000_SET_SOURCE_ACTIVE);
+          setSourceActive_Direct (sourceActive);
+          if (instrumentSettings != null && sourceActive != instrumentSettings.isSourceActive ())
+            newInstrumentSettings = instrumentSettings.withSourceActive (sourceActive);
           break;
         }
         default:
