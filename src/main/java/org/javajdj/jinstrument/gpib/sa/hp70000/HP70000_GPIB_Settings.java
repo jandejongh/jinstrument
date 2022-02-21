@@ -64,7 +64,9 @@ public class HP70000_GPIB_Settings
     final boolean rfAttenuationCoupled,
     final int traceLength,
     final String id,
-    final String configurationString)
+    final String configurationString,
+    final MeasureMode measureMode,
+    final String identificationNumber)
   {
     super (
       bytes,
@@ -83,6 +85,8 @@ public class HP70000_GPIB_Settings
     this.traceLength = traceLength;
     this.id = id;
     this.configurationString = configurationString;
+    this.measureMode = measureMode;
+    this.identificationNumber = identificationNumber;
   }
 
   private HP70000_GPIB_Settings with (final Map<String, Object> map)
@@ -105,7 +109,10 @@ public class HP70000_GPIB_Settings
       isRfAttenuationCoupled (),
       map.containsKey (TRACE_LENGTH_KEY) ? (int) map.get (TRACE_LENGTH_KEY) : this.traceLength,
       map.containsKey (ID_KEY) ? (String) map.get (ID_KEY) : this.id,
-      map.containsKey (CONFIGURATION_STRING_KEY) ? (String) map.get (CONFIGURATION_STRING_KEY) : this.configurationString);
+      map.containsKey (CONFIGURATION_STRING_KEY) ? (String) map.get (CONFIGURATION_STRING_KEY) : this.configurationString,
+      map.containsKey (MEASURE_MODE_KEY) ? (MeasureMode) map.get (MEASURE_MODE_KEY) : this.measureMode,
+      map.containsKey (IDENTIFICATION_NUMBER_KEY) ? (String) map.get (IDENTIFICATION_NUMBER_KEY) : this.identificationNumber
+    );
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,6 +190,53 @@ public class HP70000_GPIB_Settings
   public final HP70000_GPIB_Settings withId (final String id)
   {
     return with (new HashMap<String, Object> () {{ put (ID_KEY, id); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // IDENTIFICATION NUMBER [V.U.F.]
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String IDENTIFICATION_NUMBER_KEY = "identificationNumber";
+  
+  private final String identificationNumber;
+  
+  public final String getIdentificationNumber ()
+  {
+    return this.identificationNumber;
+  }
+  
+  public final HP70000_GPIB_Settings withIdentificationNumber (final String identificationNumber)
+  {
+    return with (new HashMap<String, Object> () {{ put (IDENTIFICATION_NUMBER_KEY, identificationNumber); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // MEASURE MODE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public enum MeasureMode
+  {
+    SpectrumAnalysis,
+    StimulusResponse,
+    SRMilCpl; // XXX What the heck is this?
+  }
+  
+  private final static String MEASURE_MODE_KEY = "measureMode";
+    
+  private final MeasureMode measureMode;
+  
+  public final MeasureMode getMeasureMode ()
+  {
+    return this.measureMode;
+  }
+  
+  public final HP70000_GPIB_Settings withMeasureMode (final MeasureMode measureMode)
+  {
+    return with (new HashMap<String, Object> () {{ put (MEASURE_MODE_KEY, measureMode); }});
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

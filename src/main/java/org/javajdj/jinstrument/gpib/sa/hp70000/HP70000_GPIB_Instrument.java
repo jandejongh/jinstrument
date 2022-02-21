@@ -203,10 +203,14 @@ public class HP70000_GPIB_Instrument
       if (settings == null)
         throw new IOException (); // Forces error state, so user can retry.
       final String idString = new String (writeAndReadEOISync ("ID?;"), Charset.forName ("US-ASCII")).trim ();
+      final String idnString = new String (writeAndReadEOISync ("IDN?;"), Charset.forName ("US-ASCII")).trim ();
       final String configurationString = new String (writeAndReadEOISync ("CONFIG?;"), Charset.forName ("US-ASCII")).trim ();
+      final HP70000_GPIB_Settings.MeasureMode measureMode = getMeasureModeDirect ();
       settingsReadFromInstrument (settings
         .withId (idString)
+        .withIdentificationNumber (idnString)
         .withConfigurationString (configurationString)
+        .withMeasureMode (measureMode)
         );
     }
     finally
@@ -366,7 +370,10 @@ public class HP70000_GPIB_Instrument
       false,
       traceLength,
       oldSettings != null ? oldSettings.getId () : "unknown",
-      oldSettings != null ? oldSettings.getConfigurationString () : null);
+      oldSettings != null ? oldSettings.getConfigurationString () : null,
+      oldSettings != null ? oldSettings.getMeasureMode () : null,
+      oldSettings != null ? oldSettings.getIdentificationNumber () : null
+    );
   }
  
   @Override
@@ -469,6 +476,8 @@ public class HP70000_GPIB_Instrument
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
+  // ABORT
+  
   /** Interrupts operation of all user-defined functions (asynchronous).
    * 
    * <p>
@@ -482,13 +491,17 @@ public class HP70000_GPIB_Instrument
   public final void abort ()
     throws IOException, InterruptedException
   {
+    // ABORT
     addCommand (new DefaultInstrumentCommand (
       HP70000_InstrumentCommand.IC_HP70000_ABORT));
   }
   
+  // CONFIG
+  
   public final String getConfigurationStringSync (final long timeout, final TimeUnit unit)
     throws IOException, InterruptedException, TimeoutException
   {
+    // CONFIG?
     final InstrumentCommand command = new DefaultInstrumentCommand (
       HP70000_InstrumentCommand.IC_HP70000_GET_CONFIGURATION_STRING);
     addAndProcessCommandSync (command, timeout, unit);
@@ -498,14 +511,18 @@ public class HP70000_GPIB_Instrument
   public final void getConfigurationStringASync ()
     throws IOException, InterruptedException
   {
+    // CONFIG?
     final InstrumentCommand command = new DefaultInstrumentCommand (
       HP70000_InstrumentCommand.IC_HP70000_GET_CONFIGURATION_STRING);
     addCommand (command);
   }
-    
+  
+  // ID
+  
   public final String getIdSync (final long timeout, final TimeUnit unit)
     throws IOException, InterruptedException, TimeoutException
   {
+    // ID?
     final InstrumentCommand command = new DefaultInstrumentCommand (
       HP70000_InstrumentCommand.IC_HP70000_GET_ID);
     addAndProcessCommandSync (command, timeout, unit);
@@ -515,11 +532,87 @@ public class HP70000_GPIB_Instrument
   public final void getIdASync ()
     throws IOException, InterruptedException
   {
+    // ID?
     final InstrumentCommand command = new DefaultInstrumentCommand (
       HP70000_InstrumentCommand.IC_HP70000_GET_ID);
     addCommand (command);
   }
+
+  // IDN
+  
+  public final String getIdentificationNumberSync (final long timeout, final TimeUnit unit)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // IDN?
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_GET_IDENTIFICATION_NUMBER);
+    addAndProcessCommandSync (command, timeout, unit);
+    return (String) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
+  }
     
+  // MEASURE
+  
+  protected final HP70000_GPIB_Settings.MeasureMode getMeasureModeDirect ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // MEASURE?
+    final String queryReturn = new String (writeAndReadEOISync ("MEASURE?;"), Charset.forName ("US-ASCII")).trim ();
+    if (queryReturn == null)
+      throw new IOException ();
+    switch (queryReturn)
+    {
+      case "SA":
+        return HP70000_GPIB_Settings.MeasureMode.SpectrumAnalysis;
+      case "SR":
+        return HP70000_GPIB_Settings.MeasureMode.StimulusResponse;
+      case "SRMILCPL":
+        return HP70000_GPIB_Settings.MeasureMode.SRMilCpl;
+      default:
+        throw new IOException ();
+    }
+  }
+    
+  public final HP70000_GPIB_Settings.MeasureMode getMeasureModeSync (final long timeout, final TimeUnit unit)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // MEASURE?
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_GET_MEASURE_MODE);
+    addAndProcessCommandSync (command, timeout, unit);
+    return (HP70000_GPIB_Settings.MeasureMode) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
+  }
+    
+  public final void getMeasureModeASync ()
+    throws IOException, InterruptedException
+  {
+    // MEASURE?
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_GET_MEASURE_MODE);
+    addCommand (command);
+  }
+    
+  protected final void setMeasureModeDirect (final HP70000_GPIB_Settings.MeasureMode measureMode)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // MEASURE
+    switch (measureMode)
+    {
+      case SpectrumAnalysis: writeSync ("MEASURE SA;"); break;
+      case StimulusResponse: writeSync ("MEASURE SR;"); break;
+      case SRMilCpl:         writeSync ("MEASURE SRMILCPL;"); break;
+      default: throw new IllegalArgumentException ();
+    }
+  }
+    
+  public final void setMeasureMode (final HP70000_GPIB_Settings.MeasureMode measureMode)
+    throws IOException, InterruptedException
+  {
+    // MEASURE
+    addCommand (new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_SET_MEASURE_MODE,
+      HP70000_InstrumentCommand.ICARG_HP70000_SET_MEASURE_MODE, measureMode));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -656,6 +749,17 @@ public class HP70000_GPIB_Instrument
             newInstrumentSettings = instrumentSettings.withId (queryReturn);
           break;
         }
+        case HP70000_InstrumentCommand.IC_HP70000_GET_IDENTIFICATION_NUMBER:
+        {
+          // IDN?
+          final String queryReturn = new String (writeAndReadEOISync ("IDN?;"), Charset.forName ("US-ASCII")).trim ();
+          if (queryReturn == null)
+            throw new IOException ();
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, queryReturn);
+          if (instrumentSettings != null && ! queryReturn.equals (instrumentSettings.getIdentificationNumber ()))
+            newInstrumentSettings = instrumentSettings.withIdentificationNumber (queryReturn);
+          break;
+        }
         case HP70000_InstrumentCommand.IC_HP70000_GET_CONFIGURATION_STRING:
         {
           // ID?
@@ -665,6 +769,25 @@ public class HP70000_GPIB_Instrument
           instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, queryReturn);
           if (instrumentSettings != null && ! queryReturn.equals (instrumentSettings.getConfigurationString ()))
             newInstrumentSettings = instrumentSettings.withConfigurationString (queryReturn);
+          break;
+        }
+        case HP70000_InstrumentCommand.IC_HP70000_GET_MEASURE_MODE:
+        {
+          // MEASURE?
+          final HP70000_GPIB_Settings.MeasureMode measureMode = getMeasureModeDirect ();
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, measureMode);
+          if (instrumentSettings != null && ! measureMode.equals (instrumentSettings.getMeasureMode ()))
+            newInstrumentSettings = instrumentSettings.withMeasureMode (measureMode);
+          break;
+        }
+        case HP70000_InstrumentCommand.IC_HP70000_SET_MEASURE_MODE:
+        {
+          // MEASURE?
+          final HP70000_GPIB_Settings.MeasureMode measureMode =
+            (HP70000_GPIB_Settings.MeasureMode) instrumentCommand.get (HP70000_InstrumentCommand.ICARG_HP70000_SET_MEASURE_MODE);
+          setMeasureModeDirect (measureMode);
+          if (instrumentSettings != null && ! measureMode.equals (instrumentSettings.getMeasureMode ()))
+            newInstrumentSettings = instrumentSettings.withMeasureMode (measureMode);
           break;
         }
         default:

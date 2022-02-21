@@ -36,4 +36,14 @@ public interface HP70000_InstrumentCommand
   // ID?
   public final static String IC_HP70000_GET_ID = "commandHp70000GetId";
   
+  // IDN?
+  public final static String IC_HP70000_GET_IDENTIFICATION_NUMBER = "commandHp70000GetIdentificationNumber";
+  
+  // MEASURE?
+  public final static String IC_HP70000_GET_MEASURE_MODE = "commandHp70000GetMeasureMode";
+  
+  // MEASURE
+  public final static String IC_HP70000_SET_MEASURE_MODE = "commandHp70000SetMeasureMode";
+  public final static String ICARG_HP70000_SET_MEASURE_MODE = "hp70000SetMeasureMode";
+  
 }

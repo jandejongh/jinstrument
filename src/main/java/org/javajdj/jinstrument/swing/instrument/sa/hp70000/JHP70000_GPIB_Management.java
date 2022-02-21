@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.SpectrumAnalyzer;
@@ -110,29 +111,25 @@ public class JHP70000_GPIB_Management
       level + 1,
       getGuiPreferencesManagementColor (),
       new JString_JTextField (
-        "Unknown",
+        "unknown",
         16,
         "Id",
         (settings) -> ((HP70000_GPIB_Settings) settings).getId (),
         null,
         true)));
     
-    idAddressPanel.add (JCenter.XY (new JLabel ("TBD")));
-//    idAddressPanel.add (new JInstrumentPanel (
-//      hp70000,
-//      "GPIB Address",
-//      level + 1,
-//      getGuiPreferencesManagementColor (),
-//      new JString_JTextField (
-//        "Unknown",
-//        16,
-//        "GPIB Address",
-//        (settings) -> {
-//          final Byte address = ((HP3457A_GPIB_Settings) settings).getGpibAddress ();
-//          return address == null ? "Unknown" : Byte.toString (address);
-//        },
-//        null,
-//        true)));
+    idAddressPanel.add (new JInstrumentPanel (
+      hp70000,
+      "Identification Number",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      new JString_JTextField (
+        "unknown",
+        16,
+        "Id",
+        (settings) -> ((HP70000_GPIB_Settings) settings).getIdentificationNumber (),
+        null,
+        true)));
 
     idAddressPanel.add (JCenter.XY (new JLabel ("TBD")));
 //    idAddressPanel.add (new JInstrumentPanel (
@@ -191,21 +188,17 @@ public class JHP70000_GPIB_Management
 //      hp70000::internalTest,
 //      Color.blue))));
     
-    bottomBottomPanel.add (JCenter.XY (new JLabel ("TBD")));
-//    bottomBottomPanel.add (new JInstrumentPanel (
-//      hp70000,
-//      "Math",
-//      level + 1,
-//      getGuiPreferencesManagementColor (),
-//      new JDialogCheckBox (
-//        getBackground ().darker (), 
-//        "Math",
-//        new Dimension (800, 600),
-//        new JHP3457A_GPIB_Math (
-//          hp70000,
-//          "",
-//          level + 1,
-//          JInstrumentPanel.getGuiPreferencesManagementColor ()))));
+    bottomBottomPanel.add (new JInstrumentPanel (
+      hp70000,
+      "Measure Mode",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      JCenter.XY (new JEnum_JComboBox<> (
+        HP70000_GPIB_Settings.MeasureMode.class,
+        "MeasureMode",
+        (final InstrumentSettings settings) -> ((HP70000_GPIB_Settings) settings).getMeasureMode (),
+        hp70000::setMeasureMode,
+        true))));
     
     bottomBottomPanel.add (JCenter.XY (new JLabel ("TBD")));
 //    bottomBottomPanel.add (new JInstrumentPanel (
