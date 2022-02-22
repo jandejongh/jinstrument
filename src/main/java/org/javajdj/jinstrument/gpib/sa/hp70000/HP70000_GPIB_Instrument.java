@@ -966,9 +966,10 @@ public class HP70000_GPIB_Instrument
           final double sourcePower_dBm =
             (double) instrumentCommand.get (HP70000_InstrumentCommand.ICARG_HP70000_SET_SOURCE_POWER);
           setSourcePower_dBmDirect (sourcePower_dBm);
+          final double newSourcePower_dBm = getSourcePower_dBmDirect ();
           if (instrumentSettings != null
-            && (sourcePower_dBm != instrumentSettings.getSourcePower_dBm () || ! instrumentSettings.isSourceActive ()))
-            newInstrumentSettings = instrumentSettings.withSourcePower_dBm (sourcePower_dBm).withSourceActive (true);
+            && (newSourcePower_dBm != instrumentSettings.getSourcePower_dBm () || ! instrumentSettings.isSourceActive ()))
+            newInstrumentSettings = instrumentSettings.withSourcePower_dBm (newSourcePower_dBm).withSourceActive (true);
           break;
         }
         case HP70000_InstrumentCommand.IC_HP70000_SET_SOURCE_ACTIVE:
