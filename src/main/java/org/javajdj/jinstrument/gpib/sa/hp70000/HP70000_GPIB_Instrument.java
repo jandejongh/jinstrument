@@ -237,32 +237,48 @@ public class HP70000_GPIB_Instrument
   protected InstrumentStatus getStatusFromInstrumentSync (final boolean lock)
     throws IOException, InterruptedException, TimeoutException
   {
+    
     if (lock)
       this.operationSemaphore.acquire ();
+    
     try
     {
+      
       final byte statusByte = serialPollSync ();
+      final String errorString;
+      final String messageString;
+      
       if (HP70000_GPIB_Status.isErrorPresent (statusByte))
-      {
-        final String errorString = writeAndReadlnSync ("ERR?;");
-        // XXX Could read the message structure from "MSG\r\n"... It contains UNCAL/UNCOR indications.
-        final HP70000_GPIB_Status status = HP70000_GPIB_Status.fromSerialPollStatusByteAndErrorString (statusByte, errorString);
-        return status;
-      }
-      final HP70000_GPIB_Status status = HP70000_GPIB_Status.fromSerialPollStatusByte (statusByte);
+        errorString = writeAndReadlnSync ("ERR?;");
+      else
+        errorString = null;
+      
+      if (HP70000_GPIB_Status.isMessagePresent (statusByte))
+        messageString = writeAndReadlnSync ("MSG?;");
+      else
+        messageString = null;
+      
+      final HP70000_GPIB_Status status = HP70000_GPIB_Status.fromSerialPollStatusByteAndErrorStringAndMessageString (
+        statusByte,
+        errorString,
+        messageString);
+      
       if (status.isEndOfSweep ())
       {
         final InstrumentReading reading = getReadingFromInstrumentSync ();
         if (reading != null)
           readingReadFromInstrument (reading);
       }
+      
       return status;
+      
     }
     finally
     {
       if (lock)
         this.operationSemaphore.release ();
     }
+    
   }
 
   @Override

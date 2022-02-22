@@ -20,6 +20,8 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.Arrays;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -35,6 +37,8 @@ import org.javajdj.jinstrument.gpib.sa.hp70000.HP70000_GPIB_Instrument;
 import org.javajdj.jinstrument.gpib.sa.hp70000.HP70000_GPIB_Status;
 import org.javajdj.jinstrument.swing.base.JSpectrumAnalyzerPanel;
 import org.javajdj.jswing.jbyte.JByte;
+import org.javajdj.jswing.jcenter.JCenter;
+import org.javajdj.jswing.jcolorcheckbox.JColorCheckBox;
 
 /** A Swing panel for the status of a {@link HP70000_GPIB_Instrument} Spectrum Analyzer.
  *
@@ -84,10 +88,49 @@ public class JHP70000_GPIB_Status
       Arrays.asList (new String[]{" X ", "RQS", "ERR", "RDY", " X ", "EOS", "MSG", "ARM"}));
     add (this.jSerialPollStatus);
     
+    final JPanel messageUncalUncorPanel = new JPanel ();
+    add (messageUncalUncorPanel);
+    
+    messageUncalUncorPanel.setLayout (new GridLayout (1, 2));
+    
     this.jMessage = new JTextArea (3, 1);
     this.jMessage.setEditable (false);
-    add (new JScrollPane (this.jMessage));
+    messageUncalUncorPanel.add (new JScrollPane (this.jMessage));
 
+    final JPanel uncalUncorPanel = new JPanel ();
+    messageUncalUncorPanel.add (uncalUncorPanel);
+    
+    // XXX The layout of this panel could use some more work...
+    uncalUncorPanel.setLayout (new GridLayout (2,5));
+    
+    // uncalUncorPanel top row...
+    
+    uncalUncorPanel.add (new JLabel ());
+    
+    this.jUncalibrated = new JColorCheckBox.JBoolean (Color.red);
+    uncalUncorPanel.add (JCenter.XY (this.jUncalibrated));
+    
+    uncalUncorPanel.add (new JLabel ());
+    
+    this.jUncorrected = new JColorCheckBox.JBoolean (Color.red);
+    uncalUncorPanel.add (JCenter.XY (this.jUncorrected));
+    
+    uncalUncorPanel.add (new JLabel ());
+    
+    // uncalUncorPanel bottom row...
+    
+    uncalUncorPanel.add (new JLabel ());
+    
+    uncalUncorPanel.add (JCenter.X (new JLabel ("UNCAL")));
+    
+    uncalUncorPanel.add (new JLabel ());
+    
+    uncalUncorPanel.add (JCenter.X (new JLabel ("UNCOR")));
+    
+    uncalUncorPanel.add (new JLabel ());
+    
+    // InstrumentListener
+    
     getSpectrumAnalyzer ().addInstrumentListener (this.instrumentListener);
     
   }
@@ -158,6 +201,10 @@ public class JHP70000_GPIB_Status
   private final JByte jSerialPollStatus;
   
   private final JTextArea jMessage;
+  
+  private final JColorCheckBox.JBoolean jUncalibrated;
+  
+  private final JColorCheckBox.JBoolean jUncorrected;
     
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
@@ -179,19 +226,21 @@ public class JHP70000_GPIB_Status
       SwingUtilities.invokeLater (() ->
       {
         JHP70000_GPIB_Status.this.jSerialPollStatus.setDisplayedValue (hp70000_status.getSerialPollStatusByte ());
-        // XXX JHP70000_GPIB_Status needs more details, and this listener needs to be adapted.
-        // if (hp70000_status.isError ())
-        // {
-        //   final String errorsString = hp70000_status.getErrorsString ();
-        //   if (errorsString != null)
-        //     JHP70000_GPIB_Status.this.jMessage.append (errorsString + "\n");
-        // }
-        // if (hp70000_status.isHardwareError ())
-        // {
-        //   final String auxiliaryErrorsString = hp70000_status.getAuxiliaryErrorsString ();
-        //   if (auxiliaryErrorsString != null)
-        //     JHP70000_GPIB_Status.this.jMessage.append (auxiliaryErrorsString + "\n");          
-        // }
+        if (hp70000_status.isErrorPresent ())
+        {
+          final String errorsString = hp70000_status.getErrorString ();
+          if (errorsString != null)
+            JHP70000_GPIB_Status.this.jMessage.append ("Error: " + errorsString + "\n");
+        }
+        JHP70000_GPIB_Status.this.jUncalibrated.setDisplayedValue (hp70000_status.isUncalibrated ());
+        JHP70000_GPIB_Status.this.jUncorrected.setDisplayedValue (hp70000_status.isUncorrected ());
+        if (hp70000_status.isMessagePresent ())
+        {
+          // Note: This does not show 'UNCAL/UNCOR' notifications.
+          final String messageStringCooked = hp70000_status.getMessageStringCooked ();
+          if (messageStringCooked != null)
+            JHP70000_GPIB_Status.this.jMessage.append (messageStringCooked + "\n");
+        }
       });
     }
     
