@@ -55,4 +55,11 @@ public interface HP70000_InstrumentCommand
   public final static String IC_HP70000_SET_SOURCE_ACTIVE = "commandHp70000SetSourceActive";
   public final static String ICARG_HP70000_SET_SOURCE_ACTIVE = "hp70000SetSourceActive";
   
+  // SRCALC?
+  public final static String IC_HP70000_GET_SOURCE_ALC_MODE = "commandHp70000GetSourceAlcMode";
+  
+  // SRCALC
+  public final static String IC_HP70000_SET_SOURCE_ALC_MODE = "commandHp70000SetSourceAlcMode";
+  public final static String ICARG_HP70000_SET_SOURCE_ALC_MODE = "hp70000SetSourceAlcMode";
+  
 }

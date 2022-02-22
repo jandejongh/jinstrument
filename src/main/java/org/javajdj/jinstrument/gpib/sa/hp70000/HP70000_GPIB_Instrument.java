@@ -210,7 +210,8 @@ public class HP70000_GPIB_Instrument
       final String configurationString = new String (writeAndReadEOISync ("CONFIG?;"), Charset.forName ("US-ASCII")).trim ();
       final HP70000_GPIB_Settings.MeasureMode measureMode = getMeasureModeDirect ();
       final double sourcePower_dBm = getSourcePower_dBmDirect ();
-      setSourceActive_Direct (false);
+      setSourceActiveDirect (false);
+      final HP70000_GPIB_Settings.SourceAlcMode sourceAlcMode = getSourceAlcModeDirect ();
       settingsReadFromInstrument (settings
         .withId (idString)
         .withIdentificationNumber (idnString)
@@ -218,6 +219,7 @@ public class HP70000_GPIB_Instrument
         .withMeasureMode (measureMode)
         .withSourcePower_dBm (sourcePower_dBm)
         .withSourceActive (false)
+        .withSourceAlcMode (sourceAlcMode)
         );
     }
     finally
@@ -397,7 +399,8 @@ public class HP70000_GPIB_Instrument
       oldSettings != null ? oldSettings.getMeasureMode () : null,
       oldSettings != null ? oldSettings.getIdentificationNumber () : null,
       oldSettings != null ? oldSettings.getSourcePower_dBm () : Double.NaN,
-      oldSettings != null ? oldSettings.isSourceActive () : false
+      oldSettings != null ? oldSettings.isSourceActive () : false,
+      oldSettings != null ? oldSettings.getSourceAlcMode () : null
     );
   }
  
@@ -694,7 +697,7 @@ public class HP70000_GPIB_Instrument
       HP70000_InstrumentCommand.ICARG_HP70000_SET_SOURCE_POWER, sourcePower_dBm));
   }
   
-  protected final void setSourceActive_Direct (final boolean sourceActive)
+  protected final void setSourceActiveDirect (final boolean sourceActive)
     throws IOException, InterruptedException, TimeoutException
   {
     // SRCPWR
@@ -710,6 +713,67 @@ public class HP70000_GPIB_Instrument
       HP70000_InstrumentCommand.ICARG_HP70000_SET_SOURCE_ACTIVE, sourceActive));
   }
     
+  // SRCALC
+  
+  protected final HP70000_GPIB_Settings.SourceAlcMode getSourceAlcModeDirect ()
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // SRCALC?
+    final String queryReturn = new String (writeAndReadEOISync ("SRCALC?;"), Charset.forName ("US-ASCII")).trim ();
+    if (queryReturn == null)
+      throw new IOException ();
+    final HP70000_GPIB_Settings.SourceAlcMode sourceAlcMode;
+    switch (queryReturn)
+    {
+      case "NORM": sourceAlcMode = HP70000_GPIB_Settings.SourceAlcMode.Normal;      break;
+      case "ALT":  sourceAlcMode = HP70000_GPIB_Settings.SourceAlcMode.Alternative; break;
+      case "EXT":  sourceAlcMode = HP70000_GPIB_Settings.SourceAlcMode.External;    break;
+      default: throw new IOException ();
+    }
+    return sourceAlcMode;
+  }
+    
+  public final HP70000_GPIB_Settings.SourceAlcMode getSourceAlcModeSync (final long timeout, final TimeUnit unit)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // SRCALC?
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_GET_SOURCE_ALC_MODE);
+    addAndProcessCommandSync (command, timeout, unit);
+    return (HP70000_GPIB_Settings.SourceAlcMode) command.get (InstrumentCommand.IC_RETURN_VALUE_KEY);
+  }
+    
+  public final void getSourceAlcModeASync ()
+    throws IOException, InterruptedException
+  {
+    // SRCALC?
+    final InstrumentCommand command = new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_GET_SOURCE_ALC_MODE);
+    addCommand (command);
+  }
+    
+  protected final void setSourceAlcModeDirect (final HP70000_GPIB_Settings.SourceAlcMode sourceAlcMode)
+    throws IOException, InterruptedException, TimeoutException
+  {
+    // SRCALC
+    switch (sourceAlcMode)
+    {
+      case Normal:      writeSync ("SRCALC NORM;"); break;
+      case Alternative: writeSync ("SRCALC ALT;");  break;
+      case External:    writeSync ("SRCALC EXT;");  break;
+      default: throw new IllegalArgumentException ();
+    }
+  }
+    
+  public final void setSourceAlcMode (final HP70000_GPIB_Settings.SourceAlcMode sourceAlcMode)
+    throws IOException, InterruptedException
+  {
+    // SRCALC
+    addCommand (new DefaultInstrumentCommand (
+      HP70000_InstrumentCommand.IC_HP70000_SET_SOURCE_ALC_MODE,
+      HP70000_InstrumentCommand.ICARG_HP70000_SET_SOURCE_ALC_MODE, sourceAlcMode));
+  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // AbstractInstrument
@@ -912,9 +976,29 @@ public class HP70000_GPIB_Instrument
           // SRCPWR
           final boolean sourceActive =
             (boolean) instrumentCommand.get (HP70000_InstrumentCommand.ICARG_HP70000_SET_SOURCE_ACTIVE);
-          setSourceActive_Direct (sourceActive);
+          setSourceActiveDirect (sourceActive);
           if (instrumentSettings != null && sourceActive != instrumentSettings.isSourceActive ())
             newInstrumentSettings = instrumentSettings.withSourceActive (sourceActive);
+          break;
+        }
+        case HP70000_InstrumentCommand.IC_HP70000_GET_SOURCE_ALC_MODE:
+        {
+          // SRCALC?
+          final HP70000_GPIB_Settings.SourceAlcMode sourceAlcMode = getSourceAlcModeDirect ();
+          instrumentCommand.put (InstrumentCommand.IC_RETURN_VALUE_KEY, sourceAlcMode);
+          if (instrumentSettings != null && ! sourceAlcMode.equals (instrumentSettings.getSourceAlcMode ()))
+            newInstrumentSettings = instrumentSettings.withSourceAlcMode (sourceAlcMode);
+          break;
+        }
+        case HP70000_InstrumentCommand.IC_HP70000_SET_SOURCE_ALC_MODE:
+        {
+          // SRCALC
+          final HP70000_GPIB_Settings.SourceAlcMode sourceAlcMode =
+            (HP70000_GPIB_Settings.SourceAlcMode)
+              instrumentCommand.get (HP70000_InstrumentCommand.ICARG_HP70000_SET_SOURCE_ALC_MODE);
+          setSourceAlcModeDirect (sourceAlcMode);
+          if (instrumentSettings != null && ! sourceAlcMode.equals (instrumentSettings.getSourceAlcMode ()))
+            newInstrumentSettings = instrumentSettings.withSourceAlcMode (sourceAlcMode);
           break;
         }
         default:

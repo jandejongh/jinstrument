@@ -68,7 +68,8 @@ public class HP70000_GPIB_Settings
     final MeasureMode measureMode,
     final String identificationNumber,
     final double sourcePower_dBm,
-    final boolean sourceActive)
+    final boolean sourceActive,
+    final SourceAlcMode sourceAlcMode)
   {
     super (
       bytes,
@@ -91,6 +92,7 @@ public class HP70000_GPIB_Settings
     this.identificationNumber = identificationNumber;
     this.sourcePower_dBm = sourcePower_dBm;
     this.sourceActive = sourceActive;
+    this.sourceAlcMode = sourceAlcMode;
   }
 
   private HP70000_GPIB_Settings with (final Map<String, Object> map)
@@ -117,7 +119,8 @@ public class HP70000_GPIB_Settings
       map.containsKey (MEASURE_MODE_KEY) ? (MeasureMode) map.get (MEASURE_MODE_KEY) : this.measureMode,
       map.containsKey (IDENTIFICATION_NUMBER_KEY) ? (String) map.get (IDENTIFICATION_NUMBER_KEY) : this.identificationNumber,
       map.containsKey (SOURCE_POWER_KEY) ? (double) map.get (SOURCE_POWER_KEY) : this.sourcePower_dBm,
-      map.containsKey (SOURCE_ACTIVE_KEY) ? (boolean) map.get (SOURCE_ACTIVE_KEY) : this.sourceActive
+      map.containsKey (SOURCE_ACTIVE_KEY) ? (boolean) map.get (SOURCE_ACTIVE_KEY) : this.sourceActive,
+      map.containsKey (SOURCE_ALC_MODE_KEY) ? (SourceAlcMode) map.get (SOURCE_ALC_MODE_KEY) : this.sourceAlcMode
     );
   }
   
@@ -278,6 +281,33 @@ public class HP70000_GPIB_Settings
   public final HP70000_GPIB_Settings withSourceActive (final boolean sourceActive)
   {
     return with (new HashMap<String, Object> () {{ put (SOURCE_ACTIVE_KEY, sourceActive); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: ALC
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_ALC_MODE_KEY = "sourceAlcMode";
+  
+  public enum SourceAlcMode
+  {
+    Normal,
+    Alternative,
+    External;
+  }
+  
+  private final SourceAlcMode sourceAlcMode;
+  
+  public final SourceAlcMode getSourceAlcMode ()
+  {
+    return this.sourceAlcMode;
+  }
+  
+  public final HP70000_GPIB_Settings withSourceAlcMode (final SourceAlcMode sourceAlcMode)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_ALC_MODE_KEY, sourceAlcMode); }});
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

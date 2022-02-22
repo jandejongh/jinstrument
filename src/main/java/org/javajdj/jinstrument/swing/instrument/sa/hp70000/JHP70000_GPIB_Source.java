@@ -21,6 +21,7 @@ import java.awt.GridLayout;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
 import org.javajdj.jinstrument.Instrument;
+import org.javajdj.jinstrument.InstrumentSettings;
 import org.javajdj.jinstrument.InstrumentView;
 import org.javajdj.jinstrument.InstrumentViewType;
 import org.javajdj.jinstrument.SpectrumAnalyzer;
@@ -94,7 +95,17 @@ public class JHP70000_GPIB_Source
         hp70000::setSourcePower_dBm,
         true)));
     
-    add (JCenter.XY (new JLabel ("TBD")));
+    add (new JInstrumentPanel (
+      hp70000,
+      "ALC Mode",
+      level + 1,
+      getGuiPreferencesPowerColor (),
+      new JEnum_JComboBox<> (
+        HP70000_GPIB_Settings.SourceAlcMode.class,
+        "ALC Mode",
+        (final InstrumentSettings settings) -> ((HP70000_GPIB_Settings) settings).getSourceAlcMode (),
+        hp70000::setSourceAlcMode,
+        true)));
     
     add (JCenter.XY (new JLabel ("TBD")));
     
