@@ -179,16 +179,15 @@ public class JHP70000_GPIB_Management
     
     bottomBottomPanel.setLayout (new GridLayout (1, 3));
     
-    bottomBottomPanel.add (JCenter.XY (new JLabel ("TBD")));
-//    bottomBottomPanel.add (new JInstrumentPanel (
-//      hp70000,
-//      "Internal Test",
-//      level + 1,
-//      getGuiPreferencesManagementColor (),
-//      JCenter.XY (new JVoid_JColorCheckBox (
-//      "Internal Test",
-//      hp70000::internalTest,
-//      Color.blue))));
+    bottomBottomPanel.add (new JInstrumentPanel (
+      hp70000,
+      "Preset [IP]",
+      level + 1,
+      getGuiPreferencesManagementColor (),
+      JCenter.XY (new JVoid_JColorCheckBox (
+        "Preset [IP]",
+        hp70000::preset,
+        Color.blue))));
     
     bottomBottomPanel.add (new JInstrumentPanel (
       hp70000,
@@ -210,7 +209,7 @@ public class JHP70000_GPIB_Management
       new JDialogCheckBox (
         getBackground ().darker (),
         "Tracking Generator",
-        new Dimension (800, 600),
+        new Dimension (1024, 768),
         new JHP70000_GPIB_Source (
           hp70000,
           "",
