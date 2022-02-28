@@ -286,7 +286,7 @@ public class JInstrumentPanel
     return JInstrumentPanel.DEFAULT_CURRENT_COLOR;
   }
   
-  public final static Color DEFAULT_POWER_COLOR = Color.blue;
+  public final static Color DEFAULT_POWER_COLOR = Color.red; // Same as DEFAULT_AMPLITUDE_COLOR.
   
   public final static Color getGuiPreferencesPowerColor ()
   {
