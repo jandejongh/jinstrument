@@ -17,7 +17,7 @@ Apache v2.0.
 
 Most important changes:
 - HP-70000 Spectrum Analyzer [progress alpha -> beta].
--- Implemented all SRCxxx [tracking generator] commands.
+  - Implemented all SRCxxx [tracking generator] commands.
 
 ## Status/Log [20220213 - v0.8]
 
