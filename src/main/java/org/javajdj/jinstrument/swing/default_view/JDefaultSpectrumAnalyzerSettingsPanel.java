@@ -250,6 +250,8 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
   private final JSevenSegmentNumber jRfAttenuation_dB;
   private final JColorCheckBox<Boolean> jRfAttenuationCoupled;
   
+  // XXX These listeners need protection again null settings.
+  
   private void addSwingListeners ()
   {
     this.jCenterFrequency_MHz.addMouseListener (new MouseAdapter ()
