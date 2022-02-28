@@ -13,7 +13,11 @@ is there as well.
 ## License
 Apache v2.0.
 
-## Status/Log [20220213 - v0.9-SNAPSHOT]
+## Status/Log [20220228 - v0.9-SNAPSHOT]
+
+Most important changes:
+- HP-70000 Spectrum Analyzer [progress alpha -> beta].
+-- Implemented all SRCxxx [tracking generator] commands.
 
 ## Status/Log [20220213 - v0.8]
 
