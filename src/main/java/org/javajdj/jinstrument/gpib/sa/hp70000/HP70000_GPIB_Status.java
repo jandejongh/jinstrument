@@ -220,7 +220,12 @@ public class HP70000_GPIB_Status
     final byte lsb = messageString.getBytes (Charset.forName ("US-ASCII"))[7];
     final int length = (msb & 0xff) * 256 + (lsb & 0xff);
     if (messageString.length () != 8 + length)
+    {
+      LOG.log (Level.WARNING, "Unexpected format for message string {0}, length = {1} (should be {2}).",
+        new Object[]{messageString, messageString.length (), 8 + length});
+      // XXX This is not very constructive...
       throw new IllegalArgumentException ();
+    }
     return messageString;
   }
   
