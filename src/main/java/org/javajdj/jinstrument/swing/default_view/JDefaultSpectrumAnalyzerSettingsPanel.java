@@ -523,7 +523,6 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
     @Override
     public void newInstrumentSettings (final Instrument instrument, final InstrumentSettings instrumentSettings)
     {
-      LOG.log (Level.WARNING, "PRE-SETTINGS!!! PRE-SETTINGS!!!");
       if (instrument != JDefaultSpectrumAnalyzerSettingsPanel.this.getSpectrumAnalyzer ())
         return;
       SwingUtilities.invokeLater (() ->
@@ -548,7 +547,6 @@ public class JDefaultSpectrumAnalyzerSettingsPanel
           }
           else
           {
-            LOG.log (Level.WARNING, "SETTINGS!!! SETTINGS!!!");
             final SpectrumAnalyzerSettings settings = (SpectrumAnalyzerSettings) instrumentSettings;
             JDefaultSpectrumAnalyzerSettingsPanel.this.jCenterFrequency_MHz.setNumber (
               settings.getCenterFrequency_MHz ());
