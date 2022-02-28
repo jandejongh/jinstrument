@@ -69,7 +69,22 @@ public class HP70000_GPIB_Settings
     final String identificationNumber,
     final double sourcePower_dBm,
     final boolean sourceActive,
-    final SourceAlcMode sourceAlcMode)
+    final SourceAlcMode sourceAlcMode,
+    final double sourceAmDepth_percent,
+    final boolean sourceAmActive,
+    final double sourceAmFrequency_Hz,
+    final double sourceAttenuation_dB,
+    final boolean sourceAttenuationCoupled,
+    final boolean sourceBlanking,
+    final SourceModulationInput sourceModulationInput,
+    final SourceOscillator sourceOscillator,
+    final double sourcePowerOffset_dB,
+    final SourcePowerStepSizeMode sourcePowerStepSizeMode,
+    final double sourcePowerStepSize_dB,
+    final boolean sourcePowerSweepActive,
+    final double sourcePowerSweepRange_dB,
+    final double sourceTracking_Hz,
+    final boolean sourcePeakTrackingAuto)
   {
     super (
       bytes,
@@ -93,6 +108,21 @@ public class HP70000_GPIB_Settings
     this.sourcePower_dBm = sourcePower_dBm;
     this.sourceActive = sourceActive;
     this.sourceAlcMode = sourceAlcMode;
+    this.sourceAmDepth_percent = sourceAmDepth_percent;
+    this.sourceAmActive = sourceAmActive;
+    this.sourceAmFrequency_Hz = sourceAmFrequency_Hz;
+    this.sourceAttenuation_dB = sourceAttenuation_dB;
+    this.sourceAttenuationCoupled = sourceAttenuationCoupled;
+    this.sourceBlanking = sourceBlanking;
+    this.sourceModulationInput = sourceModulationInput;
+    this.sourceOscillator = sourceOscillator;
+    this.sourcePowerOffset_dB = sourcePowerOffset_dB;
+    this.sourcePowerStepSizeMode = sourcePowerStepSizeMode;
+    this.sourcePowerStepSize_dB = sourcePowerStepSize_dB;
+    this.sourcePowerSweepActive = sourcePowerSweepActive;
+    this.sourcePowerSweepRange_dB = sourcePowerSweepRange_dB;
+    this.sourceTracking_Hz = sourceTracking_Hz;
+    this.sourcePeakTrackingAuto = sourcePeakTrackingAuto;
   }
 
   private HP70000_GPIB_Settings with (final Map<String, Object> map)
@@ -120,7 +150,28 @@ public class HP70000_GPIB_Settings
       map.containsKey (IDENTIFICATION_NUMBER_KEY) ? (String) map.get (IDENTIFICATION_NUMBER_KEY) : this.identificationNumber,
       map.containsKey (SOURCE_POWER_KEY) ? (double) map.get (SOURCE_POWER_KEY) : this.sourcePower_dBm,
       map.containsKey (SOURCE_ACTIVE_KEY) ? (boolean) map.get (SOURCE_ACTIVE_KEY) : this.sourceActive,
-      map.containsKey (SOURCE_ALC_MODE_KEY) ? (SourceAlcMode) map.get (SOURCE_ALC_MODE_KEY) : this.sourceAlcMode
+      map.containsKey (SOURCE_ALC_MODE_KEY) ? (SourceAlcMode) map.get (SOURCE_ALC_MODE_KEY) : this.sourceAlcMode,
+      map.containsKey (SOURCE_AM_DEPTH_KEY) ? (double) map.get (SOURCE_AM_DEPTH_KEY) : this.sourceAmDepth_percent,
+      map.containsKey (SOURCE_AM_ACTIVE_KEY) ? (boolean) map.get (SOURCE_AM_ACTIVE_KEY) : this.sourceAmActive,
+      map.containsKey (SOURCE_AM_FREQUENCY_KEY) ? (double) map.get (SOURCE_AM_FREQUENCY_KEY) : this.sourceAmFrequency_Hz,
+      map.containsKey (SOURCE_ATTENUATION_KEY) ? (double) map.get (SOURCE_ATTENUATION_KEY) : this.sourceAttenuation_dB,
+      map.containsKey (SOURCE_ATTENUATION_COUPLED_KEY) ? (boolean) map.get (SOURCE_ATTENUATION_COUPLED_KEY)
+                                                       : this.sourceAttenuationCoupled,
+      map.containsKey (SOURCE_BLANKING_KEY) ? (boolean) map.get (SOURCE_BLANKING_KEY) : this.sourceBlanking,
+      map.containsKey (SOURCE_MODULATION_INPUT_KEY) ? (SourceModulationInput) map.get (SOURCE_MODULATION_INPUT_KEY)
+                                                    : this.sourceModulationInput,
+      map.containsKey (SOURCE_OSCILLATOR_KEY) ? (SourceOscillator) map.get (SOURCE_OSCILLATOR_KEY) : this.sourceOscillator,
+      map.containsKey (SOURCE_POWER_OFFSET_KEY) ? (double) map.get (SOURCE_POWER_OFFSET_KEY) : this.sourcePowerOffset_dB,
+      map.containsKey (SOURCE_POWER_STEP_SIZE_MODE_KEY) ? (SourcePowerStepSizeMode) map.get (SOURCE_POWER_STEP_SIZE_MODE_KEY)
+                                                        : this.sourcePowerStepSizeMode,
+      map.containsKey (SOURCE_POWER_STEP_SIZE_KEY) ? (double) map.get (SOURCE_POWER_STEP_SIZE_KEY) : this.sourcePowerStepSize_dB,
+      map.containsKey (SOURCE_POWER_SWEEP_ACTIVE_KEY) ? (boolean) map.get (SOURCE_POWER_SWEEP_ACTIVE_KEY)
+                                                      : this.sourcePowerSweepActive,
+      map.containsKey (SOURCE_POWER_SWEEP_RANGE_KEY) ? (double) map.get (SOURCE_POWER_SWEEP_RANGE_KEY)
+                                                     : this.sourcePowerSweepRange_dB,
+      map.containsKey (SOURCE_TRACKING_KEY) ? (double) map.get (SOURCE_TRACKING_KEY) : this.sourceTracking_Hz,
+      map.containsKey (SOURCE_PEAK_TRACKING_AUTO_KEY) ? (boolean) map.get (SOURCE_PEAK_TRACKING_AUTO_KEY)
+                                                      : this.sourcePeakTrackingAuto
     );
   }
   
@@ -223,6 +274,55 @@ public class HP70000_GPIB_Settings
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
+  // INSTRUMENT PRESET
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  public static HP70000_GPIB_Settings fromPreset ()
+  {
+    // XXX There is no way to implement this without knowing the instrument's configuration.
+    throw new UnsupportedOperationException ();
+//    return new HP70000_GPIB_Settings (
+//      null,              // bytes
+//      Unit.UNIT_dBm,     // unit
+//      10000,             // centerFrequency_MHz XXX?
+//      10000,             // span_MHz XXX?
+//      0,                 // resolutionBandwitdh_Hz
+//      true,
+//      0,
+//      true,
+//      0,
+//      true,
+//      0,
+//      0,
+//      true,
+//      0,
+//      ID_KEY,
+//      CONFIGURATION_STRING_KEY,
+//      MeasureMode.SRMilCpl,
+//      IDENTIFICATION_NUMBER_KEY,
+//      0,
+//      true,
+//      SourceAlcMode.Normal,
+//      0,
+//      true,
+//      0,
+//      0,
+//      true,
+//      true,
+//      SourceModulationInput.External,
+//      SourceOscillator.Internal,
+//      0,
+//      SourcePowerStepSizeMode.Automatic,
+//      0,
+//      true,
+//      0,
+//      0,
+//      true);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // MEASURE MODE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -251,7 +351,6 @@ public class HP70000_GPIB_Settings
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //
   // SOURCE: POWER
-  // SOURCE ACTIVE
   //
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -308,6 +407,300 @@ public class HP70000_GPIB_Settings
   public final HP70000_GPIB_Settings withSourceAlcMode (final SourceAlcMode sourceAlcMode)
   {
     return with (new HashMap<String, Object> () {{ put (SOURCE_ALC_MODE_KEY, sourceAlcMode); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: AM DEPTH
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_AM_DEPTH_KEY = "sourceAmDepth";
+  
+  private final double sourceAmDepth_percent;
+  
+  public final double getSourceAmDepth_percent ()
+  {
+    return this.sourceAmDepth_percent;
+  }
+  
+  public final HP70000_GPIB_Settings withSourceAmDepth_percent (final double sourceAmDepth_percent)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_AM_DEPTH_KEY, sourceAmDepth_percent); }});
+  }
+  
+  private final static String SOURCE_AM_ACTIVE_KEY = "sourceAmActive";
+  
+  private final boolean sourceAmActive;
+  
+  public final boolean isSourceAmActive ()
+  {
+    return this.sourceAmActive;
+  }
+  
+  public final HP70000_GPIB_Settings withSourceAmActive (final boolean sourceAmActive)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_AM_ACTIVE_KEY, sourceAmActive); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: AM FREQUENCY
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_AM_FREQUENCY_KEY = "sourceAmFrequency";
+  
+  private final double sourceAmFrequency_Hz;
+  
+  public final double getSourceAmFrequency_Hz ()
+  {
+    return this.sourceAmFrequency_Hz;
+  }
+  
+  public final HP70000_GPIB_Settings withSourceAmFrequency_Hz (final double sourceAmFrequency_Hz)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_AM_FREQUENCY_KEY, sourceAmFrequency_Hz); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: ATTENUATOR
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_ATTENUATION_KEY = "sourceAttenuation";
+  
+  private final double sourceAttenuation_dB;
+  
+  public final double getSourceAttenuation_dB ()
+  {
+    return this.sourceAttenuation_dB;
+  }
+  
+  public final HP70000_GPIB_Settings withSourceAttenuation_dB (final double sourceAttenuation_dB)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_ATTENUATION_KEY, sourceAttenuation_dB); }});
+  }
+  
+  private final static String SOURCE_ATTENUATION_COUPLED_KEY = "sourceAttenuationCoupled";
+  
+  private final boolean sourceAttenuationCoupled;
+  
+  public final boolean isSourceAttenuationCoupled ()
+  {
+    return this.sourceAttenuationCoupled;
+  }
+  
+  public final HP70000_GPIB_Settings withSourceAttenuationCoupled (final boolean sourceAttenuationCoupled)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_ATTENUATION_COUPLED_KEY, sourceAttenuationCoupled); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: BLANK
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_BLANKING_KEY = "sourceBlanking";
+  
+  private final boolean sourceBlanking;
+  
+  public final boolean isSourceBlanking ()
+  {
+    return this.sourceBlanking;
+  }
+  
+  public final HP70000_GPIB_Settings withSourceBlanking (final boolean sourceBlanking)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_BLANKING_KEY, sourceBlanking); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: MODULATION INPUT
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_MODULATION_INPUT_KEY = "sourceModulationInput";
+  
+  public enum SourceModulationInput
+  {
+    Internal,
+    External;
+  }
+  
+  private final SourceModulationInput sourceModulationInput;
+  
+  public final SourceModulationInput getSourceModulationInput ()
+  {
+    return this.sourceModulationInput;
+  }
+  
+  public final HP70000_GPIB_Settings withSourceModulationInput (final SourceModulationInput sourceModulationInput)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_MODULATION_INPUT_KEY, sourceModulationInput); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: OSCILLATOR
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_OSCILLATOR_KEY = "sourceOscillator";
+  
+  public enum SourceOscillator
+  {
+    Internal,
+    External;
+  }
+  
+  private final SourceOscillator sourceOscillator;
+  
+  public final SourceOscillator getSourceOscillator ()
+  {
+    return this.sourceOscillator;
+  }
+  
+  public final HP70000_GPIB_Settings withSourceOscillator (final SourceOscillator sourceOscillator)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_OSCILLATOR_KEY, sourceOscillator); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: POWER OFFSET
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_POWER_OFFSET_KEY = "sourcePowerOffset";
+  
+  private final double sourcePowerOffset_dB;
+  
+  public final double getSourcePowerOffset_dB ()
+  {
+    return this.sourcePowerOffset_dB;
+  }
+  
+  public final HP70000_GPIB_Settings withSourcePowerOffset_dB (final double sourcePowerOffset_dB)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_POWER_OFFSET_KEY, sourcePowerOffset_dB); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: POWER STEP SIZE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_POWER_STEP_SIZE_MODE_KEY = "sourcePowerStepSizeMode";
+  
+  public enum SourcePowerStepSizeMode
+  {
+    Automatic,
+    Manual;
+  }
+  
+  private final SourcePowerStepSizeMode sourcePowerStepSizeMode;
+  
+  public final SourcePowerStepSizeMode getSourcePowerStepSizeMode ()
+  {
+    return this.sourcePowerStepSizeMode;
+  }
+  
+  public final HP70000_GPIB_Settings withSourcePowerStepSizeMode (final SourcePowerStepSizeMode sourcePowerStepSizeMode)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_POWER_STEP_SIZE_MODE_KEY, sourcePowerStepSizeMode); }});
+  }
+  
+  private final static String SOURCE_POWER_STEP_SIZE_KEY = "sourcePowerStepSize";
+  
+  private final double sourcePowerStepSize_dB;
+  
+  public final double getSourcePowerStepSize_dB ()
+  {
+    return this.sourcePowerStepSize_dB;
+  }
+  
+  public final HP70000_GPIB_Settings withSourcePowerStepSize_dB (final double sourcePowerStepSize_dB)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_POWER_STEP_SIZE_KEY, sourcePowerStepSize_dB); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: POWER SWEEP
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_POWER_SWEEP_ACTIVE_KEY = "sourcePowerSweepActive";
+  
+  private final boolean sourcePowerSweepActive;
+  
+  public final boolean isSourcePowerSweepActive ()
+  {
+    return this.sourcePowerSweepActive;
+  }
+  
+  public final HP70000_GPIB_Settings withSourcePowerSweepActive (final boolean sourcePowerSweepActive)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_POWER_SWEEP_ACTIVE_KEY, sourcePowerSweepActive); }});
+  }
+  
+  private final static String SOURCE_POWER_SWEEP_RANGE_KEY = "sourcePowerSweepRange";
+  
+  private final double sourcePowerSweepRange_dB;
+  
+  public final double getSourcePowerSweepRange_dB ()
+  {
+    return this.sourcePowerSweepRange_dB;
+  }
+  
+  public final HP70000_GPIB_Settings withSourcePowerSweepRange_dB (final double sourcePowerSweepRange_dB)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_POWER_SWEEP_RANGE_KEY, sourcePowerSweepRange_dB); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: TRACKING
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_TRACKING_KEY = "sourceTracking";
+  
+  private final double sourceTracking_Hz;
+  
+  public final double getSourceTracking_Hz ()
+  {
+    return this.sourceTracking_Hz;
+  }
+  
+  public final HP70000_GPIB_Settings withSourceTracking_Hz (final double sourceTracking_Hz)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_TRACKING_KEY, sourceTracking_Hz); }});
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SOURCE: TRACKING PEAK
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  private final static String SOURCE_PEAK_TRACKING_AUTO_KEY = "sourcePeakTrackingAuto";
+  
+  private final boolean sourcePeakTrackingAuto;
+  
+  public final boolean isSourcePeakTrackingAuto ()
+  {
+    return this.sourcePeakTrackingAuto;
+  }
+  
+  public final HP70000_GPIB_Settings withSourcePeakTrackingAuto (final boolean sourcePeakTrackingAuto)
+  {
+    return with (new HashMap<String, Object> () {{ put (SOURCE_PEAK_TRACKING_AUTO_KEY, sourcePeakTrackingAuto); }});
   }
   
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
